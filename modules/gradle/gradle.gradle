@@ -3,7 +3,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 dependencies{
     compile gradleApi()
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernal", project.internalVersion);
+    compile d.depends(":kernel", project.internalVersion);
     //compile d.depends(":ssh", project.internalVersion);
     //compile d.depends(":xml", project.internalVersion);
     compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
