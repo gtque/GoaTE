@@ -29,19 +29,41 @@ package com.thegoate.dsl;
 
 import com.thegoate.Goate;
 
-/**
- * Created by gtque on 4/19/2017.
- */
-public class DSL {
-    Goate data;
+import java.util.ArrayList;
+import java.util.List;
 
-    public DSL(Goate data){
-        this.data = data;
-        if(this.data==null){
-            this.data = new Goate();
+/**
+ * Created by gtque on 4/20/2017.
+ */
+public abstract class DSL {
+
+    List<String> definition;
+    Object value;
+
+    public DSL(Object value){
+        define(value);
+    }
+
+    public String type(){
+        String type = "undefined";
+
+        if(definition!=null){
+            if(definition.size()>0){
+                type = definition.get(0);
+            }
         }
+        return type;
     }
-    public Object translate(String dsl, Object value){
-        return value;
+
+    public List<String> define(Object value){
+        this.value = value;
+        definition = new ArrayList<>();
+        String[] def = (""+value).split("::");
+        for(String d:def){
+            definition.add(d);
+        }
+        return definition;
     }
+
+    public abstract Object evaluate(Goate data);
 }

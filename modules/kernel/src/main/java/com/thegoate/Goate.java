@@ -27,21 +27,58 @@
 
 package com.thegoate;
 
-import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.Interpreter;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * The manager for the collection of test data.
  * Created by gtque on 4/19/2017.
  */
 public class Goate {
     Map<String, Object> data = new ConcurrentHashMap<>();
-    DSL dictionary;
+    Interpreter dictionary;
 
-    public Goate(){
-        dictionary = new DSL(this);
+    public Goate() {
+        dictionary = new Interpreter(this);
     }
+
+    public int size(){
+        int size = 0;
+        if(data!=null){
+            size = data.size();
+        }
+        return size;
+    }
+
+    public Set<String> keys() {
+        return data.keySet();
+    }
+
+    public Goate put(String key, Object value) {
+        if (data == null) {
+            data = new ConcurrentHashMap<>();
+        }
+        if(value!=null) {
+            if(key.contains("##")){
+                key = buildKey(key);
+            }
+            data.put(key, value);
+        }
+        return this;
+    }
+
+    public String buildKey(String key){
+        String fullKey = key;
+        while(fullKey.contains("##")) {
+            Goate billy = filter(key.substring(0, key.indexOf("##")));
+            fullKey = key.replace("##", ""+billy.size());
+        }
+        return fullKey;
+    }
+
     public Object getStrict(String key) {
         return get(key, null, false);
     }
@@ -61,13 +98,13 @@ public class Goate {
             if (value == null) {
                 if (data.containsKey(key)) {
                     value = data.get(key);
-                }else if(def!=null){
+                } else if (def != null) {
                     data.put(key, def);
                     value = def;
                 }
             }
         }
-        if (value == null) {
+        if (value == null && !data.containsKey(key)) {
             value = def;
         }
         if (value != null && dsl) {
@@ -76,16 +113,33 @@ public class Goate {
         return value;
     }
 
-    public Object processDSL(Object value){
+    public Object processDSL(Object value) {
         String check = "" + value;
-        if(check.contains("::")){
-            check = check.substring(0,check.indexOf("::"));
-        }else{
+        if (check.contains("::")) {
+            check = check.substring(0, check.indexOf("::"));
+        } else {
             check = null;
         }
-        if(check!=null){
+        if (check != null) {
             value = dictionary.translate(check, value);
         }
         return value;
+    }
+
+    /**
+     * Simple filter, matches if key starts with the given pattern.
+     * @param pattern The pattern to match
+     * @return A Goate collection containing matching elements.
+     */
+    public Goate filter(String pattern){
+        Goate filtered = new Goate();
+        if(data!=null){
+            for(String key:keys()){
+                if(key.startsWith(pattern)){
+                    filtered.put(key, getStrict(key));
+                }
+            }
+        }
+        return filtered;
     }
 }
