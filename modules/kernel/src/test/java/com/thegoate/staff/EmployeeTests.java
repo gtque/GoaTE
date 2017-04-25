@@ -25,20 +25,29 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.annotations;
+package com.thegoate.staff;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.Goate;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
- * Checks to see if the class is annotated and if those annotations have a processor defined.
- * Created by gtque on 4/21/2017.
+ * Created by gtque on 4/25/2017.
  */
-public class AnnotationEvaluator {
+public class EmployeeTests {
 
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    @Test(groups = {"unit"})
+    public void simpleEmployeeSize(){
+        Goate data = new Goate().put("val##", 1).put("val##", 2).put("val##", 3);
+        int r = Integer.parseInt("" + Employee.recruit("t_size", data).work());
+        assertEquals(r, 3);
+    }
 
-    public void process(Object instance, Class theClass){
-
+    @Test(groups = {"unit"})
+    public void simpleEmployeeLength(){
+        Goate data = new Goate().put("val##", 1).put("val##", 2).put("val##", 3);
+        int r = Integer.parseInt("" + Employee.recruit("t_length", data).work());
+        assertEquals(r, 3);
     }
 }

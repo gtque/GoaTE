@@ -25,20 +25,27 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.annotations;
+package com.thegoate.staff;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Checks to see if the class is annotated and if those annotations have a processor defined.
+ * Use to define a task a particular method does.<br/>
+ * This adds an additional way to define behavior.<br/>
+ * In order to pass parameters into the method, they must be declared in order in the task
+ * definition using ${} around the reference name for the parameter. The reference name is how the value
+ * for the parameter should be referenced in the data loaded from the provider.
+ * example:
+ * {@literal @}GoateTask(task = "Add ${x} and ${y}")
+ * public int add(int first, int second){return first+second;}<br/>
+ *
  * Created by gtque on 4/21/2017.
  */
-public class AnnotationEvaluator {
-
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
-
-    public void process(Object instance, Class theClass){
-
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface GoateTask {
+    String task();
 }

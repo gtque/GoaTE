@@ -92,6 +92,10 @@ public class Goate {
     }
 
     public Object get(String key, Object def, boolean dsl) {
+        return get(key, def, dsl, Object.class);
+    }
+
+    public <T>T get(String key, Object def, boolean dsl, Class<T> type){
         Object value = System.getProperty(key);
         if (value == null) {
             value = System.getenv(key);
@@ -110,7 +114,7 @@ public class Goate {
         if (value != null && dsl) {
             value = processDSL(value);
         }
-        return value;
+        return type.cast(value);
     }
 
     public Object processDSL(Object value) {

@@ -25,20 +25,18 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.annotations;
+package com.thegoate.staff;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Checks to see if the class is annotated and if those annotations have a processor defined.
+ * Use to annotate a class has having methods annotated with {@literal @}GoateTask.<br/>
  * Created by gtque on 4/21/2017.
  */
-public class AnnotationEvaluator {
-
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
-
-    public void process(Object instance, Class theClass){
-
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface GoateTaskContainer {
 }

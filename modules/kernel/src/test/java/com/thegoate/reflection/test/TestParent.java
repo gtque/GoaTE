@@ -25,20 +25,14 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.annotations;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package com.thegoate.reflection.test;
 
 /**
- * Checks to see if the class is annotated and if those annotations have a processor defined.
- * Created by gtque on 4/21/2017.
+ * Created by gtque on 4/25/2017.
  */
-public class AnnotationEvaluator {
-
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
-
-    public void process(Object instance, Class theClass){
-
-    }
+public abstract class TestParent {
+    public void methodP1(){}
+    private boolean methodP2(){return false;}
+    protected int methodP3(){return 42;}
+    public abstract void methodP4();
 }

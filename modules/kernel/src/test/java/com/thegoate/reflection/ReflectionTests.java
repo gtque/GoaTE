@@ -25,55 +25,31 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl;
+package com.thegoate.reflection;
 
-import com.thegoate.Goate;
+import com.thegoate.reflection.test.TestChild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.Test;
 
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.List;
 
+import static org.testng.Assert.assertEquals;
+
 /**
- * The base definition for a new word in the DSL.<br/>
- * Words should extend DSL and be annotated with the {@literal @}GoateDSL annotation
- * Created by gtque on 4/20/2017.
+ * Simple tests to validate reflection wrappers and helpers.
+ * Created by gtque on 4/25/2017.
  */
-public abstract class DSL {
+public class ReflectionTests {
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
-    protected List<String> definition;
-    protected Object value;
 
-    public DSL(Object value){
-        define(value);
-    }
-
-    public String type(){
-        String type = "undefined";
-
-        if(definition!=null){
-            if(definition.size()>0){
-                type = definition.get(0);
-            }
+    @Test(groups = {"unit"})
+    public void getAllMethods(){
+        List<Method> methods = new GoateReflection().getAllMethods(TestChild.class, null);
+        for(Method m:methods) {
+            LOG.debug(m.getName());
         }
-        return type;
+        assertEquals(methods.size(), 19);
     }
-
-    protected Object get(int index, Goate data){
-        Object o = data.get(definition.get(index), null);
-        return o==null?definition.get(index):o;
-    }
-
-
-    public List<String> define(Object value){
-        this.value = value;
-        definition = new ArrayList<>();
-        String[] def = (""+value).split("::");
-        for(String d:def){
-            definition.add(d);
-        }
-        return definition;
-    }
-
-    public abstract Object evaluate(Goate data);
 }

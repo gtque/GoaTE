@@ -25,20 +25,25 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.annotations;
+package com.thegoate.staff.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.GoateJob;
 
 /**
- * Checks to see if the class is annotated and if those annotations have a processor defined.
- * Created by gtque on 4/21/2017.
+ * Simple employee that simply returns the length of the data.
+ * Created by gtque on 4/25/2017.
  */
-public class AnnotationEvaluator {
+@GoateJob(jobs = {"t_size","t_length"})
+public class Employee1 extends Employee {
 
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    @Override
+    public Employee init() {
+        return null;
+    }
 
-    public void process(Object instance, Class theClass){
-
+    @Override
+    public Object doWork() {
+        return data!=null?data.size():-1;//-1 means the data was null.
     }
 }

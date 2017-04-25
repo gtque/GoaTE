@@ -25,55 +25,40 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl;
+package com.thegoate.reflection;
 
-import com.thegoate.Goate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The base definition for a new word in the DSL.<br/>
- * Words should extend DSL and be annotated with the {@literal @}GoateDSL annotation
- * Created by gtque on 4/20/2017.
+ * Some simple custom methods for reflection.
+ * Created by gtque on 4/24/2017.
  */
-public abstract class DSL {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
-    protected List<String> definition;
-    protected Object value;
+public class GoateReflection {
 
-    public DSL(Object value){
-        define(value);
-    }
-
-    public String type(){
-        String type = "undefined";
-
-        if(definition!=null){
-            if(definition.size()>0){
-                type = definition.get(0);
+    public List<Method> getDeclaredMethods(Class klass){
+        List<Method> methods = new ArrayList<>();
+        for(Method m : klass.getDeclaredMethods()){
+            if(!m.getName().startsWith("$jacoco")) {
+                methods.add(m);
             }
         }
-        return type;
+        return methods;
     }
 
-    protected Object get(int index, Goate data){
-        Object o = data.get(definition.get(index), null);
-        return o==null?definition.get(index):o;
-    }
-
-
-    public List<String> define(Object value){
-        this.value = value;
-        definition = new ArrayList<>();
-        String[] def = (""+value).split("::");
-        for(String d:def){
-            definition.add(d);
+    public List<Method> getAllMethods(Class klass, List<Method> methods){
+        if(methods == null){
+            methods = new ArrayList<>();
         }
-        return definition;
+        for(Method m:klass.getDeclaredMethods()){
+            if(!m.getName().startsWith("$jacoco")) {
+                methods.add(m);
+            }
+        }
+        if(klass.getSuperclass() != null){
+            methods = getAllMethods(klass.getSuperclass(), methods);
+        }
+        return methods;
     }
-
-    public abstract Object evaluate(Goate data);
 }

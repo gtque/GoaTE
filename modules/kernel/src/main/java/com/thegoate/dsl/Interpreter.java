@@ -28,13 +28,12 @@
 package com.thegoate.dsl;
 
 import com.thegoate.Goate;
-import org.atteo.classindex.ClassIndex;
+import com.thegoate.annotations.AnnotationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Builds the dictionary and translates the words.
@@ -44,27 +43,26 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Interpreter {
     Logger LOG = LoggerFactory.getLogger(getClass());
     Goate data;
-    static Map<String, Class> dictionary = null;
+    Map<String, Class> dictionary = null;
 
     public Interpreter(Goate data) {
         this.data = data;
         if (this.data == null) {
             this.data = new Goate();
         }
-        if (dictionary == null) {
-            initDictionary();
-        }
+        initDictionary();
     }
 
     /**
      * Translates the value based on the given dsl word.
-     * @param dsl The dsl word to be translated, if not found the value is simply returned unprocessed.
+     *
+     * @param dsl   The dsl word to be translated, if not found the value is simply returned unprocessed.
      * @param value The value, aka parameters, to be translated.
      * @return The translated value.
      */
     public Object translate(String dsl, Object value) {
         DSL word = build(dsl, value);
-        if(word!=null){
+        if (word != null) {
             value = word.evaluate(data);
         }
         return value;
@@ -72,15 +70,16 @@ public class Interpreter {
 
     /**
      * Builds the instance of the dsl to be used for translating.
-     * @param word The word to be translated
+     *
+     * @param word  The word to be translated
      * @param value The information to be translated.
      * @return DSL The instance of the word that can be used for translating.
      */
-    protected DSL build(String word, Object value){
+    protected DSL build(String word, Object value) {
         DSL dsl = null;
-        if(dictionary!=null){
-            if(dictionary.containsKey(word)){
-                try{
+        if (dictionary != null) {
+            if (dictionary.containsKey(word)) {
+                try {
                     dsl = (DSL) dictionary.get(word).getConstructor(Object.class).newInstance(value);
                 } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
                     LOG.error("Problem translating: " + e.getMessage(), e);
@@ -97,26 +96,13 @@ public class Interpreter {
      * which may produce unexpected results if more than one uses the same word.
      */
     protected void initDictionary() {
-        if (dictionary == null) {
-            dictionary = new ConcurrentHashMap<>();
-            for (Class<?> word : ClassIndex.getAnnotated(GoateDSL.class)) {
-                try {
-                    LOG.debug("indexing word: " + word.getCanonicalName());
-                    Class klass = Class.forName(word.getCanonicalName());
-                    GoateDSL dsl = (GoateDSL) klass.getAnnotation(GoateDSL.class);
-                    if (dsl != null) {
-                        if (dsl.isDefault()) {
-                            dictionary.put("default", klass);
-                        }
-                        if (dictionary.containsKey(dsl.word())) {
-                            LOG.warn("The word: " + dsl.word() + " already exists, the previous definition will be replaced with: " + klass.getName());
-                        }
-                        dictionary.put(dsl.word(), klass);
-                    }
-                } catch (ClassNotFoundException e) {
-                    LOG.error("There was a problem getting the word: " + e.getMessage(), e);
-                }
+        try {
+            if (dictionary == null) {
+                new AnnotationFactory().using(GoateDSL.class.getMethod("word")).doDefault().annotatedWith(GoateDSL.class).buildDirectory();
             }
+            dictionary = AnnotationFactory.directory.get(GoateDSL.class.getCanonicalName());
+        } catch (Throwable e) {
+            LOG.error("Problem initializing dsl: " + e.getMessage(), e);
         }
     }
 }

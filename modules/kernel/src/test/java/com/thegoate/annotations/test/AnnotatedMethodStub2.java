@@ -25,20 +25,24 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.annotations;
+package com.thegoate.annotations.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.staff.GoateTask;
+import com.thegoate.staff.GoateTaskContainer;
 
 /**
- * Checks to see if the class is annotated and if those annotations have a processor defined.
- * Created by gtque on 4/21/2017.
+ * Created by gtque on 4/24/2017.
  */
-public class AnnotationEvaluator {
+@GoateTaskContainer
+public class AnnotatedMethodStub2 {
 
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    @GoateTask(task = "say goodbye")
+    public String goodbye(){
+        return "goodbye";
+    }
 
-    public void process(Object instance, Class theClass){
-
+    @GoateTask(task = "add ${x} + ${y}")
+    public int add(int first, int second){
+        return first + second;
     }
 }

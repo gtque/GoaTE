@@ -25,55 +25,32 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl;
+package com.thegoate.annotations.test;
 
 import com.thegoate.Goate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.thegoate.staff.GoateTask;
+import com.thegoate.staff.GoateTaskContainer;
 
 /**
- * The base definition for a new word in the DSL.<br/>
- * Words should extend DSL and be annotated with the {@literal @}GoateDSL annotation
- * Created by gtque on 4/20/2017.
+ * Created by gtque on 4/24/2017.
  */
-public abstract class DSL {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
-    protected List<String> definition;
-    protected Object value;
+@GoateTaskContainer
+public class AnnotatedMethodStub {
 
-    public DSL(Object value){
-        define(value);
+    @GoateTask(task = "say hello")
+    public String hello(){
+        return "hello";
     }
 
-    public String type(){
-        String type = "undefined";
+    @GoateTask(task = "say ${word} and print ${data}")
+    public String say(String word, Goate data){
+        return word + "\n" + data.toString();
+    }
 
-        if(definition!=null){
-            if(definition.size()>0){
-                type = definition.get(0);
-            }
+    @GoateTask(task = "void ${truth}")
+    public void checkBoolean(boolean pass) throws Exception{
+        if(!pass){
+            throw new Exception("FAIL");
         }
-        return type;
     }
-
-    protected Object get(int index, Goate data){
-        Object o = data.get(definition.get(index), null);
-        return o==null?definition.get(index):o;
-    }
-
-
-    public List<String> define(Object value){
-        this.value = value;
-        definition = new ArrayList<>();
-        String[] def = (""+value).split("::");
-        for(String d:def){
-            definition.add(d);
-        }
-        return definition;
-    }
-
-    public abstract Object evaluate(Goate data);
 }

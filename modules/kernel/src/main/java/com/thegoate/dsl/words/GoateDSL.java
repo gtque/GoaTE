@@ -25,20 +25,23 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.annotations;
+package com.thegoate.dsl.words;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.Goate;
+import com.thegoate.dsl.DSL;
 
 /**
- * Checks to see if the class is annotated and if those annotations have a processor defined.
+ * Returns the current System nano time.
  * Created by gtque on 4/21/2017.
  */
-public class AnnotationEvaluator {
+@com.thegoate.dsl.GoateDSL(word = "goate")
+public class GoateDSL extends DSL {
+    public GoateDSL(Object value) {
+        super(value);
+    }
 
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
-
-    public void process(Object instance, Class theClass){
-
+    @Override
+    public Object evaluate(Goate data) {
+        return data;
     }
 }
