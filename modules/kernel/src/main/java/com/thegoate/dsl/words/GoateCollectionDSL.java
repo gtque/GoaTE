@@ -25,18 +25,24 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl;
+package com.thegoate.dsl.words;
 
-import org.atteo.classindex.IndexAnnotated;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.thegoate.Goate;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
 
 /**
+ * Returns the current Goate Collection.
  * Created by gtque on 4/21/2017.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@IndexAnnotated
-public @interface GoateDSL {
-    String word();
+@GoateDSL(word = "goate")
+public class GoateCollectionDSL extends DSL {
+    public GoateCollectionDSL(Object value) {
+        super(value);
+    }
+
+    @Override
+    public Object evaluate(Goate data) {
+        return data;
+    }
 }

@@ -25,18 +25,19 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl;
+package com.thegoate.utils.get;
 
-import org.atteo.classindex.IndexAnnotated;
+import org.testng.annotations.Test;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static org.testng.Assert.assertEquals;
 
 /**
- * Created by gtque on 4/21/2017.
+ * Created by Eric Angeli on 5/5/2017.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@IndexAnnotated
-public @interface GoateDSL {
-    String word();
+public class GetTest {
+    @Test(groups = {"unit"})
+    public void getFile(){
+        String result = ""+new Get("file::").from("hello.txt");
+        assertEquals(result, "world!");
+    }
 }

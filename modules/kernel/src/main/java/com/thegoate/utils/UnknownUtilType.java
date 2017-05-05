@@ -28,29 +28,63 @@
 package com.thegoate.utils;
 
 import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.reflection.GoateReflection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
  * Base Class for utils. Determines the type of util to use.
  * The util(s) should have a method called isType that checks to see if the input
- * is of the type that service can process.
+ * is of the type that service can process. All generic utility classes should extend this class
+ * and call buildUtil in the constructor.
  * Created by gtque on 5/4/2017.
  */
 public class UnknownUtilType {
     final Logger LOG = LoggerFactory.getLogger(getClass());
 
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util){
+        Object utility = null;
+        Class def = null;
+        Object[] args = {obj};
         AnnotationFactory af = new AnnotationFactory();
-        af.annotatedWith(util).buildDirectory();
-        Map<String, Class> utils = AnnotationFactory.directory.get(util.getCanonicalName());
+        af.constructorArgs(args);
+        Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName());
         if(utils!=null) {
             for (String key : utils.keySet()){
-                Class c = utils.get(key);
+                try {
+                    Class c = utils.get(key);
+                    Annotation d = c.getAnnotation(IsDefault.class);
+                    if(d!=null){
+                        def = c;
+                    }else {
+                        Class[] types = {Object.class};
+                        Method check = c.getMethod("isType", types);
+                        Object u = af.build(c);
+                        if (check != null && Boolean.parseBoolean(""+check.invoke(u, args))) {
+                            utility = u;
+                        }
+                    }
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |InstantiationException e) {
+                    LOG.warn("The class did not have isType, cannot determine if that class is the correct type. " + e.getMessage());
+                }
             }
         }
-        return null;
+        if(utility==null){
+            if(def!=null){
+                try{
+                    utility = af.build(def);
+                } catch (IllegalAccessException | InvocationTargetException |InstantiationException e){
+                    LOG.warn("Problem instantiating the default utility: " + e.getMessage(), e);
+                }
+            }
+        }
+        return utility;
     }
 }

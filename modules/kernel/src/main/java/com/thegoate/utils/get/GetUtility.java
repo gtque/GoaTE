@@ -25,23 +25,13 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl.words;
-
-import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
+package com.thegoate.utils.get;
 
 /**
- * Returns the current System nano time.
- * Created by gtque on 4/21/2017.
+ * Defines the interface for a get utility.
+ * Created by Eric Angeli on 5/5/2017.
  */
-@com.thegoate.dsl.GoateDSL(word = "goate")
-public class GoateDSL extends DSL {
-    public GoateDSL(Object value) {
-        super(value);
-    }
-
-    @Override
-    public Object evaluate(Goate data) {
-        return data;
-    }
+public interface GetUtility {
+    boolean isType(Object check);
+    Object from(Object container);
 }

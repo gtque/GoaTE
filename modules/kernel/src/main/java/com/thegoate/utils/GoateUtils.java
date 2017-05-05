@@ -40,6 +40,7 @@ import java.net.URL;
 import java.util.*;
 
 /**
+ * Some basic utily helpers.
  * Created by gtque on 5/3/2017.
  */
 public class GoateUtils {
@@ -69,10 +70,10 @@ public class GoateUtils {
     }
 
     public static String getFilePath(String fileName,boolean leaveInJar, boolean force) {
-        if (fileName.indexOf("/") == 0)
-            fileName = fileName.substring(1);
+        if (fileName.indexOf("/") != 0&&fileName.indexOf("\\")!=0)
+            fileName = "/"+fileName;
 
-        String path = System.getProperty("user.dir") + "/" + fileName;
+        String path = System.getProperty("user.dir") + fileName;
         LOG.debug("checking path: " + path);
         try {
             File temp = new File(path);
@@ -91,7 +92,6 @@ public class GoateUtils {
                     }else{
                         path = path.replace("jar:","");
                     }
-                    //path = "temp" + path.substring(path.lastIndexOf("/"));
                 }
                 path = path.replace("file:/", "");
                 path = path.replace("file:", "");

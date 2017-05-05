@@ -63,6 +63,7 @@ public class AnnotationFactory {
         id = null;
         methodId = null;
         constructorArgs = new Object[0];
+        constructor = null;
         check = null;
         annotation = null;
         methodAnnotation = null;
@@ -100,8 +101,18 @@ public class AnnotationFactory {
         return this;
     }
 
+    public Map<String, Class> getDirectory(String dir) {
+        buildDirectory();
+        return directory.get(dir);
+    }
+
     public AnnotationFactory methodAnnotatedWith(Class<? extends java.lang.annotation.Annotation> annotation) {
         this.methodAnnotation = annotation;
+        return this;
+    }
+
+    public AnnotationFactory constructorArgs(Object[] args) {
+        this.constructorArgs = args;
         return this;
     }
 
@@ -151,17 +162,13 @@ public class AnnotationFactory {
                         listing.put(temp.getCanonicalName(), klass.forName(theClass));//default to using the full class name.
                     }
                     if (setDefault) {
-                        Method def = temp.getAnnotation(annotation).getClass().getMethod("isDefault");
+                        Annotation def = temp.getAnnotation(IsDefault.class);
                         if (def != null) {
-                            if (Boolean.parseBoolean("" + def.invoke(temp.getAnnotation(annotation)))) {
-                                listing.put("default", temp);
-                            }
+                            listing.put("default", temp);
                         }
                     }
                 } catch (ClassNotFoundException | NullPointerException | IllegalAccessException | InvocationTargetException e) {
                     LOG.error("could not get the class: " + theClass + "; " + e.getMessage(), e);
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
                 }
             }
         }

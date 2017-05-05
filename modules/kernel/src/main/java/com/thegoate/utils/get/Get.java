@@ -25,18 +25,33 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl;
+package com.thegoate.utils.get;
 
-import org.atteo.classindex.IndexAnnotated;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.thegoate.utils.UnknownUtilType;
 
 /**
- * Created by gtque on 4/21/2017.
+ * The generic get class.
+ * This will attempt to look up the specific get utility for the type detected.
+ * Created by Eric Angeli on 5/5/2017.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@IndexAnnotated
-public @interface GoateDSL {
-    String word();
+public class Get extends UnknownUtilType implements GetUtility{
+    GetUtility tool = null;
+
+    public Get(Object o){
+        tool = (GetUtility)buildUtil(o, GetUtil.class);
+    }
+
+    @Override
+    public boolean isType(Object check) {
+        return false;
+    }
+
+    @Override
+    public Object from(Object container) {
+        Object result = null;
+        if(tool!=null){
+            result = tool.from(container);
+        }
+        return result;
+    }
 }

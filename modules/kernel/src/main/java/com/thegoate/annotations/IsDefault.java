@@ -25,7 +25,7 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl;
+package com.thegoate.annotations;
 
 import org.atteo.classindex.IndexAnnotated;
 
@@ -33,10 +33,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * Use this to mark something as default.
  * Created by gtque on 4/21/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @IndexAnnotated
-public @interface GoateDSL {
-    String word();
+public @interface IsDefault {
 }

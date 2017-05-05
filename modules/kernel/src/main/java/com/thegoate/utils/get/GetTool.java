@@ -24,19 +24,22 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.utils.get;
 
-package com.thegoate.dsl;
-
-import org.atteo.classindex.IndexAnnotated;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Created by gtque on 4/21/2017.
+ * Base class for Get Utilities. Adds logger, and class level variables.
+ * It is recommend that Get utilities extend this class, but they really only
+ * need to implement the GetUtility interface.
+ * Created by Eric Angeli on 5/5/2017.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@IndexAnnotated
-public @interface GoateDSL {
-    String word();
+public abstract class GetTool implements GetUtility{
+    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected Object selector = null;
+    protected Object container = null;
+    public GetTool(Object selector){
+        this.selector = selector;
+    }
 }
