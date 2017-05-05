@@ -28,10 +28,13 @@
 package com.thegoate.reflection;
 
 import com.thegoate.reflection.test.TestChild;
+import com.thegoate.reflection.test.TestConstructors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -51,5 +54,73 @@ public class ReflectionTests {
             LOG.debug(m.getName());
         }
         assertEquals(methods.size(), 19);
+    }
+
+    @Test(groups = {"unit"})
+    public void constructorStringString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] args = {"Hello", "world!"};
+        Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
+        TestConstructors tc = (TestConstructors)c.newInstance(args);
+        assertEquals(tc.v1, "Hello");
+        assertEquals(tc.v2, "world!");
+        assertEquals(tc.v3, 0);
+    }
+
+    @Test(groups = {"unit"})
+    public void constructorStringInt() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] args = {"Hello", 42};
+        Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
+        TestConstructors tc = (TestConstructors)c.newInstance(args);
+        assertEquals(tc.v1, "Hello");
+        assertEquals(tc.v2, "");
+        assertEquals(tc.v3, 42);
+    }
+
+    @Test(groups = {"unit"})
+    public void constructorByte() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] args = {(byte)2};
+        Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
+        TestConstructors tc = (TestConstructors)c.newInstance(args);
+        assertEquals(tc.b, (byte)2);
+    }
+
+    @Test(groups = {"unit"})
+    public void constructorLong() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] args = {2L};
+        Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
+        TestConstructors tc = (TestConstructors)c.newInstance(args);
+        assertEquals(tc.l, 2L);
+    }
+
+    @Test(groups = {"unit"})
+    public void constructorDouble() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] args = {2d};
+        Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
+        TestConstructors tc = (TestConstructors)c.newInstance(args);
+        assertEquals(tc.d, 2d);
+    }
+
+    @Test(groups = {"unit"})
+    public void constructorFloat() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] args = {2f};
+        Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
+        TestConstructors tc = (TestConstructors)c.newInstance(args);
+        assertEquals(tc.f, 2f);
+    }
+
+    @Test(groups = {"unit"})
+    public void constructorBoolean() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] args = {true};
+        Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
+        TestConstructors tc = (TestConstructors)c.newInstance(args);
+        assertEquals(tc.t, true);
+    }
+
+    @Test(groups = {"unit"})
+    public void constructorChar() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] args = {'z'};
+        Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
+        TestConstructors tc = (TestConstructors)c.newInstance(args);
+        assertEquals(tc.c, 'z');
     }
 }

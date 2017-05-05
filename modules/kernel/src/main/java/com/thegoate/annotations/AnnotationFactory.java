@@ -59,7 +59,7 @@ public class AnnotationFactory {
     Class<? extends java.lang.annotation.Annotation> methodAnnotation;
     boolean setDefault = false;
 
-    public AnnotationFactory clear(){
+    public AnnotationFactory clear() {
         id = null;
         methodId = null;
         constructorArgs = new Object[0];
@@ -70,7 +70,7 @@ public class AnnotationFactory {
         return this;
     }
 
-    public AnnotationFactory doDefault(){
+    public AnnotationFactory doDefault() {
         setDefault = true;
         return this;
     }
@@ -105,7 +105,7 @@ public class AnnotationFactory {
         return this;
     }
 
-    public Class lookUp(){
+    public Class lookUp() {
         buildDirectory();
         Class c = null;
         buildDirectory();
@@ -121,7 +121,7 @@ public class AnnotationFactory {
 
     public Object build() throws IllegalAccessException, InstantiationException, InvocationTargetException {
         buildDirectory();
-        Class c = methodId==null?lookUp():lookUpByAnnotatedMethod();
+        Class c = methodId == null ? lookUp() : lookUpByAnnotatedMethod();
         return build(c);
     }
 
@@ -138,22 +138,22 @@ public class AnnotationFactory {
                     Class temp = Class.forName(theClass);
                     Annotation service = temp.getAnnotation(annotation);
                     String aid = theClass;
-                    if(check!=null){
+                    if (check != null) {
                         Object theCheck = check.invoke(service);
-                        if(theCheck!=null&&theCheck.getClass().isArray()){
-                            for(Object aido:(Object[])theCheck){
-                                listing.put(""+aido, klass.forName(theClass));
+                        if (theCheck != null && theCheck.getClass().isArray()) {
+                            for (Object aido : (Object[]) theCheck) {
+                                listing.put("" + aido, klass.forName(theClass));
                             }
-                        }else {
-                            listing.put(""+theCheck, klass.forName(theClass));
+                        } else {
+                            listing.put("" + theCheck, klass.forName(theClass));
                         }
-                    }else{
+                    } else {
                         listing.put(temp.getCanonicalName(), klass.forName(theClass));//default to using the full class name.
                     }
-                    if(setDefault){
+                    if (setDefault) {
                         Method def = temp.getAnnotation(annotation).getClass().getMethod("isDefault");
-                        if (def!=null){
-                            if(Boolean.parseBoolean(""+def.invoke(temp.getAnnotation(annotation)))) {
+                        if (def != null) {
+                            if (Boolean.parseBoolean("" + def.invoke(temp.getAnnotation(annotation)))) {
                                 listing.put("default", temp);
                             }
                         }
@@ -171,8 +171,13 @@ public class AnnotationFactory {
     public Object build(Class klass) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Object o = null;
         if (klass != null) {
-            if (constructor != null) {
-                o = constructor.newInstance(constructorArgs);
+            if (constructorArgs != null) {
+                if (constructor == null) {
+                    constructor = new GoateReflection().findConstructor(klass.getConstructors(), constructorArgs);
+                }
+                if (constructor != null) {
+                    o = constructor.newInstance(constructorArgs);
+                }
             } else {
                 o = klass.newInstance();
             }
@@ -180,18 +185,18 @@ public class AnnotationFactory {
         return o;
     }
 
-    public Class lookUpByAnnotatedMethod(){
+    public Class lookUpByAnnotatedMethod() {
         buildDirectory();
         Class klass = null;
         Map<String, Class> listings = directory.get(annotation.getCanonicalName());
-        for(String theClass:listings.keySet()) {
+        for (String theClass : listings.keySet()) {
             List<Method> methods = new GoateReflection().getDeclaredMethods(listings.get(theClass));
             for (Method m : methods) {
-                if(m.isAnnotationPresent(methodAnnotation)){
-                    for(Method am:methodAnnotation.getDeclaredMethods()){
+                if (m.isAnnotationPresent(methodAnnotation)) {
+                    for (Method am : methodAnnotation.getDeclaredMethods()) {
                         Annotation dam = m.getAnnotation(methodAnnotation);
-                        try{
-                            if(methodId.equals(am.invoke(dam))){
+                        try {
+                            if (methodId.equals(am.invoke(dam))) {
                                 klass = listings.get(theClass);
                                 break;
                             }
@@ -201,7 +206,7 @@ public class AnnotationFactory {
                             e.printStackTrace();
                         }
                     }
-                    if(klass!=null){
+                    if (klass != null) {
                         break;
                     }
                 }
@@ -210,18 +215,18 @@ public class AnnotationFactory {
         return klass;
     }
 
-    public Method getMethod(){
+    public Method getMethod() {
         buildDirectory();
         Map<String, Class> listings = directory.get(annotation.getCanonicalName());
         Method method = null;
-        for(String theClass:listings.keySet()) {
+        for (String theClass : listings.keySet()) {
             List<Method> methods = new GoateReflection().getDeclaredMethods(listings.get(theClass));
             for (Method m : methods) {
-                if(m.isAnnotationPresent(methodAnnotation)){
-                    for(Method am:methodAnnotation.getDeclaredMethods()){
+                if (m.isAnnotationPresent(methodAnnotation)) {
+                    for (Method am : methodAnnotation.getDeclaredMethods()) {
                         Annotation dam = m.getAnnotation(methodAnnotation);
-                        try{
-                            if(methodId.equals(am.invoke(dam))){
+                        try {
+                            if (methodId.equals(am.invoke(dam))) {
                                 method = m;
                                 break;
                             }
@@ -231,7 +236,7 @@ public class AnnotationFactory {
                             e.printStackTrace();
                         }
                     }
-                    if(method!=null){
+                    if (method != null) {
                         break;
                     }
                 }

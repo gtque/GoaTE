@@ -27,6 +27,7 @@
 
 package com.thegoate.reflection;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,66 @@ import java.util.List;
  * Created by gtque on 4/24/2017.
  */
 public class GoateReflection {
+
+    public Constructor findConstructor(Constructor<?>[] constructors, Object[] args) {
+        Constructor p = null;
+        for (Constructor constructor : constructors) {
+            Class<?>[] ptypes = constructor.getParameterTypes();
+            boolean found = false;
+            if (ptypes.length == args.length) {
+                found = true;
+                for (int i = 0; i < args.length; i++) {
+                    if(isPrimitive(args[i].getClass())){
+                        if(ptypes[i].equals(Integer.TYPE)){
+                            if(!(args[i] instanceof Integer)){
+                                found = false;
+                            }
+                        } else if(ptypes[i].equals(Byte.TYPE)){
+                            if(!(args[i] instanceof Byte)){
+                                found = false;
+                            }
+                        } else if(ptypes[i].equals(Double.TYPE)){
+                            if(!(args[i] instanceof Double)){
+                                found = false;
+                            }
+                        } else if(ptypes[i].equals(Float.TYPE)){
+                            if(!(args[i] instanceof Float)){
+                                found = false;
+                            }
+                        } else if(ptypes[i].equals(Long.TYPE)){
+                            if(!(args[i] instanceof Long)){
+                                found = false;
+                            }
+                        } else if(ptypes[i].equals(Boolean.TYPE)){
+                            if(!(args[i] instanceof Boolean)){
+                                found = false;
+                            }
+                        } else if(ptypes[i].equals(Character.TYPE)){
+                            if(!(args[i] instanceof Character)){
+                                found = false;
+                            }
+                        }else{
+                            found = false;
+                        }
+                    }else {
+                        if (!ptypes[i].isAssignableFrom(args[i].getClass())) {
+                            found = false;
+                        }
+                    }
+                }
+            }
+            if (found) {
+                p = constructor;
+                break;
+            }
+        }
+        return p;
+    }
+
+    public boolean isPrimitive(Class c){
+        return c.equals(Boolean.class) || c.equals(Byte.class) || c.equals(Integer.class) || c.equals(Double.class)
+                || c.equals(Float.class) || c.equals(Long.class) || c.equals(Character.class);
+    }
 
     public List<Method> getDeclaredMethods(Class klass){
         List<Method> methods = new ArrayList<>();
