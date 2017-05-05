@@ -29,6 +29,8 @@ package com.thegoate.utils.get;
 
 import com.thegoate.utils.GoateUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -54,19 +56,28 @@ public class GetFileAsString extends GetTool{
 
     @Override
     public String from(Object container) {
-        String file = "" + container;
         String result = "";
-        if (file != null && !file.equals("") && !file.equalsIgnoreCase("null")) {
-            String fullPath = GoateUtils.getFilePath(file);
+        if(container instanceof File){
             try {
-                if (fullPath.contains(":")) {
-                    if (fullPath.indexOf("/") == 0) {
-                        fullPath = fullPath.substring(1);
-                    }
-                }
-                result = new String(Files.readAllBytes(Paths.get(fullPath)));
-            } catch (Exception e) {
+                result = new String(Files.readAllBytes(((File) container).toPath()));
+            } catch (IOException e) {
                 LOG.error("Problem loading file into a string: " + e.getMessage(), e);
+            }
+        }else {
+            String file = "" + container;
+
+            if (file != null && !file.equals("") && !file.equalsIgnoreCase("null")) {
+                String fullPath = GoateUtils.getFilePath(file);
+                try {
+                    if (fullPath.contains(":")) {
+                        if (fullPath.indexOf("/") == 0) {
+                            fullPath = fullPath.substring(1);
+                        }
+                    }
+                    result = new String(Files.readAllBytes(Paths.get(fullPath)));
+                } catch (Exception e) {
+                    LOG.error("Problem loading file into a string: " + e.getMessage(), e);
+                }
             }
         }
         return result;
