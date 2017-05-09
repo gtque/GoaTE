@@ -114,8 +114,10 @@ public class GoateUtils {
     /**
      * Borrowed from stack over flow. I have lost the original information, if
      * you know it please let me know so I may give appropriate credit.
-     * @param key
-     * @param value
+     * @param key the key or name of the environment variable to set
+     * @param value The value to set it to.
+     * @param <K> generic type
+     * @param <V> generic type
      */
     public static <K, V> void setEnvironment(String key, String value){
         try {

@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Defines an employee object. An employee does some type of work by calling the work method.<br/>
+ * Defines an employee object. An employee does some type of work by calling the work method.<br>
  * In order to make full use of an employee with other GoaTE frameworks, they should be annotated
  * with {@literal @}GoateJob to provide a list of jobs the employee fills.
  * Created by gtque on 4/21/2017.

@@ -33,7 +33,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Use to annotate a class has having methods annotated with {@literal @}GoateTask.<br/>
+ * Use to annotate a class has having methods annotated with {@literal @}GoateTask.<br>
  * Created by gtque on 4/21/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)

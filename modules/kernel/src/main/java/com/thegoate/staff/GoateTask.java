@@ -33,14 +33,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Use to define a task a particular method does.<br/>
- * This adds an additional way to define behavior.<br/>
+ * Use to define a task a particular method does.<br>
+ * This adds an additional way to define behavior.<br>
  * In order to pass parameters into the method, they must be declared in order in the task
  * definition using ${} around the reference name for the parameter. The reference name is how the value
  * for the parameter should be referenced in the data loaded from the provider.
  * example:
  * {@literal @}GoateTask(task = "Add ${x} and ${y}")
- * public int add(int first, int second){return first+second;}<br/>
+ * public int add(int first, int second){return first+second;}<br>
  *
  * Created by gtque on 4/21/2017.
  */

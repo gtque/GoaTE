@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The base definition for a new word in the DSL.<br/>
+ * The base definition for a new word in the DSL.<br>
  * Words should extend DSL and be annotated with the {@literal @}GoateDSL annotation
  * Created by gtque on 4/20/2017.
  */
