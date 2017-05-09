@@ -102,8 +102,30 @@ public class AnnotationFactory {
     }
 
     public Map<String, Class> getDirectory(String dir) {
+        return getDirectory(dir, null, null);
+    }
+
+    public Map<String, Class> getDirectory(String dir, String id, Method identifier) {
         buildDirectory();
-        return directory.get(dir);
+        Map<String, Class> unfiltered = directory.get(dir);
+        Map<String, Class> filtered = new ConcurrentHashMap<>();
+        if (id != null && identifier != null) {
+            for (String key : unfiltered.keySet()) {
+                try {
+                    Class temp = unfiltered.get(key);
+                    Annotation service = temp.getAnnotation(annotation);
+                    if (identifier != null) {
+                        Object theCheck = identifier.invoke(service);
+                        if (theCheck != null && theCheck.equals(id)) {
+                            filtered.put(key, temp);
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.error("Problem checking the class: " + e.getMessage(), e);
+                }
+            }
+        }
+        return (id != null && identifier != null) ? filtered : unfiltered;
     }
 
     public AnnotationFactory methodAnnotatedWith(Class<? extends java.lang.annotation.Annotation> annotation) {
@@ -138,6 +160,8 @@ public class AnnotationFactory {
 
     /**
      * The listings for each annotation is generated only one time, the first time they are looked up.
+     *
+     * @return The instance of itself, syntactic sugar for stringing calls together.
      */
     public AnnotationFactory buildDirectory() {
         if (!directory.containsKey(annotation.getCanonicalName())) {
@@ -175,6 +199,10 @@ public class AnnotationFactory {
         return this;
     }
 
+    public AnnotationFactory constructor(Constructor constructor){
+        this.constructor = constructor;
+        return this;
+    }
     public Object build(Class klass) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Object o = null;
         if (klass != null) {
