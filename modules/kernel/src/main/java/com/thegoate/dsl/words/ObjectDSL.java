@@ -25,24 +25,24 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.annotations.test;
+package com.thegoate.dsl.words;
 
-import com.thegoate.staff.GoateTask;
-import com.thegoate.staff.GoateTaskContainer;
+import com.thegoate.Goate;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
 
 /**
- * Created by gtque on 4/24/2017.
+ * Returns the value of the referenced object.
+ * Created by gtque on 4/21/2017.
  */
-@GoateTaskContainer
-public class AnnotatedMethodStub2 {
-
-    @GoateTask(task = "say goodbye")
-    public String goodbye(){
-        return "goodbye";
+@GoateDSL(word = "o")
+public class ObjectDSL extends DSL {
+    public ObjectDSL(Object value) {
+        super(value);
     }
 
-    @GoateTask(task = "add ${var} + ${var}")
-    public int add(int first, int second){
-        return first + second;
+    @Override
+    public Object evaluate(Goate data) {
+        return data.get(""+get(1,data));
     }
 }

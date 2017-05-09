@@ -75,7 +75,7 @@ public class GoateReflection {
                             if(!(args[i] instanceof Character)){
                                 found = false;
                             }
-                        }else{
+                        }else if(!ptypes[i].equals(Object.class)){
                             found = false;
                         }
                     }else {

@@ -29,12 +29,10 @@ package com.thegoate.utils;
 
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.annotations.IsDefault;
-import com.thegoate.reflection.GoateReflection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -49,13 +47,17 @@ import java.util.Map;
 public class UnknownUtilType {
     final Logger LOG = LoggerFactory.getLogger(getClass());
 
-    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util){
+    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util) {
+        return buildUtil(obj, util, null, null);
+    }
+
+    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, String id, Method identifier) {
         Object utility = null;
         Class def = null;
         Object[] args = {obj};
         AnnotationFactory af = new AnnotationFactory();
         af.constructorArgs(args);
-        Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName());
+        Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
         if(utils!=null) {
             for (String key : utils.keySet()){
                 try {
@@ -66,7 +68,7 @@ public class UnknownUtilType {
                     }else {
                         Class[] types = {Object.class};
                         Method check = c.getMethod("isType", types);
-                        Object u = af.build(c);
+                        Object u = af.constructor(null).build(c);
                         if (check != null && Boolean.parseBoolean(""+check.invoke(u, args))) {
                             utility = u;
                         }
@@ -79,7 +81,7 @@ public class UnknownUtilType {
         if(utility==null){
             if(def!=null){
                 try{
-                    utility = af.build(def);
+                    utility = af.constructor(null).build(def);
                 } catch (IllegalAccessException | InvocationTargetException |InstantiationException e){
                     LOG.warn("Problem instantiating the default utility: " + e.getMessage(), e);
                 }

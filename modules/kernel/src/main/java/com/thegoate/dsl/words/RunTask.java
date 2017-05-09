@@ -59,10 +59,10 @@ public class RunTask extends DSL {
         Object result = null;
         try {
             af.annotatedWith(GoateTaskContainer.class)
-                    .findByMethod(task)
+                    .findByMethod(makeGeneric(task))
                     .methodAnnotatedWith(GoateTask.class);
-            Object owner = findOwner(task);
-            Method m = findTask(task);
+            Object owner = findOwner();
+            Method m = findTask();
             Object[] args = buildArgs(m, task, data);
             try {
                 boolean accessible = m.isAccessible();
@@ -95,14 +95,23 @@ public class RunTask extends DSL {
         return arg.substring(0,last);
     }
 
-    public Object findOwner(String task) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Object findOwner() throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Object owner = af.build();
         return owner;
     }
 
-    public Method findTask(String task){
+    public Method findTask(){
         Method m = af.getMethod();
         return m;
+    }
+
+    public String makeGeneric(String task){
+        String gen = task;
+        while(gen.contains("${")){
+            String val = gen.substring(gen.indexOf("${")+2,gen.indexOf("}"));
+            gen = gen.replace("${"+val+"}","&&var&&");
+        }
+        return gen.replaceAll("&&var&&","\\${var}");
     }
 
     public Object[] buildArgs(Method m, String task, Goate data){

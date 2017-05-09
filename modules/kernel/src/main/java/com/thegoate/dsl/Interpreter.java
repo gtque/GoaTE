@@ -53,6 +53,14 @@ public class Interpreter {
         initDictionary();
     }
 
+    public Object translate(Object value) {
+        String check = "" + value;
+        if (check.contains("::")) {
+            check = check.substring(0, check.indexOf("::"));
+            return translate(check, value);
+        }
+        return value;
+    }
     /**
      * Translates the value based on the given dsl word.
      *

@@ -50,4 +50,11 @@ public class EmployeeTests {
         int r = Integer.parseInt("" + Employee.recruit("t_length", data).work());
         assertEquals(r, 3);
     }
+
+    @Test(groups = {"unit"})
+    public void simpleEmployeeLengthNull(){
+        Goate data = null;
+        int r = Integer.parseInt("" + Employee.recruit("t_length", data).work());
+        assertEquals(r, -1);
+    }
 }

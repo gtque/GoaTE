@@ -42,12 +42,12 @@ public class AnnotatedMethodStub {
         return "hello";
     }
 
-    @GoateTask(task = "say ${word} and print ${data}")
+    @GoateTask(task = "say ${var} and print ${var}")
     public String say(String word, Goate data){
         return word + "\n" + data.toString();
     }
 
-    @GoateTask(task = "void ${truth}")
+    @GoateTask(task = "void ${var}")
     public void checkBoolean(boolean pass) throws Exception{
         if(!pass){
             throw new Exception("FAIL");

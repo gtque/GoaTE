@@ -24,25 +24,21 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.expect;
 
-package com.thegoate.annotations.test;
+import org.atteo.classindex.IndexAnnotated;
 
-import com.thegoate.staff.GoateTask;
-import com.thegoate.staff.GoateTaskContainer;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by gtque on 4/24/2017.
+ * Annotated something as an expectation operator.
+ * The operator is the symbol or statement used to identify the expectation.
+ * example: "!=" could be used to mean "not equal to" and would return true if the objects are not equal.
+ * Created by Eric Angeli on 5/8/2017.
  */
-@GoateTaskContainer
-public class AnnotatedMethodStub2 {
-
-    @GoateTask(task = "say goodbye")
-    public String goodbye(){
-        return "goodbye";
-    }
-
-    @GoateTask(task = "add ${var} + ${var}")
-    public int add(int first, int second){
-        return first + second;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface Expect {
+    String operator();
 }

@@ -46,4 +46,14 @@ public class HealthRecord {
         report.put("secondary", secondary);
         records.put("report##", report);
     }
+
+    public String printRecords(){
+        StringBuilder sb = new StringBuilder("");
+        for(String key:records.keys()){
+            Map<String, String> report = (Map<String, String>) records.get(key);
+            sb.append(key + ": " + report.get("message") + "\n\t"+report.get("secondary") +"\n");
+        }
+        sb.replace(sb.lastIndexOf("\n"),sb.length(),"");
+        return sb.toString();
+    }
 }
