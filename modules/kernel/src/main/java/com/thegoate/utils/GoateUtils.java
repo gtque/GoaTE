@@ -62,6 +62,7 @@ public class GoateUtils {
             Thread.sleep(sleepInMillis);
         } catch (InterruptedException e) {
             logger.warn("problem sleeping: " + e.getMessage());
+            Thread.currentThread().interrupt();
         }
     }
 

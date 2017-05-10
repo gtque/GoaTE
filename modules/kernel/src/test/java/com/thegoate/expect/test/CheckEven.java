@@ -24,35 +24,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.expect.test;
 
-package com.thegoate.staff;
-
-import com.thegoate.Goate;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.GoateJob;
 
 /**
- * Store any reports related to the health of the employee.
- * Created by gtque on 4/21/2017.
+ * Simple employee that checks if the parameter in CheckEven##.value is even or not.
+ * Created by Eric Angeli on 5/10/2017.
  */
-public class HealthRecord {
-
-    Goate records = new Goate();
-
-    public void report(String message, String secondary){
-        Map<String, String> report = new ConcurrentHashMap<>();
-        report.put("message", message);
-        report.put("secondary", secondary);
-        records.put("report##", report);
+@GoateJob(jobs = {"check if even"})
+public class CheckEven extends Employee {
+    int value = 0;
+    @Override
+    public Employee init() {
+        value = Integer.parseInt(""+data.get(getName()+".value"));
+        return this;
     }
 
-    public String printRecords(){
-        StringBuilder sb = new StringBuilder("");
-        for(String key:records.keys()){
-            Map<String, String> report = (Map<String, String>) records.get(key);
-            sb.append(key + ": " + report.get("message") + "\n\t"+report.get("secondary") +"\n");
-        }
-        return sb.toString();
+    @Override
+    public Object doWork() {
+        return value%2==0;
     }
 }

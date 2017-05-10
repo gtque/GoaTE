@@ -25,34 +25,30 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.staff;
+package com.thegoate.expect;
 
 import com.thegoate.Goate;
+import org.testng.annotations.Test;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import static org.testng.Assert.assertTrue;
 
 /**
- * Store any reports related to the health of the employee.
- * Created by gtque on 4/21/2017.
+ * Test expect framework.
+ * Created by Eric Angeli on 5/10/2017.
  */
-public class HealthRecord {
+public class ExpectTests {
 
-    Goate records = new Goate();
-
-    public void report(String message, String secondary){
-        Map<String, String> report = new ConcurrentHashMap<>();
-        report.put("message", message);
-        report.put("secondary", secondary);
-        records.put("report##", report);
-    }
-
-    public String printRecords(){
-        StringBuilder sb = new StringBuilder("");
-        for(String key:records.keys()){
-            Map<String, String> report = (Map<String, String>) records.get(key);
-            sb.append(key + ": " + report.get("message") + "\n\t"+report.get("secondary") +"\n");
-        }
-        return sb.toString();
+    @Test(groups = {"unit"})
+    public void isEven(){
+        Goate data = new Goate();
+        data.put("check if even.value",4)
+                .put("check if even#1.value",5);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        Expectation e2 = new Expectation(data).from("check if even#1").actual("return").is("!=").expected(true);
+        etb.expect("check if even>return,==,boolean::true").expect(e2)
+        .expect("check if even>return,!=,boolean::false");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
     }
 }

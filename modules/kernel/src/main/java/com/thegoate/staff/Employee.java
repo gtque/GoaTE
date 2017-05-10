@@ -53,11 +53,19 @@ public abstract class Employee {
     protected final static Logger slog = LoggerFactory.getLogger(Employee.class);
     protected HealthRecord hr = new HealthRecord();
     protected Goate data;
-
-    //protected Map<String, Class> employeeDirectory = null;
+    protected String name = "";
 
     public HealthRecord getHrReport() {
         return hr;
+    }
+
+    protected Employee setName(String name){
+        this.name = name;
+        return this;
+    }
+
+    protected String getName(){
+        return name;
     }
 
     public Employee setData(Goate data) {
@@ -107,10 +115,16 @@ public abstract class Employee {
 
     public static Employee recruit(String job, Goate data) {
         Employee employee = null;
+        String id = "";
+        if(job.contains("#")){
+            id = job.substring(job.indexOf("#")+1);
+            job = job.substring(0, job.indexOf("#"));
+        }
         Class recruit = findEmployee(job);
         if (recruit != null) {
             try {
                 employee = (Employee) recruit.newInstance();
+                employee.setName(job + (id.isEmpty()?"":("#"+id)));
             } catch (InstantiationException | IllegalAccessException e) {
                 slog.error("Problem recruiting the employee: " + e.getMessage(), e);
             }

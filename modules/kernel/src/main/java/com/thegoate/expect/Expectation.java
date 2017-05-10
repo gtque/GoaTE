@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Contains the information about what is expected.
+ * The source should be defined and annotated as an Employee.<br>
  * Created by Eric Angeli on 5/8/2017.
  */
 public class Expectation {
@@ -47,7 +48,7 @@ public class Expectation {
     String id = "";
     Goate data = null;
     Goate expect = new Goate();
-    int simpleState = 0;
+    String simpleState = "";
     Object actual;
     String operator = "";
     Object expected = null;
@@ -75,6 +76,17 @@ public class Expectation {
         return this;
     }
 
+    public Object getActual(){
+        return actual;
+    }
+
+    public String getOperator(){
+        return operator;
+    }
+
+    public Object getExpected(){
+        return expected;
+    }
     /**
      * When adding a new expectation to an existing one you must set actual, is, and expected, (even if expected is null)
      * Except for the last one added.
@@ -82,36 +94,49 @@ public class Expectation {
      */
     public Expectation addNewExpectation(){
         checkState(true);
-        simpleState = 0;
+        simpleState = "";
         actual = null;
         operator = "";
         expected = null;
         return this;
     }
 
-    public Expectation actual(String actual){
+    public Goate getExpectations(){
+        return expect;
+    }
+
+    public Expectation add(Expectation expectation){
+        Goate ex = expectation.getExpectations();
+        for (String key : ex.keys()) {
+            Map<String, Object> exp = (Map<String, Object>) ex.get(key);
+            actual(exp.get("actual")).is(""+exp.get("operator")).expected(exp.get("expected"));
+        }
+        return this;
+    }
+
+    public Expectation actual(Object actual){
         this.actual = actual;
-        simpleState++;
+        simpleState+="a";
         checkState(false);
         return this;
     }
 
     public Expectation is(String operator){
         this.operator = operator;
-        simpleState++;
+        simpleState+="i";
         checkState(false);
         return this;
     }
 
     public Expectation expected(Object expected){
         this.expected = expected;
-        simpleState++;
+        simpleState+="c";
         checkState(false);
         return this;
     }
 
     protected void checkState(boolean force){
-        if(simpleState==3||force){
+        if((simpleState.length()==3&&simpleState.contains("a")&&simpleState.contains("i")&&simpleState.contains("c"))||force){
             if(actual!=null&&operator!=null&&!operator.isEmpty()) {//must at least set actual and operator fields.
                 String key = "" + actual + operator + expected;
                 Map<String, Object> exp = new ConcurrentHashMap<>();
@@ -122,23 +147,29 @@ public class Expectation {
                 actual = null;
                 operator = "";
                 expected = null;
+                simpleState = "";
             }
         }
     }
 
     public boolean evaluate(){
-        failed = new StringBuilder("");
+        failed = new StringBuilder("");//only the last failure is preserved. if the expectation is executed more than once it resets the failure message.
         boolean result = true;//assume true, and if a failure is detected set to false.
         if(from!=null) {
             Object rtrn = from.work();
             for (String key : expect.keys()) {
                 Map<String, Object> exp = (Map<String, Object>) expect.get(key);
-                Get get = new Get(exp.get("actual"));//from.doWork());
-                Object val = get.from(rtrn);
-                LOG.info("evaluating: " + exp.get("actual") + "(" + val + ") " + operator + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
+                Object val = null;
+                if(exp.get("actual") instanceof String && ((String) exp.get("actual")).equalsIgnoreCase("return")){
+                    val = rtrn;
+                }else {
+                    Get get = new Get(exp.get("actual"));//from.doWork());
+                    val = get.from(rtrn);
+                }
+                LOG.info("evaluating \""+fullName()+"\": " + exp.get("actual") + "(" + val + ") " + exp.get("operator") + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
                 if (!(new Compare(val).to(exp.get("expected")).using(exp.get("operator")).evaluate())) {
                     result = false;
-                    failed.append(key + " evaluated to false.");
+                    failed.append(fullName() + ">"+key + " evaluated to false.");
                 }
             }
         }else{
@@ -173,7 +204,7 @@ public class Expectation {
             if(expectation.contains(">"))
             {
                 source = expectation.substring(0,expectation.indexOf(">"));
-                expectation = expectation.substring(expectation.indexOf(">")+2);
+                expectation = expectation.substring(expectation.indexOf(">")+1);
 
             }
             String[] parts = expectation.split(",");
@@ -206,7 +237,7 @@ public class Expectation {
             }else{
                 this.id = "0";
             }
-            worker = Employee.recruit(sourceInfo[0], data);
+            worker = Employee.recruit(source, data);
         }
         return worker;
     }
