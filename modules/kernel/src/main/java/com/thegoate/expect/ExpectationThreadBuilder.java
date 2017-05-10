@@ -42,7 +42,7 @@ public class ExpectationThreadBuilder {
     List<Expectation> expectations = new ArrayList<>();
     Goate data = null;
     long timeoutMS = 0;
-    long period = 0;
+    long period = 50;
 
     public ExpectationThreadBuilder timeout(long timeoutMS){
         this.timeoutMS = timeoutMS;

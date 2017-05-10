@@ -24,11 +24,25 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare;
+package com.thegoate.utils;
+
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertNull;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
- * Created by Eric Angeli on 5/9/2017.
+ * Test the helper methods in GoateUtils.
+ * Created by Eric Angeli on 5/10/2017.
  */
-public abstract class Comparator {
-    public abstract boolean evaluate();
+public class GoateUtilsTest {
+
+    @Test(groups = {"unit"})
+    public void setEnv(){
+        assertNull(GoateUtils.getProperty("finklestein"));
+        GoateUtils.setEnvironment("finklestein", "dooda");
+        assertEquals(GoateUtils.getProperty("finklestein","man taco"),"dooda");
+        GoateUtils.removeEnvironment("finklestein");
+        assertEquals(GoateUtils.getProperty("finklestein","man taco"),"man taco");
+    }
 }

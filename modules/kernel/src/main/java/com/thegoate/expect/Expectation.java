@@ -156,21 +156,26 @@ public class Expectation {
         failed = new StringBuilder("");//only the last failure is preserved. if the expectation is executed more than once it resets the failure message.
         boolean result = true;//assume true, and if a failure is detected set to false.
         if(from!=null) {
-            Object rtrn = from.work();
-            for (String key : expect.keys()) {
-                Map<String, Object> exp = (Map<String, Object>) expect.get(key);
-                Object val = null;
-                if(exp.get("actual") instanceof String && ((String) exp.get("actual")).equalsIgnoreCase("return")){
-                    val = rtrn;
-                }else {
-                    Get get = new Get(exp.get("actual"));//from.doWork());
-                    val = get.from(rtrn);
+            try {
+                Object rtrn = from.work();
+                for (String key : expect.keys()) {
+                    Map<String, Object> exp = (Map<String, Object>) expect.get(key);
+                    Object val = null;
+                    if (exp.get("actual") instanceof String && ((String) exp.get("actual")).equalsIgnoreCase("return")) {
+                        val = rtrn;
+                    } else {
+                        Get get = new Get(exp.get("actual"));//from.doWork());
+                        val = get.from(rtrn);
+                    }
+                    LOG.info("evaluating \"" + fullName() + "\": " + exp.get("actual") + "(" + val + ") " + exp.get("operator") + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
+                    if (!(new Compare(val).to(exp.get("expected")).using(exp.get("operator")).evaluate())) {
+                        result = false;
+                        failed.append(fullName() + ">" + key + " evaluated to false.\n");
+                    }
                 }
-                LOG.info("evaluating \""+fullName()+"\": " + exp.get("actual") + "(" + val + ") " + exp.get("operator") + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
-                if (!(new Compare(val).to(exp.get("expected")).using(exp.get("operator")).evaluate())) {
-                    result = false;
-                    failed.append(fullName() + ">"+key + " evaluated to false.");
-                }
+            }catch(Throwable t){
+                result = false;
+                failed.append("there was a problem executing the work: " + t.getMessage()+"\n");
             }
         }else{
             result = false;

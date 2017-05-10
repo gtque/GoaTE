@@ -39,7 +39,6 @@ public abstract class CompareTool implements CompareUtility{
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
     protected Object actual = null;
     protected Object expected = null;
-    protected Comparator comparator = null;
     protected Object operator = null;
     public CompareTool(Object actual){
         this.actual = actual;
@@ -53,11 +52,7 @@ public abstract class CompareTool implements CompareUtility{
     @Override
     public CompareUtility using(Object operator){
         this.operator = operator;
-        comparator = buildComparator();
         return this;
     }
 
-    protected Comparator buildComparator(){
-        return null;
-    }
 }

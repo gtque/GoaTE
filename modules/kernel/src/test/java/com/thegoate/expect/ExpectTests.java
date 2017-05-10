@@ -28,8 +28,11 @@
 package com.thegoate.expect;
 
 import com.thegoate.Goate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -37,6 +40,7 @@ import static org.testng.Assert.assertTrue;
  * Created by Eric Angeli on 5/10/2017.
  */
 public class ExpectTests {
+    final Logger LOG = LoggerFactory.getLogger(getClass());
 
     @Test(groups = {"unit"})
     public void isEven(){
@@ -46,9 +50,21 @@ public class ExpectTests {
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         Expectation e2 = new Expectation(data).from("check if even#1").actual("return").is("!=").expected(true);
         etb.expect("check if even>return,==,boolean::true").expect(e2)
-        .expect("check if even>return,!=,boolean::false");
+                .expect("check if even>return,!=,boolean::false");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void isEvenFail(){
+        Goate data = new Goate();
+        data.put("check if even.value",42);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check if even>return,==,boolean::true");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertFalse(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
     }
 }
