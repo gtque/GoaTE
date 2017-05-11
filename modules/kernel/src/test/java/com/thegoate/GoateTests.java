@@ -27,7 +27,13 @@
 
 package com.thegoate;
 
+import com.thegoate.data.DataLoader;
+import com.thegoate.data.PropertyFileDL;
+import com.thegoate.data.StaticDL;
+import com.thegoate.utils.GoateUtils;
 import org.testng.annotations.Test;
+
+import java.io.File;
 
 import static org.testng.Assert.assertEquals;
 
@@ -41,5 +47,30 @@ public class GoateTests {
         Goate data = new Goate().put("test##", "a").put("atest", "nanotime::").put("test2","c").put("test##", "b");
         assertEquals(data.size(), 3);
         assertEquals(data.get("test2"),"b");
+    }
+    @Test(groups = {"unit"})
+    public void staticDataLoader(){
+        DataLoader dl = new StaticDL().add("test##", "a").add("atest", "nanotime::").add("test2","c").add("test##", "b");
+        Goate data = dl.load().get(0);
+        assertEquals(data.size(), 3);
+        assertEquals(data.get("test2"),"b");
+    }
+
+    @Test(groups = {"unit"})
+    public void propertyFileDataLoaderStringPath(){
+        DataLoader dl = new PropertyFileDL().file("sample.prop");
+        Goate data = dl.load().get(0);
+
+        assertEquals(data.size(), 5);
+        assertEquals(data.get("test3"),"d");
+    }
+
+    @Test(groups = {"unit"})
+    public void propertyFileDataLoaderFile(){
+        DataLoader dl = new PropertyFileDL().file(new File(GoateUtils.getFilePath("sample.prop")));
+        Goate data = dl.load().get(0);
+
+        assertEquals(data.size(), 5);
+        assertEquals(data.get("test3"),"d");
     }
 }

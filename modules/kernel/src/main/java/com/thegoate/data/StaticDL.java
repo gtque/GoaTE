@@ -41,7 +41,7 @@ public class StaticDL extends DataLoader{
     public List<Goate> load() {
         List<Goate> data = new ArrayList<>();
         data.add(parameters);
-        return null;
+        return data;
     }
 
     public StaticDL add(String key, Object value){

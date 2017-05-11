@@ -47,8 +47,10 @@ public class Copy {
 
     public Copy() {
     }
+
     /**
      * Creates a new copy with the given original file name.
+     *
      * @param originalFile The path to the original file.
      */
     public Copy(String originalFile) {
@@ -57,24 +59,27 @@ public class Copy {
 
     /**
      * Creates a new copy with the given original file name.
+     *
      * @param file The original file.
      */
     public Copy(File file) {
         file(file);
     }
 
-    public Copy(InputStream inputStream){
+    public Copy(InputStream inputStream) {
         file(inputStream);
     }
 
-    public Copy file(InputStream inputStream){
+    public Copy file(InputStream inputStream) {
         this.fileInputStream = inputStream;
         this.originalFile = null;
         this.file = null;
         return this;
     }
+
     /**
      * Sets the path to the original  file.
+     *
      * @param originalFile The path to the original file.
      * @return Returns this as Syntactic sugar for stringing "to" together.
      */
@@ -87,6 +92,7 @@ public class Copy {
 
     /**
      * Sets the path to the original  file.
+     *
      * @param file The path to the original file.
      * @return Returns this as Syntactic sugar for stringing "to" together.
      */
@@ -99,18 +105,18 @@ public class Copy {
 
     public Copy file(URL originalUrl) {
         try {
-            this.fileInputStream = originalUrl.openStream();
+            file(originalUrl.openStream());
+            this.originalFile = originalUrl.getPath();
         } catch (IOException e) {
             LOG.error("Problem opening a stream to the url: " + e.getMessage(), e);
         }
-        this.originalFile = null;
-        this.file = null;
         return this;
     }
 
     /**
      * Copies the original file to the new file.<br>
      * Will overwrite the destination file if it already exists.
+     *
      * @param copyFile The destination to copy to.
      * @return True if successful, false if failed.
      */
@@ -118,21 +124,25 @@ public class Copy {
         return to(copyFile, true);
     }
 
-    public String toDir(String destinationDir){
-        return to(destinationDir+"/"+getSource().getName(), true);
+    public String toDir(String destinationDir) {
+        return to(destinationDir + "/" + getSource().getName(), true);
     }
 
-    protected File getSource(){
+    protected File getSource() {
         File sourceFile = null;
-        if(originalFile!=null)
+        if (originalFile != null)
             sourceFile = new File(originalFile);
-        if(file!=null)
+        if (file != null)
             sourceFile = file;
+        if (fileInputStream != null) {
+            LOG.debug("you gave me an input stream. Unless you gave me the url, I cannot determine the sourceFile.");
+        }
         return sourceFile;
     }
 
     /**
      * Copies the original file to the new file.
+     *
      * @param copyFile  The destination to which to copy.
      * @param overwrite Whether to overwrite the destination file if it exists. True to overwrite, false to not.
      * @return True if successful, false if failed.
@@ -145,13 +155,11 @@ public class Copy {
         if (destFile.exists()) {
             if (overwrite) {
                 try {
-                    if (destFile.exists()) {
-                        if (destFile.delete())
-                            LOG.debug("File deleted");
-                        else {
-                            LOG.debug("File could not be deleted");
-                            status = null;
-                        }
+                    if (destFile.delete())
+                        LOG.debug("File deleted");
+                    else {
+                        LOG.debug("File could not be deleted");
+                        status = null;
                     }
                 } catch (Exception e) {
                     LOG.error("Copy File", e);
@@ -161,7 +169,7 @@ public class Copy {
                 status = null;
             }
         }
-        if (status!=null) {
+        if (status != null) {
             try {
                 LOG.debug("file: " + destFile.getAbsolutePath());
                 if (destFile.getParentFile().mkdirs())
@@ -172,12 +180,16 @@ public class Copy {
                     FileOutputStream destination = null;
 
                     try {
-                        if(sourceFile!=null) {
-                            source = new FileInputStream(sourceFile);
-                        }else if(fileInputStream!=null){
+                        if (sourceFile != null) {
+                            if (fileInputStream == null) {
+                                source = new FileInputStream(sourceFile);
+                            } else {
+                                source = fileInputStream;
+                            }
+                        } else if (fileInputStream != null) {
                             source = fileInputStream;
                         }
-                        if(source!=null) {
+                        if (source != null) {
                             destination = new FileOutputStream(destFile);
                             byte[] buffer = new byte[4096];
                             int bytesRead = source.read(buffer);
@@ -194,8 +206,7 @@ public class Copy {
                             destination.close();
                         }
                     }
-                }
-                else {
+                } else {
                     LOG.debug("File not created");
                     status = null;
                 }
