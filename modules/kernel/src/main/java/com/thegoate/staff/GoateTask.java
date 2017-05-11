@@ -24,16 +24,28 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+
+package com.thegoate.staff;
+
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+/**
+ * Use to define a task a particular method does.<br>
+ * This adds an additional way to define behavior.<br>
+ * In order to pass parameters into the method, they must be declared in order in the task
+ * definition using ${} around the reference name for the parameter. The reference name is how the value
+ * for the parameter should be referenced in the data loaded from the provider.
+ * example:
+ * {@literal @}GoateTask(task = "Add ${x} and ${y}")
+ * public int add(int first, int second){return first+second;}<br>
+ *
+ * Created by gtque on 4/21/2017.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface GoateTask {
+    String task();
 }

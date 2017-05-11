@@ -24,16 +24,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+
+package com.thegoate.staff.test;
+
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.GoateJob;
+
+/**
+ * Simple employee that simply returns the length of the data.
+ * Created by gtque on 4/25/2017.
+ */
+@GoateJob(jobs = {"t_size","t_length"})
+public class Employee1 extends Employee {
+
+    @Override
+    public Employee init() {
+        return null;
+    }
+
+    @Override
+    public Object doWork() {
+        return data!=null?data.size():-1;//-1 means the data was null.
+    }
 }

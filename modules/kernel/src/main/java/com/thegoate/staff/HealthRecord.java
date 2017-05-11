@@ -24,16 +24,35 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+
+package com.thegoate.staff;
+
+import com.thegoate.Goate;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Store any reports related to the health of the employee.
+ * Created by gtque on 4/21/2017.
+ */
+public class HealthRecord {
+
+    Goate records = new Goate();
+
+    public void report(String message, String secondary){
+        Map<String, String> report = new ConcurrentHashMap<>();
+        report.put("message", message);
+        report.put("secondary", secondary);
+        records.put("report##", report);
+    }
+
+    public String printRecords(){
+        StringBuilder sb = new StringBuilder("");
+        for(String key:records.keys()){
+            Map<String, String> report = (Map<String, String>) records.get(key);
+            sb.append(key + ": " + report.get("message") + "\n\t"+report.get("secondary") +"\n");
+        }
+        return sb.toString();
+    }
 }

@@ -24,16 +24,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+package com.thegoate.data;
+
+import com.thegoate.Goate;
+
+/**
+ * Simple data loader container.
+ * This can be used to predefine a provider and then reuse it using.
+ * Created by Eric Angeli on 5/5/2017.
+ */
+public abstract class DLProvider {
+    Goate data = null;
+    Goate constantData = null;
+
+    public DLProvider data(Goate data){
+        this.data = data;
+        return this;
+    }
+    public DLProvider constants(Goate data){
+        this.constantData = data;
+        return this;
+    }
+    public abstract void init();
 }

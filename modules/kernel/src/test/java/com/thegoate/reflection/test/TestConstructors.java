@@ -24,16 +24,48 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+
+package com.thegoate.reflection.test;
+
+/**
+ * Created by gtque on 5/4/2017.
+ */
+public class TestConstructors {
+    public String v1 = "";
+    public String v2 = "";
+    public int v3 = 0;
+    public byte b = 0;
+    public long l = 0L;
+    public double d = 0d;
+    public float f = 0f;
+    public boolean t = false;
+    public char c = 'c';
+
+    public TestConstructors(){}
+    public TestConstructors(String v1, String v2){
+        this.v1 = v1;
+        this.v2 = v2;
+    }
+    public TestConstructors(String v1, int v3){
+        this.v1 = v1;
+        this.v3 = v3;
+    }
+    public TestConstructors(byte o){
+        this.b = o;
+    }
+    public TestConstructors(long o){
+        this.l = o;
+    }
+    public TestConstructors(double o){
+        this.d = o;
+    }
+    public TestConstructors(float o){
+        this.f = o;
+    }
+    public TestConstructors(boolean o){
+        this.t = o;
+    }
+    public TestConstructors(char o){
+        this.c = o;
+    }
 }

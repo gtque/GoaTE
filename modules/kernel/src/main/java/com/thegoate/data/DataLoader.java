@@ -24,16 +24,31 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+package com.thegoate.data;
+
+import com.thegoate.Goate;
+
+import java.util.List;
+
+/**
+ * Defines the base data loader class.
+ * Created by Eric Angeli on 5/5/2017.
+ */
+public abstract class DataLoader {
+
+    protected Goate parameters = new Goate();
+
+    public abstract List<Goate> load();//loads the data into separate goate collections, each data set/row is a new collection.
+    public DataLoader setParameter(String parameter, Object value){
+        if(parameters == null){
+            parameters = new Goate();
+        }
+        parameters.put(parameter, value);
+        return this;
+    }
+    public DataLoader setParameters(Goate params){
+        this.parameters = params;
+        return this;
+    }
+
 }

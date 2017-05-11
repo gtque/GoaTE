@@ -24,16 +24,35 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+package com.thegoate.utils.compare;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Base class for Compare Utilities. Adds logger, and class level variables.
+ * It is recommend that Compare utilities extend this class, but they really only
+ * need to implement the CompareUtility interface.
+ * Created by Eric Angeli on 5/5/2017.
+ */
+public abstract class CompareTool implements CompareUtility{
+    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected Object actual = null;
+    protected Object expected = null;
+    protected Object operator = null;
+    public CompareTool(Object actual){
+        this.actual = actual;
+    }
+
+    @Override
+    public CompareUtility to(Object expected){
+        this.expected = expected;
+        return this;
+    }
+    @Override
+    public CompareUtility using(Object operator){
+        this.operator = operator;
+        return this;
+    }
+
 }

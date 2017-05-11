@@ -24,16 +24,48 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+
+package com.thegoate.utils.file;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+
+/**
+ * Created by gtque on 5/3/2017.
+ */
+public class Append {
+    Logger LOG = LoggerFactory.getLogger(getClass());
+    String line = "";
+
+    public Append line(String line){
+        this.line = line;
+        return this;
+    }
+
+    public void to(String file){
+        to(file, false);
+    }
+
+    public void to(String file, boolean overwrite){
+        PrintWriter pw = null;
+        try {
+            if(overwrite){
+                new Delete().rm(file);
+            }
+            File temp = new File(file);
+            if(temp.getParentFile()!=null) {
+                temp.getParentFile().mkdirs();
+            }
+            FileWriter fw = new FileWriter(temp.getAbsolutePath(), true);
+            pw = new PrintWriter(new BufferedWriter(fw));
+            pw.println(line);
+        } catch (IOException e) {
+            LOG.error("Error writing "+line+" to "+file+".", e);
+        } finally {
+            if (pw != null)
+                pw.close();
+        }
+    }
 }

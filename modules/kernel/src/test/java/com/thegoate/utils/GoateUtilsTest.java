@@ -24,16 +24,25 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends
-apply plugin: 'com.github.johnrengelman.shadow'
-dependencies{
-    compile gradleApi()
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201605250940-rc1'
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+package com.thegoate.utils;
+
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertNull;
+import static org.testng.AssertJUnit.assertEquals;
+
+/**
+ * Test the helper methods in GoateUtils.
+ * Created by Eric Angeli on 5/10/2017.
+ */
+public class GoateUtilsTest {
+
+    @Test(groups = {"unit"})
+    public void setEnv(){
+        assertNull(GoateUtils.getProperty("finklestein"));
+        GoateUtils.setEnvironment("finklestein", "dooda");
+        assertEquals(GoateUtils.getProperty("finklestein","man taco"),"dooda");
+        GoateUtils.removeEnvironment("finklestein");
+        assertEquals(GoateUtils.getProperty("finklestein","man taco"),"man taco");
+    }
 }
