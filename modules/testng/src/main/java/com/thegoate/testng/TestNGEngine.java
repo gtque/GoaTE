@@ -1,3 +1,29 @@
+/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
@@ -45,7 +71,8 @@ public abstract class TestNGEngine implements ITest, TestNG{
         String startMessage = "\n"+
                 "***************************Starting Up***************************\n"+
                 "*\t"+getTestName()+"\t*\n"+
-                "*****************************************************************\n";
+                data.toString("*\t","\t*")+
+                "*****************************************************************";
         LOG.debug(startMessage);
     }
 
@@ -54,7 +81,8 @@ public abstract class TestNGEngine implements ITest, TestNG{
         String endMessage = "\n"+
                 "*****************************************************************\n"+
                 "*\t"+getTestName()+"\t*\n"+
-                "***************************Finished Up***************************\n";
+                data.toString("*\t","\t*")+
+                "***************************Finished Up***************************";
         LOG.debug(endMessage);
     }
     protected void init(Goate data){
@@ -79,9 +107,11 @@ public abstract class TestNGEngine implements ITest, TestNG{
     public Object[][] dataLoader(ITestContext context) throws Exception {
         number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
         this.testContext = context;
-        xt = context.getCurrentXmlTest();
+        if(context!=null) {
+            xt = context.getCurrentXmlTest();
+        }
         initDataLoaders();
-        return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader());
+        return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true);
     }
 
     protected void initDataLoaders(){

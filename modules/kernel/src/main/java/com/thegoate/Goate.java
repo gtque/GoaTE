@@ -162,4 +162,16 @@ public class Goate {
         }
         return this;
     }
+
+    public String toString(){
+        return toString("","");
+    }
+
+    public String toString(String prepadding, String postpadding){
+        StringBuilder sb = new StringBuilder("");
+        for(String key:keys()){
+            sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding).append("\n");
+        }
+        return sb.toString();
+    }
 }

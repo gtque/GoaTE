@@ -24,12 +24,12 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.testng;
+
+package com.thegoate.testng.test;
 
 import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
-import com.thegoate.testng.test.SampleTestNGEngineTest;
-import com.thegoate.utils.GoateUtils;
+import com.thegoate.testng.TestNGEngine;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
@@ -38,35 +38,23 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by Eric Angeli on 5/11/2017.
  */
-public class TestNGEngineTest extends TestNGEngine {
+public class SampleTestNGEngineTest extends TestNGEngine {
 
-    public TestNGEngineTest(){
+    public SampleTestNGEngineTest(){
         super();
     }
 
     @Factory(dataProvider = "dataLoader")
-    public TestNGEngineTest(Goate data){
+    public SampleTestNGEngineTest(Goate data){
         super(data);
     }
 
     @Override
     public void defineDataLoaders() {
-    }
-
-    @Test(groups = {"unit"})
-    public void runNumberCheck() throws Exception {
-        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
-        assertEquals(runs.length, 4);
-    }
-
-    @Test(groups = {"unit"})
-    public void filtered() throws Exception {
-        GoateUtils.setEnvironment("run", "1,fourth");
-        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
-        GoateUtils.removeEnvironment("run");
-        assertEquals(runs.length, 2);
+        runData.put("dl##", new StaticDL().add("runNumber",1).add("Scenario", "first run"))
+                .put("dl##", new StaticDL().add("runNumber",2))
+                .put("dl##", new StaticDL().add("runNumber",3).add("Scenario", "first run"))
+                .put("dl##", new StaticDL().add("runNumber",4).add("Scenario", "fourth"));
     }
 
 }

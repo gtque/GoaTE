@@ -38,35 +38,32 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by Eric Angeli on 5/11/2017.
  */
-public class TestNGEngineTest extends TestNGEngine {
+public class TestNGEngineDataTest extends TestNGEngine {
 
-    public TestNGEngineTest(){
+    public TestNGEngineDataTest(){
         super();
     }
 
     @Factory(dataProvider = "dataLoader")
-    public TestNGEngineTest(Goate data){
+    public TestNGEngineDataTest(Goate data){
         super(data);
     }
 
     @Override
     public void defineDataLoaders() {
+        runData.put("dl##", new StaticDL().add("a","x").add("Scenario", "add to run data."));
+        constantData.put("dl##", new StaticDL().add("b","y"));
     }
 
     @Test(groups = {"unit"})
-    public void runNumberCheck() throws Exception {
-        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
-        assertEquals(runs.length, 4);
+    public void putRunData() throws Exception {
+        assertEquals(data.size(), 3);
+        assertEquals(get("b"),"y");
+        assertEquals(get("a"),"x");
+        put("c", 3);
+        assertEquals(get("c"),3);
+        assertEquals(data.size(), 4);
     }
 
-    @Test(groups = {"unit"})
-    public void filtered() throws Exception {
-        GoateUtils.setEnvironment("run", "1,fourth");
-        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
-        GoateUtils.removeEnvironment("run");
-        assertEquals(runs.length, 2);
-    }
 
 }
