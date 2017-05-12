@@ -34,11 +34,11 @@ import com.thegoate.Goate;
  * Created by Eric Angeli on 5/5/2017.
  */
 public abstract class DLProvider {
-    Goate data = null;
-    Goate constantData = null;
+    protected Goate runData = new Goate();
+    protected Goate constantData = new Goate();
 
     public DLProvider data(Goate data){
-        this.data = data;
+        this.runData = data;
         return this;
     }
     public DLProvider constants(Goate data){
@@ -47,7 +47,7 @@ public abstract class DLProvider {
     }
 
     public Goate getRunDataLoaders(){
-        return this.data;
+        return this.runData;
     }
 
     public Goate getConstantDataLoaders(){

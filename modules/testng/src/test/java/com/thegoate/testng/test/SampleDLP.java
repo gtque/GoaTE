@@ -24,48 +24,21 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.testng;
+package com.thegoate.testng.test;
 
-import com.thegoate.Goate;
-import com.thegoate.testng.test.SampleTestNGEngineTest;
-import com.thegoate.utils.GoateUtils;
-import org.testng.annotations.Factory;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
+import com.thegoate.data.DLProvider;
+import com.thegoate.data.GoateDLP;
+import com.thegoate.data.StaticDL;
 
 /**
- * Created by Eric Angeli on 5/11/2017.
+ * Simple sample data loader provider.
+ * Created by Eric Angeli on 5/12/2017.
  */
-public class TestNGEngineTest extends TestNGEngine {
-
-    public TestNGEngineTest(){
-        super();
-    }
-
-    @Factory(dataProvider = "dataLoader")
-    public TestNGEngineTest(Goate data){
-        super(data);
-    }
-
+@GoateDLP(name = "sample")
+public class SampleDLP extends DLProvider {
     @Override
-    public void defineDataLoaders() {
+    public void init() {
+        runData.put("dl##", new StaticDL().add("a","x").add("Scenario", "use DLProvider."));
+        constantData.put("dl##", new StaticDL().add("b","y"));
     }
-
-    @Test(groups = {"unit"})
-    public void runNumberCheck() throws Exception {
-        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
-        assertEquals(runs.length, 4);
-    }
-
-    @Test(groups = {"unit"})
-    public void filtered() throws Exception {
-        GoateUtils.setEnvironment("run", "1,fourth");
-        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
-        GoateUtils.removeEnvironment("run");
-        assertEquals(runs.length, 2);
-    }
-
 }

@@ -27,45 +27,37 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
-import com.thegoate.testng.test.SampleTestNGEngineTest;
-import com.thegoate.utils.GoateUtils;
+import com.thegoate.data.GoateProvider;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
 /**
+ * Use the class name to find the data loader provider.
  * Created by Eric Angeli on 5/11/2017.
  */
-public class TestNGEngineTest extends TestNGEngine {
+@GoateProvider(name = "com.thegoate.testng.test.SampleDLP")
+public class TestNGEngineDataProviderClassTest extends TestNGEngineAnnotatedDL {
 
-    public TestNGEngineTest(){
+    public TestNGEngineDataProviderClassTest(){
         super();
     }
 
     @Factory(dataProvider = "dataLoader")
-    public TestNGEngineTest(Goate data){
+    public TestNGEngineDataProviderClassTest(Goate data){
         super(data);
     }
 
-    @Override
-    public void defineDataLoaders() {
+    @Test(groups = {"unit"})
+    public void putRunData() throws Exception {
+        assertEquals(data.size(), 3);
+        assertEquals(get("b"),"y");
+        assertEquals(get("a"),"x");
+        put("c", 3);
+        assertEquals(get("c"),3);
+        assertEquals(data.size(), 4);
     }
 
-    @Test(groups = {"unit"})
-    public void runNumberCheck() throws Exception {
-        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
-        assertEquals(runs.length, 4);
-    }
-
-    @Test(groups = {"unit"})
-    public void filtered() throws Exception {
-        GoateUtils.setEnvironment("run", "1,fourth");
-        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
-        GoateUtils.removeEnvironment("run");
-        assertEquals(runs.length, 2);
-    }
 
 }
