@@ -146,4 +146,32 @@ public class Goate {
         }
         return filtered;
     }
+
+    public Goate merge(Goate merge, boolean replace){
+        if(merge!=null){
+            Set<String> myKeys = keys();
+            for(String key:merge.keys()){
+                if(replace){
+                    put(key, merge.getStrict(key));
+                }else{
+                    if(!myKeys.contains(key)){
+                        put(key, merge.getStrict(key));
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    public String toString(){
+        return toString("","");
+    }
+
+    public String toString(String prepadding, String postpadding){
+        StringBuilder sb = new StringBuilder("");
+        for(String key:keys()){
+            sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding).append("\n");
+        }
+        return sb.toString();
+    }
 }

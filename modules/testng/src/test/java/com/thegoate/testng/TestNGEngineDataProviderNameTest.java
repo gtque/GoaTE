@@ -24,38 +24,40 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.data;
+package com.thegoate.testng;
 
 import com.thegoate.Goate;
+import com.thegoate.data.GoateProvider;
+import com.thegoate.data.StaticDL;
+import org.testng.annotations.Factory;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
- * Simple data loader container.
- * This can be used to predefine a provider and then reuse it using.
- * Created by Eric Angeli on 5/5/2017.
+ * Created by Eric Angeli on 5/11/2017.
  */
-public abstract class DLProvider {
-    protected Goate runData = new Goate();
-    protected Goate constantData = new Goate();
+@GoateProvider(name = "sample")
+public class TestNGEngineDataProviderNameTest extends TestNGEngineAnnotatedDL {
 
-    public DLProvider data(Goate data){
-        this.runData = data;
-        return this;
-    }
-    public DLProvider constants(Goate data){
-        this.constantData = data;
-        return this;
+    public TestNGEngineDataProviderNameTest(){
+        super();
     }
 
-    public Goate getRunDataLoaders(){
-        return this.runData;
+    @Factory(dataProvider = "dataLoader")
+    public TestNGEngineDataProviderNameTest(Goate data){
+        super(data);
     }
 
-    public Goate getConstantDataLoaders(){
-        return this.constantData;
+    @Test(groups = {"unit"})
+    public void putRunData() throws Exception {
+        assertEquals(data.size(), 3);
+        assertEquals(get("b"),"y");
+        assertEquals(get("a"),"x");
+        put("c", 3);
+        assertEquals(get("c"),3);
+        assertEquals(data.size(), 4);
     }
 
-    /**
-     * Override init to define the run data and the constant data.
-     */
-    public abstract void init();
+
 }

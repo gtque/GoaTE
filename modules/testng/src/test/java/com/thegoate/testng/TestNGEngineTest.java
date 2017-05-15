@@ -24,38 +24,48 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.data;
+package com.thegoate.testng;
 
 import com.thegoate.Goate;
+import com.thegoate.testng.test.SampleTestNGEngineTest;
+import com.thegoate.utils.GoateUtils;
+import org.testng.annotations.Factory;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
- * Simple data loader container.
- * This can be used to predefine a provider and then reuse it using.
- * Created by Eric Angeli on 5/5/2017.
+ * Created by Eric Angeli on 5/11/2017.
  */
-public abstract class DLProvider {
-    protected Goate runData = new Goate();
-    protected Goate constantData = new Goate();
+public class TestNGEngineTest extends TestNGEngine {
 
-    public DLProvider data(Goate data){
-        this.runData = data;
-        return this;
-    }
-    public DLProvider constants(Goate data){
-        this.constantData = data;
-        return this;
+    public TestNGEngineTest(){
+        super();
     }
 
-    public Goate getRunDataLoaders(){
-        return this.runData;
+    @Factory(dataProvider = "dataLoader")
+    public TestNGEngineTest(Goate data){
+        super(data);
     }
 
-    public Goate getConstantDataLoaders(){
-        return this.constantData;
+    @Override
+    public void defineDataLoaders() {
     }
 
-    /**
-     * Override init to define the run data and the constant data.
-     */
-    public abstract void init();
+    @Test(groups = {"unit"})
+    public void runNumberCheck() throws Exception {
+        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
+        Object[][] runs = test.dataLoader(null);
+        assertEquals(runs.length, 4);
+    }
+
+    @Test(groups = {"unit"})
+    public void filtered() throws Exception {
+        GoateUtils.setEnvironment("run", "1,fourth");
+        SampleTestNGEngineTest test = new SampleTestNGEngineTest();
+        Object[][] runs = test.dataLoader(null);
+        GoateUtils.removeEnvironment("run");
+        assertEquals(runs.length, 2);
+    }
+
 }

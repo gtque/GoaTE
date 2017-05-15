@@ -24,38 +24,21 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.data;
+package com.thegoate.testng.test;
 
-import com.thegoate.Goate;
+import com.thegoate.data.DLProvider;
+import com.thegoate.data.GoateDLP;
+import com.thegoate.data.StaticDL;
 
 /**
- * Simple data loader container.
- * This can be used to predefine a provider and then reuse it using.
- * Created by Eric Angeli on 5/5/2017.
+ * Simple sample data loader provider.
+ * Created by Eric Angeli on 5/12/2017.
  */
-public abstract class DLProvider {
-    protected Goate runData = new Goate();
-    protected Goate constantData = new Goate();
-
-    public DLProvider data(Goate data){
-        this.runData = data;
-        return this;
+@GoateDLP(name = "sample")
+public class SampleDLP extends DLProvider {
+    @Override
+    public void init() {
+        runData.put("dl##", new StaticDL().add("a","x").add("Scenario", "use DLProvider."));
+        constantData.put("dl##", new StaticDL().add("b","y"));
     }
-    public DLProvider constants(Goate data){
-        this.constantData = data;
-        return this;
-    }
-
-    public Goate getRunDataLoaders(){
-        return this.runData;
-    }
-
-    public Goate getConstantDataLoaders(){
-        return this.constantData;
-    }
-
-    /**
-     * Override init to define the run data and the constant data.
-     */
-    public abstract void init();
 }

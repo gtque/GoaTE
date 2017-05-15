@@ -24,38 +24,43 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.data;
+package com.thegoate.testng;
 
 import com.thegoate.Goate;
+import com.thegoate.data.GoateProvider;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
- * Simple data loader container.
- * This can be used to predefine a provider and then reuse it using.
- * Created by Eric Angeli on 5/5/2017.
+ * Created by Eric Angeli on 5/11/2017.
  */
-public abstract class DLProvider {
-    protected Goate runData = new Goate();
-    protected Goate constantData = new Goate();
+public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
 
-    public DLProvider data(Goate data){
-        this.runData = data;
-        return this;
-    }
-    public DLProvider constants(Goate data){
-        this.constantData = data;
-        return this;
+    public TestNGEngineDataProviderMethodLevel(){
+        super();
     }
 
-    public Goate getRunDataLoaders(){
-        return this.runData;
+    @GoateProvider(name = "sample")
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void putRunData(Goate d) throws Exception {
+        assertEquals(data.size(), 3);
+        assertEquals(get("b"),"y");
+        assertEquals(get("a"),"x");
+        put("c", 3);
+        assertEquals(get("c"),3);
+        assertEquals(data.size(), 4);
     }
 
-    public Goate getConstantDataLoaders(){
-        return this.constantData;
+    @GoateProvider(name = "com.thegoate.testng.test.SampleDLP")
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void putRunData2(Goate d) throws Exception {
+        assertEquals(data.size(), 3);
+        assertEquals(get("b"),"y");
+        assertEquals(get("a"),"x");
+        put("c", 3);
+        assertEquals(get("c"),3);
+        assertEquals(data.size(), 4);
     }
 
-    /**
-     * Override init to define the run data and the constant data.
-     */
-    public abstract void init();
 }
