@@ -25,7 +25,7 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.staff;
+package com.thegoate.rest.annotation;
 
 import org.atteo.classindex.IndexAnnotated;
 
@@ -33,21 +33,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Use to define a task a particular method does.<br>
- * This adds an additional way to define behavior.<br>
- * In order to pass parameters into the method, they must be declared in order in the task
- * definition using ${var} to represent the parameter. The reference name is how the value
- * When defining a usage then "var" inside ${var} should be replaced with the actual name
- * of the variable stored in the Goate collection to be used.
- * for the parameter should be referenced in the data loaded from the provider.
- * example:
- * {@literal @}GoateTask(task = "Add ${var} and ${var}")
- * public int add(int first, int second){return first+second;}<br>
- *
+ * Annotation to identify as a rest implementation.
  * Created by gtque on 4/21/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @IndexAnnotated
-public @interface GoateTask {
-    String task();
+public @interface GoateRest {
+    String security() default "none";
 }
