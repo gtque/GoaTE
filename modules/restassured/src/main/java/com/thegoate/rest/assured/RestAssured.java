@@ -1,0 +1,187 @@
+/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.rest.assured;
+
+import com.thegoate.Goate;
+import com.thegoate.rest.Rest;
+import com.thegoate.rest.RestSpec;
+import com.thegoate.rest.annotation.GoateRest;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.config.EncoderConfig.encoderConfig;
+import static io.restassured.config.HeaderConfig.headerConfig;
+
+/**
+ * REST Assured implementation.
+ * Created by Eric Angeli on 5/16/2017.
+ */
+@GoateRest
+public class RestAssured extends Rest implements RASpec{
+    RequestSpecification specification = null;
+    Response response = null;
+
+    public RestAssured(){
+        this.specification = RestAssured.init(given());
+    }
+
+    public RestAssured(RequestSpecification specification){
+        this.specification = RestAssured.init(specification);
+    }
+
+    public static RequestSpecification init(RequestSpecification specification){
+        specification = specification==null?given():specification;
+        specification.config(new RestAssuredConfig()
+                .headerConfig(headerConfig()
+                        .overwriteHeadersWithName("Authorization")
+                        .overwriteHeadersWithName("Content-Type")))
+                .config(new RestAssuredConfig().encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false)));
+        return specification;
+    }
+
+    public static RequestSpecification build(RASpec spec){
+        RequestSpecification mySpec = spec.getSpec();
+        if(mySpec != null) {
+            mySpec.baseUri(spec.getBaseURL());
+            setHeaders(mySpec, spec.getHeaders());
+            setURLParameters(mySpec, spec.getHeaders());
+            setQueryParameters(mySpec, spec.getHeaders());
+            setPathParameters(mySpec, spec.getHeaders());
+            setBody(mySpec, spec.getBody());
+            if(spec.doLog()){
+                mySpec.log().all();
+            }
+        }
+        return mySpec;
+    }
+
+    protected static void setHeaders(RequestSpecification spec, Goate headers){
+        if(headers!=null&&spec!=null) {
+            for (String key : headers.keys()) {
+                spec.header(key, headers.get(key));
+            }
+        }
+    }
+
+    protected static void setURLParameters(RequestSpecification spec, Goate params){
+        if(params!=null&&spec!=null) {
+            for (String key : params.keys()) {
+                spec.param(key, params.get(key));
+            }
+        }
+    }
+
+    protected static void setQueryParameters(RequestSpecification spec, Goate params){
+        if(params!=null&&spec!=null) {
+            for (String key : params.keys()) {
+                spec.queryParam(key, params.get(key));
+            }
+        }
+    }
+
+    protected static void setPathParameters(RequestSpecification spec, Goate params){
+        if(params!=null&&spec!=null) {
+            for (String key : params.keys()) {
+                spec.pathParam(key, params.get(key));
+            }
+        }
+    }
+
+    protected static void setBody(RequestSpecification spec, Goate body){
+
+    }
+    @Override
+    public Object response(){
+        return response;
+    }
+
+    @Override
+    public RestSpec processCustomData(String key, Object value){
+        return this;
+    }
+
+    @Override
+    /**
+     * This is a null operation for the base RestAssured class.
+     */
+    public RestSpec processCustomData(Enum key, Object value) {
+        return this;
+    }
+
+    @Override
+    public Object get(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.get(endpoint);
+        log(response);
+        return response;
+    }
+
+    @Override
+    public Object put(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.put(endpoint);
+        log(response);
+        return response;
+    }
+
+    @Override
+    public Object post(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.post(endpoint);
+        log(response);
+        return response;
+    }
+
+    @Override
+    public Object delete(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.delete(endpoint);
+        log(response);
+        return response;
+    }
+
+    @Override
+    public Object patch(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.patch(endpoint);
+        log(response);
+        return response;
+    }
+
+    protected void log(Response response){
+        if(doLog()){
+            LOG.info("response follows");
+            response.then().log().all();
+        }
+    }
+    @Override
+    public RequestSpecification getSpec() {
+        return specification;
+    }
+}
