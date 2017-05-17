@@ -26,7 +26,7 @@
  */
 package com.thegoate.rest.assured;
 
-import com.thegoate.rest.RestAuthBasicHeader;
+import com.thegoate.rest.RestAuthBearer;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
 import io.restassured.response.Response;
@@ -38,16 +38,16 @@ import static io.restassured.RestAssured.given;
  * REST Assured implementation.
  * Created by Eric Angeli on 5/16/2017.
  */
-@GoateRest(security = "basic auth with user and password")
-public class RestAssuredAuthBasicHeader extends RestAuthBasicHeader implements RASpec{
+@GoateRest(security = "auth with bearer token")
+public class RestAssuredAuthBearer extends RestAuthBearer implements RASpec{
     RequestSpecification specification = null;
     Response response = null;
 
-    public RestAssuredAuthBasicHeader(){
+    public RestAssuredAuthBearer(){
         this.specification = RestAssured.init(given());
     }
 
-    public RestAssuredAuthBasicHeader(RequestSpecification specification){
+    public RestAssuredAuthBearer(RequestSpecification specification){
         this.specification = RestAssured.init(specification);
     }
 

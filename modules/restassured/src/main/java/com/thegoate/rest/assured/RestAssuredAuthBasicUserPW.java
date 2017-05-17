@@ -38,7 +38,7 @@ import static io.restassured.RestAssured.given;
  * REST Assured implementation.
  * Created by Eric Angeli on 5/16/2017.
  */
-@GoateRest
+@GoateRest(security = "basic auth with header")
 public class RestAssuredAuthBasicUserPW extends RestAuthBasicUserPW implements RASpec{
     RequestSpecification specification = null;
     Response response = null;
