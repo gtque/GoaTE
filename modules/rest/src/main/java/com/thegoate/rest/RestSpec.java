@@ -41,11 +41,19 @@ public interface RestSpec {
 
     RestSpec disableLog();
 
+    RestSpec headers(Goate data);
+
     RestSpec header(String key, Object value);
+
+    RestSpec queryParams(Goate data);
 
     RestSpec queryParam(String key, Object value);
 
+    RestSpec urlParams(Goate data);
+
     RestSpec urlParam(String key, Object value);
+
+    RestSpec pathParams(Goate data);
 
     RestSpec pathParam(String key, Object value);
 
@@ -59,6 +67,8 @@ public interface RestSpec {
 
     RestSpec bodyAsBinaryData();
 
+    RestSpec formData(Goate data);
+
     RestSpec formData(String key, Object value);
 
     RestSpec formUrlencodedData(String key, Object value);
@@ -67,9 +77,13 @@ public interface RestSpec {
 
     RestSpec rawBody(Object value);
 
+    RestSpec multipartData(Goate data);
+
     RestSpec multipartFormData(Object value);
 
     RestSpec multipartFormData(String key, Object value);
+
+    RestSpec customData(Goate data);
 
     RestSpec customData(Enum key, Object value);
 
@@ -87,16 +101,6 @@ public interface RestSpec {
 
     RestSpec baseURL(String url);
 
-    Object get(String endpoint);
-
-    Object put(String endpoint);
-
-    Object post(String endpoint);
-
-    Object delete(String endpoint);
-
-    Object patch(String endpoint);
-
     Goate getHeaders();
 
     Goate getQueryParameters();
@@ -110,4 +114,14 @@ public interface RestSpec {
     boolean doLog();
 
     String getBaseURL();
+
+    Object get(String endpoint);
+
+    Object put(String endpoint);
+
+    Object post(String endpoint);
+
+    Object delete(String endpoint);
+
+    Object patch(String endpoint);
 }

@@ -38,35 +38,22 @@ import static io.restassured.RestAssured.given;
  * REST Assured implementation.
  * Created by Eric Angeli on 5/16/2017.
  */
-@GoateRest(security = "auth with bearer token")
-public class RestAssuredAuthBearer extends RestAuthBearer implements RASpec{
+@GoateRest(security = "bearer token")
+public class RAAuthBearer extends RestAuthBearer implements RASpec{
     RequestSpecification specification = null;
     Response response = null;
 
-    public RestAssuredAuthBearer(){
+    public RAAuthBearer(){
         this.specification = RestAssured.init(given());
     }
 
-    public RestAssuredAuthBearer(RequestSpecification specification){
+    public RAAuthBearer(RequestSpecification specification){
         this.specification = RestAssured.init(specification);
     }
 
     @Override
     public Object response(){
         return response;
-    }
-
-    @Override
-    public RestSpec processCustomData(String key, Object value){
-        return this;
-    }
-
-    @Override
-    /**
-     * This is a null operation for the base RestAssured class.
-     */
-    public RestSpec processCustomData(Enum key, Object value) {
-        return this;
     }
 
     @Override

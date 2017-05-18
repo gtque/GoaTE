@@ -24,38 +24,21 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.rest.assured;
+package com.thegoate.rest.staff;
 
-import com.thegoate.Goate;
-import com.thegoate.rest.Rest;
-import com.thegoate.rest.staff.ApiGet;
-import com.thegoate.rest.staff.ApiPost;
-import com.thegoate.staff.Employee;
-import com.thegoate.testng.TestNGEngineAnnotatedDL;
-import io.restassured.response.Response;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
+import com.thegoate.staff.GoateJob;
 
 /**
- * Simple rest tests.
- * this really should be a spring test that stands up a spring application for testing purposes.
- * or a mock server.
- * Created by Eric Angeli on 5/16/2017.
+ * Defines the generic employee that makes a get call to an api.
+ * Created by Eric Angeli on 5/17/2017.
  */
-public class RATests extends TestNGEngineAnnotatedDL {
-    @Test(groups = {"unit2"})
-    public void getGoogle(){
-        Rest rest = new RABasicAuthHeader();
-        Response response = (Response)rest.baseURL("http://google.com").get("");
-        assertEquals(response.statusCode(), 200);
-    }
+@GoateJob(jobs = {"get api", "rest get", "get"})
+public class ApiGet extends ApiEmployee {
 
-    @Test(groups = {"unit2"})
-    public void getGoogleByEmployee(){
-        Goate d = new Goate().put("base url", "http://google.com");
-        Employee e = new ApiGet().init(d);
-        Response response = (Response)e.doWork();
-        assertEquals(response.statusCode(), 200);
+    @Override
+    public Object doWork() {
+        Object response = rest.get(data.get("end point","", true, String.class));
+        data.put("response", response);
+        return response;
     }
 }

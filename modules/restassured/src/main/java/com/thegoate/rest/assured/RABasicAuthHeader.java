@@ -26,7 +26,7 @@
  */
 package com.thegoate.rest.assured;
 
-import com.thegoate.rest.RestAuthBasicUserPW;
+import com.thegoate.rest.RestAuthBasicHeader;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
 import io.restassured.response.Response;
@@ -38,35 +38,22 @@ import static io.restassured.RestAssured.given;
  * REST Assured implementation.
  * Created by Eric Angeli on 5/16/2017.
  */
-@GoateRest(security = "basic auth with header")
-public class RestAssuredAuthBasicUserPW extends RestAuthBasicUserPW implements RASpec{
+@GoateRest(security = "basic auth header")
+public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     RequestSpecification specification = null;
     Response response = null;
 
-    public RestAssuredAuthBasicUserPW(){
+    public RABasicAuthHeader(){
         this.specification = RestAssured.init(given());
     }
 
-    public RestAssuredAuthBasicUserPW(RequestSpecification specification){
+    public RABasicAuthHeader(RequestSpecification specification){
         this.specification = RestAssured.init(specification);
     }
 
     @Override
     public Object response(){
         return response;
-    }
-
-    @Override
-    public RestSpec processCustomData(String key, Object value){
-        return this;
-    }
-
-    @Override
-    /**
-     * This is a null operation for the base RestAssured class.
-     */
-    public RestSpec processCustomData(Enum key, Object value) {
-        return this;
     }
 
     @Override
@@ -118,7 +105,6 @@ public class RestAssuredAuthBasicUserPW extends RestAuthBasicUserPW implements R
 
     @Override
     public RequestSpecification getSpec() {
-        specification.auth().preemptive().basic(user, password);
         return specification;
     }
 }

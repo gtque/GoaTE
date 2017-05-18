@@ -98,13 +98,19 @@ public class Goate {
     public <T>T get(String key, Object def, boolean dsl, Class<T> type){
         Object value = System.getProperty(key);
         if (value == null) {
-            value = System.getenv(key);
-            if (value == null) {
-                if (data.containsKey(key)) {
-                    value = data.get(key);
-                } else if (def != null) {
-                    data.put(key, def);
-                    value = def;
+            if(key.equals("username")){//username is a special key name, in most cases we want to use the one set in the collection
+                //so it is checked first, and then if it is null it, check using the normal flow.
+                value = data.get(key);
+            }
+            if(value==null) {
+                value = System.getenv(key);
+                if (value == null) {
+                    if (data.containsKey(key)) {
+                        value = data.get(key);
+                    } else if (def != null) {
+                        data.put(key, def);
+                        value = def;
+                    }
                 }
             }
         }
@@ -141,6 +147,31 @@ public class Goate {
             for(String key:keys()){
                 if(key.startsWith(pattern)){
                     filtered.put(key, getStrict(key));
+                }
+            }
+        }
+        return filtered;
+    }
+
+    public Goate filterAndSplitKeyValuePairs(String filter){
+        return filterAndSplitKeyValuePairs(filter, ":=");
+    }
+
+    public Goate filterAndSplitKeyValuePairs(String filter, String split){
+        Goate filtered = new Goate();
+        if(data!=null) {
+            Goate info = filter(filter);
+            for (String key:info.keys()){
+                String def = info.get(key, null, true, String.class);
+                if(def!=null){
+                    if(!def.contains(split)) {
+                        def = "" + processDSL(def);
+                    }
+                    if(def.contains(split)){
+                        String k = def.substring(0, def.indexOf(split));
+                        String v = def.substring(def.indexOf(split) + split.length());
+                        filtered.put("" + processDSL(k), processDSL(v));
+                    }
                 }
             }
         }

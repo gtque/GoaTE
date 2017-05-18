@@ -45,8 +45,8 @@ public abstract class Rest implements RestSpec {
     protected Goate custom = new Goate();
     protected String baseURL = "";//this should include the port if different from default.
     protected boolean logAll = true;
-
-    enum BODY {
+    public static final String MP_ID_NOT_SET = "_mp_id_not_set";
+    public enum BODY {
         form, urlencoded, raw, binary, multipart
     }
 
@@ -86,8 +86,28 @@ public abstract class Rest implements RestSpec {
     }
 
     @Override
+    public RestSpec headers(Goate data) {
+        if(data!=null) {
+            for (String key : data.keys()) {
+                header(key, data.get(key));
+            }
+        }
+        return this;
+    }
+
+    @Override
     public RestSpec header(String key, Object value) {
         headers.put(key, value);
+        return this;
+    }
+
+    @Override
+    public RestSpec queryParams(Goate data) {
+        if(data!=null) {
+            for (String key : data.keys()) {
+                queryParam(key, data.get(key));
+            }
+        }
         return this;
     }
 
@@ -98,8 +118,28 @@ public abstract class Rest implements RestSpec {
     }
 
     @Override
+    public RestSpec urlParams(Goate data) {
+        if(data!=null) {
+            for (String key : data.keys()) {
+                urlParam(key, data.get(key));
+            }
+        }
+        return this;
+    }
+
+    @Override
     public RestSpec urlParam(String key, Object value) {
         urlParams.put(key, value);
+        return this;
+    }
+
+    @Override
+    public RestSpec pathParams(Goate data) {
+        if(data!=null) {
+            for (String key : data.keys()) {
+                pathParam(key, data.get(key));
+            }
+        }
         return this;
     }
 
@@ -140,6 +180,16 @@ public abstract class Rest implements RestSpec {
     }
 
     @Override
+    public RestSpec formData(Goate data) {
+        if(data!=null) {
+            for (String key : data.keys()) {
+                formData(key, data.get(key));
+            }
+        }
+        return this;
+    }
+
+    @Override
     public RestSpec formData(String key, Object value) {
         bodyFormat = BODY.form;
         return body(bodyFormat, key, value);
@@ -164,14 +214,35 @@ public abstract class Rest implements RestSpec {
     }
 
     @Override
+    public RestSpec multipartData(Goate data) {
+        if(data!=null) {
+            for (String key : data.keys()) {
+                multipartFormData(key.isEmpty()?(MP_ID_NOT_SET+"##"):key, data.get(key));
+            }
+        }
+        return this;
+    }
+
+    @Override
     public RestSpec multipartFormData(Object value) {
-        return multipartFormData("_mp_id_not_set##", value);
+        return multipartFormData(MP_ID_NOT_SET+"##", value);
     }
 
     @Override
     public RestSpec multipartFormData(String key, Object value) {
         bodyFormat = BODY.multipart;
         return body(bodyFormat, key, value);
+    }
+
+    @Override
+    public RestSpec customData(Goate data){
+        if(data!=null) {
+            for (String key : data.keys()) {
+                custom.put(key,data.get(key));
+                processCustomData(key, data.get(key));
+            }
+        }
+        return this;
     }
 
     @Override

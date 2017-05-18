@@ -34,6 +34,8 @@ import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.io.File;
+
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
 import static io.restassured.config.HeaderConfig.headerConfig;
@@ -70,9 +72,9 @@ public class RestAssured extends Rest implements RASpec{
         if(mySpec != null) {
             mySpec.baseUri(spec.getBaseURL());
             setHeaders(mySpec, spec.getHeaders());
-            setURLParameters(mySpec, spec.getHeaders());
-            setQueryParameters(mySpec, spec.getHeaders());
-            setPathParameters(mySpec, spec.getHeaders());
+            setURLParameters(mySpec, spec.getURLParameters());
+            setQueryParameters(mySpec, spec.getQueryParameters());
+            setPathParameters(mySpec, spec.getPathParameters());
             setBody(mySpec, spec.getBody());
             if(spec.doLog()){
                 mySpec.log().all();
@@ -114,7 +116,26 @@ public class RestAssured extends Rest implements RASpec{
     }
 
     protected static void setBody(RequestSpecification spec, Goate body){
-
+        if(spec!=null&&body!=null) {
+            for (String key : body.keys()) {
+                Goate b = (Goate)body.get(key);
+                if(b!=null) {
+                    for (String id:b.keys()) {
+                        if (key.equals(BODY.urlencoded.name())||key.equals(BODY.form.name())) {
+                            spec.formParam(id, b.get(id));
+                        }else if(key.equals(BODY.multipart.name())){
+                            if(id.startsWith(MP_ID_NOT_SET)){
+                                spec.multiPart((File)b.get(id));
+                            }else{
+                                spec.multiPart(id, b.get(id));
+                            }
+                        }else{
+                            spec.body(b.get(id));
+                        }
+                    }
+                }
+            }
+        }
     }
     @Override
     public Object response(){
