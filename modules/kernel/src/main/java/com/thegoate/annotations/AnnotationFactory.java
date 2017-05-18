@@ -58,6 +58,7 @@ public class AnnotationFactory {
     Class<? extends java.lang.annotation.Annotation> annotation;
     Class<? extends java.lang.annotation.Annotation> methodAnnotation;
     boolean setDefault = false;
+    String checkName = null;
 
     public AnnotationFactory clear() {
         id = null;
@@ -91,6 +92,17 @@ public class AnnotationFactory {
         return this;
     }
 
+    public AnnotationFactory using(String check){
+        if(annotation!=null){
+            try {
+                using(annotation.getMethod(check));
+            } catch (NoSuchMethodException e) {
+                LOG.error("could not find the identifying method: " + check);
+            }
+        }
+        this.checkName = check;
+        return this;
+    }
     public AnnotationFactory using(Method check) {
         this.check = check;
         return this;
@@ -98,6 +110,9 @@ public class AnnotationFactory {
 
     public AnnotationFactory annotatedWith(Class<? extends java.lang.annotation.Annotation> annotation) {
         this.annotation = annotation;
+        if(checkName!=null){
+            using(checkName);
+        }
         return this;
     }
 

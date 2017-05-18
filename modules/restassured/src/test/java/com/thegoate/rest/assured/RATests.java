@@ -24,30 +24,38 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.rest.assured;
 
-package com.thegoate.staff;
+import com.thegoate.Goate;
+import com.thegoate.rest.Rest;
+import com.thegoate.rest.staff.ApiGet;
+import com.thegoate.rest.staff.ApiPost;
+import com.thegoate.staff.Employee;
+import com.thegoate.testng.TestNGEngineAnnotatedDL;
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
 
-import org.atteo.classindex.IndexAnnotated;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static org.testng.Assert.assertEquals;
 
 /**
- * Use to define a task a particular method does.<br>
- * This adds an additional way to define behavior.<br>
- * In order to pass parameters into the method, they must be declared in order in the task
- * definition using ${var} to represent the parameter. The reference name is how the value
- * When defining a usage then "var" inside ${var} should be replaced with the actual name
- * of the variable stored in the Goate collection to be used.
- * for the parameter should be referenced in the data loaded from the provider.
- * example:
- * {@literal @}GoateTask(task = "Add ${var} and ${var}")
- * public int add(int first, int second){return first+second;}<br>
- *
- * Created by gtque on 4/21/2017.
+ * Simple rest tests.
+ * this really should be a spring test that stands up a spring application for testing purposes.
+ * or a mock server.
+ * Created by Eric Angeli on 5/16/2017.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@IndexAnnotated
-public @interface GoateTask {
-    String task();
+public class RATests extends TestNGEngineAnnotatedDL {
+    @Test(groups = {"unit2"})
+    public void getGoogle(){
+        Rest rest = new RABasicAuthHeader();
+        Response response = (Response)rest.baseURL("http://google.com").get("");
+        assertEquals(response.statusCode(), 200);
+    }
+
+    @Test(groups = {"unit2"})
+    public void getGoogleByEmployee(){
+        Goate d = new Goate().put("base url", "http://google.com");
+        Employee e = new ApiGet().init(d);
+        Response response = (Response)e.doWork();
+        assertEquals(response.statusCode(), 200);
+    }
 }

@@ -24,30 +24,27 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
-package com.thegoate.staff;
-
-import org.atteo.classindex.IndexAnnotated;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+package com.thegoate.rest;
 
 /**
- * Use to define a task a particular method does.<br>
- * This adds an additional way to define behavior.<br>
- * In order to pass parameters into the method, they must be declared in order in the task
- * definition using ${var} to represent the parameter. The reference name is how the value
- * When defining a usage then "var" inside ${var} should be replaced with the actual name
- * of the variable stored in the Goate collection to be used.
- * for the parameter should be referenced in the data loaded from the provider.
- * example:
- * {@literal @}GoateTask(task = "Add ${var} and ${var}")
- * public int add(int first, int second){return first+second;}<br>
- *
- * Created by gtque on 4/21/2017.
+ * Base class for using bearer authentication.
+ * Created by Eric Angeli on 5/16/2017.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@IndexAnnotated
-public @interface GoateTask {
-    String task();
+public abstract class RestAuthBearer extends Rest {
+    public enum Settings{
+        bearer;
+    }
+
+    @Override
+    public RestSpec processCustomData(Enum key, Object value){
+        return processCustomData(key.name(), value);
+    }
+
+    @Override
+    public RestSpec processCustomData(String key, Object value){
+        if (key.equals(Settings.bearer.name())) {
+            header("Authorization", "bearer " + value);
+        }
+        return this;
+    }
 }
