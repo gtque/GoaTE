@@ -36,7 +36,9 @@ import java.util.List;
 
 /**
  * The base definition for a new word in the DSL.<br>
- * Words should extend DSL and be annotated with the {@literal @}GoateDSL annotation
+ * Words should extend DSL and be annotated with the {@literal @}GoateDSL annotation<br>
+ * When referencing the word it should be terminated with double colons (::)<br>
+ * Parameters for the word should come after :: and be comma (,) separated.
  * Created by gtque on 4/20/2017.
  */
 public abstract class DSL {
@@ -68,7 +70,9 @@ public abstract class DSL {
     public List<String> define(Object value){
         this.value = value;
         definition = new ArrayList<>();
-        String[] def = (""+value).split("::");
+        String v = "" + value;
+        definition.add(v.substring(0,v.indexOf("::")));
+        String[] def = (v.substring(v.indexOf("::")+2)).split(",");
         for(String d:def){
             definition.add(d);
         }
