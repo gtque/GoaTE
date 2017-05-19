@@ -91,7 +91,6 @@ allprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
     apply plugin: 'com.jfrog.artifactory'
-    apply plugin: 'com.jfrog.bintray'
     apply plugin: 'jacoco'
     version = v + release;
     group = "goate"
@@ -128,6 +127,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'jacoco'
+    apply plugin: 'com.jfrog.bintray'
     apply plugin: 'goate.test'
     //apply plugin: 'application'
 
@@ -178,12 +178,12 @@ subprojects {
         configurations = ['archives'] //When uploading configuration files
         pkg {
             repo = 'GoaTE'
-            name = projectName
+            name = 'goate:'+projectName
             websiteUrl = siteUrl
             issueTrackerUrl = 'https://github.com/bintray/bintray-examples/issues'
             vcsUrl = gitUrl
             licenses = ['MIT']
-            labels = ['GoaTE', projectName]
+            labels = ['GoaTE', projectName.replace(javaVersion)]
             publicDownloadNumbers = true
         }
     }
