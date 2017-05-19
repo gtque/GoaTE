@@ -183,7 +183,7 @@ subprojects {
             issueTrackerUrl = 'https://github.com/bintray/bintray-examples/issues'
             vcsUrl = gitUrl
             licenses = ['MIT']
-            labels = ['GoaTE', projectName.replace(javaVersion)]
+            labels = ['GoaTE', projectName.replace(javaVersion,"")]
             publicDownloadNumbers = true
         }
     }
