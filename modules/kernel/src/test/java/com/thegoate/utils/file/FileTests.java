@@ -48,7 +48,7 @@ public class FileTests {
     @Test(groups = {"unit"})
     public void appendToFile(){
         new Append().line("howdy!").to("temp/test.txt");
-        String howdy = ""+new Get("file::").from("temp/test.txt");
+        String howdy = ""+new Get("temp/test.txt").from("file::");
         howdy = howdy.replace("\n","\r").replace("\r","");
         assertEquals(howdy, "howdy!");
     }
@@ -60,7 +60,7 @@ public class FileTests {
         new Copy("temp/test.txt").to("temp/test"+unique+".txt");
         new Copy(new File("temp/test.txt").toURI().toURL().openStream()).to("temp/test"+unique+"b.txt");
         new Append().line("doody!").to("temp/test"+unique+".txt", true);
-        String howdy = ""+new Get("file::").from("temp/test"+unique+".txt");
+        String howdy = ""+new Get("temp/test"+unique+".txt").from("file::");
         howdy = howdy.replace("\n","\r").replace("\r","");
         assertEquals(howdy, "doody!");
         File f1a = new File("temp/test"+unique+"b.txt");
@@ -71,11 +71,11 @@ public class FileTests {
     public void deleteFile() throws MalformedURLException {
         String unique = ""+System.nanoTime();
         File f0 = new File("temp/test.txt");
-        assertEquals((""+new Get("file::").from(f0)).replace("\n","\r").replace("\r",""),"howdy!");
+        assertEquals((""+new Get(f0).from("file::")).replace("\n","\r").replace("\r",""),"howdy!");
         new Copy(f0).to("temp/test"+unique+".txt");
         new Copy().file(new File("temp/test.txt").toURI().toURL()).toDir("temp/temp");
         new Append().line("doody!").to("temp/test"+unique+".txt");
-        String howdy = ""+new Get("file::").from("temp/test"+unique+".txt");
+        String howdy = ""+new Get("temp/test"+unique+".txt").from("file::");
         howdy = howdy.replace("\n","\r").replace("\r","");
         assertEquals(howdy, "howdy!doody!");
         File f1 = new File("temp/test"+unique+".txt");

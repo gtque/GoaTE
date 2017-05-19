@@ -48,13 +48,22 @@ public class UnknownUtilType {
     final Logger LOG = LoggerFactory.getLogger(getClass());
 
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util) {
-        return buildUtil(obj, util, null, null);
+        return buildUtil(obj, util, obj);
+    }
+
+    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val) {
+        return buildUtil(obj, util, val, null, null);
     }
 
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, String id, Method identifier) {
+        return buildUtil(obj, util, obj, id, identifier);
+    }
+
+    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier) {
         Object utility = null;
         Class def = null;
-        Object[] args = {obj};
+        Object[] args = {val};
+        Object[] checkArgs = {obj};
         AnnotationFactory af = new AnnotationFactory();
         af.constructorArgs(args);
         Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
@@ -69,7 +78,7 @@ public class UnknownUtilType {
                         Class[] types = {Object.class};
                         Method check = c.getMethod("isType", types);
                         Object u = af.constructor(null).build(c);
-                        if (check != null && Boolean.parseBoolean(""+check.invoke(u, args))) {
+                        if (check != null && Boolean.parseBoolean(""+check.invoke(u, checkArgs))) {
                             utility = u;
                         }
                     }

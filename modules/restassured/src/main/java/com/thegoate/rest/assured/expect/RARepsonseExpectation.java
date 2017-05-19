@@ -24,20 +24,32 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.rest.assured.expect;
 
-package com.thegoate.utils.get;
-
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.GoateJob;
+import io.restassured.response.Response;
 
 /**
- * Created by Eric Angeli on 5/5/2017.
+ * Does the work of validating rest assured responses.
+ * Created by Eric Angeli on 5/18/2017.
  */
-public class GetTest {
-    @Test(groups = {"unit"})
-    public void getFile(){
-        String result = ""+new Get("hello.txt").from("file::");
-        assertEquals(result, "world!");
+@GoateJob(jobs = {"api response"})
+public class RARepsonseExpectation extends Employee {
+
+    Response response;
+
+    @Override
+    public Employee init() {
+        response = (Response)data.get("response");
+        return this;
+    }
+
+    @Override
+    public Object doWork() {
+        if(response==null){
+            LOG.warn("The response was null, make sure it was set correctly in the data collection by putting in with a key of \"response\".");
+        }
+        return response;
     }
 }

@@ -27,6 +27,8 @@
 package com.thegoate.rest.assured;
 
 import com.thegoate.Goate;
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.staff.ApiGet;
 import com.thegoate.rest.staff.ApiPost;
@@ -36,6 +38,7 @@ import io.restassured.response.Response;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Simple rest tests.
@@ -45,17 +48,28 @@ import static org.testng.Assert.assertEquals;
  */
 public class RATests extends TestNGEngineAnnotatedDL {
     @Test(groups = {"unit2"})
-    public void getGoogle(){
+    public void getGoogle() {
         Rest rest = new RABasicAuthHeader();
-        Response response = (Response)rest.baseURL("http://google.com").get("");
+        Response response = (Response) rest.baseURL("http://google.com").get("");
+        data.put("response", response);
         assertEquals(response.statusCode(), 200);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("api response>status code,==,200");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
     }
 
     @Test(groups = {"unit2"})
-    public void getGoogleByEmployee(){
+    public void getGoogleByEmployee() {
         Goate d = new Goate().put("base url", "http://google.com");
         Employee e = new ApiGet().init(d);
-        Response response = (Response)e.doWork();
+        Response response = (Response) e.doWork();
         assertEquals(response.statusCode(), 200);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(d);
+        etb.expect("api response>status code,==,200");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
     }
 }
