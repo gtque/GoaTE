@@ -36,9 +36,10 @@ import com.thegoate.utils.UnknownUtilType;
  */
 public class Get extends UnknownUtilType implements GetUtility{
     GetUtility tool = null;
+    Object find = null;
 
     public Get(Object o){
-        tool = (GetUtility)buildUtil(o, GetUtil.class);
+        this.find = o;
     }
 
     @Override
@@ -48,6 +49,7 @@ public class Get extends UnknownUtilType implements GetUtility{
 
     @Override
     public Object from(Object container) {
+        tool = (GetUtility)buildUtil(container, GetUtil.class, find);
         Object result = null;
         if(tool!=null){
             result = tool.from(container);

@@ -57,16 +57,16 @@ public class GetFileAsString extends GetTool{
     @Override
     public String from(Object container) {
         String result = "";
-        if(container instanceof File){
+        if(selector instanceof File){
             try {
-                result = new String(Files.readAllBytes(((File) container).toPath()));
+                result = new String(Files.readAllBytes(((File) selector).toPath()));
             } catch (IOException e) {
                 LOG.error("Problem loading file into a string: " + e.getMessage(), e);
             }
         }else {
-            String file = "" + container;
+            String file = "" + selector;
 
-            if (file != null && !file.equals("") && !file.equalsIgnoreCase("null")) {
+            if (!file.equals("") && !file.equalsIgnoreCase("null")) {
                 String fullPath = GoateUtils.getFilePath(file);
                 try {
                     if (fullPath.contains(":")) {

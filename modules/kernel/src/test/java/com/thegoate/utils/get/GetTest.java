@@ -37,7 +37,7 @@ import static org.testng.Assert.assertEquals;
 public class GetTest {
     @Test(groups = {"unit"})
     public void getFile(){
-        String result = ""+new Get("file::").from("hello.txt");
+        String result = ""+new Get("hello.txt").from("file::");
         assertEquals(result, "world!");
     }
 }
