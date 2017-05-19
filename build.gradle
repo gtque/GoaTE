@@ -38,8 +38,9 @@ buildscript {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-        classpath files('gradle/goate/gradle.jar')//this needs to be replaced when a version is finally published.
+//        classpath files('gradle/goate/gradle.jar')//this needs to be replaced when a version is finally published.
 //        classpath 'goate:gradle7:1.0.201703131452'
+        classpath 'goate:gradle8:0.2.201705171305beta'
     }
 }
 
@@ -126,6 +127,8 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'jacoco'
+    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'goate.test'
     //apply plugin: 'application'
 
     project.ext.set("internalVersion", vbase);
@@ -148,45 +151,6 @@ subprojects {
         compileOnly "org.atteo.classindex:classindex:3.3"
     }
 
-    //def testRemote = project.hasProperty("remoteTest")?project.remoteTest.equals("true"):false;
-    def testGroups = project.hasProperty("testGroups") ? (project.testGroups.equals("all") ? "unit,integration" : project.testGroups) : 'unit'
-    def excludeGroup = project.hasProperty("excludeGroup") ? project.excludeGroup : ''
-    def testSuite = project.hasProperty("testSuite") ? project.testSuite : ''
-    def forks = project.hasProperty("forks") ? (project.forks.isEmpty() ? "1" : project.forks) : '1'
-    def forksEvery = project.hasProperty("forksEvery") ? (project.forksEvery.isEmpty() ? "" : project.forksEvery) : ''
-    def threads = project.hasProperty("threads") ? (project.threads.isEmpty() ? "1" : project.threads) : '1'
-
-    test {
-        exclude "**/GradleExcludeTrue1*"
-        exclude "**/GradleExcludeTrue2*","**/GradleExcludeTrue3*"
-        systemProperties System.getProperties();
-        //setting checkTemplateLocation to false since they are not used.
-        systemProperty "spring.freemarker.checkTemplateLocation", "false";
-        systemProperty "spring.velocity.checkTemplateLocation", "false";
-        systemProperty "user.dir", project.buildscript.sourceFile.parentFile.path
-        useTestNG() {
-            listeners << "org.testng.reporters.XMLReporter"
-            if (testSuite.equals('')) {
-                //System.out.println("\tgroup: " + testGroup)
-                maxParallelForks = Long.parseLong("${forks}")
-                if (!forksEvery.isEmpty()) {
-                    forkEvery = Long.parseLong("${forksEvery}")
-                }
-                parallel = "tests"
-                threadCount = Long.parseLong("${threads}")
-                if (!testGroups.equals('')) {
-                    includeGroups "${testGroups}"
-                }
-                if (!excludeGroup.equals('')) {
-                    excludeGroups "${excludeGroup}"
-                }
-            } else {
-                //println "executing test suite ${testSuite}"
-                suites "${testSuite}"
-                //useDefaultListeners true
-            }
-        }
-    }
     jar.baseName = projectName
 
     sourceSets {
@@ -205,19 +169,43 @@ subprojects {
         exclude group: 'commons-pool2', module: 'commons-pool2'
     }
 
-    test.finalizedBy(project.tasks.jacocoTestReport)/**/
+    def siteUrl = 'http://www.thegoate.com'
+    def gitUrl = 'https://github.com/gtque/goate'
+    bintray {
+        user = bintray_user
+        key = bintray_api_key
+
+        configurations = ['archives'] //When uploading configuration files
+        pkg {
+            repo = 'GoaTE'
+            name = 'goate:'+projectName
+            websiteUrl = siteUrl
+            issueTrackerUrl = 'https://github.com/bintray/bintray-examples/issues'
+            vcsUrl = gitUrl
+            licenses = ['MIT']
+            labels = ['GoaTE', projectName.replace(javaVersion)]
+            publicDownloadNumbers = true
+        }
+    }
+
     install  {
         repositories.mavenInstaller {
             //System.out.println("installing: " + group + ":" + projectName + ":" + version)
             GoateGradleHelper.customPom(pom, configurations, project.javaVersion, oneOff)
             pom {
                 project {
-                    url 'http://www.thegoate.com'
+                    url siteUrl
                     // Set your license
                     licenses {
                         license {
                             name 'MIT'
                             url 'http://www.thegoate.com/licenses/LICENSE-MIT.txt'
+                        }
+                    }
+                    developers {
+                        developer{
+                            id 'gtque'
+                            name 'Eric Angeli'
                         }
                     }
                 }
@@ -248,7 +236,7 @@ subprojects {
         //The base Artifactory URL if not overridden by the publisher/resolver
         publish {
             repository {
-                repoKey = 'vbs-maven-release'
+                repoKey = 'release'
                 username = "${artifactory_user}"
                 password = "${artifactory_password}"
                 maven = true
