@@ -44,7 +44,7 @@ public class PropertyFileDL extends DataLoader {
     @Override
     public List<Goate> load() {
         List<Goate> data = new ArrayList<>();
-        String pf = new GetFileAsString().from(parameters.get("file"));
+        String pf = new GetFileAsString(parameters.get("file")).from("file::");
         Goate props = new Goate();
         if(pf!=null&&!pf.isEmpty()) {
             pf = pf.replace("\n\r","\r").replace("\r","\n");
