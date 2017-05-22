@@ -124,14 +124,16 @@ public class Goate {
     }
 
     public Object processDSL(Object value) {
-        String check = "" + value;
-        if (check.contains("::")) {
-            check = check.substring(0, check.indexOf("::"));
-        } else {
-            check = null;
-        }
-        if (check != null) {
-            value = dictionary.translate(check, value);
+        if(value!=null) {
+            String check = "" + value;
+            if (check.contains("::")) {
+                check = check.substring(0, check.indexOf("::"));
+            } else {
+                check = null;
+            }
+            if (check != null) {
+                value = dictionary.translate(check, value);
+            }
         }
         return value;
     }

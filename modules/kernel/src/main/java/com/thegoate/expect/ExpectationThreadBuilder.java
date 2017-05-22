@@ -58,6 +58,19 @@ public class ExpectationThreadBuilder {
         this.data = data;
     }
 
+    public ExpectationThreadBuilder expect(Goate expectations){
+        if(expectations!=null){
+            for(String key:expectations.keys()){
+                if(expectations.get(key) instanceof String) {
+                    expect("" + expectations.get(key));
+                }else if(expectations.get(key) instanceof Expectation){
+                    expect((Expectation)expectations.get(key));
+                }
+            }
+        }
+        return this;
+    }
+    
     public ExpectationThreadBuilder expect(String definition){
         return expect(new Expectation(data).define(definition));
     }

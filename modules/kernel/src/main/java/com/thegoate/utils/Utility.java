@@ -24,15 +24,11 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
-package com.thegoate.utils.get;
-
-import com.thegoate.utils.Utility;
+package com.thegoate.utils;
 
 /**
- * Defines the interface for a get utility.
- * Created by Eric Angeli on 5/5/2017.
+ * Created by Eric Angeli on 5/19/2017.
  */
-public interface GetUtility extends Utility {
-    Object from(Object container);
+public interface Utility {
+    boolean isType(Object check);
 }
