@@ -1,0 +1,15 @@
+{
+  "Scenario":"get google, but first yahoo, and clean up with msn",
+  "abstract":true,
+  "job":"api",
+  "base url":"http://google.com",
+  "setup":[
+    {
+      "job":"api",
+      "base url":"http://google.com",
+      "method":"get",
+      "end point":"",
+      "security":"none"
+    }
+  ]
+}
