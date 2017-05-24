@@ -1,5 +1,5 @@
 {
-  "Scenario":"get google, but first yahoo, and clean up with msn",
+  "extends":"parent.json",
   "abstract":true,
   "job":"api",
   "base url":"http://google.com",

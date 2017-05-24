@@ -138,6 +138,11 @@ public class Goate {
         return value;
     }
 
+    public Goate drop(String key){
+        data.remove(key);
+        return this;
+    }
+
     /**
      * Simple filter, matches if key starts with the given pattern.
      * @param pattern The pattern to match

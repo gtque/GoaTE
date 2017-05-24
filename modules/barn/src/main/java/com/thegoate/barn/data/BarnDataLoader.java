@@ -50,11 +50,8 @@ public class BarnDataLoader extends DataLoader {
             Goate rd = new ToGoate(new Get(file).from("file::")).convert();
             if(rd.get("abstract")==null||!(""+rd.get("abstract")).equals("true")) {
                 if(rd.get("extends")!=null){
-                    String ext = ""+rd.get("extends");
-                    if(ext.startsWith("/")){
-                        ext = ext.substring(1);
-                    }
-                    rd.merge(new ToGoate(new Get(""+parameters.get("dir")+"/"+ext).from("file::")).convert(),false);
+                    rd = extend(rd,rd);
+                    rd.drop("abstract");
                 }
                 rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
                 data.add(rd);
@@ -63,6 +60,19 @@ public class BarnDataLoader extends DataLoader {
         return data;
     }
 
+    protected Goate extend(Goate rd, Goate extension){
+        if(extension!=null&&rd!=null) {
+            if (extension.get("extends") != null) {
+                String ext = "" + rd.get("extends");
+                if (ext.startsWith("/")) {
+                    ext = ext.substring(1);
+                }
+                extension.merge(extend(extension,new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert()),false);
+            }
+            rd.merge(extension, false);
+        }
+        return rd;
+    }
     public BarnDataLoader testCaseDirectory(String dir){
         setParameter("dir", dir);
         return this;
