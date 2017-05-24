@@ -38,8 +38,6 @@ buildscript {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-//        classpath files('gradle/goate/gradle.jar')//this needs to be replaced when a version is finally published.
-//        classpath 'goate:gradle7:1.0.201703131452'
         classpath 'goate:gradle8:0.3.201705241823'
     }
 }
@@ -49,26 +47,7 @@ mongo {
     port 27017
     storageLocation "mongo"
 }
-/**
-apply plugin: "goate.version"
-apply plugin: "goate.git"
 
-versionInfo {
-    versionProperties = "build.number.properties"
-    versionIsTime = true;
-    commitAfterIncrement = false;
-}
-
-git {
-    properties = "git.settings"
-}
-
-task("release.version"){
-    System.setProperty("incrementVersion", "number");
-    dependsOn "incrementVersion"
-    finalizedBy 'pushVersion'
-}
-/**/
 //-Dorg.gradle.java.home=<path to jdk>
 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
 def maxJV = "8";//this should be updated when a new version of java is supported.
@@ -76,7 +55,7 @@ String javaVersion = "" + Integer.parseInt(project.hasProperty("javaVersion") ? 
 if (javaVersion.contains(".")) {
     javaVersion = javaVersion.substring(("" + javaVersion).indexOf(".") + 1);
 }
-//-Dorg.gradle.java.home=<path to jdk>
+
 def vbase = '0.3'
 def v = "${vbase}." + sdf.format(new Date());
 def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : project.release) : 'beta'
