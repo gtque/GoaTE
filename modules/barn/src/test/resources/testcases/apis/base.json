@@ -2,7 +2,6 @@
   "extends":"parent.json",
   "abstract":true,
   "job":"api",
-  "base url":"http://google.com",
   "setup":[
     {
       "job":"api",
