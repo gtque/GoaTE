@@ -164,7 +164,7 @@ public class Goate {
         if(data!=null) {
             Goate info = filter(filter);
             for (String key:info.keys()){
-                String def = info.get(key, null, true, String.class);
+                String def = "" + info.get(key, "");
                 if(def!=null){
                     if(!def.contains(split)) {
                         def = "" + processDSL(def);

@@ -44,7 +44,7 @@ import java.lang.reflect.Method;
  * Created by Eric Angeli on 5/11/2017.
  */
 public abstract class TestNGEngine implements ITest, TestNG{
-    final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final Logger LOG = LoggerFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
     protected Goate constantData;

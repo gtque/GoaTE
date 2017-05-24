@@ -59,15 +59,15 @@ public abstract class ApiEmployee extends Employee {
         spec = (RestSpec)af.annotatedWith(GoateRest.class).find(security).using("security").build();
         if(spec!=null) {
             spec.baseURL(data.get("base url", null, true, String.class));
-            spec.headers(data.filterAndSplitKeyValuePairs("header"));
-            spec.urlParams(data.filterAndSplitKeyValuePairs("url param"));
-            spec.queryParams(data.filterAndSplitKeyValuePairs("query param"));
-            spec.pathParams(data.filterAndSplitKeyValuePairs("path param"));
+            spec.headers(data.filterAndSplitKeyValuePairs("headers."));
+            spec.urlParams(data.filterAndSplitKeyValuePairs("url params."));
+            spec.queryParams(data.filterAndSplitKeyValuePairs("query params."));
+            spec.pathParams(data.filterAndSplitKeyValuePairs("path params."));
             if(data.get("body")!=null)
             spec.body(data.get("body"));
-            spec.formData(data.filterAndSplitKeyValuePairs("form param"));
-            spec.multipartData(data.filterAndSplitKeyValuePairs("multipart param"));
-            spec.customData(data.filterAndSplitKeyValuePairs("custom param"));
+            spec.formData(data.filterAndSplitKeyValuePairs("form params."));
+            spec.multipartData(data.filterAndSplitKeyValuePairs("multipart"));
+            spec.customData(data.filterAndSplitKeyValuePairs("custom params."));
         }
         return spec;
     }
