@@ -40,7 +40,7 @@ buildscript {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
 //        classpath files('gradle/goate/gradle.jar')//this needs to be replaced when a version is finally published.
 //        classpath 'goate:gradle7:1.0.201703131452'
-        classpath 'goate:gradle8:0.2.201705171305beta'
+        classpath 'goate:gradle8:0.3.201705241823'
     }
 }
 
