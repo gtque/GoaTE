@@ -55,6 +55,10 @@ public class GoateDepends {
         this.javaVersion = ""+javaVersion;
     }
 
+    public Object depends(String dependency){
+        return depends(dependency, "");
+    }
+
     public Object depends(String dependency, String baseVer) {
         return depends(group, dependency, baseVer, false);
     }

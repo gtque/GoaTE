@@ -27,6 +27,7 @@
 package com.thegoate.rest.assured;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.IsDefault;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
@@ -45,6 +46,7 @@ import static io.restassured.config.HeaderConfig.headerConfig;
  * Created by Eric Angeli on 5/16/2017.
  */
 @GoateRest
+@IsDefault
 public class RestAssured extends Rest implements RASpec{
     RequestSpecification specification = null;
     Response response = null;

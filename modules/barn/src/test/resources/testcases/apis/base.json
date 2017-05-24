@@ -1,0 +1,14 @@
+{
+  "extends":"parent.json",
+  "abstract":true,
+  "job":"api",
+  "setup":[
+    {
+      "job":"api",
+      "base url":"http://google.com",
+      "method":"get",
+      "end point":"",
+      "security":"none"
+    }
+  ]
+}

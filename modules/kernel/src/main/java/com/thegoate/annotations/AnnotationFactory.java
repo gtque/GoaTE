@@ -156,7 +156,6 @@ public class AnnotationFactory {
     public Class lookUp() {
         buildDirectory();
         Class c = null;
-        buildDirectory();
         LOG.debug("looking for " + annotation.getName());
         String theClass = id;
         try {

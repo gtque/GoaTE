@@ -138,6 +138,11 @@ public class Goate {
         return value;
     }
 
+    public Goate drop(String key){
+        data.remove(key);
+        return this;
+    }
+
     /**
      * Simple filter, matches if key starts with the given pattern.
      * @param pattern The pattern to match
@@ -164,7 +169,7 @@ public class Goate {
         if(data!=null) {
             Goate info = filter(filter);
             for (String key:info.keys()){
-                String def = info.get(key, null, true, String.class);
+                String def = "" + info.get(key, "");
                 if(def!=null){
                     if(!def.contains(split)) {
                         def = "" + processDSL(def);
