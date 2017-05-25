@@ -41,7 +41,10 @@ import java.util.List;
  * example: -Deut=local<br>
  *      then in the resource directory:<br>
  *          resources/eut/local.properties<br>
- * You can override the properties file by setting the same parameter in your run data.
+ * You can override the properties file by setting the same parameter in your run data.<br>
+ * To reference something in the eut properties use: eut::name,default
+ * <br>where name is the name of the property and default is a default value to use if not found.
+ * <br>default is not required and may be left off.
  * Created by gtque on 5/19/2017.
  */
 @GoateDSL(word = "eut")
@@ -62,6 +65,7 @@ public class EutConfigDSL extends DSL {
             }
         }
         String key = ""+get(1,data);
-        return data.get(key, eutConfig!=null?eutConfig.get(key):null);
+        Object def = get(2,data);
+        return data.get(key, eutConfig!=null?(eutConfig.get(key)==null?def:eutConfig.get(key)):def);
     }
 }

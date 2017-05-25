@@ -62,7 +62,10 @@ public abstract class DSL {
     }
 
     protected Object get(int index, Goate data){
-        Object o = data.processDSL(definition.get(index));
+        Object o = null;
+        if(definition.size()>index) {
+            o = data.processDSL(definition.get(index));
+        }
         return o==null?definition.get(index):o;
     }
 
