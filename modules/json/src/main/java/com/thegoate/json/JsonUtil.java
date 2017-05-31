@@ -37,10 +37,19 @@ import org.slf4j.LoggerFactory;
  * Base json util class that implements the isType method.
  * Created by Eric Angeli on 5/19/2017.
  */
-public class JsonUtil implements Utility {
+public abstract class JsonUtil implements Utility {
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
     protected Object takeActionOn = null;
+    protected Object nested = null;
+
     public JsonUtil(Object val){
+        if(val instanceof String){
+            String select = ""+val;
+            if((select).contains(">")){
+                nested = select.substring(select.indexOf(">")+1);
+                val = select.substring(0,select.indexOf(">"));
+            }
+        }
         this.takeActionOn = val;
     }
 
@@ -66,4 +75,5 @@ public class JsonUtil implements Utility {
         }
         return istype;
     }
+    protected abstract Object processNested(Object subContainer);
 }

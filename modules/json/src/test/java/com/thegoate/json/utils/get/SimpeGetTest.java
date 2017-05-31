@@ -42,5 +42,9 @@ public class SimpeGetTest extends TestNGEngineAnnotatedDL {
     public void simpleGet(){
         String a = "" + new Get("a").from(new Get("simple.json").from("file::"));
         assertEquals(a, "b");
+        Object cSize = new Get("c>size()").from(new Get("simple.json").from("file::"));
+        Object cSize2 = new Get("c>length()").from(new Get("simple.json").from("file::"));
+        assertEquals(cSize, 2);
+        assertEquals(cSize2, 2);
     }
 }
