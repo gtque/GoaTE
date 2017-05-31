@@ -56,9 +56,11 @@ public class EutConfigTests extends TestNGEngineAnnotatedDL {
 
     @Test(groups = {"unit"})
     public void loadDooda(){
-        Goate d = new Goate().put("eut", "dooda").put("test", "eut::hello");
+        Goate d = new Goate().put("eut", "dooda").put("test", "eut::hello").put("test2", "eut::chunky,monkey");
         String actual = ""+ d.get("test", "foobar");
+        String actual2 = ""+ d.get("test2", "banana");
         assertEquals(actual, "dooda!");
+        assertEquals(actual2, "monkey");
         assertEquals(d.get("test", "foobar"), "dooda!");
     }
 }

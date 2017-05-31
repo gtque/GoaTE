@@ -86,6 +86,7 @@ public class GetRAResponse extends GetTool{
             }
 
         }
+        result = processNested(result);//process nested gets.
         return result;
     }
 }

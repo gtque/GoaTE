@@ -70,21 +70,26 @@ public abstract class TestNGEngine implements ITest, TestNG{
         methodName = method.getName();
         String startMessage = "\n"+
                 "***************************Starting Up***************************\n"+
-                "*\t"+getTestName()+"\t*\n"+
-                data.toString("*\t","\t*")+
-                "*****************************************************************";
-        LOG.debug(startMessage);
+                "*\t"+getTestName()+"\t*\n";
+        if(LOG.isDebugEnabled()){
+            startMessage += data.toString("*\t","\t*");
+        }
+        startMessage += "*****************************************************************";
+        LOG.info(startMessage);
     }
 
     @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         String endMessage = "\n"+
                 "*****************************************************************\n"+
-                "*\t"+getTestName()+"\t*\n"+
-                data.toString("*\t","\t*")+
-                "***************************Finished Up***************************";
-        LOG.debug(endMessage);
+                "*\t"+getTestName()+"\t*\n";
+        if(LOG.isDebugEnabled()){
+            endMessage += data.toString("*\t","\t*");
+        }
+        endMessage += "***************************Finished Up***************************";
+        LOG.info(endMessage);
     }
+
     protected void init(Goate data){
         setData(data);
         setScenario(get("Scenario","empty::",String.class));

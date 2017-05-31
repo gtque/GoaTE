@@ -66,7 +66,7 @@ public abstract class DSL {
         if(definition.size()>index) {
             o = data.processDSL(definition.get(index));
         }
-        return o==null?definition.get(index):o;
+        return o;
     }
 
 
