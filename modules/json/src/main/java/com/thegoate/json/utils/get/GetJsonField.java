@@ -29,8 +29,10 @@ package com.thegoate.json.utils.get;
 import com.thegoate.Goate;
 import com.thegoate.json.JsonUtil;
 import com.thegoate.json.utils.togoate.JSONToGoate;
+import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetUtil;
 import com.thegoate.utils.get.GetUtility;
+import org.json.JSONArray;
 
 /**
  * Get the field from the given json.
@@ -44,12 +46,30 @@ public class GetJsonField extends JsonUtil implements GetUtility {
     }
 
     @Override
-    public Object from(Object container) {
-        Goate g = new JSONToGoate(container).convert();
-        Object result = null;
-        if(g!=null){
-            result = g.get(""+takeActionOn);
+    protected Object processNested(Object subContainer) {
+        Object result = subContainer;
+        if(nested!=null){
+            result = new Get(nested).from(subContainer);
         }
+        return result;
+    }
+
+    @Override
+    public Object from(Object container) {
+        Object result = null;
+        if(takeActionOn instanceof String && (takeActionOn.equals("size()")||takeActionOn.equals("length()"))){
+            try {
+                result = new JSONArray(container.toString()).length();
+            }catch(Exception e){
+                LOG.warn("The container was not something to get the size from.\n"+e.getMessage(), e);
+            }
+        }else {
+            Goate g = new JSONToGoate(container).convert();
+            if (g != null) {
+                result = g.get("" + takeActionOn);
+            }
+        }
+        result = processNested(result);
         return result;
     }
 }

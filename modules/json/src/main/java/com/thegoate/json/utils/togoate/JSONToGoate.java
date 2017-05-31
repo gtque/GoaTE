@@ -44,6 +44,13 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
 
     public JSONToGoate(Object val) {
         super(val);
+        takeActionOn = val;
+        nested = null;
+    }
+
+    @Override
+    protected Object processNested(Object subContainer) {
+        return subContainer;
     }
 
     @Override

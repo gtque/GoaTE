@@ -55,8 +55,8 @@ public class GetFileAsString extends GetTool{
     }
 
     @Override
-    public String from(Object container) {
-        String result = "";
+    public Object from(Object container) {
+        Object result = "";
         if(selector instanceof File){
             try {
                 result = new String(Files.readAllBytes(((File) selector).toPath()));
@@ -80,6 +80,7 @@ public class GetFileAsString extends GetTool{
                 }
             }
         }
+        result = processNested(result);//process nested gets.
         return result;
     }
 }

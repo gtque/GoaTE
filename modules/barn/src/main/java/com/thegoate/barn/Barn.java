@@ -77,12 +77,14 @@ public class Barn extends TestNGEngine {
 
     protected void steps(String step){
         Goate sup = new ToGoate(data.get(step, "[]")).convert();
-        for(int i = 0; i<Integer.MAX_VALUE;i++) {
-            if(sup.keys().contains(""+i)) {
-                Goate d = new ToGoate(sup.get(""+i, "{}")).convert();
-                doWork(d);
-            }else{
-                break;
+        if(sup!=null) {
+            for (int i = 0; i < Integer.MAX_VALUE; i++) {
+                if (sup.keys().contains("" + i)) {
+                    Goate d = new ToGoate(sup.get("" + i, "{}")).convert();
+                    doWork(d);
+                } else {
+                    break;
+                }
             }
         }
     }

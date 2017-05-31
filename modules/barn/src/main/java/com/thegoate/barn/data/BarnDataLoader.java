@@ -45,14 +45,14 @@ public class BarnDataLoader extends DataLoader {
     @Override
     public List<Goate> load() {
         List<Goate> data = new ArrayList<>();
-        List<File> files =  new GetFileListFromDir(parameters.get("dir")).from("filedir::");
-        for(File file:files){
+        List<File> files = (List<File>) new GetFileListFromDir(parameters.get("dir")).from("filedir::");
+        for (File file : files) {
             Goate rd = new ToGoate(new Get(file).from("file::")).convert();
-            if(rd.get("abstract")==null||!(""+rd.get("abstract")).equals("true")) {
-                if(rd.get("extends")!=null){
-                    rd = extend(rd,rd);
-                    rd.drop("abstract");
-                }
+            if (("" + rd.get("abstract")).equals("true")) {
+                LOG.debug("skipping: " + file.getName());
+            }else{
+                rd = extend(rd, rd);
+                rd.drop("abstract");
                 rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
                 data.add(rd);
             }
@@ -60,20 +60,21 @@ public class BarnDataLoader extends DataLoader {
         return data;
     }
 
-    protected Goate extend(Goate rd, Goate extension){
-        if(extension!=null&&rd!=null) {
+    protected Goate extend(Goate rd, Goate extension) {
+        if (extension != null && rd != null) {
             if (extension.get("extends") != null) {
                 String ext = "" + rd.get("extends");
                 if (ext.startsWith("/")) {
                     ext = ext.substring(1);
                 }
-                extension.merge(extend(extension,new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert()),false);
+                extension.merge(extend(extension, new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert()), false);
             }
             rd.merge(extension, false);
         }
         return rd;
     }
-    public BarnDataLoader testCaseDirectory(String dir){
+
+    public BarnDataLoader testCaseDirectory(String dir) {
         setParameter("dir", dir);
         return this;
     }

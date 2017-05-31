@@ -108,8 +108,9 @@ public class Expectation {
     public Expectation add(Expectation expectation){
         Goate ex = expectation.getExpectations();
         for (String key : ex.keys()) {
-            Map<String, Object> exp = (Map<String, Object>) ex.get(key);
-            actual(exp.get("actual")).is(""+exp.get("operator")).expected(exp.get("expected"));
+//            Map<String, Object> exp = (Map<String, Object>) ex.get(key);
+            Goate exp = (Goate)ex.get(key);
+            actual(exp.getStrict("actual")).is(""+exp.getStrict("operator")).expected(exp.getStrict("expected"));
         }
         return this;
     }
@@ -139,7 +140,8 @@ public class Expectation {
         if((simpleState.length()==3&&simpleState.contains("a")&&simpleState.contains("i")&&simpleState.contains("c"))||force){
             if(actual!=null&&operator!=null&&!operator.isEmpty()) {//must at least set actual and operator fields.
                 String key = "" + actual + operator + expected;
-                Map<String, Object> exp = new ConcurrentHashMap<>();
+//                Map<String, Object> exp = new ConcurrentHashMap<>();
+                Goate exp = new Goate();
                 exp.put("actual", actual);
                 exp.put("operator", operator);
                 exp.put("expected", expected);
@@ -159,7 +161,8 @@ public class Expectation {
             try {
                 Object rtrn = from.work();
                 for (String key : expect.keys()) {
-                    Map<String, Object> exp = (Map<String, Object>) expect.get(key);
+//                    Map<String, Object> exp = (Map<String, Object>) expect.get(key);
+                    Goate exp = (Goate)expect.get(key);
                     Object val = null;
                     if (exp.get("actual") instanceof String && ((String) exp.get("actual")).equalsIgnoreCase("return")) {
                         val = rtrn;

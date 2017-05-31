@@ -43,7 +43,7 @@ public abstract class ApiBarn extends Barn {
     /**
      * Make sure you add the factor annotation to the subclasses implementation of this constructor.<br>
      * The data provider can be set to "dataLoader".
-     * @param data
+     * @param data the run data
      */
     public ApiBarn(Goate data){
         super(data);

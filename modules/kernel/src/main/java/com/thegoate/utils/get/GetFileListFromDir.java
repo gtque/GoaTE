@@ -59,7 +59,7 @@ public class GetFileListFromDir extends GetTool{
     }
 
     @Override
-    public List<File> from(Object container) {
+    public Object from(Object container) {
         File original = null;
         if(selector instanceof File){
                 if(((File) selector).isDirectory()){
@@ -100,6 +100,7 @@ public class GetFileListFromDir extends GetTool{
                 }
             }
         }
-        return files;
+        Object result = processNested(files);
+        return result;
     }
 }

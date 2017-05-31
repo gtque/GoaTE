@@ -19,7 +19,7 @@
   "setup":[
     {
       "job":"api",
-      "base url":"http://yahoo.com",
+      "base url":"https://yahoo.com",
       "method":"get",
       "end point":"",
       "security":"none"

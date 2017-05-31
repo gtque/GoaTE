@@ -38,8 +38,31 @@ import org.slf4j.LoggerFactory;
 public abstract class GetTool implements GetUtility{
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
     protected Object selector = null;
+    protected Object nested = null;
     protected Object container = null;
     public GetTool(Object selector){
+        if(selector instanceof String){
+            String select = ""+selector;
+            if((select).contains(">")){
+                nested = select.substring(select.indexOf(">")+1);
+                selector = select.substring(0,select.indexOf(">"));
+            }
+        }
         this.selector = selector;
+    }
+
+    /**
+     * The from implementation should, in most cases,
+     * call processNested on the result and return that value.
+     * In some cases this may not make sense and no processing of nested gets can be performed.
+     * @param subContainer The container to perform the action on.
+     * @return The result of processing the nested operation.
+     */
+    protected Object processNested(Object subContainer){
+        Object result = subContainer;
+        if(nested!=null){
+            result = new Get(nested).from(subContainer);
+        }
+        return result;
     }
 }
