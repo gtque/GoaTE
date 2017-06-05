@@ -31,6 +31,9 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        maven{
+            url "https://dl.bintray.com/pilotg2/GoaTE"
+        }
         mavenLocal()
     }
     dependencies {
@@ -38,7 +41,7 @@ buildscript {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-        classpath 'goate:gradle8:0.3.201705241823'
+        classpath 'goate:gradle8:0.3.201705310130'
     }
 }
 
@@ -64,6 +67,9 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
+        maven{
+            url "https://dl.bintray.com/pilotg2/GoaTE"
+        }
         mavenLocal()
     }
     apply plugin: 'idea'
@@ -156,10 +162,11 @@ subprojects {
 
         configurations = ['archives'] //When uploading configuration files
         pkg {
+            userOrg = 'goate'
             repo = 'GoaTE'
-            name = 'goate:'+projectName
+            name = projectName
             websiteUrl = siteUrl
-            issueTrackerUrl = 'https://github.com/bintray/bintray-examples/issues'
+            issueTrackerUrl = 'https://github.com/gtque/goate/issues'
             vcsUrl = gitUrl
             licenses = ['MIT']
             labels = ['GoaTE', projectName.replace(javaVersion,"")]

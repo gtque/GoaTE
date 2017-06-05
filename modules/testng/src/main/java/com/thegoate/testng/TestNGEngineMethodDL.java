@@ -102,6 +102,10 @@ public class TestNGEngineMethodDL extends TestNGEngine {
                         cdl.merge(providers[1], true);
                     }
                 }
+                for(String k:rdl.keys()){
+                    Goate g = (Goate)rdl.get(k);
+                    g.put("_goate:method", method);
+                }
             } catch (Exception e) {
                 LOG.error("There was a problem building the providers: " + e.getMessage(), e);
             }

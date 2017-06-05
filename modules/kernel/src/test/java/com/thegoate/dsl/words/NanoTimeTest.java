@@ -31,6 +31,8 @@ import com.thegoate.Goate;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertTrue;
+
 /**
  * Tests the dsl for getting the current system nano time.
  * Created by gtque on 4/21/2017.
@@ -40,14 +42,20 @@ public class NanoTimeTest {
     public void translateNanoTimeSet(){
         Goate data = new Goate();
         data.put("test", "nanotime::");
+        Long start = System.nanoTime();
         Long nt = (Long) data.get("test");
         Assert.assertNotEquals(nt, 0L);
+        assertTrue(nt>start,"the generate time was not greater than the start time.");
+        assertTrue(nt<System.nanoTime(),"the generate time was not less than the end time.");
     }
 
     @Test(groups = {"unit"})
     public void translateNanoTimeDefault(){
         Goate data = new Goate();
+        Long start = System.nanoTime();
         Long nt = (Long) data.get("test","nanotime::");
         Assert.assertNotEquals(nt, 0L);
+        assertTrue(nt>start,"the generate time was not greater than the start time.");
+        assertTrue(nt<System.nanoTime(),"the generate time was not less than the end time.");
     }
 }

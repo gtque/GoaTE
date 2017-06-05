@@ -63,11 +63,14 @@ public class BarnDataLoader extends DataLoader {
     protected Goate extend(Goate rd, Goate extension) {
         if (extension != null && rd != null) {
             if (extension.get("extends") != null) {
-                String ext = "" + rd.get("extends");
-                if (ext.startsWith("/")) {
-                    ext = ext.substring(1);
+                String extensions = "" + rd.get("extends");
+                for(String ext:extensions.split(",")) {
+                    ext = ext.trim();
+                    if (ext.startsWith("/")) {
+                        ext = ext.substring(1);
+                    }
+                    extension.merge(extend(extension, new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert()), false);
                 }
-                extension.merge(extend(extension, new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert()), false);
             }
             rd.merge(extension, false);
         }

@@ -43,6 +43,13 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
         super();
     }
 
+    /**
+     * You can define the data loader provider in the same class<br>
+     * Implement a method that returns an array of Goate with length 2.<br>
+     * The first index (0) is the run data. The second index (1) is the constant data.<br>
+     * You can annotate the method with {@literal @}GoateDLP if you want to have a more descriptive name.
+     * @return an array of length 2 of Goate objects.
+     */
     @GoateDLP(name="sample2")
     public Goate[] dlp(){
         Goate[] d = new Goate[2];
@@ -51,6 +58,13 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
         return d;
     }
 
+    /**
+     * You can define the data loader provider in the same class<br>
+     * Implement a method that returns an array of Goate with length 2.<br>
+     * The first index (0) is the run data. The second index (1) is the constant data.<br>
+     * You do not have to annotate the method if you do not want to, instead reference it using the method name.
+     * @return an array of length 2 of Goate objects.
+     */
     public Goate[] sample3(){
         Goate[] d = new Goate[2];
         d[0] = new Goate().put("dl##", new StaticDL().add("a","x").add("Scenario", "use method provider 3."));
