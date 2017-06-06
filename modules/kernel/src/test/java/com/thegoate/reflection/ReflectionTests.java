@@ -27,10 +27,11 @@
 
 package com.thegoate.reflection;
 
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.test.TestChild;
 import com.thegoate.reflection.test.TestConstructors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;
@@ -45,7 +46,7 @@ import static org.testng.Assert.assertEquals;
  * Created by gtque on 4/25/2017.
  */
 public class ReflectionTests {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     @Test(groups = {"unit"})
     public void getAllMethods(){

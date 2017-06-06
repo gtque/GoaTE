@@ -28,9 +28,10 @@ package com.thegoate.testng;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ import java.util.List;
  * Created by Eric Angeli on 5/11/2017.
  */
 public class TestNGRunFactory {
-    static final Logger LOG = LoggerFactory.getLogger(TestNGRunFactory.class);
+    static final BleatBox LOG = BleatFactory.getLogger(TestNGRunFactory.class);
 
     public static Object[][] loadRuns(Goate runData, Goate constantData, boolean atLeastOneRun) {
         List<Goate> runs = new ArrayList<>();

@@ -35,6 +35,7 @@ import com.thegoate.staff.Employee;
 import com.thegoate.staff.GoateJob;
 import com.thegoate.testng.TestNGEngine;
 import com.thegoate.utils.togoate.ToGoate;
+import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -49,6 +50,8 @@ import static org.testng.Assert.assertTrue;
 public class Barn extends TestNGEngine {
     String label = "barn";//label will be used in the future, but not currently used.
     String baseTestCaseDir = "testcases";
+    ExpectEvaluator ev = null;
+    Throwable preFailure = null;
 
     public Barn(){}
 
@@ -64,14 +67,23 @@ public class Barn extends TestNGEngine {
     @BeforeMethod(alwaysRun = true)
     public void setup() {
         LOG.debug("----running setup----");
-        steps("setup");
+        try {
+            steps("setup");
+        }catch(Throwable t){
+            preFailure = t;
+        }
         LOG.debug("----finished setup----");
     }
 
     @AfterMethod(alwaysRun = true)
     public void cleanup() {
         LOG.debug("----running cleanup----");
-        steps("cleanup");
+        try {
+            steps("cleanup");
+        }catch(Throwable t){
+            LOG.warn(getTestName(), "Cleanup had a failure: " + t.getMessage(), t);
+            throw t;
+        }
         LOG.debug("----finished cleanup----");
     }
 
@@ -89,17 +101,31 @@ public class Barn extends TestNGEngine {
         }
     }
 
-    public void execute(){
-        LOG.debug("----starting execution----");
-        doWork(data);
-        LOG.debug("----finished execution----");
-        LOG.debug("----evaluating expectations----");
-        try {
-            evaluateExpectations();
-        }catch(Throwable t){
-            throw t;
-        }finally {
-            LOG.debug("----finished expectations----");
+    public void execute() {
+        if(preFailure!=null){
+            LOG.skip(getTestName(),"Skipping test because pre-steps failed: " + preFailure.getMessage());
+            throw new SkipException(preFailure.getMessage());
+        }else {
+            LOG.debug("----starting execution----");
+            doWork(data);
+            LOG.debug("----finished execution----");
+            LOG.debug("----evaluating expectations----");
+            try {
+                evaluateExpectations();
+            } catch (Throwable t) {
+//                LOG.warn(getTestName(), "Failed: " + t.getMessage());
+                throw t;
+            } finally {
+                if(ev!=null) {
+                    for (Goate p : ev.passes()) {
+                        LOG.pass(getTestName(), "PASSED: " + p.toString());
+                    }
+                    for (Goate f : ev.fails()) {
+                        LOG.fail(getTestName(), "FAILED: " + f.toString());
+                    }
+                }
+                LOG.debug("----finished expectations----");
+            }
         }
     }
 
@@ -120,7 +146,7 @@ public class Barn extends TestNGEngine {
     protected void evaluateExpectations(){
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect(data.filter("expect."));
-        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
     }

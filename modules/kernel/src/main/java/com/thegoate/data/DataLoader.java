@@ -27,8 +27,8 @@
 package com.thegoate.data;
 
 import com.thegoate.Goate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public abstract class DataLoader {
 
-    protected Logger LOG = LoggerFactory.getLogger(getClass());
+    protected BleatBox LOG = BleatFactory.getLogger(getClass());
 
     protected Goate parameters = new Goate();
 

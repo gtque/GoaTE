@@ -27,8 +27,10 @@
 
 package com.thegoate.utils.file;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 import java.io.*;
 
@@ -36,7 +38,7 @@ import java.io.*;
  * Created by gtque on 5/3/2017.
  */
 public class Append {
-    Logger LOG = LoggerFactory.getLogger(getClass());
+    BleatBox LOG = BleatFactory.getLogger(getClass());
     String line = "";
 
     public Append line(String line){

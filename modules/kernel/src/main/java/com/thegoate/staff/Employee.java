@@ -30,15 +30,12 @@ package com.thegoate.staff;
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationEvaluator;
 import com.thegoate.annotations.AnnotationFactory;
-import org.atteo.classindex.ClassIndex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -49,8 +46,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Created by gtque on 4/21/2017.
  */
 public abstract class Employee {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
-    protected final static Logger slog = LoggerFactory.getLogger(Employee.class);
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
+    protected final static BleatBox slog = BleatFactory.getLogger(Employee.class);
     protected HealthRecord hr = new HealthRecord();
     protected Goate data;
     protected String name = "";

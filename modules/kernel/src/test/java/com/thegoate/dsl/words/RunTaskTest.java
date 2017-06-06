@@ -28,8 +28,9 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -40,7 +41,7 @@ import static org.testng.Assert.fail;
  * Created by gtque on 4/21/2017.
  */
 public class RunTaskTest {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     @Test(groups = {"unit"})
     public void runHello(){
         Goate data = new Goate();

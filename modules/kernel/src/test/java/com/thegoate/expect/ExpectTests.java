@@ -28,8 +28,9 @@
 package com.thegoate.expect;
 
 import com.thegoate.Goate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertFalse;
@@ -40,7 +41,7 @@ import static org.testng.Assert.assertTrue;
  * Created by Eric Angeli on 5/10/2017.
  */
 public class ExpectTests {
-    final Logger LOG = LoggerFactory.getLogger(getClass());
+    final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     @Test(groups = {"unit"})
     public void isEven(){

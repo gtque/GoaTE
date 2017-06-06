@@ -28,9 +28,9 @@
 package com.thegoate.utils;
 
 import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.file.Copy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -44,7 +44,7 @@ import java.util.*;
  * Created by gtque on 5/3/2017.
  */
 public class GoateUtils {
-    static final Logger LOG = LoggerFactory.getLogger(GoateUtils.class);
+    static final BleatBox LOG = BleatFactory.getLogger(GoateUtils.class);
 
     public static Object getProperty(String key){
         return getProperty(key, null);
@@ -57,7 +57,7 @@ public class GoateUtils {
         sleep(sleepInMillis, LOG);
     }
 
-    public static void sleep(long sleepInMillis, Logger logger){
+    public static void sleep(long sleepInMillis, BleatBox logger){
         try{
             Thread.sleep(sleepInMillis);
         } catch (InterruptedException e) {

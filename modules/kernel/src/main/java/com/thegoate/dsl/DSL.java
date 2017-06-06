@@ -28,8 +28,8 @@
 package com.thegoate.dsl;
 
 import com.thegoate.Goate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.List;
  * Created by gtque on 4/20/2017.
  */
 public abstract class DSL {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected List<String> definition;
     protected Object value;
 

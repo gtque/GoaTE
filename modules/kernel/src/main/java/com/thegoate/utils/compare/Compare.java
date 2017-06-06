@@ -26,16 +26,17 @@
  */
 package com.thegoate.utils.compare;
 
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.UnknownUtilType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 /**
  * Generic sompare service.
  * Created by Eric Angeli on 5/9/2017.
  */
 public class Compare extends UnknownUtilType implements CompareUtility {
-    final Logger LOG = LoggerFactory.getLogger(getClass());
+    final BleatBox LOG = BleatFactory.getLogger(getClass());
     CompareUtility tool = null;
     Object actual = null;
     Object operator = null;

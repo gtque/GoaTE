@@ -27,10 +27,10 @@
 
 package com.thegoate.annotations;
 
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import org.atteo.classindex.ClassIndex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -46,9 +46,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AnnotationFactory {
 
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected static final BleatBox LOG = BleatFactory.getLogger(AnnotationFactory.class);
 
-    public static Map<String, Map<String, Class>> directory = new ConcurrentHashMap<>();
+    public static volatile Map<String, Map<String, Class>> directory = new ConcurrentHashMap<>();
+
+    public AnnotationFactory(){
+        if(directory==null){
+            directory = new ConcurrentHashMap<>();
+        }
+    }
 
     String id;
     String methodId;

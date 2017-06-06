@@ -27,9 +27,10 @@
 
 package com.thegoate.utils.file;
 
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.io.*;
 import java.net.URL;
@@ -39,7 +40,7 @@ import java.net.URL;
  */
 public class Copy {
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     private String originalFile = null;
     private File file = null;

@@ -27,8 +27,9 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -44,7 +45,7 @@ import java.lang.reflect.Method;
  * Created by Eric Angeli on 5/11/2017.
  */
 public abstract class TestNGEngine implements ITest, TestNG{
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
     protected Goate constantData;
@@ -71,7 +72,7 @@ public abstract class TestNGEngine implements ITest, TestNG{
         String startMessage = "\n"+
                 "***************************Starting Up***************************\n"+
                 "*\t"+getTestName()+"\t*\n";
-        if(LOG.isDebugEnabled()){
+        if(LOG.level().isDebugEnabled()){
             startMessage += data.toString("*\t","\t*");
         }
         startMessage += "*****************************************************************";
@@ -83,7 +84,7 @@ public abstract class TestNGEngine implements ITest, TestNG{
         String endMessage = "\n"+
                 "*****************************************************************\n"+
                 "*\t"+getTestName()+"\t*\n";
-        if(LOG.isDebugEnabled()){
+        if(LOG.level().isDebugEnabled()){
             endMessage += data.toString("*\t","\t*");
         }
         endMessage += "***************************Finished Up***************************";

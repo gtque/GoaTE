@@ -27,8 +27,8 @@
 
 package com.thegoate.annotations;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 /**
  * Checks to see if the class is annotated and if those annotations have a processor defined.
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AnnotationEvaluator {
 
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     public void process(Object instance, Class theClass){
 

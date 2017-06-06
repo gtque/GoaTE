@@ -24,46 +24,18 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.logging;
 
-package com.thegoate.utils.file;
+import org.atteo.classindex.IndexAnnotated;
 
-
-
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-
-import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by gtque on 5/3/2017.
+ * Annotate the class that implements the logging scheme you want to use.
+ * Created by Eric Angeli on 6/5/2017.
  */
-public class Delete {
-    BleatBox LOG = BleatFactory.getLogger(getClass());
-
-    public boolean rm(String file){
-        return rm(new File(file));
-    }
-
-    public boolean rm(File file){
-        boolean result = true;
-        if(file!=null){
-            if(file.exists()){
-                if(file.isDirectory()){
-                    for(File f:file.listFiles()){
-                        boolean tr = rm(f);
-                        if(!tr){
-                            result = tr;
-                        }
-                    }
-                }
-                if(result) {
-                    result = file.delete();
-                }
-            }
-        }
-        if(!result){
-            LOG.warn("Could not delete: " + (file==null?"null":file.getPath()));
-        }
-        return result;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface Bleat {
 }

@@ -26,19 +26,19 @@
  */
 package com.thegoate.json;
 
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.Utility;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base json util class that implements the isType method.
  * Created by Eric Angeli on 5/19/2017.
  */
 public abstract class JsonUtil implements Utility {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Object takeActionOn = null;
     protected Object nested = null;
 

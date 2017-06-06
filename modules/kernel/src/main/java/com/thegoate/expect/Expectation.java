@@ -28,14 +28,14 @@ package com.thegoate.expect;
 
 import com.thegoate.Goate;
 import com.thegoate.dsl.Interpreter;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.staff.Employee;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.get.Get;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Contains the information about what is expected.
@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Eric Angeli on 5/8/2017.
  */
 public class Expectation {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     String name = "";
     String id = "";
     Goate data = null;
@@ -54,6 +54,8 @@ public class Expectation {
     Object expected = null;
     Employee from = null;
     StringBuilder failed = new StringBuilder("");
+    List<Goate> fails = new ArrayList<>();
+    List<Goate> passes = new ArrayList<>();
 
     public Expectation(Goate data){
         this.data = data;
@@ -145,6 +147,7 @@ public class Expectation {
                 exp.put("actual", actual);
                 exp.put("operator", operator);
                 exp.put("expected", expected);
+                exp.put("from", fullName());
                 expect.put(key, exp);
                 actual = null;
                 operator = "";
@@ -174,6 +177,9 @@ public class Expectation {
                     if (!(new Compare(val).to(exp.get("expected")).using(exp.get("operator")).evaluate())) {
                         result = false;
                         failed.append(fullName() + ">" + key + " evaluated to false.\n");
+                        fails.add(exp);
+                    }else{
+                        passes.add(exp);
                     }
                 }
             }catch(Throwable t){
@@ -191,6 +197,13 @@ public class Expectation {
         return failed.append(from.getHrReport().printRecords()).toString();
     }
 
+    public List<Goate> fails(){
+        return fails;
+    }
+
+    public List<Goate> passes(){
+        return passes;
+    }
     /**
      * This can be used to build the expectation by parsing a string that defines the expectation.<br>
      * There are four parts to the definition<br>

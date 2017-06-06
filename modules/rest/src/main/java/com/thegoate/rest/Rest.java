@@ -27,15 +27,16 @@
 package com.thegoate.rest;
 
 import com.thegoate.Goate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+
 
 /**
  * Base RestSpec class for doing restful api calls.
  * Created by Eric Angeli on 5/16/2017.
  */
 public abstract class Rest implements RestSpec {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     protected Goate headers = new Goate();
     protected Goate queryParams = new Goate();

@@ -29,8 +29,8 @@ package com.thegoate.dsl;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -41,7 +41,7 @@ import java.util.Map;
  * Created by gtque on 4/19/2017.
  */
 public class Interpreter {
-    Logger LOG = LoggerFactory.getLogger(getClass());
+    BleatBox LOG = BleatFactory.getLogger(getClass());
     Goate data;
     Map<String, Class> dictionary = null;
 

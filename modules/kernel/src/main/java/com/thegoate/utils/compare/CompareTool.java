@@ -26,8 +26,9 @@
  */
 package com.thegoate.utils.compare;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 /**
  * Base class for Compare Utilities. Adds logger, and class level variables.
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * Created by Eric Angeli on 5/5/2017.
  */
 public abstract class CompareTool implements CompareUtility{
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Object actual = null;
     protected Object expected = null;
     protected Object operator = null;

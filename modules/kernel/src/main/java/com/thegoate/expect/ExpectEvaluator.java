@@ -27,8 +27,9 @@
 
 package com.thegoate.expect;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +43,12 @@ import java.util.concurrent.TimeUnit;
  * Created by Eric Angeli on 5/10/2017.
  */
 public class ExpectEvaluator {
-    final Logger LOG = LoggerFactory.getLogger(getClass());
+    final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     List<ExpectThreadExecuter> expectations = null;
     StringBuilder failed = new StringBuilder("");
+    List<Goate> fails = new ArrayList<>();
+    List<Goate> passes = new ArrayList<>();
 
     public ExpectEvaluator(ExpectationThreadBuilder etb){
         buildExpectations(etb);
@@ -67,9 +70,19 @@ public class ExpectEvaluator {
             if(!expect.status()){
                 result = false;
                 failed.append(expect.failedMessage());
+                fails.addAll(expect.fails());
             }
+            passes.addAll(expect.passes());
         }
         return result;
+    }
+
+    public List<Goate> fails(){
+        return fails;
+    }
+
+    public List<Goate> passes(){
+        return passes;
     }
 
     public String failed(){

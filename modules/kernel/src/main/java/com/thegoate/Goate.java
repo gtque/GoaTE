@@ -95,6 +95,14 @@ public class Goate {
         return get(key, def, dsl, Object.class);
     }
 
+    public <T>T get(String key, Class<T> type){
+        return get(key,null,true,type);
+    }
+
+    public <T>T get(String key, Object def, Class<T> type){
+        return get(key, def, true, type);
+    }
+    
     public <T>T get(String key, Object def, boolean dsl, Class<T> type){
         Object value = System.getProperty(key);
         if (value == null) {

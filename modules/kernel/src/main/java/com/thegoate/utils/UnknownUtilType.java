@@ -29,8 +29,9 @@ package com.thegoate.utils;
 
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.annotations.IsDefault;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -45,7 +46,7 @@ import java.util.Map;
  * Created by gtque on 5/4/2017.
  */
 public class UnknownUtilType {
-    final Logger LOG = LoggerFactory.getLogger(getClass());
+    final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util) {
         return buildUtil(obj, util, obj);

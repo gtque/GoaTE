@@ -27,16 +27,20 @@
 
 package com.thegoate.expect;
 
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple thread executor for evaluating expectations in a thread.
  * Created by Eric Angeli on 5/10/2017.
  */
 public class ExpectThreadExecuter extends Thread {
-    final Logger LOG = LoggerFactory.getLogger(getClass());
+    final BleatBox LOG = BleatFactory.getLogger(getClass());
     Expectation expectation = null;
     volatile boolean status = false;
     volatile boolean running = false;
@@ -102,6 +106,14 @@ public class ExpectThreadExecuter extends Thread {
 
     public String failedMessage(){
         return failed.toString();
+    }
+
+    public List<Goate> fails(){
+        return expectation!=null?expectation.fails():new ArrayList<>();
+    }
+
+    public List<Goate> passes(){
+        return expectation!=null?expectation.passes():new ArrayList<>();
     }
 
     @Override
