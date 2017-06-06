@@ -35,7 +35,7 @@ import com.thegoate.annotations.IsDefault;
  */
 @Bleat
 @IsDefault
-public class BleatBoxDefault extends BleatBox{
+public class BleatBoxDefault extends BleatBoxBase{
 
     public BleatBoxDefault(Class logger) {
         super(logger);

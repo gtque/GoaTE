@@ -35,58 +35,48 @@ import org.slf4j.LoggerFactory;
  * This uses slf4j for basic logging purposes.
  * Created by Eric Angeli on 6/5/2017.
  */
-public abstract class BleatBox {
-    protected Logger LOG;
-    protected Class loggingClass;
-
-    public BleatBox(Class logger){
-        this.loggingClass = logger;
-        LOG = LoggerFactory.getLogger(logger);
-    }
-
-    public Logger level(){
-        return LOG;
-    }
-
-    public abstract void debug(String message);
-    public abstract void debug(String title, String message);
-    public abstract void debug(String message, Throwable t);
-    public abstract void debug(String title, String message, Throwable t);
-    public abstract void info(String message);
-    public abstract void info(String title, String message);
-    public abstract void info(String message, Throwable t);
-    public abstract void info(String title, String message, Throwable t);
-    public abstract void warn(String message);
-    public abstract void warn(String title, String message);
-    public abstract void warn(String message, Throwable t);
-    public abstract void warn(String title, String message, Throwable t);
-    public abstract void error(String message);
-    public abstract void error(String title, String message);
-    public abstract void error(String message, Throwable t);
-    public abstract void error(String title, String message, Throwable t);
-    public abstract void trace(String message);
-    public abstract void trace(String title, String message);
-    public abstract void trace(String message, Throwable t);
-    public abstract void trace(String title, String message, Throwable t);
-    public abstract void pass(String message);
-    public abstract void pass(String title, String message);
-    public abstract void pass(String message, Throwable t);
-    public abstract void pass(String title, String message, Throwable t);
-    public abstract void fail(String message);
-    public abstract void fail(String title, String message);
-    public abstract void fail(String message, Throwable t);
-    public abstract void fail(String title, String message, Throwable t);
-    public abstract void fatal(String message);
-    public abstract void fatal(String title, String message);
-    public abstract void fatal(String message, Throwable t);
-    public abstract void fatal(String title, String message, Throwable t);
-    public abstract void skip(String message);
-    public abstract void skip(String title, String message);
-    public abstract void skip(String message, Throwable t);
-    public abstract void skip(String title, String message, Throwable t);
-    public abstract void unknown(String message);
-    public abstract void unknown(String title, String message);
-    public abstract void unknown(String message, Throwable t);
-    public abstract void unknown(String title, String message, Throwable t);
+public interface BleatBox {
+    
+    Object level();
+    void debug(String message);
+    void debug(String title, String message);
+    void debug(String message, Throwable t);
+    void debug(String title, String message, Throwable t);
+    void info(String message);
+    void info(String title, String message);
+    void info(String message, Throwable t);
+    void info(String title, String message, Throwable t);
+    void warn(String message);
+    void warn(String title, String message);
+    void warn(String message, Throwable t);
+    void warn(String title, String message, Throwable t);
+    void error(String message);
+    void error(String title, String message);
+    void error(String message, Throwable t);
+    void error(String title, String message, Throwable t);
+    void trace(String message);
+    void trace(String title, String message);
+    void trace(String message, Throwable t);
+    void trace(String title, String message, Throwable t);
+    void pass(String message);
+    void pass(String title, String message);
+    void pass(String message, Throwable t);
+    void pass(String title, String message, Throwable t);
+    void fail(String message);
+    void fail(String title, String message);
+    void fail(String message, Throwable t);
+    void fail(String title, String message, Throwable t);
+    void fatal(String message);
+    void fatal(String title, String message);
+    void fatal(String message, Throwable t);
+    void fatal(String title, String message, Throwable t);
+    void skip(String message);
+    void skip(String title, String message);
+    void skip(String message, Throwable t);
+    void skip(String title, String message, Throwable t);
+    void unknown(String message);
+    void unknown(String title, String message);
+    void unknown(String message, Throwable t);
+    void unknown(String title, String message, Throwable t);
 
 }
