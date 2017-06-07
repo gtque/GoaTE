@@ -38,56 +38,21 @@ import org.slf4j.LoggerFactory;
 public abstract class BleatBoxBase implements BleatBox{
     protected Logger LOG;
     protected Class loggingClass;
+    protected BleatLevel volume;
 
     public BleatBoxBase(Class logger){
         this.loggingClass = logger;
         LOG = LoggerFactory.getLogger(logger);
     }
 
+    /**
+     * Always returns null right now.<br>
+     * This is a place holder for possible future funtionality not yet implemented.
+     * @return The level information.
+     */
     @Override
-    public Logger level(){
-        return LOG;
+    public BleatLevel level(){
+        return volume;
     }
-
-    public abstract void debug(String message);
-    public abstract void debug(String title, String message);
-    public abstract void debug(String message, Throwable t);
-    public abstract void debug(String title, String message, Throwable t);
-    public abstract void info(String message);
-    public abstract void info(String title, String message);
-    public abstract void info(String message, Throwable t);
-    public abstract void info(String title, String message, Throwable t);
-    public abstract void warn(String message);
-    public abstract void warn(String title, String message);
-    public abstract void warn(String message, Throwable t);
-    public abstract void warn(String title, String message, Throwable t);
-    public abstract void error(String message);
-    public abstract void error(String title, String message);
-    public abstract void error(String message, Throwable t);
-    public abstract void error(String title, String message, Throwable t);
-    public abstract void trace(String message);
-    public abstract void trace(String title, String message);
-    public abstract void trace(String message, Throwable t);
-    public abstract void trace(String title, String message, Throwable t);
-    public abstract void pass(String message);
-    public abstract void pass(String title, String message);
-    public abstract void pass(String message, Throwable t);
-    public abstract void pass(String title, String message, Throwable t);
-    public abstract void fail(String message);
-    public abstract void fail(String title, String message);
-    public abstract void fail(String message, Throwable t);
-    public abstract void fail(String title, String message, Throwable t);
-    public abstract void fatal(String message);
-    public abstract void fatal(String title, String message);
-    public abstract void fatal(String message, Throwable t);
-    public abstract void fatal(String title, String message, Throwable t);
-    public abstract void skip(String message);
-    public abstract void skip(String title, String message);
-    public abstract void skip(String message, Throwable t);
-    public abstract void skip(String title, String message, Throwable t);
-    public abstract void unknown(String message);
-    public abstract void unknown(String title, String message);
-    public abstract void unknown(String message, Throwable t);
-    public abstract void unknown(String title, String message, Throwable t);
 
 }

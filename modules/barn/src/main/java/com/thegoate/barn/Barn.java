@@ -107,9 +107,15 @@ public class Barn extends TestNGEngine {
             throw new SkipException(preFailure.getMessage());
         }else {
             LOG.debug("----starting execution----");
-            doWork(data);
-            LOG.debug("----finished execution----");
-            LOG.debug("----evaluating expectations----");
+            try {
+                doWork(data);
+            }catch(Throwable t){
+                LOG.fatal(getTestName(),"Encountered a problem executing the test: " + t.getMessage(), t);
+                throw t;
+            }finally {
+                LOG.debug("----finished execution----");
+                LOG.debug("----evaluating expectations----");
+            }
             try {
                 evaluateExpectations();
             } catch (Throwable t) {
