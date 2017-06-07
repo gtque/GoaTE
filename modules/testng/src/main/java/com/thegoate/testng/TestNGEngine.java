@@ -44,7 +44,7 @@ import java.lang.reflect.Method;
  * The base class for writing TestNG classes.
  * Created by Eric Angeli on 5/11/2017.
  */
-public abstract class TestNGEngine implements ITest, TestNG{
+public abstract class TestNGEngine implements ITest, TestNG {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
@@ -58,53 +58,49 @@ public abstract class TestNGEngine implements ITest, TestNG{
 
     public static int number = 0;
 
-    public TestNGEngine(){
+    public TestNGEngine() {
         setData(null);
     }
 
-    public TestNGEngine(Goate data){
+    public TestNGEngine(Goate data) {
         init(data);
     }
 
     @BeforeMethod(alwaysRun = true)
     public void startUp(Method method) {
         methodName = method.getName();
-        String startMessage = "\n"+
-                "***************************Starting Up***************************\n"+
-                "*\t"+getTestName()+"\t*\n";
-        if(LOG.level().isDebugEnabled()){
-            startMessage += data.toString("*\t","\t*");
-        }
+        String startMessage = "\n" +
+                "***************************Starting Up***************************\n" +
+                "*\t" + getTestName() + "\t*\n";
+        startMessage += data.toString("*\t", "\t*");
         startMessage += "*****************************************************************";
         LOG.info(startMessage);
     }
 
     @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
-        String endMessage = "\n"+
-                "*****************************************************************\n"+
-                "*\t"+getTestName()+"\t*\n";
-        if(LOG.level().isDebugEnabled()){
-            endMessage += data.toString("*\t","\t*");
-        }
+        String endMessage = "\n" +
+                "*****************************************************************\n" +
+                "*\t" + getTestName() + "\t*\n";
+        endMessage += data.toString("*\t", "\t*");
         endMessage += "***************************Finished Up***************************";
         LOG.info(endMessage);
     }
 
-    protected void init(Goate data){
+    protected void init(Goate data) {
         setData(data);
-        setScenario(get("Scenario","empty::",String.class));
+        setScenario(get("Scenario", "empty::", String.class));
         bumpRunNumber();
     }
 
     @Override
     public String getTestName() {
         StringBuilder name = new StringBuilder("");
-        if(includeClassMethodInName){
-            name.append(getClass().getCanonicalName()+":"+methodName+":");
+        if (includeClassMethodInName) {
+            name.append(getClass().getCanonicalName() + ":" + methodName + ":");
         }
         name.append(scenario);
-        name.append("("+runNumber+")");
+        name.append("(" + runNumber + ")");
         return name.toString();
     }
 
@@ -113,14 +109,14 @@ public abstract class TestNGEngine implements ITest, TestNG{
     public Object[][] dataLoader(ITestContext context) throws Exception {
         number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
         this.testContext = context;
-        if(context!=null) {
+        if (context != null) {
             xt = context.getCurrentXmlTest();
         }
         initDataLoaders();
         return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true);
     }
 
-    protected void initDataLoaders(){
+    protected void initDataLoaders() {
         runData = new Goate();
         constantData = new Goate();
         defineDataLoaders();
@@ -149,7 +145,7 @@ public abstract class TestNGEngine implements ITest, TestNG{
 
     @Override
     public void setData(Goate data) {
-        if(data==null){
+        if (data == null) {
             data = new Goate();
         }
         this.data = data;
@@ -184,6 +180,11 @@ public abstract class TestNGEngine implements ITest, TestNG{
     @Override
     public Object get(String key) {
         return get(key, null);
+    }
+
+    @Override
+    public <T>T get(String key, Class<T> type) {
+        return get(key, null, type);
     }
 
     @Override

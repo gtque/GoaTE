@@ -26,8 +26,11 @@
  */
 package com.thegoate.rest.assured;
 
+import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.RestSpec;
 import io.restassured.specification.RequestSpecification;
+
+import java.io.PrintStream;
 
 /**
  * Used for defining the rest assured interface needed for building a Rest Assured based Rest class.
@@ -35,4 +38,5 @@ import io.restassured.specification.RequestSpecification;
  */
 public interface RASpec extends RestSpec {
     RequestSpecification getSpec();
+    BleatBox getLog();
 }

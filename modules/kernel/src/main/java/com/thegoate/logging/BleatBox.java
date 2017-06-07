@@ -27,9 +27,6 @@
 package com.thegoate.logging;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Base Logging class.
  * This uses slf4j for basic logging purposes.
@@ -37,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public interface BleatBox {
     
-    Object level();
+    BleatLevel level();
     void debug(String message);
     void debug(String title, String message);
     void debug(String message, Throwable t);

@@ -26,6 +26,7 @@
  */
 package com.thegoate.rest.assured;
 
+import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.RestAuthBearer;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
@@ -49,6 +50,11 @@ public class RAAuthBearer extends RestAuthBearer implements RASpec{
 
     public RAAuthBearer(RequestSpecification specification){
         this.specification = RestAssured.init(specification);
+    }
+
+    @Override
+    public BleatBox getLog(){
+        return LOG;
     }
 
     @Override
