@@ -28,14 +28,16 @@ package com.thegoate.rest.assured;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
+import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
+import io.restassured.config.LogConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-import java.io.File;
+import java.io.*;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
@@ -47,20 +49,20 @@ import static io.restassured.config.HeaderConfig.headerConfig;
  */
 @GoateRest
 @IsDefault
-public class RestAssured extends Rest implements RASpec{
+public class RestAssured extends Rest implements RASpec {
     RequestSpecification specification = null;
     Response response = null;
 
-    public RestAssured(){
+    public RestAssured() {
         this.specification = RestAssured.init(given());
     }
 
-    public RestAssured(RequestSpecification specification){
+    public RestAssured(RequestSpecification specification) {
         this.specification = RestAssured.init(specification);
     }
 
-    public static RequestSpecification init(RequestSpecification specification){
-        specification = specification==null?given():specification;
+    public static RequestSpecification init(RequestSpecification specification) {
+        specification = specification == null ? given() : specification;
         specification.config(new RestAssuredConfig()
                 .headerConfig(headerConfig()
                         .overwriteHeadersWithName("Authorization")
@@ -69,69 +71,109 @@ public class RestAssured extends Rest implements RASpec{
         return specification;
     }
 
-    public static RequestSpecification build(RASpec spec){
+    public static RequestSpecification build(RASpec spec) {
         RequestSpecification mySpec = spec.getSpec();
-        if(mySpec != null) {
+        if (mySpec != null) {
             mySpec.baseUri(spec.getBaseURL());
             setHeaders(mySpec, spec.getHeaders());
             setURLParameters(mySpec, spec.getURLParameters());
             setQueryParameters(mySpec, spec.getQueryParameters());
             setPathParameters(mySpec, spec.getPathParameters());
             setBody(mySpec, spec.getBody());
-            if(spec.doLog()){
+            if (spec.doLog()) {
+                PrintStream streamer = getPrintStream(spec.getLog());
+                RestAssuredConfig rac = new RestAssuredConfig();
+                LogConfig lc = new LogConfig(streamer, true);
+//                lc.defaultStream(streamer);
+                rac = rac.logConfig(lc);
+                mySpec.config(rac);
                 mySpec.log().all();
             }
         }
         return mySpec;
     }
 
-    protected static void setHeaders(RequestSpecification spec, Goate headers){
-        if(headers!=null&&spec!=null) {
+    @Override
+    public BleatBox getLog(){
+        return LOG;
+    }
+
+    /**
+     * COPIED FROM STACKOVERFLOW.
+     *
+     * @return printStream
+     */
+    public static PrintStream getPrintStream(BleatBox log) {
+        PrintStream stream;
+        OutputStream output = new OutputStream() {
+            BleatBox logger = log;
+            private StringBuilder myStringBuilder = new StringBuilder();
+
+            @Override
+            public void write(int b) throws IOException {
+                this.myStringBuilder.append((char) b);
+            }
+
+            /**
+             * @see java.io.OutputStream#flush()
+             */
+            @Override
+            public void flush() {
+                logger.info(this.myStringBuilder.toString());
+                myStringBuilder = new StringBuilder();
+            }
+        };
+        stream = new PrintStream(output, true);  // true: autoflush must be set!
+        return stream;
+    }
+
+    protected static void setHeaders(RequestSpecification spec, Goate headers) {
+        if (headers != null && spec != null) {
             for (String key : headers.keys()) {
                 spec.header(key, headers.get(key));
             }
         }
     }
 
-    protected static void setURLParameters(RequestSpecification spec, Goate params){
-        if(params!=null&&spec!=null) {
+    protected static void setURLParameters(RequestSpecification spec, Goate params) {
+        if (params != null && spec != null) {
             for (String key : params.keys()) {
                 spec.param(key, params.get(key));
             }
         }
     }
 
-    protected static void setQueryParameters(RequestSpecification spec, Goate params){
-        if(params!=null&&spec!=null) {
+    protected static void setQueryParameters(RequestSpecification spec, Goate params) {
+        if (params != null && spec != null) {
             for (String key : params.keys()) {
                 spec.queryParam(key, params.get(key));
             }
         }
     }
 
-    protected static void setPathParameters(RequestSpecification spec, Goate params){
-        if(params!=null&&spec!=null) {
+    protected static void setPathParameters(RequestSpecification spec, Goate params) {
+        if (params != null && spec != null) {
             for (String key : params.keys()) {
                 spec.pathParam(key, params.get(key));
             }
         }
     }
 
-    protected static void setBody(RequestSpecification spec, Goate body){
-        if(spec!=null&&body!=null) {
+    protected static void setBody(RequestSpecification spec, Goate body) {
+        if (spec != null && body != null) {
             for (String key : body.keys()) {
-                Goate b = (Goate)body.get(key);
-                if(b!=null) {
-                    for (String id:b.keys()) {
-                        if (key.equals(BODY.urlencoded.name())||key.equals(BODY.form.name())) {
+                Goate b = (Goate) body.get(key);
+                if (b != null) {
+                    for (String id : b.keys()) {
+                        if (key.equals(BODY.urlencoded.name()) || key.equals(BODY.form.name())) {
                             spec.formParam(id, b.get(id));
-                        }else if(key.equals(BODY.multipart.name())){
-                            if(id.startsWith(MP_ID_NOT_SET)){
-                                spec.multiPart((File)b.get(id));
-                            }else{
+                        } else if (key.equals(BODY.multipart.name())) {
+                            if (id.startsWith(MP_ID_NOT_SET)) {
+                                spec.multiPart((File) b.get(id));
+                            } else {
                                 spec.multiPart(id, b.get(id));
                             }
-                        }else{
+                        } else {
                             spec.body(b.get(id));
                         }
                     }
@@ -139,13 +181,14 @@ public class RestAssured extends Rest implements RASpec{
             }
         }
     }
+
     @Override
-    public Object response(){
+    public Object response() {
         return response;
     }
 
     @Override
-    public RestSpec processCustomData(String key, Object value){
+    public RestSpec processCustomData(String key, Object value) {
         return this;
     }
 
@@ -197,12 +240,13 @@ public class RestAssured extends Rest implements RASpec{
         return response;
     }
 
-    protected void log(Response response){
-        if(doLog()){
+    protected void log(Response response) {
+        if (doLog()) {
             LOG.info("response follows");
             response.then().log().all();
         }
     }
+
     @Override
     public RequestSpecification getSpec() {
         return specification;

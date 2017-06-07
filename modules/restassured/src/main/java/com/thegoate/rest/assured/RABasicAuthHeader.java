@@ -26,6 +26,7 @@
  */
 package com.thegoate.rest.assured;
 
+import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.RestAuthBasicHeader;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
@@ -49,6 +50,11 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
 
     public RABasicAuthHeader(RequestSpecification specification){
         this.specification = RestAssured.init(specification);
+    }
+
+    @Override
+    public BleatBox getLog(){
+        return LOG;
     }
 
     @Override
