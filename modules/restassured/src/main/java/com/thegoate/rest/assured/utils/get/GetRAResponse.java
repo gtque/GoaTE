@@ -33,6 +33,7 @@ import com.thegoate.statics.ResetStatics;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetTool;
 import com.thegoate.utils.get.GetUtil;
+import com.thegoate.utils.get.NotFound;
 import com.thegoate.utils.togoate.ToGoate;
 import io.restassured.response.Response;
 
@@ -107,7 +108,11 @@ public class GetRAResponse extends GetTool implements ResetStatic {
                 }
 //                result = new Get(selector).from(r.body().prettyPrint());
                 if(g!=null){
-                    result = g.get(""+selector);
+                    if(g.keys().contains(""+selector)) {
+                        result = g.get("" + selector);
+                    }else{
+                        result = new NotFound(""+selector);
+                    }
                 }
             }
 
