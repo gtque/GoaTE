@@ -32,6 +32,7 @@ import com.thegoate.json.utils.togoate.JSONToGoate;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetUtil;
 import com.thegoate.utils.get.GetUtility;
+import com.thegoate.utils.get.NotFound;
 import org.json.JSONArray;
 
 /**
@@ -66,7 +67,11 @@ public class GetJsonField extends JsonUtil implements GetUtility {
         }else {
             Goate g = new JSONToGoate(container).convert();
             if (g != null) {
-                result = g.get("" + takeActionOn);
+                if(g.keys().contains(""+takeActionOn)) {
+                    result = g.get("" + takeActionOn);
+                }else{
+                    result = new NotFound(""+takeActionOn);
+                }
             }
         }
         result = processNested(result);

@@ -56,7 +56,7 @@ public class GetFileAsString extends GetTool{
 
     @Override
     public Object from(Object container) {
-        Object result = "";
+        Object result = new NotFound(""+selector);
         if(selector instanceof File){
             try {
                 result = new String(Files.readAllBytes(((File) selector).toPath()));

@@ -61,7 +61,7 @@ public abstract class GetTool implements GetUtility{
      */
     protected Object processNested(Object subContainer){
         Object result = subContainer;
-        if(nested!=null){
+        if(nested!=null&&!(subContainer instanceof NotFound)){
             result = new Get(nested).from(subContainer);
         }
         return result;
