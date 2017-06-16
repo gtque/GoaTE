@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.statics.StaticScrubber;
 import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -79,6 +80,8 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
+        StaticScrubber scrubber = new StaticScrubber();
+        scrubber.scrub();
         String endMessage = "\n" +
                 "*****************************************************************\n" +
                 "*\t" + getTestName() + "\t*\n";
@@ -180,11 +183,6 @@ public abstract class TestNGEngine implements ITest, TestNG {
     @Override
     public Object get(String key) {
         return get(key, null);
-    }
-
-    @Override
-    public <T>T get(String key, Class<T> type) {
-        return get(key, null, type);
     }
 
     @Override
