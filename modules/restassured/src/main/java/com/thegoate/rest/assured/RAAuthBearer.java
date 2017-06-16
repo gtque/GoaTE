@@ -45,11 +45,11 @@ public class RAAuthBearer extends RestAuthBearer implements RASpec{
     Response response = null;
 
     public RAAuthBearer(){
-        this.specification = RestAssured.init(given());
+        this.specification = RestAssured.init(given(), this);
     }
 
     public RAAuthBearer(RequestSpecification specification){
-        this.specification = RestAssured.init(specification);
+        this.specification = RestAssured.init(specification, this);
     }
 
     @Override

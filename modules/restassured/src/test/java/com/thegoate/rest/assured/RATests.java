@@ -34,9 +34,13 @@ import com.thegoate.rest.staff.ApiGet;
 import com.thegoate.rest.staff.ApiPost;
 import com.thegoate.staff.Employee;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.config.SSLConfig;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.testng.annotations.Test;
 
+import static io.restassured.RestAssured.given;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -47,6 +51,7 @@ import static org.testng.Assert.assertTrue;
  * Created by Eric Angeli on 5/16/2017.
  */
 public class RATests extends TestNGEngineAnnotatedDL {
+
     @Test(groups = {"unit2"})
     public void getGoogle() {
         Rest rest = new RABasicAuthHeader();

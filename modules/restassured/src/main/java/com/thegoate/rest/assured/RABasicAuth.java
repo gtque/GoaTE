@@ -45,11 +45,11 @@ public class RABasicAuth extends RestAuthBasicUserPW implements RASpec{
     Response response = null;
 
     public RABasicAuth(){
-        this.specification = RestAssured.init(given());
+        this.specification = RestAssured.init(given(), this);
     }
 
     public RABasicAuth(RequestSpecification specification){
-        this.specification = RestAssured.init(specification);
+        this.specification = RestAssured.init(specification, this);
     }
 
     @Override

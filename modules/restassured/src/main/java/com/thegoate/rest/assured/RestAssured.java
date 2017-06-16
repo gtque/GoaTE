@@ -32,8 +32,10 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
+import io.restassured.config.EncoderConfig;
 import io.restassured.config.LogConfig;
 import io.restassured.config.RestAssuredConfig;
+import io.restassured.config.SSLConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -54,21 +56,26 @@ public class RestAssured extends Rest implements RASpec {
     Response response = null;
 
     public RestAssured() {
-        this.specification = RestAssured.init(given());
+        this.specification = RestAssured.init(given(), this);
     }
 
     public RestAssured(RequestSpecification specification) {
-        this.specification = RestAssured.init(specification);
+        this.specification = RestAssured.init(specification, this);
     }
 
-    public static RequestSpecification init(RequestSpecification specification) {
+    public static RequestSpecification init(RequestSpecification specification, RASpec spec) {
         specification = specification == null ? given() : specification;
-        specification.config(new RestAssuredConfig()
-                .headerConfig(headerConfig()
-                        .overwriteHeadersWithName("Authorization")
-                        .overwriteHeadersWithName("Content-Type")))
-                .config(new RestAssuredConfig().encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false)));
-        return specification;
+        RestAssuredConfig rac = new RestAssuredConfig();
+        PrintStream streamer = getPrintStream(spec.getLog());
+        LogConfig lc = new LogConfig(streamer, true);
+        SSLConfig sslc = new SSLConfig().allowAllHostnames().relaxedHTTPSValidation();
+        rac = rac.sslConfig(sslc);
+        rac = rac.logConfig(lc);
+        rac = rac.headerConfig(headerConfig()
+                .overwriteHeadersWithName("Authorization")
+                .overwriteHeadersWithName("Content-Type"));
+        rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));
+        return specification.config(rac);
     }
 
     public static RequestSpecification build(RASpec spec) {
@@ -81,12 +88,6 @@ public class RestAssured extends Rest implements RASpec {
             setPathParameters(mySpec, spec.getPathParameters());
             setBody(mySpec, spec.getBody());
             if (spec.doLog()) {
-                PrintStream streamer = getPrintStream(spec.getLog());
-                RestAssuredConfig rac = new RestAssuredConfig();
-                LogConfig lc = new LogConfig(streamer, true);
-//                lc.defaultStream(streamer);
-                rac = rac.logConfig(lc);
-                mySpec.config(rac);
                 mySpec.log().all();
             }
         }
