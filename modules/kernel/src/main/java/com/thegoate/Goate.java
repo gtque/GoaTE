@@ -45,9 +45,9 @@ public class Goate {
         dictionary = new Interpreter(this);
     }
 
-    public int size(){
+    public int size() {
         int size = 0;
-        if(data!=null){
+        if (data != null) {
             size = data.size();
         }
         return size;
@@ -61,20 +61,20 @@ public class Goate {
         if (data == null) {
             data = new ConcurrentHashMap<>();
         }
-        if(value!=null) {
-            if(key.contains("##")){
-                key = buildKey(key);
-            }
-            data.put(key, value);
+//        if(value!=null) {
+        if (key.contains("##")) {
+            key = buildKey(key);
         }
+        data.put(key, value);
+//        }
         return this;
     }
 
-    public String buildKey(String key){
+    public String buildKey(String key) {
         String fullKey = key;
-        while(fullKey.contains("##")) {
+        while (fullKey.contains("##")) {
             Goate billy = filter(key.substring(0, key.indexOf("##")));
-            fullKey = key.replace("##", ""+billy.size());
+            fullKey = key.replace("##", "" + billy.size());
         }
         return fullKey;
     }
@@ -95,22 +95,18 @@ public class Goate {
         return get(key, def, dsl, Object.class);
     }
 
-    public <T>T get(String key, Class<T> type){
-        return get(key,null,true,type);
-    }
-
-    public <T>T get(String key, Object def, Class<T> type){
+    public <T> T get(String key, Object def, Class<T> type) {
         return get(key, def, true, type);
     }
-    
-    public <T>T get(String key, Object def, boolean dsl, Class<T> type){
+
+    public <T> T get(String key, Object def, boolean dsl, Class<T> type) {
         Object value = System.getProperty(key);
         if (value == null) {
-            if(key.equals("username")){//username is a special key name, in most cases we want to use the one set in the collection
+            if (key.equals("username")) {//username is a special key name, in most cases we want to use the one set in the collection
                 //so it is checked first, and then if it is null it, check using the normal flow.
                 value = data.get(key);
             }
-            if(value==null) {
+            if (value == null) {
                 value = System.getenv(key);
                 if (value == null) {
                     if (data.containsKey(key)) {
@@ -132,7 +128,7 @@ public class Goate {
     }
 
     public Object processDSL(Object value) {
-        if(value!=null) {
+        if (value != null) {
             String check = "" + value;
             if (check.contains("::")) {
                 check = check.substring(0, check.indexOf("::"));
@@ -146,21 +142,22 @@ public class Goate {
         return value;
     }
 
-    public Goate drop(String key){
+    public Goate drop(String key) {
         data.remove(key);
         return this;
     }
 
     /**
      * Simple filter, matches if key starts with the given pattern.
+     *
      * @param pattern The pattern to match
      * @return A Goate collection containing matching elements.
      */
-    public Goate filter(String pattern){
+    public Goate filter(String pattern) {
         Goate filtered = new Goate();
-        if(data!=null){
-            for(String key:keys()){
-                if(key.startsWith(pattern)){
+        if (data != null) {
+            for (String key : keys()) {
+                if (key.startsWith(pattern)) {
                     filtered.put(key, getStrict(key));
                 }
             }
@@ -168,21 +165,21 @@ public class Goate {
         return filtered;
     }
 
-    public Goate filterAndSplitKeyValuePairs(String filter){
+    public Goate filterAndSplitKeyValuePairs(String filter) {
         return filterAndSplitKeyValuePairs(filter, ":=");
     }
 
-    public Goate filterAndSplitKeyValuePairs(String filter, String split){
+    public Goate filterAndSplitKeyValuePairs(String filter, String split) {
         Goate filtered = new Goate();
-        if(data!=null) {
+        if (data != null) {
             Goate info = filter(filter);
-            for (String key:info.keys()){
+            for (String key : info.keys()) {
                 String def = "" + info.get(key, "");
-                if(def!=null){
-                    if(!def.contains(split)) {
+                if (def != null) {
+                    if (!def.contains(split)) {
                         def = "" + processDSL(def);
                     }
-                    if(def.contains(split)){
+                    if (def.contains(split)) {
                         String k = def.substring(0, def.indexOf(split));
                         String v = def.substring(def.indexOf(split) + split.length());
                         filtered.put("" + processDSL(k), processDSL(v));
@@ -193,14 +190,14 @@ public class Goate {
         return filtered;
     }
 
-    public Goate merge(Goate merge, boolean replace){
-        if(merge!=null){
+    public Goate merge(Goate merge, boolean replace) {
+        if (merge != null) {
             Set<String> myKeys = keys();
-            for(String key:merge.keys()){
-                if(replace){
+            for (String key : merge.keys()) {
+                if (replace) {
                     put(key, merge.getStrict(key));
-                }else{
-                    if(!myKeys.contains(key)){
+                } else {
+                    if (!myKeys.contains(key)) {
                         put(key, merge.getStrict(key));
                     }
                 }
@@ -209,13 +206,13 @@ public class Goate {
         return this;
     }
 
-    public String toString(){
-        return toString("","");
+    public String toString() {
+        return toString("", "");
     }
 
-    public String toString(String prepadding, String postpadding){
+    public String toString(String prepadding, String postpadding) {
         StringBuilder sb = new StringBuilder("");
-        for(String key:keys()){
+        for (String key : keys()) {
             sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding).append("\n");
         }
         return sb.toString();

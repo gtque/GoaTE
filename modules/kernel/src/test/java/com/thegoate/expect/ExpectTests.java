@@ -58,6 +58,19 @@ public class ExpectTests {
     }
 
     @Test(groups = {"unit"})
+    public void isEvenButReallyOdd(){
+        Goate data = new Goate();
+        data.put("check if even.value",43);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check if even>return,==,boolean::true");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertFalse(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
+    }
+
+
+    @Test(groups = {"unit"})
     public void isEvenFail(){
         Goate data = new Goate();
         data.put("check if even.value",42);
@@ -66,6 +79,90 @@ public class ExpectTests {
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertFalse(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJson(){
+        Goate data = new Goate();
+        String json = "{" +
+                "'a':[" +
+                "{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]" +
+                "}";
+        data.put("check json.value",json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>a.*.b,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonNested(){
+        Goate data = new Goate();
+        String json = "{" +
+                "'a':[" +
+                "[{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]," +
+                "[{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]]" +
+                "}";
+        data.put("check json.value",json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>a.*.*.b,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonNestedFailure(){
+        Goate data = new Goate();
+        String json = "{" +
+                "'a':[" +
+                "[{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]," +
+                "[{'b':42}," +
+                "{'b':40}," +
+                "{'b':44}," +
+                "{'b':45}]]" +
+                "}";
+        data.put("check json.value",json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>a.*.*.b,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertFalse(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonNotExist(){
+        Goate data = new Goate();
+        String json = "{" +
+                "'a':[" +
+                "{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]" +
+                "}";
+        data.put("check json.value",json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>a.*.c,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
         LOG.debug("failed message:\n"+ev.failed());
     }
 }
