@@ -239,6 +239,7 @@ public class Expectation {
                     throw new RuntimeException("Did not find: " + exp.get("actual"));
                 }
             } else {
+                exp.put("actual_value", val);
                 LOG.info("evaluating \"" + fullName() + "\": " + exp.get("actual") + "(" + val + ") " + exp.get("operator") + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
                 if (!(new Compare(val).to(exp.get("expected")).using(exp.get("operator")).evaluate())) {
                     result = false;
