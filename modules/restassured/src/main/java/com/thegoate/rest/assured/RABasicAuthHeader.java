@@ -45,11 +45,11 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     Response response = null;
 
     public RABasicAuthHeader(){
-        this.specification = RestAssured.init(given());
+        this.specification = RestAssured.init(given(), this);
     }
 
     public RABasicAuthHeader(RequestSpecification specification){
-        this.specification = RestAssured.init(specification);
+        this.specification = RestAssured.init(specification, this);
     }
 
     @Override
