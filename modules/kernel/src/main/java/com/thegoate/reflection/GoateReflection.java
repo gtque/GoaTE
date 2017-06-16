@@ -46,7 +46,7 @@ public class GoateReflection {
             if (ptypes.length == args.length) {
                 found = true;
                 for (int i = 0; i < args.length; i++) {
-                    if(isPrimitive(args[i].getClass())){
+                    if(args[i]!=null&&isPrimitive(args[i].getClass())){
                         if(ptypes[i].equals(Integer.TYPE)){
                             if(!(args[i] instanceof Integer)){
                                 found = false;
@@ -79,7 +79,7 @@ public class GoateReflection {
                             found = false;
                         }
                     }else {
-                        if (!ptypes[i].isAssignableFrom(args[i].getClass())) {
+                        if (args[i]!=null&&!ptypes[i].isAssignableFrom(args[i].getClass())) {
                             found = false;
                         }
                     }
