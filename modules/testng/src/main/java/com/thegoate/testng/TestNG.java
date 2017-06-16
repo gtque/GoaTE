@@ -22,7 +22,6 @@ public interface TestNG {
     void setScenario(String scenario);
     String getScenario();
     Object get(String key);
-    <T>T get(String key, Class<T> type);
     Object get(String key, Object def);
     <T>T get(String key, Object def, Class<T> type);
     TestNG put(String key, Object val);

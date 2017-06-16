@@ -27,17 +27,27 @@
 
 package com.thegoate.rest.assured.utils.get;
 
+import com.thegoate.Goate;
+import com.thegoate.statics.ResetStatic;
+import com.thegoate.statics.ResetStatics;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetTool;
 import com.thegoate.utils.get.GetUtil;
+import com.thegoate.utils.togoate.ToGoate;
 import io.restassured.response.Response;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Loads the file specified in from into a string and retuns it.
  * Created by Eric Angeli on 5/18/2017.
  */
 @GetUtil
-public class GetRAResponse extends GetTool{
+@ResetStatics
+public class GetRAResponse extends GetTool implements ResetStatic {
+
+    static Map<Object, Goate> resp = new ConcurrentHashMap<>();
 
     public GetRAResponse(){
         super(null);
@@ -47,6 +57,12 @@ public class GetRAResponse extends GetTool{
         super(selector);
     }
 
+    @Override
+    public void resetStatics(){
+        resp = null;
+        resp = new ConcurrentHashMap<>();
+    }
+    
     @Override
     public boolean isType(Object check) {
         return check instanceof Response;
@@ -82,7 +98,17 @@ public class GetRAResponse extends GetTool{
             }else if(selector.toString().startsWith("detailedCookie")){
                 result = r.detailedCookie(selector.toString().substring("detailedCookie".length()).trim());
             }else{
-                result = new Get(selector).from(r.body().prettyPrint());
+                Goate g = null;
+                if(resp.containsKey(container)){
+                    g = resp.get(container);
+                }else{
+                    g = new ToGoate(r.body().prettyPrint()).convert();
+                    resp.put(container, g);
+                }
+//                result = new Get(selector).from(r.body().prettyPrint());
+                if(g!=null){
+                    result = g.get(""+selector);
+                }
             }
 
         }
