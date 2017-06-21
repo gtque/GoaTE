@@ -39,6 +39,7 @@ public abstract class BleatBoxBase implements BleatBox{
     protected Logger LOG;
     protected Class loggingClass;
     protected BleatLevel volume;
+    StringBuilder buffer = new StringBuilder();
 
     public BleatBoxBase(Class logger){
         this.loggingClass = logger;
@@ -55,4 +56,19 @@ public abstract class BleatBoxBase implements BleatBox{
         return volume;
     }
 
+    @Override
+    public void infoBuffer(String message) {
+        if(buffer == null){
+            buffer = new StringBuilder();
+        }
+        buffer.append(message);
+    }
+
+    @Override
+    public void flush() {
+        if(buffer.length()>0) {
+            info(buffer.toString());
+            buffer = new StringBuilder();
+        }
+    }
 }

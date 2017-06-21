@@ -240,4 +240,5 @@ public class BleatBoxDefault extends BleatBoxBase{
     public void unknown(String title, String message, Throwable t) {
         info(title, message, t);
     }
+
 }
