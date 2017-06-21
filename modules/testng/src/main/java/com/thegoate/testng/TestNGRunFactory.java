@@ -59,20 +59,28 @@ public class TestNGRunFactory {
             }
         }
         if (runs.size() == 0) {
-            runs.add(new Goate());
+            runs.add(null);
         }
         runs = filter(runs);
         if (constants.size() > 0) {
             for (Goate data : runs) {
+                int i = -42;
+                if(data==null){
+                    i = runs.indexOf(data);
+                    data = new Goate();
+                }
                 data.merge(constants, false);
+                if(i!=-42){
+                    runs.set(i,data);
+                }
                 //a constant can be overloaded by setting it in the run data.
             }
         }
-        Object[][] rawData = new Object[runs.size()][1];
+        Object[][] rawData = new Object[runs.size()][runs.size()>0?1:0];
         for (int i = 0; i < rawData.length; i++) {
             rawData[i][0] = runs.get(i);
         }
-        return rawData;
+        return rawData.length>0?rawData:null;
     }
 
     protected static List<Goate> filter(List<Goate> runs) {
@@ -91,14 +99,16 @@ public class TestNGRunFactory {
                 int count = 0;
                 for (Goate rd : runs) {
                     count++;
-                    if (runNum >= 0) {
-                        if (runNum == count) {
-                            filtered.add(rd);
-                        }
-                    } else {
-                        String scene = "" + rd.get("Scenario");
-                        if (scene.equals(run)) {
-                            filtered.add(rd);
+                    if(rd!=null) {
+                        if (runNum >= 0) {
+                            if (runNum == count) {
+                                filtered.add(rd);
+                            }
+                        } else {
+                            String scene = "" + rd.get("Scenario");
+                            if (scene.equals(run)) {
+                                filtered.add(rd);
+                            }
                         }
                     }
                 }

@@ -48,13 +48,17 @@ public class BarnDataLoader extends DataLoader {
         List<File> files = (List<File>) new GetFileListFromDir(parameters.get("dir")).from("filedir::");
         for (File file : files) {
             Goate rd = new ToGoate(new Get(file).from("file::")).convert();
-            if (("" + rd.get("abstract")).equals("true")) {
-                LOG.debug("skipping: " + file.getName());
+            if(rd!=null) {
+                if (("" + rd.get("abstract")).equals("true")) {
+                    LOG.debug("skipping: " + file.getName());
+                } else {
+                    rd = extend(rd, rd);
+                    rd.drop("abstract");
+                    rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
+                    data.add(rd);
+                }
             }else{
-                rd = extend(rd, rd);
-                rd.drop("abstract");
-                rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
-                data.add(rd);
+                LOG.error("Problem loading test: " + file.getName());
             }
         }
         return data;

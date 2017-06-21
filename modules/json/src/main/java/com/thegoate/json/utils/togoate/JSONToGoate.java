@@ -62,7 +62,7 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
                 try{
                     takeActionOn = new JSONArray(""+takeActionOn);
                 }catch (Exception e){
-                    LOG.warn("Failed to convert the string to a JSONObject or JSONArray.");
+                    LOG.warn("Failed to convert the string to a JSONObject or JSONArray.\n"+e.getMessage());
                 }
             }
         }

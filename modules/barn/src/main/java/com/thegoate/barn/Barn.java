@@ -88,20 +88,26 @@ public class Barn extends TestNGEngine {
     }
 
     protected void steps(String step){
-        Goate sup = new ToGoate(data.get(step, "[]")).convert();
-        if(sup!=null) {
-            for (int i = 0; i < Integer.MAX_VALUE; i++) {
-                if (sup.keys().contains("" + i)) {
-                    Goate d = new ToGoate(sup.get("" + i, "{}")).convert();
-                    doWork(d);
-                } else {
-                    break;
+        if(data.size()>0) {
+            Goate sup = new ToGoate(data.get(step, "[]")).convert();
+            if (sup != null) {
+                for (int i = 0; i < Integer.MAX_VALUE; i++) {
+                    if (sup.keys().contains("" + i)) {
+                        Goate d = new ToGoate(sup.get("" + i, "{}")).convert();
+                        doWork(d);
+                    } else {
+                        break;
+                    }
                 }
             }
         }
     }
 
     public void execute() {
+        if(data.size()==0){
+            LOG.skip(getTestName(),"Skipping test because there is nothing to execute.");
+            throw new SkipException("No run data.");
+        }
         if(preFailure!=null){
             LOG.skip(getTestName(),"Skipping test because pre-steps failed: " + preFailure.getMessage());
             throw new SkipException(preFailure.getMessage());

@@ -46,7 +46,7 @@ import java.util.Map;
  * Created by gtque on 5/4/2017.
  */
 public class UnknownUtilType {
-    final BleatBox LOG = BleatFactory.getLogger(getClass());
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util) {
         return buildUtil(obj, util, obj);
