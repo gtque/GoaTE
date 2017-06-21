@@ -46,6 +46,8 @@ public abstract class DSL {
     protected List<String> definition;
     protected Object value;
 
+    public DSL(){}
+
     public DSL(Object value){
         define(value);
     }

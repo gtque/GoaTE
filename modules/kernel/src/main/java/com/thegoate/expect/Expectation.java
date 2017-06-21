@@ -183,6 +183,8 @@ public class Expectation {
                             }
                         } else {
                             result = false;
+                            failed.append(fullName() + ">" + key + " evaluated to false.\n");
+                            fails.add(exp);
                         }
                     }
                 }
@@ -236,6 +238,7 @@ public class Expectation {
             if (val instanceof NotFound) {
                 if (!exp.get("operator").equals("doesNotExist")) {
                     LOG.info("" + exp.get("actual") + " was not found, but this does not necessarily indicate a failure.");
+                    exp.put("actual_value", "_NOT_FOUND_");
                     throw new RuntimeException("Did not find: " + exp.get("actual"));
                 }
             } else {
