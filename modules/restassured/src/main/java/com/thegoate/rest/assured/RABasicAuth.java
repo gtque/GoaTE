@@ -106,6 +106,7 @@ public class RABasicAuth extends RestAuthBasicUserPW implements RASpec{
         if(doLog()){
             LOG.info("response follows");
             response.then().log().all();
+            LOG.flush();
         }
     }
 

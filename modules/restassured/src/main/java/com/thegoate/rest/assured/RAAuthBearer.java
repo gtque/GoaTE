@@ -106,6 +106,7 @@ public class RAAuthBearer extends RestAuthBearer implements RASpec{
         if(doLog()){
             LOG.info("response follows");
             response.then().log().all();
+            LOG.flush();
         }
     }
 

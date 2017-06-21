@@ -89,6 +89,7 @@ public class RestAssured extends Rest implements RASpec {
             setBody(mySpec, spec.getBody());
             if (spec.doLog()) {
                 mySpec.log().all();
+                spec.getLog().flush();
             }
         }
         return mySpec;
@@ -120,7 +121,7 @@ public class RestAssured extends Rest implements RASpec {
              */
             @Override
             public void flush() {
-                logger.info(this.myStringBuilder.toString());
+                logger.infoBuffer(this.myStringBuilder.toString());
                 myStringBuilder = new StringBuilder();
             }
         };
@@ -245,6 +246,7 @@ public class RestAssured extends Rest implements RASpec {
         if (doLog()) {
             LOG.info("response follows");
             response.then().log().all();
+            LOG.flush();
         }
     }
 
