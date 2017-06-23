@@ -34,6 +34,7 @@ import com.thegoate.utils.togoate.ToGoate;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,9 +42,13 @@ import java.util.List;
  * Created by Eric Angeli on 5/22/2017.
  */
 public class BarnDataLoader extends DataLoader {
-
+    String[] groups = {};
     @Override
     public List<Goate> load() {
+        String testGroups = parameters.get("testGroups","", String.class);
+        if(!testGroups.trim().isEmpty()) {
+            groups = testGroups.split(",");
+        }
         List<Goate> data = new ArrayList<>();
         List<File> files = (List<File>) new GetFileListFromDir(parameters.get("dir")).from("filedir::");
         for (File file : files) {
@@ -55,7 +60,9 @@ public class BarnDataLoader extends DataLoader {
                     rd = extend(rd, rd);
                     rd.drop("abstract");
                     rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
-                    data.add(rd);
+                    if(checkGroups(rd)) {
+                        data.add(rd);
+                    }
                 }
             }else{
                 LOG.error("Problem loading test: " + file.getName());
@@ -81,8 +88,22 @@ public class BarnDataLoader extends DataLoader {
         return rd;
     }
 
+    protected boolean checkGroups(Goate tc){
+        boolean result = false;
+        if(groups.length==0){
+            result = true;
+        } else {
+            String group = tc.get("groups", "", String.class)+","+parameters.get("groups","");
+            result = Arrays.stream(groups).parallel().anyMatch(group::contains);
+        }
+        return result;
+    }
     public BarnDataLoader testCaseDirectory(String dir) {
         setParameter("dir", dir);
+        return this;
+    }
+    public BarnDataLoader groups(String label) {
+        setParameter("groups", label);
         return this;
     }
 }

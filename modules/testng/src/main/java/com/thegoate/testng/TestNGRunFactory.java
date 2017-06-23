@@ -76,11 +76,15 @@ public class TestNGRunFactory {
                 //a constant can be overloaded by setting it in the run data.
             }
         }
+        if(runs.size()==1&&runs.get(0)==null){
+            runs = new ArrayList<>();
+        }
         Object[][] rawData = new Object[runs.size()][runs.size()>0?1:0];
         for (int i = 0; i < rawData.length; i++) {
             rawData[i][0] = runs.get(i);
         }
-        return rawData.length>0?rawData:null;
+        Object[][] empty = {};
+        return rawData.length>0?rawData:empty;
     }
 
     protected static List<Goate> filter(List<Goate> runs) {

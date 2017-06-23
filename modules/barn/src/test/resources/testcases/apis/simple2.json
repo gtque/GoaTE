@@ -1,0 +1,29 @@
+{
+  "Scenario":"get google, but first yahoo, and clean up with msn",
+  "extends":"/base.json, cleanup.json",
+  "groups":"s2",
+  "method":"get",
+  "end point":"",
+  "security":"none",
+  "headers":[
+  ],
+  "custom params":[
+  ],
+  "form params":[
+  ],
+  "multipart":[
+  ],
+  "query params":[
+  ],
+  "expect":[
+  ],
+  "setup":[
+    {
+      "job":"api",
+      "base url":"https://yahoo.com",
+      "method":"get",
+      "end point":"",
+      "security":"none"
+    }
+  ]
+}

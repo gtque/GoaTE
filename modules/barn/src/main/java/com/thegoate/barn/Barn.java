@@ -61,7 +61,7 @@ public class Barn extends TestNGEngine {
 
     @Override
     public void defineDataLoaders() {
-        runData.put("dl##", new BarnDataLoader().testCaseDirectory(baseTestCaseDir));
+        runData.put("dl##", new BarnDataLoader().testCaseDirectory(baseTestCaseDir).groups(label));
     }
 
     @BeforeMethod(alwaysRun = true)
