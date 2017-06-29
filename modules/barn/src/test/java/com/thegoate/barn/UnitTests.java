@@ -24,38 +24,30 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.barn.staff;
+package com.thegoate.barn;
 
 import com.thegoate.Goate;
-import com.thegoate.staff.Employee;
-import com.thegoate.staff.GoateJob;
+import org.testng.annotations.Factory;
+import org.testng.annotations.Test;
 
 /**
- * Runs a series of steps.
+ * Simple implementation of ApiBarn for testing and demo purposes.
  * Created by Eric Angeli on 5/22/2017.
  */
-@GoateJob(jobs = {"integration", "steps"})
-public class IntegrationEmployee extends Employee {
-
-    String steps = "";
-    Goate results = new Goate();
-
-    @Override
-    public Employee init() {
-        steps = "" + data.get("steps", "[]");//default to get if not specified.
-        return this;
+public class UnitTests extends Barn {
+    public UnitTests(){
+        super();
+        label = "unit";
+        baseTestCaseDir += "/unit";
     }
 
-    @Override
-    public Object doWork() {
-        StepsExecutor dosteps = new StepsExecutor(data).ordered().override(!Boolean.parseBoolean(""+data.get("doOverride","false")));
-        Goate r = dosteps.doSteps(steps);
-        return r;
+    @Factory(dataProvider = "dataLoader")
+    public UnitTests(Goate data){
+        super(data);
     }
 
-    @Override
-    public String[] detailedScrub(){
-        String[] scrub = {"steps", "doOverride"};
-        return scrub;
+    @Test(groups = {"unit"})
+    public void unitTest() {
+        execute();
     }
 }

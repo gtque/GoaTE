@@ -62,4 +62,10 @@ public class StepEmployee extends Employee {
         }
         return result;
     }
+
+    @Override
+    public String[] detailedScrub(){
+        String[] scrub = {};
+        return scrub;
+    }
 }

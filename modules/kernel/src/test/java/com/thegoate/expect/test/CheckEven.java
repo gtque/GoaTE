@@ -49,4 +49,9 @@ public class CheckEven extends Employee {
         }
         return value%2==0;
     }
+
+    @Override
+    public String[] detailedScrub(){
+        return null;
+    }
 }

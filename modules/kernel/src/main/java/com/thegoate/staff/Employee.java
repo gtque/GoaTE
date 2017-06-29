@@ -92,6 +92,23 @@ public abstract class Employee {
         return result;
     }
 
+    public Goate scrub(Goate data){
+        String[] baseScrub = {"Scenario", "job", "abstract", "extends", "groups", "expect", "override"};
+        Goate scrubbed = clean(new Goate().merge(data,false),baseScrub);
+        return clean(scrubbed, detailedScrub());
+    }
+
+    public Goate clean(Goate data, String[] scrub){
+        if(scrub!=null) {
+            for (String key : scrub) {
+                data.scrub(key);
+            }
+        }
+        return data;
+    }
+
+    public abstract String[] detailedScrub();
+
     public Employee init(Goate data) {
         setData(data);
         return init();

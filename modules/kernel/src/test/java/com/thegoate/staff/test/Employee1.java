@@ -46,4 +46,9 @@ public class Employee1 extends Employee {
     public Object doWork() {
         return data!=null?data.size():-1;//-1 means the data was null.
     }
+
+    @Override
+    public String[] detailedScrub(){
+        return null;
+    }
 }

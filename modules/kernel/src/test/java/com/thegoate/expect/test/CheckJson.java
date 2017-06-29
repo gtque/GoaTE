@@ -46,4 +46,9 @@ public class CheckJson extends Employee {
     public Object doWork() {
         return value;
     }
+
+    @Override
+    public String[] detailedScrub(){
+        return null;
+    }
 }

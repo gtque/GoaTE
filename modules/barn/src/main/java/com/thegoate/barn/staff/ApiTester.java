@@ -38,7 +38,7 @@ import java.lang.reflect.InvocationTargetException;
  * Created by Eric Angeli on 5/22/2017.
  */
 @GoateJob(jobs = {"api"})
-public class ApiTester extends Employee {
+public class ApiTester extends ApiEmployee {
 
     ApiEmployee worker;
 

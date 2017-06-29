@@ -52,4 +52,10 @@ public class RARepsonseExpectation extends Employee {
         }
         return response;
     }
+
+    @Override
+    public String[] detailedScrub(){
+        String[] scrub = {"response"};
+        return scrub;
+    }
 }

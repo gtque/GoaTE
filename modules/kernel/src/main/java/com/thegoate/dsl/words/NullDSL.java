@@ -24,38 +24,25 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.barn.staff;
+
+package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-import com.thegoate.staff.Employee;
-import com.thegoate.staff.GoateJob;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
 
 /**
- * Runs a series of steps.
- * Created by Eric Angeli on 5/22/2017.
+ * Returns the current System nano time.
+ * Created by gtque on 4/21/2017.
  */
-@GoateJob(jobs = {"integration", "steps"})
-public class IntegrationEmployee extends Employee {
-
-    String steps = "";
-    Goate results = new Goate();
-
-    @Override
-    public Employee init() {
-        steps = "" + data.get("steps", "[]");//default to get if not specified.
-        return this;
+@GoateDSL(word = "null")
+public class NullDSL extends DSL {
+    public NullDSL(Object value) {
+        super(value);
     }
 
     @Override
-    public Object doWork() {
-        StepsExecutor dosteps = new StepsExecutor(data).ordered().override(!Boolean.parseBoolean(""+data.get("doOverride","false")));
-        Goate r = dosteps.doSteps(steps);
-        return r;
-    }
-
-    @Override
-    public String[] detailedScrub(){
-        String[] scrub = {"steps", "doOverride"};
-        return scrub;
+    public Object evaluate(Goate data) {
+        return null;
     }
 }

@@ -49,4 +49,10 @@ public class GetGoateResultEmployee extends Employee {
     public Object doWork() {
         return result;
     }
+
+    @Override
+    public String[] detailedScrub(){
+        String[] scrub = {"_goate_result"};
+        return scrub;
+    }
 }

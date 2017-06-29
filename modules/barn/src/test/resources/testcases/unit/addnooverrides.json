@@ -1,0 +1,28 @@
+{
+  "Scenario": "simple integration test that strings together steps/tests into a single test.",
+  "job": "integration",
+  "groups": "",
+  "abstract": false,
+  "expect": [
+    "get result>0,==,11",
+    "get result>1,==,11"
+  ],
+  "val1":5,
+  "val2":19,
+  "steps": [
+    {
+      "#": "0",
+      "override": [],
+      "job": "simple add",
+      "val1":41,
+      "val2":6
+    },
+    {
+      "#": "1",
+      "override": [],
+      "job": "simple add",
+      "val1":8,
+      "val2":6
+    }
+  ]
+}

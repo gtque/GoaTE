@@ -147,6 +147,16 @@ public class Goate {
         return this;
     }
 
+    public Goate scrub(String pattern){
+        Goate scrub = filter(pattern);
+        if(scrub!=null){
+            for(String key: scrub.keys()){
+                drop(key);
+            }
+        }
+        return this;
+    }
+
     /**
      * Simple filter, matches if key starts with the given pattern.
      *
