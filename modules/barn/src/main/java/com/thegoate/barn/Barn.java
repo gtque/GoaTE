@@ -29,6 +29,7 @@ package com.thegoate.barn;
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.barn.data.BarnDataLoader;
+import com.thegoate.barn.staff.StepsExecutor;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.staff.Employee;
@@ -53,9 +54,10 @@ public class Barn extends TestNGEngine {
     ExpectEvaluator ev = null;
     Throwable preFailure = null;
 
-    public Barn(){}
+    public Barn() {
+    }
 
-    public Barn(Goate data){
+    public Barn(Goate data) {
         super(data);
     }
 
@@ -69,7 +71,7 @@ public class Barn extends TestNGEngine {
         LOG.debug("----running setup----");
         try {
             steps("setup");
-        }catch(Throwable t){
+        } catch (Throwable t) {
             preFailure = t;
         }
         LOG.debug("----finished setup----");
@@ -80,45 +82,38 @@ public class Barn extends TestNGEngine {
         LOG.debug("----running cleanup----");
         try {
             steps("cleanup");
-        }catch(Throwable t){
+        } catch (Throwable t) {
             LOG.warn(getTestName(), "Cleanup had a failure: " + t.getMessage(), t);
             throw t;
         }
         LOG.debug("----finished cleanup----");
     }
 
-    protected void steps(String step){
-        if(data.size()>0) {
-            Goate sup = new ToGoate(data.get(step, "[]")).convert();
-            if (sup != null) {
-                for (int i = 0; i < Integer.MAX_VALUE; i++) {
-                    if (sup.keys().contains("" + i)) {
-                        Goate d = new ToGoate(sup.get("" + i, "{}")).convert();
-                        doWork(d);
-                    } else {
-                        break;
-                    }
-                }
-            }
+    protected void steps(String step) {
+        if (data.size() > 0) {
+            StepsExecutor dosteps = new StepsExecutor(data).notOrdered();
+            String steps = ""+data.get(step,"[]");
+            data.put(step+"_result##",dosteps.doSteps(steps));
         }
     }
 
     public void execute() {
-        if(data.size()==0){
-            LOG.skip(getTestName(),"Skipping test because there is nothing to execute.");
+        if (data.size() == 0) {
+            LOG.skip(getTestName(), "Skipping test because there is nothing to execute.");
             throw new SkipException("No run data.");
         }
-        if(preFailure!=null){
-            LOG.skip(getTestName(),"Skipping test because pre-steps failed: " + preFailure.getMessage());
+        if (preFailure != null) {
+            LOG.skip(getTestName(), "Skipping test because pre-steps failed: " + preFailure.getMessage());
             throw new SkipException(preFailure.getMessage());
-        }else {
+        } else {
             LOG.debug("----starting execution----");
             try {
-                doWork(data);
-            }catch(Throwable t){
-                LOG.fatal(getTestName(),"Encountered a problem executing the test: " + t.getMessage(), t);
+                StepsExecutor steps = new StepsExecutor(data).notOrdered();
+                data.put("_goate_result",steps.doSteps(null).get("0"));
+            } catch (Throwable t) {
+                LOG.fatal(getTestName(), "Encountered a problem executing the test: " + t.getMessage(), t);
                 throw t;
-            }finally {
+            } finally {
                 LOG.debug("----finished execution----");
                 LOG.debug("----evaluating expectations----");
             }
@@ -128,7 +123,7 @@ public class Barn extends TestNGEngine {
 //                LOG.warn(getTestName(), "Failed: " + t.getMessage());
                 throw t;
             } finally {
-                if(ev!=null) {
+                if (ev != null) {
                     for (Goate p : ev.passes()) {
                         LOG.pass(getTestName(), "PASSED: " + p.toString());
                     }
@@ -141,21 +136,7 @@ public class Barn extends TestNGEngine {
         }
     }
 
-    protected void doWork(Goate d){
-        if(d!=null) {
-            String type = "" + d.get("job", "api");
-            AnnotationFactory af = new AnnotationFactory();
-            try {
-                Employee worker = (Employee) af.annotatedWith(GoateJob.class).find(type).using("jobs").build();
-                worker.init(d);
-                put("_goate_result", worker.doWork());
-            } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                LOG.error("problem finding something to execute a " + type + "\nmake sure you have an implementation library included.", e);
-            }
-        }
-    }
-
-    protected void evaluateExpectations(){
+    protected void evaluateExpectations() {
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect(data.filter("expect."));
         ev = new ExpectEvaluator(etb);

@@ -1,5 +1,6 @@
 {
   "Scenario":"get google, but first yahoo, and clean up with msn",
+  "abstract":false,
   "extends":"/base.json, cleanup.json",
   "method":"get",
   "end point":"",
@@ -15,6 +16,7 @@
   "query params":[
   ],
   "expect":[
+    "get result>status code,==,200"
   ],
   "setup":[
     {

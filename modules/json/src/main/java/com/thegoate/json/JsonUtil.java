@@ -65,7 +65,7 @@ public abstract class JsonUtil implements Utility {
         }catch(JSONException je){
             try{
                 if(!(check instanceof JSONArray)) {
-                    if (new JSONArray(check) == null) {
+                    if (new JSONArray(""+check) == null) {
                         istype = false;
                     }
                 }

@@ -1,29 +1,39 @@
 {
-  "Scenario":"get google, but first yahoo, and clean up with msn",
-  "extends":"/base.json, cleanup.json",
-  "groups":"s2",
-  "method":"get",
-  "end point":"",
-  "security":"none",
-  "headers":[
+  "Scenario": "simple integration test that strings together steps/tests into a single test.",
+  "job": "integration",
+  "groups": "s2",
+  "abstract": false,
+  "expect": [
+    "get result>0>status code,==,200",
+    "get result>1>status code,==,200"
   ],
-  "custom params":[
-  ],
-  "form params":[
-  ],
-  "multipart":[
-  ],
-  "query params":[
-  ],
-  "expect":[
-  ],
-  "setup":[
+  "steps": [
     {
-      "job":"api",
-      "base url":"https://yahoo.com",
-      "method":"get",
-      "end point":"",
-      "security":"none"
+      "#": "0",
+      "override": [],
+      "job": "api",
+      "base url": "https://yahoo.com",
+      "method": "get",
+      "end point": "",
+      "security": "none"
+    },
+    {
+      "#": "1",
+      "override": [],
+      "job": "api",
+      "base url": "https://google.com",
+      "method": "get",
+      "end point": "",
+      "security": "none"
+    }
+  ],
+  "cleanup": [
+    {
+      "job": "api",
+      "base url": "http://msn.com",
+      "method": "get",
+      "end point": "",
+      "security": "none"
     }
   ]
 }
