@@ -56,7 +56,7 @@ public class ToGoate extends UnknownUtilType implements ToGoateUtility{
             result = tool.convert();
         }
         if(result==null){
-            LOG.warn("Failed to convert: " + original);
+            LOG.info("Failed to convert: " + original);
         }
         return result;
     }

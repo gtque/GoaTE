@@ -49,8 +49,8 @@ import static org.testng.Assert.assertTrue;
  * Created by Eric Angeli on 5/22/2017.
  */
 public class Barn extends TestNGEngine {
-    String label = "barn";//label will be used in the future, but not currently used.
-    String baseTestCaseDir = "testcases";
+    protected String label = "barn";//label will be used in the future, but not currently used.
+    protected String baseTestCaseDir = "testcases";
     ExpectEvaluator ev = null;
     Throwable preFailure = null;
 

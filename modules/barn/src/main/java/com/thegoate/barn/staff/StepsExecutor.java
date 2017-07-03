@@ -122,6 +122,15 @@ public class StepsExecutor {
                 }
                 worker.init(fullData);
                 result = worker.doWork();
+                Object carryover = fullData.get("carryover", "[]");//process the override values.
+                for (int i = 0; i < Integer.MAX_VALUE; i++) {
+                    Object key = new Get(""+i).from(carryover);
+                    if (key != null && !(key instanceof NotFound)) {
+                        data.put("" + key, fullData.get("" + key, "null::"));
+                    }else{
+                        break;
+                    }
+                }
             } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
                 LOG.error("problem finding something to execute a " + type + "\nmake sure you have an implementation library included.", e);
             }
