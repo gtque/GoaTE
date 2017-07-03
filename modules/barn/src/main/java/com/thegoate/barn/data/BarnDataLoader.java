@@ -28,6 +28,7 @@ package com.thegoate.barn.data;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
+import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetFileListFromDir;
 import com.thegoate.utils.togoate.ToGoate;
@@ -79,6 +80,9 @@ public class BarnDataLoader extends DataLoader {
                     ext = ext.trim();
                     if (ext.startsWith("/")) {
                         ext = ext.substring(1);
+                    }
+                    if(ext.contains("${")){
+                        ext = ""+new Fill(ext).with(parameters);
                     }
                     extension.merge(extend(extension, new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert()), false);
                 }
