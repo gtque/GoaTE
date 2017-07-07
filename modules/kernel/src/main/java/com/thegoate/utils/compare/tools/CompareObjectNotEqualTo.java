@@ -34,11 +34,11 @@ import com.thegoate.utils.compare.CompareUtil;
  * Compares two booleans for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "==", type = "object")
+@CompareUtil(operator = "!=", type = "object")
 @IsDefault
-public class CompareObjectEqualTo extends CompareTool {
+public class CompareObjectNotEqualTo extends CompareTool {
 
-    public CompareObjectEqualTo(Object actual) {
+    public CompareObjectNotEqualTo(Object actual) {
         super(actual);
     }
 
@@ -49,6 +49,6 @@ public class CompareObjectEqualTo extends CompareTool {
 
     @Override
     public boolean evaluate() {
-        return actual!=null?actual.equals(expected):expected==null;
+        return !(actual!=null?actual.equals(expected):expected==null);
     }
 }
