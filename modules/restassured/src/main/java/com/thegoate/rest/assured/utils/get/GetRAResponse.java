@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Loads the file specified in from into a string and retuns it.
+ * Loads the file specified in from into a string and returns it.
  * Created by Eric Angeli on 5/18/2017.
  */
 @GetUtil

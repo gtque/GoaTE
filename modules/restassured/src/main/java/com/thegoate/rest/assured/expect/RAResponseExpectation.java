@@ -35,7 +35,7 @@ import io.restassured.response.Response;
  * Created by Eric Angeli on 5/18/2017.
  */
 @GoateJob(jobs = {"api response"})
-public class RARepsonseExpectation extends Employee {
+public class RAResponseExpectation extends Employee {
 
     Response response;
 
