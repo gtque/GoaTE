@@ -163,6 +163,8 @@ public class Expectation {
 
     public boolean evaluate() {
         failed = new StringBuilder("");//only the last failure is preserved. if the expectation is executed more than once it resets the failure message.
+        fails = new ArrayList<>();
+        passes = new ArrayList<>();
         boolean result = true;//assume true, and if a failure is detected set to false.
         if (from != null) {
             try {
@@ -180,6 +182,8 @@ public class Expectation {
                         if (key.contains("*")) {
                             if (!resultC) {
                                 result = false;
+                                failed.append(fullName() + ">" + key + " evaluated to false.\n");
+                                fails.add(exp);
                             }
                         } else {
                             result = false;
@@ -190,7 +194,12 @@ public class Expectation {
                 }
             } catch (Throwable t) {
                 result = false;
+                Goate exp = new Goate();
+                exp.put("from", fullName());
+                exp.put("error", t.getMessage());
+                LOG.error(t.getMessage(), t);
                 failed.append("there was a problem executing the work: " + t.getMessage() + "\n");
+                fails.add(exp);
             }
         } else {
             result = false;
@@ -295,12 +304,13 @@ public class Expectation {
             String[] parts = expectation.split(",");
             Interpreter i = new Interpreter(data);
             from(source);
-            actual("" + i.translate(parts[0]));
+            Object act = i.translate(parts[0]);
+            actual(act);
             if (parts.length > 1) {
-                is("" + i.translate(parts[1]));
+                is(""+i.translate(parts[1]));
             }
             if (parts.length > 2) {
-                expected("" + i.translate(parts[2]));
+                expected(i.translate(parts[2]));
             }
         }
         return this;

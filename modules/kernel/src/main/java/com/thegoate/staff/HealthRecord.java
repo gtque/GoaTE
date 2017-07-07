@@ -42,9 +42,9 @@ public class HealthRecord {
 
     public void report(String message, String secondary){
         Map<String, String> report = new ConcurrentHashMap<>();
-        report.put("message", message);
-        report.put("secondary", secondary);
-        records.put("report##", report);
+        report.put("message", "" + message);
+        report.put("secondary", "" + secondary);
+        records.put("report##", "" + report);
     }
 
     public String printRecords(){

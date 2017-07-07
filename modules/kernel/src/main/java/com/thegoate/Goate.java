@@ -65,7 +65,7 @@ public class Goate {
         if (key.contains("##")) {
             key = buildKey(key);
         }
-        data.put(key, value);
+        data.put(key, value==null?"null::":value);//can't put null in a map, so wrap in the null dsl.
 //        }
         return this;
     }
