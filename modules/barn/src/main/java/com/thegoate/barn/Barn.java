@@ -55,10 +55,13 @@ public class Barn extends TestNGEngine {
     Throwable preFailure = null;
 
     public Barn() {
+        super();
+        includeClassMethodInName = false;
     }
 
     public Barn(Goate data) {
         super(data);
+        includeClassMethodInName = false;
     }
 
     @Override
