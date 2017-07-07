@@ -34,6 +34,7 @@ import com.thegoate.utils.get.GetUtil;
 import com.thegoate.utils.get.GetUtility;
 import com.thegoate.utils.get.NotFound;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Get the field from the given json.
@@ -62,7 +63,11 @@ public class GetJsonField extends JsonUtil implements GetUtility {
             try {
                 result = new JSONArray(container.toString()).length();
             }catch(Exception e){
-                LOG.warn("The container was not something to get the size from.\n"+e.getMessage(), e);
+                try {
+                    result = new JSONObject(container.toString()).length();
+                }catch(Exception e1) {
+                    LOG.warn("The container was not something to get the size from.\n" + e1.getMessage(), e1);
+                }
             }
         }else {
             Goate g = new JSONToGoate(container).convert();
