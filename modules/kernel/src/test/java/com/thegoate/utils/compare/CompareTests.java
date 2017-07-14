@@ -26,6 +26,9 @@
  */
 package com.thegoate.utils.compare;
 
+import com.thegoate.utils.compare.tools.integer.*;
+import com.thegoate.utils.compare.tools.l.CompareLongEqualTo;
+import com.thegoate.utils.compare.tools.l.CompareLongGreaterThanEqualTo;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertFalse;
@@ -39,82 +42,82 @@ public class CompareTests {
 
     @Test(groups = {"unit"})
     public void intEqualTo(){
-        assertTrue(new Compare(42).to(42).using("==").evaluate());
+        assertTrue(new CompareIntEqualTo(42).to(42).using("==").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intEqualToFail(){
-        assertFalse(new Compare(43).to(42).using("==").evaluate());
+        assertFalse(new CompareIntEqualTo(43).to(42).using("==").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intNotEqualTo(){
-        assertTrue(new Compare(42).to(43).using("!=").evaluate());
+        assertTrue(new CompareIntNotEqualTo(42).to(43).using("!=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intNotEqualToFail(){
-        assertFalse(new Compare(42).to(42).using("!=").evaluate());
+        assertFalse(new CompareIntNotEqualTo(42).to(42).using("!=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intLessEqualTo(){
-        assertTrue(new Compare(42).to(42).using("<=").evaluate());
+        assertTrue(new CompareIntLessThanEqualTo(42).to(42).using("<=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intLessEqualToLess(){
-        assertTrue(new Compare(41).to(42).using("<=").evaluate());
+        assertTrue(new CompareIntLessThanEqualTo(41).to(42).using("<=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intLessEqualToFail(){
-        assertFalse(new Compare(42).to(41).using("<=").evaluate());
+        assertFalse(new CompareIntLessThanEqualTo(42).to(41).using("<=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intGreaterEqualTo(){
-        assertTrue(new Compare(42).to(42).using(">=").evaluate());
+        assertTrue(new CompareIntGreaterThanEqualTo(42).to(42).using(">=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intGreaterEqualToGreater(){
-        assertTrue(new Compare(43).to(42).using(">=").evaluate());
+        assertTrue(new CompareIntGreaterThanEqualTo(43).to(42).using(">=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intGreaterEqualToFail(){
-        assertFalse(new Compare(42).to(43).using(">=").evaluate());
+        assertFalse(new CompareIntGreaterThanEqualTo(42).to(43).using(">=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intGreater(){
-        assertTrue(new Compare(43).to(42).using(">").evaluate());
+        assertTrue(new CompareIntGreaterThan(43).to(42).using(">").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intGreaterEqualFail(){
-        assertFalse(new Compare(42).to(42).using(">").evaluate());
+        assertFalse(new CompareIntGreaterThan(42).to(42).using(">").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intGreaterFail(){
-        assertFalse(new Compare(42).to(43).using(">").evaluate());
+        assertFalse(new CompareIntGreaterThan(42).to(43).using(">").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intLesser(){
-        assertTrue(new Compare(42).to(43).using("<").evaluate());
+        assertTrue(new CompareIntLessThan(42).to(43).using("<").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intLesserEqualFail(){
-        assertFalse(new Compare(42).to(42).using("<").evaluate());
+        assertFalse(new CompareIntLessThan(42).to(42).using("<").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void intLesserFail(){
-        assertFalse(new Compare(43).to(42).using("<").evaluate());
+        assertFalse(new CompareIntLessThan(43).to(42).using("<").evaluate());
     }
 
     @Test(groups = {"unit"})
@@ -124,7 +127,7 @@ public class CompareTests {
 
     @Test(groups = {"unit"})
     public void intFloatEqualTo(){
-        assertTrue(new Compare(42).to(42.0).using("==").evaluate());
+        assertTrue(new CompareIntEqualTo(42).to(42.0).using("==").evaluate());
     }
 
     @Test(groups = {"unit"})
@@ -209,7 +212,7 @@ public class CompareTests {
 
     @Test(groups = {"unit"})
     public void longEqualTo(){
-        assertTrue(new Compare(42L).to(42L).using("==").evaluate());
+        assertTrue(new CompareLongEqualTo(42L).to(42L).using("==").evaluate());
     }
 
     @Test(groups = {"unit"})
@@ -244,12 +247,12 @@ public class CompareTests {
 
     @Test(groups = {"unit"})
     public void longGreaterEqualTo(){
-        assertTrue(new Compare(42L).to(42L).using(">=").evaluate());
+        assertTrue(new CompareLongGreaterThanEqualTo(42L).to(42L).using(">=").evaluate());
     }
 
     @Test(groups = {"unit"})
     public void longGreaterEqualToGreater(){
-        assertTrue(new Compare(43L).to(42L).using(">=").evaluate());
+        assertTrue(new CompareLongGreaterThanEqualTo(43L).to(42L).using(">=").evaluate());
     }
 
     @Test(groups = {"unit"})

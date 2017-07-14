@@ -30,7 +30,7 @@ import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.tools.f.CompareFloatTool;
 
 /**
- * Compares two booleans for equality.
+ * Compares two longs for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
 @CompareUtil(operator = "==", type = "long")

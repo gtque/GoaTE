@@ -29,7 +29,7 @@ package com.thegoate.utils.compare.tools.integer;
 import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Compares two booleans for equality.
+ * Compares two ints for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
 @CompareUtil(operator = "==", type = "int")

@@ -32,10 +32,10 @@ import com.thegoate.utils.compare.CompareUtil;
  * Compares two floats for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = ">", type = "float")
-public class CompareFloatGreaterThan extends CompareFloatTool {
+@CompareUtil(operator = "!=", type = "float")
+public class CompareFloatNotEqualTo extends CompareFloatTool {
 
-    public CompareFloatGreaterThan(Object actual) {
+    public CompareFloatNotEqualTo(Object actual) {
         super(actual);
     }
 
@@ -43,9 +43,9 @@ public class CompareFloatGreaterThan extends CompareFloatTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = Float.parseFloat(""+actual)>Float.parseFloat(""+expected);
+            result = Float.parseFloat(""+actual)!=Float.parseFloat(""+expected);
         }catch(Exception e){
-            result = tryExpectedType(">");
+            result = tryExpectedType("!=");
         }
         return result;
     }

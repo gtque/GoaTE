@@ -24,18 +24,18 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools.f;
+package com.thegoate.utils.compare.tools.l;
 
 import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Compares two floats for equality.
+ * Compares two longs for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = ">", type = "float")
-public class CompareFloatGreaterThan extends CompareFloatTool {
+@CompareUtil(operator = "!=", type = "long")
+public class CompareLongNotEqualTo extends CompareLongTool {
 
-    public CompareFloatGreaterThan(Object actual) {
+    public CompareLongNotEqualTo(Object actual) {
         super(actual);
     }
 
@@ -43,9 +43,9 @@ public class CompareFloatGreaterThan extends CompareFloatTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = Float.parseFloat(""+actual)>Float.parseFloat(""+expected);
+            result = Long.parseLong(""+actual)!=Long.parseLong(""+expected);
         }catch(Exception e){
-            result = tryExpectedType(">");
+            result = tryExpectedType("!=");
         }
         return result;
     }

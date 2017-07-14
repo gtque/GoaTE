@@ -29,7 +29,7 @@ package com.thegoate.utils.compare.tools.l;
 import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Compares two booleans for equality.
+ * Compares two longs for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
 @CompareUtil(operator = "<=", type = "long")

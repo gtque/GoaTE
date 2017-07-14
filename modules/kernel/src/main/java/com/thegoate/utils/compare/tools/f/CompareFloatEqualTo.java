@@ -30,7 +30,7 @@ import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.tools.integer.CompareIntTool;
 
 /**
- * Compares two booleans for equality.
+ * Compares two floats for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
 @CompareUtil(operator = "==", type = "float")
