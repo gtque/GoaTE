@@ -75,7 +75,7 @@ public class GoateUtils {
             fileName = "/"+fileName;
 
         String path = System.getProperty("user.dir") + fileName;
-        LOG.debug("checking path: " + path);
+//        LOG.debug("checking path: " + path);
         try {
             File temp = new File(path);
             if (!temp.exists()) {
@@ -83,7 +83,7 @@ public class GoateUtils {
                 URL opath = GoateUtils.class.getResource(path);
                 if(opath!=null)
                     path = GoateUtils.class.getResource(path).toString();
-                LOG.debug("path: " + path);
+//                LOG.debug("path: " + path);
                 if (path.contains("jar:")) {
                     if(!leaveInJar) {
                         String tempPath = new Copy().file(opath).to("temp" + path.substring(path.lastIndexOf("/")), force);
@@ -103,8 +103,7 @@ public class GoateUtils {
                         path = path.substring(1);
                     }
                 }
-
-                LOG.debug("full adjust path: " + path);
+//                LOG.debug("full adjust path: " + path);
             }
         } catch (Exception e) {
             LOG.error("Exception encountered finding file: " + e.getMessage(), e);
