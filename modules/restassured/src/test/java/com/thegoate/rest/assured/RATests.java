@@ -55,7 +55,7 @@ public class RATests extends TestNGEngineAnnotatedDL {
     @Test(groups = {"unit2"})
     public void getGoogle() {
         Rest rest = new RABasicAuthHeader();
-        Response response = (Response) rest.baseURL("http://google.com").get("");
+        Response response = (Response) rest.baseURL("https://www.google.com").get("");
         data.put("response", response);
         assertEquals(response.statusCode(), 200);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
@@ -67,7 +67,7 @@ public class RATests extends TestNGEngineAnnotatedDL {
 
     @Test(groups = {"unit2"})
     public void getGoogleByEmployee() {
-        Goate d = new Goate().put("base url", "http://google.com");
+        Goate d = new Goate().put("base url", "https://www.google.com");
         Employee e = new ApiGet().init(d);
         Response response = (Response) e.doWork();
         assertEquals(response.statusCode(), 200);

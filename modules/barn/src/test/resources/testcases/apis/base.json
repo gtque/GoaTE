@@ -5,7 +5,7 @@
   "setup":[
     {
       "job":"api",
-      "base url":"http://google.com",
+      "base url":"https://www.google.com",
       "method":"get",
       "end point":"",
       "security":"none"

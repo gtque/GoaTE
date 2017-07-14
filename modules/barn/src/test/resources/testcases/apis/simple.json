@@ -1,5 +1,6 @@
 {
   "Scenario":"get google, but first yahoo, and clean up with msn",
+  "groups":"simple",
   "abstract":false,
   "extends":"/base.json, cleanup.json",
   "method":"get",
