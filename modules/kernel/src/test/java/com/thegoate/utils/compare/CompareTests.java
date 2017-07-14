@@ -82,7 +82,6 @@ public class CompareTests {
         assertTrue(new Compare(43).to(42).using(">=").evaluate());
     }
 
-
     @Test(groups = {"unit"})
     public void intGreaterEqualToFail(){
         assertFalse(new Compare(42).to(43).using(">=").evaluate());
@@ -118,6 +117,176 @@ public class CompareTests {
         assertFalse(new Compare(43).to(42).using("<").evaluate());
     }
 
+    @Test(groups = {"unit"})
+    public void floatEqualTo(){
+        assertTrue(new Compare(42.0).to(42.0).using("==").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void intFloatEqualTo(){
+        assertTrue(new Compare(42).to(42.0).using("==").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatIntEqualTo(){
+        assertTrue(new Compare(42.0).to(42).using("==").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatEqualToFail(){
+        assertFalse(new Compare(42.1).to(42.0).using("==").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatNotEqualTo(){
+        assertTrue(new Compare(42.1).to(42.0).using("!=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatNotEqualToFail(){
+        assertFalse(new Compare(42.0).to(42.0).using("!=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatLessEqualTo(){
+        assertTrue(new Compare(42.0).to(42.0).using("<=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatLessEqualToLess(){
+        assertTrue(new Compare(42.0).to(42.1).using("<=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatLessEqualToFail(){
+        assertFalse(new Compare(42.0).to(41.0).using("<=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatGreaterEqualTo(){
+        assertTrue(new Compare(42.0).to(42.0).using(">=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatGreaterEqualToGreater(){
+        assertTrue(new Compare(43.0).to(42.0).using(">=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatGreaterEqualToFail(){
+        assertFalse(new Compare(42.0).to(43.0).using(">=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatGreater(){
+        assertTrue(new Compare(43.0).to(42.0).using(">").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatGreaterEqualFail(){
+        assertFalse(new Compare(42.0).to(42.0).using(">").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatGreaterFail(){
+        assertFalse(new Compare(42.0).to(43.0).using(">").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatLesser(){
+        assertTrue(new Compare(42.0).to(43.0).using("<").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatLesserEqualFail(){
+        assertFalse(new Compare(42.0).to(42.0).using("<").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void floatLesserFail(){
+        assertFalse(new Compare(43.0).to(42.0).using("<").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longEqualTo(){
+        assertTrue(new Compare(42L).to(42L).using("==").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longEqualToFail(){
+        assertFalse(new Compare(43L).to(42L).using("==").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longNotEqualTo(){
+        assertTrue(new Compare(42L).to(43L).using("!=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longNotEqualToFail(){
+        assertFalse(new Compare(42L).to(42L).using("!=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longLessEqualTo(){
+        assertTrue(new Compare(42).to(42L).using("<=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longLessEqualToLess(){
+        assertTrue(new Compare(41L).to(42L).using("<=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longLessEqualToFail(){
+        assertFalse(new Compare(42L).to(41L).using("<=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longGreaterEqualTo(){
+        assertTrue(new Compare(42L).to(42L).using(">=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longGreaterEqualToGreater(){
+        assertTrue(new Compare(43L).to(42L).using(">=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longGreaterEqualToFail(){
+        assertFalse(new Compare(42L).to(43L).using(">=").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longGreater(){
+        assertTrue(new Compare(43L).to(42L).using(">").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longGreaterEqualFail(){
+        assertFalse(new Compare(42L).to(42L).using(">").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longGreaterFail(){
+        assertFalse(new Compare(42L).to(43L).using(">").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longLesser(){
+        assertTrue(new Compare(42L).to(43L).using("<").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longLesserEqualFail(){
+        assertFalse(new Compare(42L).to(42L).using("<").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void longLesserFail(){
+        assertFalse(new Compare(43L).to(42L).using("<").evaluate());
+    }
+    
     @Test(groups = {"unit"})
     public void booleanEqualTo(){
         assertTrue(new Compare(true).to(true).using("==").evaluate());

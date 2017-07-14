@@ -1,12 +1,12 @@
-package com.thegoate.utils.compare.tools;
+package com.thegoate.utils.compare.tools.l;
 
 import com.thegoate.utils.compare.CompareTool;
 
 /**
- * Created by Eric Angeli on 5/9/2017.
+ * Created by Eric Angeli on 7/14/2017.
  */
-public abstract class CompareIntTool extends CompareTool {
-    public CompareIntTool(Object actual) {
+public abstract class CompareLongTool extends CompareTool {
+    public CompareLongTool(Object actual) {
         super(actual);
     }
 
@@ -14,10 +14,10 @@ public abstract class CompareIntTool extends CompareTool {
     public boolean isType(Object check) {
         boolean istype = false;
         try{
-            Integer.parseInt(""+actual);
+            Long.parseLong(""+actual);
             istype = true;
         }catch(Throwable e){
-            LOG.debug(""+actual + " is not an int.");
+//            LOG.debug(""+actual + " is not a long.");
         }
         return istype;
     }

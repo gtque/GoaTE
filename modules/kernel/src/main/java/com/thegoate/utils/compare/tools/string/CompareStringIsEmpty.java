@@ -1,5 +1,6 @@
-package com.thegoate.utils.compare.tools;
+package com.thegoate.utils.compare.tools.string;
 
+import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.compare.CompareUtil;
 
 /**
@@ -11,6 +12,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Created by Eric Angeli on 7/7/2017.
  */
 @CompareUtil(operator = "isEmpty", type="String")
+@IsDefault
 public class CompareStringIsEmpty extends CompareStringTool {
     public CompareStringIsEmpty(Object actual) {
         super(actual);

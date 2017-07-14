@@ -1,4 +1,4 @@
-package com.thegoate.utils.compare.tools;
+package com.thegoate.utils.compare.tools.bool;
 
 import com.thegoate.utils.compare.CompareTool;
 

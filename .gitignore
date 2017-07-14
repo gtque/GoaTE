@@ -224,3 +224,4 @@ pip-log.txt
 *.iws
 *.iml
 .idea
+out/*

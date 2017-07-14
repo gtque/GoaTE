@@ -53,13 +53,25 @@ public class Compare extends UnknownUtilType implements CompareUtility {
 
     @Override
     public boolean evaluate() {
+        if(tool==null){
+            buildTool();
+        }
+        tool.to(expected).using(operator);
+        return tool.evaluate();
+    }
+
+    protected void buildTool(){
         try {
             tool = (CompareUtility) buildUtil(actual, CompareUtil.class, ""+operator, CompareUtil.class.getMethod("operator"));
         } catch (NoSuchMethodException e) {
             LOG.error("Problem finding the compare utility: " + e.getMessage(), e);
         }
-        tool.to(expected).using(operator);
-        return tool.evaluate();
+    }
+    public CompareUtility getTool(){
+        if(tool==null){
+            buildTool();
+        }
+        return tool;
     }
 
     @Override

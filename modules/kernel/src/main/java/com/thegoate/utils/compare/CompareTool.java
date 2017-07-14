@@ -41,8 +41,32 @@ public abstract class CompareTool implements CompareUtility{
     protected Object actual = null;
     protected Object expected = null;
     protected Object operator = null;
+    protected boolean nested = false;
     public CompareTool(Object actual){
         this.actual = actual;
+    }
+
+    public CompareTool nested(){
+        this.nested = true;
+        return this;
+    }
+
+    public boolean isNested(){
+        return nested;
+    }
+
+    protected boolean tryExpectedType(String op){
+        boolean result = false;
+        if(!isNested()) {
+            Compare compare = new Compare(expected);
+            compare.using(op).to(actual);
+            CompareUtility cu = compare.getTool();
+            if (cu instanceof CompareTool) {
+                ((CompareTool) cu).nested();
+            }
+            result = compare.evaluate();
+        }
+        return result;
     }
 
     @Override

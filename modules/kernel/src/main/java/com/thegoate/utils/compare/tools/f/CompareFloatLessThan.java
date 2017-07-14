@@ -24,23 +24,29 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools;
+package com.thegoate.utils.compare.tools.f;
 
 import com.thegoate.utils.compare.CompareUtil;
 
 /**
  * Compares two booleans for equality.
- * Created by Eric Angeli on 5/9/2017.
+ * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = "!=", type = "boolean")
-public class CompareBooleanNotEqualTo extends CompareBooleanTool {
+@CompareUtil(operator = "<", type = "float")
+public class CompareFloatLessThan extends CompareFloatTool {
 
-    public CompareBooleanNotEqualTo(Object actual) {
+    public CompareFloatLessThan(Object actual) {
         super(actual);
     }
 
     @Override
     public boolean evaluate() {
-        return Boolean.parseBoolean(""+actual)!=Boolean.parseBoolean(""+expected);
+        boolean result = false;
+        try{
+            result = Float.parseFloat(""+actual)<Float.parseFloat(""+expected);
+        }catch(Exception e){
+            result = tryExpectedType("<");
+        }
+        return result;
     }
 }

@@ -24,7 +24,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools;
+package com.thegoate.utils.compare.tools.integer;
 
 import com.thegoate.utils.compare.CompareUtil;
 
@@ -32,15 +32,22 @@ import com.thegoate.utils.compare.CompareUtil;
  * Compares two booleans for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "==", type = "boolean")
-public class CompareBooleanEqualTo extends CompareBooleanTool {
+@CompareUtil(operator = "<", type = "int")
+public class CompareIntLessThan extends CompareIntTool {
 
-    public CompareBooleanEqualTo(Object actual) {
+    public CompareIntLessThan(Object actual) {
         super(actual);
     }
 
     @Override
     public boolean evaluate() {
-        return Boolean.parseBoolean(""+actual)==Boolean.parseBoolean(""+expected);
+//        return Integer.parseInt(""+actual)<Integer.parseInt(""+expected);
+        boolean result = false;
+        try{
+            result = Integer.parseInt(""+actual)<Integer.parseInt(""+expected);
+        }catch(Exception e){
+            result = tryExpectedType("<");
+        }
+        return result;
     }
 }

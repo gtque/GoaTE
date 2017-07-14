@@ -24,23 +24,29 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools;
+package com.thegoate.utils.compare.tools.f;
 
 import com.thegoate.utils.compare.CompareUtil;
 
 /**
  * Compares two booleans for equality.
- * Created by Eric Angeli on 5/9/2017.
+ * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = ">", type = "int")
-public class CompareIntGreaterThan extends CompareIntTool {
+@CompareUtil(operator = ">", type = "float")
+public class CompareFloatGreaterThan extends CompareFloatTool {
 
-    public CompareIntGreaterThan(Object actual) {
+    public CompareFloatGreaterThan(Object actual) {
         super(actual);
     }
 
     @Override
     public boolean evaluate() {
-        return Integer.parseInt(""+actual)>Integer.parseInt(""+expected);
+        boolean result = false;
+        try{
+            result = Float.parseFloat(""+actual)>Float.parseFloat(""+expected);
+        }catch(Exception e){
+            result = tryExpectedType(">");
+        }
+        return result;
     }
 }
