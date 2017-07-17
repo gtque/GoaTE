@@ -63,11 +63,13 @@ public abstract class ApiEmployee extends Employee {
             spec.urlParams(data.filterAndSplitKeyValuePairs("url params."));
             spec.queryParams(data.filterAndSplitKeyValuePairs("query params."));
             spec.pathParams(data.filterAndSplitKeyValuePairs("path params."));
-            if(data.get("body")!=null)
-            spec.body(data.get("body"));
+            if(data.get("body")!=null) {
+                spec.body(data.get("body"));
+            }
             spec.formData(data.filterAndSplitKeyValuePairs("form params."));
             spec.multipartData(data.filterAndSplitKeyValuePairs("multipart"));
             spec.customData(data.filterAndSplitKeyValuePairs("custom params."));
+            spec.timeout(Integer.parseInt(""+data.get("rest.timeout",15)));
         }
         return spec;
     }

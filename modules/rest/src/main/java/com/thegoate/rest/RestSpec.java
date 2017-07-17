@@ -111,6 +111,10 @@ public interface RestSpec {
 
     Goate getBody();
 
+    int getTimeout();
+
+    RestSpec timeout(int timeoutSeconds);
+
     boolean doLog();
 
     String getBaseURL();

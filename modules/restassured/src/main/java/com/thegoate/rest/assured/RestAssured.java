@@ -32,18 +32,20 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
-import io.restassured.config.EncoderConfig;
-import io.restassured.config.LogConfig;
-import io.restassured.config.RestAssuredConfig;
-import io.restassured.config.SSLConfig;
+import io.restassured.config.*;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.params.CoreConnectionPNames;
 
 import java.io.*;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
 import static io.restassured.config.HeaderConfig.headerConfig;
+import static io.restassured.config.HttpClientConfig.httpClientConfig;
 
 /**
  * REST Assured implementation.
@@ -74,6 +76,8 @@ public class RestAssured extends Rest implements RASpec {
         rac = rac.headerConfig(headerConfig()
                 .overwriteHeadersWithName("Authorization")
                 .overwriteHeadersWithName("Content-Type"));
+        int timeout = spec.getTimeout();
+        rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout*1000));
         rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));
         return specification.config(rac);
     }

@@ -45,6 +45,7 @@ public abstract class Rest implements RestSpec {
     protected Goate body = new Goate();
     protected Goate custom = new Goate();
     protected String baseURL = "";//this should include the port if different from default.
+    protected int timeout = 15;
     protected boolean logAll = true;
     public static final String MP_ID_NOT_SET = "_mp_id_not_set";
     public enum BODY {
@@ -292,5 +293,16 @@ public abstract class Rest implements RestSpec {
     @Override
     public Goate getBody(){
         return body;
+    }
+
+    @Override
+    public RestSpec timeout(int timeoutSeconds){
+        this.timeout = timeoutSeconds;
+        return this;
+    }
+
+    @Override
+    public int getTimeout(){
+        return timeout;
     }
 }
