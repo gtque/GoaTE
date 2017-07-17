@@ -64,9 +64,15 @@ public abstract class CompareTool implements CompareUtility{
             if (cu instanceof CompareTool) {
                 ((CompareTool) cu).nested();
             }
-            result = compare.evaluate();
+            result = compare.actual(actual).to(expected).evaluate();
         }
         return result;
+    }
+
+    @Override
+    public CompareUtility actual(Object actual){
+        this.actual = actual;
+        return this;
     }
 
     @Override

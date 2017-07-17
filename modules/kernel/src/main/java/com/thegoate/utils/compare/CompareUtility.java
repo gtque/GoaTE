@@ -34,6 +34,7 @@ package com.thegoate.utils.compare;
 public interface CompareUtility {
     boolean isType(Object check);
     boolean evaluate();
+    CompareUtility actual(Object actual);
     CompareUtility to(Object expected);
     CompareUtility using(Object operator);
 }

@@ -75,6 +75,12 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     }
 
     @Override
+    public CompareUtility actual(Object actual){
+        this.actual = actual;
+        return this;
+    }
+
+    @Override
     public CompareUtility to(Object expected) {
         this.expected = expected;
         return this;
