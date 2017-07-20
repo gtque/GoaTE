@@ -57,7 +57,7 @@ public class Interpreter {
         String check = "" + value;
         if (check.contains("::")) {
             check = check.substring(0, check.indexOf("::"));
-            return translate(check, value);
+            return translate("", check, value);
         }
         return value;
     }
@@ -68,10 +68,10 @@ public class Interpreter {
      * @param value The value, aka parameters, to be translated.
      * @return The translated value.
      */
-    public Object translate(String dsl, Object value) {
+    public Object translate(String key, String dsl, Object value) {
         DSL word = build(dsl, value);
         if (word != null) {
-            value = word.evaluate(data);
+            value = word.source(key).evaluate(data);
         }
         return value;
     }
