@@ -193,7 +193,7 @@ public class BleatBoxDefault extends BleatBoxBase{
 
     @Override
     public void fatal(String message, Throwable t) {
-        fatal(message, t);
+        fatal(null, message, t);
     }
 
     @Override

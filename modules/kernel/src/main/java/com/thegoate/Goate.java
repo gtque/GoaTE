@@ -122,12 +122,16 @@ public class Goate {
             value = def;
         }
         if (value != null && dsl) {
-            value = processDSL(value);
+            value = processDSL(key, value);
         }
         return type.cast(value);
     }
 
-    public Object processDSL(Object value) {
+    public Object processDSL(Object value){
+        return processDSL("",value);
+    }
+
+    public Object processDSL(String key, Object value) {
         if (value != null) {
             String check = "" + value;
             if (check.contains("::")) {
@@ -136,7 +140,7 @@ public class Goate {
                 check = null;
             }
             if (check != null) {
-                value = dictionary.translate(check, value);
+                value = dictionary.translate(key, check, value);
             }
         }
         return value;

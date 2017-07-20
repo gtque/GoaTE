@@ -45,6 +45,7 @@ public abstract class DSL {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected List<String> definition;
     protected Object value;
+    protected String key = "";
 
     public DSL(){}
 
@@ -52,9 +53,13 @@ public abstract class DSL {
         define(value);
     }
 
+    public DSL source(String key){
+        this.key = key;
+        return this;
+    }
+
     public String type(){
         String type = "undefined";
-
         if(definition!=null){
             if(definition.size()>0){
                 type = definition.get(0);
