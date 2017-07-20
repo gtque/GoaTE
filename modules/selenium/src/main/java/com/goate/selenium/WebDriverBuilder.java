@@ -2,11 +2,14 @@ package com.goate.selenium;
 
 import com.goate.selenium.annotations.Driver;
 import com.goate.selenium.staff.GoateDriver;
+import com.goate.selenium.staff.RemoteWebDriver;
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import org.openqa.selenium.WebDriver;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Builds and returns a web driver of the given type.
@@ -15,6 +18,7 @@ import org.openqa.selenium.WebDriver;
 public class WebDriverBuilder {
     BleatBox LOG = BleatFactory.getLogger(getClass());
     String browser = "";
+    String remote = "";
 
     Goate dc = new Goate();
 
@@ -31,11 +35,22 @@ public class WebDriverBuilder {
         return build(dc);
     }
 
-    public WebDriver build(Goate data){
+    public GoateDriver buildGoateDriver() throws IllegalAccessException, InvocationTargetException, InstantiationException {
         AnnotationFactory af = new AnnotationFactory();
+        return (GoateDriver) af.annotatedWith(Driver.class).find(browser).using("type").build();
+    }
+
+    public WebDriver build(Goate data){
         GoateDriver driver = null;
         try {
-            driver = (GoateDriver) af.annotatedWith(Driver.class).find(browser).using("type").build();
+            if(browser.startsWith("remote:")){
+                remote = browser.substring("remote:".length());
+                browser = "remote";
+            }
+            driver = buildGoateDriver();
+            if(!remote.isEmpty()){
+                ((RemoteWebDriver)driver).remote(remote);
+            }
             for(String name:data.keys()){
                 driver.addCapability(name,data.get(name));
             }

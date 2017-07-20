@@ -58,6 +58,10 @@ public abstract class GoateDriver {
      */
     protected abstract DesiredCapabilities loadCapabilities();
 
+    public DesiredCapabilities getDc(){
+        return dc;
+    }
+
     /**
      * Override this method and return an instance of the webdriver.<br>
      * When instantiating, make sure to set the desired capabilities.
