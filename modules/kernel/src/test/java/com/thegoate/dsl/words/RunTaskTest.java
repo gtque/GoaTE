@@ -52,6 +52,24 @@ public class RunTaskTest {
     }
 
     @Test(groups = {"unit"})
+    public void runHowdy(){
+        Goate data = new Goate();
+        data.put("test", "do::say howdy,o::var1").put("var1","Matt");
+        String nt = "" + data.get("test");
+        LOG.debug("output: " + nt);
+        Assert.assertEquals(nt, "howdy Matt");
+    }
+
+    @Test(groups = {"unit"})
+    public void runMultipleAge(){
+        Goate data = new Goate();
+        data.put("test", "do::multiply age by ${x},o::var1").put("var1",10).put("x",2);
+        String nt = "" + data.get("test");
+        LOG.debug("output: " + nt);
+        Assert.assertEquals(nt, "20");
+    }
+
+    @Test(groups = {"unit"})
     public void runGoodbye(){
         Goate data = new Goate();
         data.put("test", "do::say goodbye");

@@ -57,10 +57,18 @@ public class RunTask extends DSL {
     public Object evaluate(Goate data){
         String task = "" + get(1, data);
         Object result = null;
+        Object[] constructorParams = null;
+        if(definition.size()>2){
+            constructorParams = new Object[definition.size()-2];
+            for(int i = 0; i<constructorParams.length;i++){
+                constructorParams[i] = get(i+2,data);
+            }
+        }
         try {
             af.annotatedWith(GoateTaskContainer.class)
                     .findByMethod(makeGeneric(task))
-                    .methodAnnotatedWith(GoateTask.class);
+                    .methodAnnotatedWith(GoateTask.class)
+                    .constructorArgs(constructorParams);
             Object owner = findOwner();
             Method m = findTask();
             Object[] args = buildArgs(m, task, data);
