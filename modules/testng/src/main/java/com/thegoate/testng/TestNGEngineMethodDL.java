@@ -142,9 +142,9 @@ public class TestNGEngineMethodDL extends TestNGEngine {
 
     @BeforeMethod(alwaysRun = true)
     public void initDataMethod(Object[] d, Method m) {
-        if (d != null) {
+        if (d != null&&d.length>0) {
             init((Goate)d[0]);
-            startUp(m);
         }
+        startUp(m);
     }
 }

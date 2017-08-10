@@ -1,0 +1,4 @@
+{
+  "end point":"fill::/${eut::endpoint.base\\,api}/booger",
+  "default eut":"fill::/${eut::ep.def\\,api}/booger"
+}

@@ -31,6 +31,8 @@ import com.thegoate.data.DataLoader;
 import com.thegoate.data.PropertyFileDL;
 import com.thegoate.data.StaticDL;
 import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.togoate.ToGoate;
 import org.testng.annotations.Test;
 
 import java.io.File;

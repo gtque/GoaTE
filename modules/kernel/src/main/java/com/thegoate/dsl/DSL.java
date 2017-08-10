@@ -82,9 +82,11 @@ public abstract class DSL {
         definition = new ArrayList<>();
         String v = "" + value;
         definition.add(v.substring(0,v.indexOf("::")));
-        String[] def = (v.substring(v.indexOf("::")+2)).split(",");
+        v = v.substring(v.indexOf("::")+2);
+        v = v.replace("\\,","(comma_goate_yall)");
+        String[] def = (v).split(",");
         for(String d:def){
-            definition.add(d);
+            definition.add(d.replace("(comma_goate_yall)",","));
         }
         return definition;
     }

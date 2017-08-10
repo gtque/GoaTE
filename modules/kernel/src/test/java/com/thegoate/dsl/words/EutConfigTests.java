@@ -28,6 +28,8 @@ package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.togoate.ToGoate;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -37,6 +39,20 @@ import static org.testng.Assert.assertEquals;
  * Created by Eric Angeli on 5/19/2017.
  */
 public class EutConfigTests extends TestNGEngineAnnotatedDL {
+
+    @Test(groups = {"unit"})
+    public void fillWithEutTest() {
+        String j = ""+new Get("sample.json").from("file::");
+        String expectedJ = "{\n" +
+                "  \"end point\":\"fill::/${eut::endpoint.base\\\\,api}/booger\",\n" +
+                "  \"default eut\":\"fill::/${eut::ep.def\\\\,api}/booger\"\n" +
+                "}";
+        assertEquals(j.replace("\r",""),expectedJ);
+        Goate g = new ToGoate(j).convert();
+        String p = "" + g.get("end point");
+        assertEquals(p, "/juicy/booger");
+        assertEquals("" + g.get("default eut"),"/api/booger");
+    }
 
     @Test(groups = {"unit"})
     public void loadLocalByDefault(){
