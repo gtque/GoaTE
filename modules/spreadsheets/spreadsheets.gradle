@@ -29,6 +29,10 @@ dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
     compile d.depends(":kernel", project.internalVersion);
     compile 'org.apache.poi:poi:+';
+    compile "org.apache.poi:poi-scratchpad:+"
+    compile "org.apache.poi:poi-excelant:+"
+    compile "org.apache.poi:poi-ooxml:+"
+    compile "org.apache.poi:poi-ooxml-schemas:+"
     compile 'org.apache.commons:commons-csv:+';
     testCompile d.depends(":testng", project.internalVersion);
 }
