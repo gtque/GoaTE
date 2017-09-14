@@ -30,7 +30,7 @@ package com.thegoate.utils.get;
 import com.thegoate.Goate;
 
 /**
- * Loads the file specified in from into a string and retuns it.
+ * Loads the file specified in from into a string and returns it.
  * Created by Eric Angeli on 5/5/2017.
  */
 @GetUtil
