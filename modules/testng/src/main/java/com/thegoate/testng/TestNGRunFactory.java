@@ -54,8 +54,12 @@ public class TestNGRunFactory {
         }
         if (constantData != null) {
             for (String key : constantData.keys()) {
-                constants.merge(((DataLoader) constantData.get(key)).load().get(0), true);
-                //the last loaded value of the constant wins.
+                if(key.equals("_goate:method")){
+                    constants.put(key,constantData.get(key));
+                }else {
+                    constants.merge(((DataLoader) constantData.get(key)).load().get(0), true);
+                    //the last loaded value of the constant wins.
+                }
             }
         }
         if (runs.size() == 0) {
