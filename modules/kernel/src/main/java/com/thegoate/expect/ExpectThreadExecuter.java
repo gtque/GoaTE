@@ -85,10 +85,12 @@ public class ExpectThreadExecuter extends Thread {
             long current = System.currentTimeMillis();
             while (executing && !status && (current - startTime) <= timeoutMS) {
                 status = expectation.evaluate();
+                if(!status){
                 GoateUtils.sleep(period, LOG);
-                if(Thread.interrupted()){
-                    executing = false;
                 }
+//                if(Thread.interrupted()){
+//                    executing = false;
+//                }
                 current = System.currentTimeMillis();
             }
             if (!status) {
