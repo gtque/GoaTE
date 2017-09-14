@@ -44,11 +44,16 @@ import java.util.List;
  */
 public class BarnDataLoader extends DataLoader {
     String[] groups = {};
+    String[] excluded = {};
     @Override
     public List<Goate> load() {
         String testGroups = parameters.get("testGroups","", String.class);
+        String excludeGroups = parameters.get("excludeGroups", "", String.class);
         if(!testGroups.trim().isEmpty()) {
             groups = testGroups.split(",");
+        }
+        if(!excludeGroups.trim().isEmpty()) {
+            excluded = excludeGroups.split(",");
         }
         List<Goate> data = new ArrayList<>();
         List<File> files = (List<File>) new GetFileListFromDir(parameters.get("dir")).from("filedir::");
@@ -99,6 +104,10 @@ public class BarnDataLoader extends DataLoader {
         } else {
             String group = tc.get("groups", "", String.class)+","+parameters.get("groups","");
             result = Arrays.stream(groups).parallel().anyMatch(group::contains);
+        }
+        if(excluded.length!=0){
+            String group = tc.get("groups", "", String.class)+","+parameters.get("groups","");
+            result = result && !(Arrays.stream(excluded).parallel().anyMatch(group::contains));
         }
         return result;
     }
