@@ -60,16 +60,6 @@ public class CSVSheet extends SheetUtils{
     }
 
     @Override
-    public Object get(int col, int row, Object def) {
-        return get((headers.size()>col?headers.get(col):(""+col)), row, def);
-    }
-
-    @Override
-    public Object get(String col, int row, Object def) {
-        return data.get(""+row,new Goate(), Goate.class).get(col,def);
-    }
-
-    @Override
     public SheetUtils set(int col, int row, Object value) {
         return null;
     }

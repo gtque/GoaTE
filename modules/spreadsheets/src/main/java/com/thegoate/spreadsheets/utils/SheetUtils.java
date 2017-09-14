@@ -51,11 +51,15 @@ public abstract class SheetUtils {
     public Object get(int col, int row) {
         return get(col, row, null);
     }
-    public abstract Object get(int col, int row, Object def);
+    public Object get(int col, int row, Object def) {
+        return get((headers.size()>col?headers.get(col):(""+col)), row, def);
+    }
     public Object get(String col, int row) {
         return get(col, row, null);
     }
-    public abstract Object get(String col, int row, Object def);
+    public Object get(String col, int row, Object def) {
+        return data.get(""+row, new Goate(), Goate.class).get(col,def);
+    }
     public abstract SheetUtils set(int col, int row, Object value);
     public abstract SheetUtils set(String col, int row, Object value);
     public abstract SheetUtils writeToFile();

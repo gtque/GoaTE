@@ -16,7 +16,7 @@ public class CSVTest extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
     public void loadSimpleCSV() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        SheetUtils sheet = SheetUtils.build("sample.csv","the sheet name does not matter.");
+        SheetUtils sheet = SheetUtils.build("sample.csv","the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
         sheet.load();
         assertEquals(sheet.get("a",0),"b");
         assertEquals(sheet.get("a",1),"false");
