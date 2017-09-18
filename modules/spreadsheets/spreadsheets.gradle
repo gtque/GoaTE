@@ -24,43 +24,15 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.testng;
-
-import com.thegoate.Goate;
-import com.thegoate.data.GoateProvider;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
-
-/**
- * Created by Eric Angeli on 5/11/2017.
- */
-public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
-
-    public TestNGEngineDataProviderMethodLevel(){
-        super();
-    }
-
-    @GoateProvider(name = "sample")
-    @Test(groups = {"unit"}, dataProvider = "methodLoader")
-    public void putRunData(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
-        assertEquals(get("b","z"),"y");
-        assertEquals(get("a","y"),"x");
-        //put("c", 3);
-        assertEquals(get("c",3),3);
-        assertEquals(data.size(), 5);
-    }
-
-    @GoateProvider(name = "com.thegoate.testng.test.SampleDLP")
-    @Test(groups = {"unit"}, dataProvider = "methodLoader")
-    public void putRunData2(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
-        assertEquals(get("b"),"y");
-        assertEquals(get("a"),"x");
-        put("c", 3);
-        assertEquals(get("c"),3);
-        assertEquals(data.size(), 5);
-    }
-
+import com.thegoate.gradle.GoateDepends;
+dependencies{
+    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
+    compile d.depends(":kernel", project.internalVersion);
+    compile 'org.apache.poi:poi:+';
+    compile "org.apache.poi:poi-scratchpad:+"
+    compile "org.apache.poi:poi-excelant:+"
+    compile "org.apache.poi:poi-ooxml:+"
+    compile "org.apache.poi:poi-ooxml-schemas:+"
+    compile 'org.apache.commons:commons-csv:+';
+    testCompile d.depends(":testng", project.internalVersion);
 }

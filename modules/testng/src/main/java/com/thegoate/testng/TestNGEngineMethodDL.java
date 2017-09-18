@@ -91,6 +91,7 @@ public class TestNGEngineMethodDL extends TestNGEngine {
                 }
                 if (provider != null) {
                     provider.init();
+                    provider.getConstantDataLoaders().put("_goate:method", method);
                     rdl.merge(provider.getRunDataLoaders(), true);
                     cdl.merge(provider.getConstantDataLoaders(), true);
                 } else {
@@ -98,14 +99,18 @@ public class TestNGEngineMethodDL extends TestNGEngine {
                     if (providers == null) {
                         throw new Exception("Failed to find the DLProvider: " + gp.name());
                     }else{
+                        if(providers[1]==null){
+                            providers[1] = new Goate();
+                        }
+                        providers[1].put("_goate:method", method);
                         rdl.merge(providers[0], true);
                         cdl.merge(providers[1], true);
                     }
                 }
-                for(String k:rdl.keys()){
-                    Goate g = (Goate)rdl.get(k);
-                    g.put("_goate:method", method);
-                }
+//                for(String k:rdl.keys()){
+//                    Goate g = (Goate)rdl.get(k);
+//                    g.put("_goate:method", method);
+//                }
             } catch (Exception e) {
                 LOG.error("There was a problem building the providers: " + e.getMessage(), e);
             }

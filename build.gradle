@@ -59,7 +59,7 @@ if (javaVersion.contains(".")) {
     javaVersion = javaVersion.substring(("" + javaVersion).indexOf(".") + 1);
 }
 
-def vbase = '0.11'
+def vbase = '0.12'
 def v = "${vbase}." + sdf.format(new Date());
 def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : project.release) : 'beta'
 

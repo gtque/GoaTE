@@ -75,23 +75,23 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
     @GoateProvider(name = "sample2")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData(Goate d) throws Exception {
-        assertEquals(data.size(), 2);
+        assertEquals(data.size(), 3);
         assertEquals(get("b"),null);
         assertEquals(get("a"),"x");
         put("c", 3);
         assertEquals(get("c"),3);
-        assertEquals(data.size(), 3);
+        assertEquals(data.size(), 4);
     }
 
     @GoateProvider(name = "sample3")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData2(Goate d) throws Exception {
-        assertEquals(data.size(), 3);
+        assertEquals(data.size(), 4);
         assertEquals(get("b"),"y");
         assertEquals(get("a"),"x");
         put("c", 3);
         assertEquals(get("c"),3);
-        assertEquals(data.size(), 4);
+        assertEquals(data.size(), 5);
     }
 
 }

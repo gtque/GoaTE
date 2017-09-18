@@ -24,43 +24,19 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.testng;
+package com.thegoate.spreadsheets.utils;
 
-import com.thegoate.Goate;
-import com.thegoate.data.GoateProvider;
-import org.testng.annotations.Test;
+import org.atteo.classindex.IndexAnnotated;
 
-import static org.testng.Assert.assertEquals;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by Eric Angeli on 5/11/2017.
+ * Use to indicate file type supported.
+ * Created by Eric Angeli on 9/14/2017.
  */
-public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
-
-    public TestNGEngineDataProviderMethodLevel(){
-        super();
-    }
-
-    @GoateProvider(name = "sample")
-    @Test(groups = {"unit"}, dataProvider = "methodLoader")
-    public void putRunData(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
-        assertEquals(get("b","z"),"y");
-        assertEquals(get("a","y"),"x");
-        //put("c", 3);
-        assertEquals(get("c",3),3);
-        assertEquals(data.size(), 5);
-    }
-
-    @GoateProvider(name = "com.thegoate.testng.test.SampleDLP")
-    @Test(groups = {"unit"}, dataProvider = "methodLoader")
-    public void putRunData2(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
-        assertEquals(get("b"),"y");
-        assertEquals(get("a"),"x");
-        put("c", 3);
-        assertEquals(get("c"),3);
-        assertEquals(data.size(), 5);
-    }
-
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface GoateSheet {
+    String[] fileTypes();
 }
