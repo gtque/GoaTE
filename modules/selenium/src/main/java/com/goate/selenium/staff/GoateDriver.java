@@ -113,7 +113,7 @@ public abstract class GoateDriver {
         String path = "";
         Driver d = getClass().getAnnotation(Driver.class);
         if(d!=null) {
-            browser = d.type();
+            browser = d.property().isEmpty()?d.type():d.property();
             driverPath = new Goate().get("driverpath","eut::selenium."+browser+".path,empty::",String.class);
             if(driverPath.isEmpty()){
                 driverPath = "webdrivers/"+browser;
