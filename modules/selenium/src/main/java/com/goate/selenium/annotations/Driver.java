@@ -13,4 +13,5 @@ import java.lang.annotation.RetentionPolicy;
 @IndexAnnotated
 public @interface Driver {
     String type();
+    String property() default "";
 }

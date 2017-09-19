@@ -9,7 +9,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
  * Returns a new firefox web driver.
  * Created by Eric Angeli on 6/28/2017.
  */
-@Driver(type = "firefox")
+@Driver(type = "firefox", property = "gecko")
 public class FirefoxWebDriver extends GoateDriver {
 
     @Override
