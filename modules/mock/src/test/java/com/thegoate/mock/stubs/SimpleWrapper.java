@@ -24,32 +24,19 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
-package com.thegoate.dsl.words;
-
-import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.PrimitiveDSL;
+package com.thegoate.mock.stubs;
 
 /**
- * Returns an int.
- * Created by gtque on 4/21/2017.
+ * Created by Eric Angeli on 9/20/2017.
  */
-@GoateDSL(word = "int")
-public class IntDSL extends PrimitiveDSL {
-    public IntDSL(Object value) {
-        super(value);
+public class SimpleWrapper {
+    public Simple1 sample = new Simple1();
+
+    public int getAxB(){
+        return sample.aXb();
     }
 
-    @Override
-    public Class classType() {
-        return Integer.TYPE;
-    }
-
-    @Override
-    public Object evaluate(Goate data) {
-        String value = "" + get(1,data);
-        return Integer.parseInt(value);
+    public String greeting(String word){
+        return sample.sayHello(word);
     }
 }

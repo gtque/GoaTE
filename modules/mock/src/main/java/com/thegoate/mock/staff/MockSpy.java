@@ -24,32 +24,41 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
-package com.thegoate.dsl.words;
+package com.thegoate.mock.staff;
 
 import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.PrimitiveDSL;
+import com.thegoate.mock.annotations.Mocker;
+import com.thegoate.reflection.GoateReflection;
+import org.mockito.Mockito;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
- * Returns an int.
- * Created by gtque on 4/21/2017.
+ * Uses mockito to "spy" on an actual object.
+ * See mockito spy for more information.
+ * Created by Eric Angeli on 9/20/2017.
  */
-@GoateDSL(word = "int")
-public class IntDSL extends PrimitiveDSL {
-    public IntDSL(Object value) {
-        super(value);
+@Mocker(type = "spy")
+public class MockSpy extends MockObject {
+
+    public MockSpy(){
+        spy = true;
     }
 
     @Override
-    public Class classType() {
-        return Integer.TYPE;
-    }
-
-    @Override
-    public Object evaluate(Goate data) {
-        String value = "" + get(1,data);
-        return Integer.parseInt(value);
+    protected Object getObject(Class theClass){
+        Object theSpy = null;
+        try {
+            Goate constructorData = sortParams(data.filter("constructor."));
+            Object[] p = new Object[constructorData.size()];
+            Class[] pc = new Class[constructorData.size()];
+            buildParameters(p, pc, constructorData);
+            Constructor constructor = new GoateReflection().findConstructor(theClass.getConstructors(), pc);
+            theSpy = Mockito.spy(constructor.newInstance(p));
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            LOG.error("There was a problem building the spy: " + e.getMessage(), e);
+        }
+        return theSpy;
     }
 }

@@ -39,7 +39,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * Base Class for utils. Determines the type of util to use.
+ * Base Class for staff. Determines the type of util to use.
  * The util(s) should have a method called isType that checks to see if the input
  * is of the type that service can process. All generic utility classes should extend this class
  * and call buildUtil in the constructor.

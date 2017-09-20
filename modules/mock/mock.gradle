@@ -24,32 +24,11 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
-package com.thegoate.dsl.words;
-
-import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.PrimitiveDSL;
-
-/**
- * Returns an int.
- * Created by gtque on 4/21/2017.
- */
-@GoateDSL(word = "int")
-public class IntDSL extends PrimitiveDSL {
-    public IntDSL(Object value) {
-        super(value);
-    }
-
-    @Override
-    public Class classType() {
-        return Integer.TYPE;
-    }
-
-    @Override
-    public Object evaluate(Goate data) {
-        String value = "" + get(1,data);
-        return Integer.parseInt(value);
-    }
+import com.thegoate.gradle.GoateDepends;
+dependencies{
+    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
+    compile d.depends(":kernel", project.internalVersion);
+    compile d.depends(":json", project.internalVersion);
+    compile "org.mockito:mockito-core:+";
+    testCompile d.depends(":testng", project.internalVersion);
 }

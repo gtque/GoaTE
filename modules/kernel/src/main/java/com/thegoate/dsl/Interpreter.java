@@ -83,7 +83,7 @@ public class Interpreter {
      * @param value The information to be translated.
      * @return DSL The instance of the word that can be used for translating.
      */
-    protected DSL build(String word, Object value) {
+    public DSL build(String word, Object value) {
         DSL dsl = null;
         if (dictionary != null) {
             if (dictionary.containsKey(word)) {

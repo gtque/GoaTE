@@ -28,9 +28,11 @@
 package com.thegoate.reflection;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Some simple custom methods for reflection.
@@ -46,40 +48,40 @@ public class GoateReflection {
             if (ptypes.length == args.length) {
                 found = true;
                 for (int i = 0; i < args.length; i++) {
-                    if(args[i]!=null&&isPrimitive(args[i].getClass())){
-                        if(ptypes[i].equals(Integer.TYPE)){
-                            if(!(args[i] instanceof Integer)){
+                    if (args[i] != null && isPrimitive(args[i].getClass())) {
+                        if (ptypes[i].equals(Integer.TYPE)) {
+                            if (!(args[i] instanceof Integer)) {
                                 found = false;
                             }
-                        } else if(ptypes[i].equals(Byte.TYPE)){
-                            if(!(args[i] instanceof Byte)){
+                        } else if (ptypes[i].equals(Byte.TYPE)) {
+                            if (!(args[i] instanceof Byte)) {
                                 found = false;
                             }
-                        } else if(ptypes[i].equals(Double.TYPE)){
-                            if(!(args[i] instanceof Double)){
+                        } else if (ptypes[i].equals(Double.TYPE)) {
+                            if (!(args[i] instanceof Double)) {
                                 found = false;
                             }
-                        } else if(ptypes[i].equals(Float.TYPE)){
-                            if(!(args[i] instanceof Float)){
+                        } else if (ptypes[i].equals(Float.TYPE)) {
+                            if (!(args[i] instanceof Float)) {
                                 found = false;
                             }
-                        } else if(ptypes[i].equals(Long.TYPE)){
-                            if(!(args[i] instanceof Long)){
+                        } else if (ptypes[i].equals(Long.TYPE)) {
+                            if (!(args[i] instanceof Long)) {
                                 found = false;
                             }
-                        } else if(ptypes[i].equals(Boolean.TYPE)){
-                            if(!(args[i] instanceof Boolean)){
+                        } else if (ptypes[i].equals(Boolean.TYPE)) {
+                            if (!(args[i] instanceof Boolean)) {
                                 found = false;
                             }
-                        } else if(ptypes[i].equals(Character.TYPE)){
-                            if(!(args[i] instanceof Character)){
+                        } else if (ptypes[i].equals(Character.TYPE)) {
+                            if (!(args[i] instanceof Character)) {
                                 found = false;
                             }
-                        }else if(!ptypes[i].equals(Object.class)){
+                        } else if (!ptypes[i].equals(Object.class)) {
                             found = false;
                         }
-                    }else {
-                        if (args[i]!=null&&!ptypes[i].isAssignableFrom(args[i].getClass())) {
+                    } else {
+                        if (args[i] != null && !ptypes[i].isAssignableFrom(args[i].getClass())) {
                             found = false;
                         }
                     }
@@ -93,33 +95,79 @@ public class GoateReflection {
         return p;
     }
 
-    public boolean isPrimitive(Class c){
+    public boolean isPrimitive(Class c) {
         return c.equals(Boolean.class) || c.equals(Byte.class) || c.equals(Integer.class) || c.equals(Double.class)
                 || c.equals(Float.class) || c.equals(Long.class) || c.equals(Character.class);
     }
 
-    public List<Method> getDeclaredMethods(Class klass){
+    public List<Method> getDeclaredMethods(Class klass) {
         List<Method> methods = new ArrayList<>();
-        for(Method m : klass.getDeclaredMethods()){
-            if(!m.getName().startsWith("$jacoco")) {
+        for (Method m : klass.getDeclaredMethods()) {
+            if (!m.getName().startsWith("$jacoco")) {
                 methods.add(m);
             }
         }
         return methods;
     }
 
-    public List<Method> getAllMethods(Class klass, List<Method> methods){
-        if(methods == null){
+    public List<Method> getAllMethods(Class klass, List<Method> methods) {
+        if (methods == null) {
             methods = new ArrayList<>();
         }
-        for(Method m:klass.getDeclaredMethods()){
-            if(!m.getName().startsWith("$jacoco")) {
+        for (Method m : klass.getDeclaredMethods()) {
+            if (!m.getName().startsWith("$jacoco")) {
                 methods.add(m);
             }
         }
-        if(klass.getSuperclass() != null){
+        if (klass.getSuperclass() != null) {
             methods = getAllMethods(klass.getSuperclass(), methods);
         }
         return methods;
+    }
+
+    public Method findMut(Class actualClass, String theMethod, Class[] pc) throws NoSuchMethodException {
+        String theClass = actualClass.getName();
+        int pcl = pc == null ? 0 : pc.length;
+        List<Method> methods = new ArrayList<>();
+        getAllMethods(actualClass, methods);
+        Method result = null;
+        for (Method m : methods) {
+            if (m.getName().equals(theMethod)) {
+                if (m.getParameterTypes().length == pcl) {
+                    boolean matched = true;
+                    for (Class type : m.getParameterTypes()) {
+                        boolean found = false;
+                        for (Class c : pc) {
+                            if (type.isAssignableFrom(c)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            matched = false;
+                        }
+                    }
+                    if (matched || pcl == 0) {
+                        result = m;
+                        break;
+                    }
+                }
+            }
+        }
+        if (result == null) {
+            throw new NoSuchMethodException("" + theMethod + " could not be found in " + theClass);
+        }
+        return result;
+    }
+
+    public void findFields(Class theClass, Map<String, Field> fieldMap) {
+        if (fieldMap != null) {
+            for (Field f : theClass.getDeclaredFields()) {
+                fieldMap.put(f.getName(), f);
+            }
+            if (theClass.getSuperclass() != null) {
+                findFields(theClass.getSuperclass(), fieldMap);
+            }
+        }
     }
 }
