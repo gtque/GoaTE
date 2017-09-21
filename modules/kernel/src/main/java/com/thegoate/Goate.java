@@ -171,7 +171,7 @@ public class Goate {
         Goate filtered = new Goate();
         if (data != null) {
             for (String key : keys()) {
-                if (key.contains(pattern)) {
+                if (key.matches(pattern+".*")) {
                     filtered.put(key, getStrict(key));
                 }
             }

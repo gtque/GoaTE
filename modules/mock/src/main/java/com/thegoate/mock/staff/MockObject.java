@@ -111,8 +111,8 @@ public class MockObject extends Mock {
                 String checkName = meth.substring(meth.lastIndexOf(".") + 1);
                 String methodName = isName(checkName);
                 if (methodName != null) {
-                    Goate methodData = methods.filter(methodName + ".");
-                    Goate params = sortParams(methodData.filter("parameters."));
+                    Goate methodData = methods.filter(meth + ".");
+                    Goate params = sortParams(methodData.filter(meth+".parameters."));
                     Object[] p = new Object[params.size()];
                     Class[] pc = new Class[params.size()];
                     if (p.length > 0) {
@@ -122,13 +122,13 @@ public class MockObject extends Mock {
                     Object r0 = null;
                     boolean notVoid = false;
                     boolean returnReal = Boolean.parseBoolean("" + data.get(meth + ".return.returnReal", "false"));
-                    if (methodData.filter("return").size() > 0) {
+                    if (methodData.filter(meth + ".return").size() > 0) {
                         Object value = data.get(meth + ".return.value");
                         String check = "" + value;
                         if (!check.equals("void")) {
                             notVoid = true;
                             if (!returnReal) {
-                                Goate returns = methodData.filter("value.");
+                                Goate returns = methodData.filter(meth+".*value.");
                                 if (returns.size() > 0) {
                                     r = new Object[returns.size() - 1];
                                     String baseReturn = returns.keys().iterator().next();
@@ -220,7 +220,7 @@ public class MockObject extends Mock {
     protected Goate sortParams(Goate params) {
         Goate sorted = new Goate();
         int i = 0;
-        for (String pv : params.filter("value").keys()) {
+        for (String pv : params.filter(".*value").keys()) {
             String base = pv.substring(0, pv.lastIndexOf("."));
             Goate param = new Goate();
             int index = Integer.parseInt("" + (data.get(base + ".index", i)));
