@@ -25,31 +25,19 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl.words;
+package com.thegoate.mock.annotations;
 
-import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.PrimitiveDSL;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Returns an int.
- * Created by gtque on 4/21/2017.
+ * Used for annotating mock employees
+ * Created by Eric Angeli on 9/19/2017.
  */
-@GoateDSL(word = "int")
-public class IntDSL extends PrimitiveDSL {
-    public IntDSL(Object value) {
-        super(value);
-    }
-
-    @Override
-    public Class classType() {
-        return Integer.TYPE;
-    }
-
-    @Override
-    public Object evaluate(Goate data) {
-        String value = "" + get(1,data);
-        return Integer.parseInt(value);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface Mocker {
+    String type();
 }

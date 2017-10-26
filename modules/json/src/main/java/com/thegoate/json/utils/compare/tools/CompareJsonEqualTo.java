@@ -24,32 +24,51 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.json.utils.compare.tools;
 
-package com.thegoate.dsl.words;
-
-import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.PrimitiveDSL;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.json.JsonUtil;
+import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.compare.CompareUtility;
 
 /**
- * Returns an int.
- * Created by gtque on 4/21/2017.
+ * Compares two json objects for equality.
+ * Created by Eric Angeli on 5/9/2017.
  */
-@GoateDSL(word = "int")
-public class IntDSL extends PrimitiveDSL {
-    public IntDSL(Object value) {
-        super(value);
+@CompareUtil(operator = "==", type = "json")
+public class CompareJsonEqualTo extends CompareJson implements CompareUtility {
+
+    Object expected = null;
+
+    public CompareJsonEqualTo(Object actual) {
+        super(actual);
     }
 
     @Override
-    public Class classType() {
-        return Integer.TYPE;
+    protected Object processNested(Object subContainer) {
+        return null;
     }
 
     @Override
-    public Object evaluate(Goate data) {
-        String value = "" + get(1,data);
-        return Integer.parseInt(value);
+    public boolean evaluate() {
+        return comparison(""+takeActionOn,""+expected)==0;//takeActionOn!=null?takeActionOn.equals(expected):expected==null;
+    }
+
+    @Override
+    public CompareUtility actual(Object actual) {
+        this.takeActionOn = actual;
+        return this;
+    }
+
+    @Override
+    public CompareUtility to(Object expected) {
+        this.expected = expected;
+        return this;
+    }
+
+    @Override
+    public CompareUtility using(Object operator) {
+        return this;
     }
 }

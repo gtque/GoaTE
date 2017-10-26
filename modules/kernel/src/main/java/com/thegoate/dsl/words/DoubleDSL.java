@@ -28,28 +28,27 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.dsl.PrimitiveDSL;
 
 /**
- * Returns an int.
- * Created by gtque on 4/21/2017.
+ * Returns a double.
+ * Created by gtque on 9/20/2017.
  */
-@GoateDSL(word = "int")
-public class IntDSL extends PrimitiveDSL {
-    public IntDSL(Object value) {
+@GoateDSL(word = "double")
+public class DoubleDSL extends PrimitiveDSL {
+    public DoubleDSL(Object value) {
         super(value);
     }
 
     @Override
     public Class classType() {
-        return Integer.TYPE;
+        return Double.TYPE;
     }
 
     @Override
     public Object evaluate(Goate data) {
         String value = "" + get(1,data);
-        return Integer.parseInt(value);
+        return Double.parseDouble(value);
     }
 }

@@ -24,32 +24,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
-package com.thegoate.dsl.words;
+package com.thegoate.mock.dsl;
 
 import com.thegoate.Goate;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.PrimitiveDSL;
+import org.mockito.Mockito;
 
 /**
- * Returns an int.
- * Created by gtque on 4/21/2017.
+ * Returns mockito anyChar
+ * Created by Eric Angeli on 9/20/2017.
  */
-@GoateDSL(word = "int")
-public class IntDSL extends PrimitiveDSL {
-    public IntDSL(Object value) {
+@GoateDSL(word = "anyChar")
+public class AnyChar extends DSL {
+
+    public AnyChar(Object value) {
         super(value);
     }
 
     @Override
-    public Class classType() {
-        return Integer.TYPE;
-    }
-
-    @Override
     public Object evaluate(Goate data) {
-        String value = "" + get(1,data);
-        return Integer.parseInt(value);
+        return Mockito.anyChar();
     }
 }
