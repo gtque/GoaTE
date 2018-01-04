@@ -17,7 +17,8 @@
   "query params":[
   ],
   "expect":[
-    "get result>status code,==,200"
+    "get result>status code,==,200",
+    "get result>a.*.xyz,==,hello"
   ],
   "setup":[
     {

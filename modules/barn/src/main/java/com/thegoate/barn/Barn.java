@@ -141,7 +141,9 @@ public class Barn extends TestNGEngine {
 
     protected void evaluateExpectations() {
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect(data.filter("expect."));
+        etb.expect(data.filter("expect."))
+                .timeout(Long.parseLong(""+data.get("expect.timeout",500L)))
+                .period(Long.parseLong(""+data.get("expect.period",50L)));
         ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());

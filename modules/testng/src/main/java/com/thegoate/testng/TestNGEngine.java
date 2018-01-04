@@ -46,7 +46,7 @@ import java.lang.reflect.Method;
  * Created by Eric Angeli on 5/11/2017.
  */
 public abstract class TestNGEngine implements ITest, TestNG {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
+    protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
     protected Goate constantData;
@@ -67,6 +67,10 @@ public abstract class TestNGEngine implements ITest, TestNG {
         init(data);
     }
 
+    public void setLOG(BleatBox box){
+        LOG = box;
+    }
+
     @BeforeMethod(alwaysRun = true)
     public void startUp(Method method) {
         methodName = method.getName();
@@ -75,7 +79,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 "*\t" + getTestName() + "\t*\n";
         startMessage += data.toString("*\t", "\t*");
         startMessage += "*****************************************************************";
-        LOG.info(startMessage);
+        LOG.info("Start Up", startMessage);
     }
 
     @AfterMethod(alwaysRun = true)
@@ -87,10 +91,10 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 "*\t" + getTestName() + "\t*\n";
         endMessage += data.toString("*\t", "\t*");
         endMessage += "***************************Finished Up***************************";
-        LOG.info(endMessage);
+        LOG.info("Shut Down", endMessage);
     }
 
-    protected void init(Goate data) {
+    public void init(Goate data) {
         setData(data);
         setScenario(get("Scenario", "empty::", String.class));
         bumpRunNumber();
@@ -119,9 +123,13 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true);
     }
 
-    protected void initDataLoaders() {
-        runData = new Goate();
-        constantData = new Goate();
+    public void initDataLoaders() {
+        if(runData==null) {
+            runData = new Goate();
+        }
+        if(constantData==null) {
+            constantData = new Goate();
+        }
         defineDataLoaders();
     }
 

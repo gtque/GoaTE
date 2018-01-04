@@ -165,4 +165,57 @@ public class ExpectTests {
         assertTrue(result, ev.failed());
         LOG.debug("failed message:\n"+ev.failed());
     }
+
+    @Test(groups = {"unit"})
+    public void checkJsonBaseElementNotExist(){
+        Goate data = new Goate();
+        String json = "{" +
+                "'a':[" +
+                "{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]" +
+                "}";
+        data.put("check json.value",json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>e.*.c,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonNotJson(){
+        Goate data = new Goate();
+        String json = "" +
+                "hello world!";
+        data.put("check json.value",json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>e.*.c,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonNullJson(){
+        Goate data = new Goate();
+        String json = null;
+        data.put("check json.value",json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>e.*.c,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+        LOG.debug("failed message:\n"+ev.failed());
+    }
+
+    @Test
+    public void simpleFloatTest(){
+        double f1 = Double.parseDouble("42,000");
+        double f2 = Double.parseDouble("42,000.00");
+        assertTrue(f1==f2);
+    }
 }
