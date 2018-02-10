@@ -45,7 +45,7 @@ public class CompareLongNotEqualTo extends CompareLongTool {
         try{
             result = Long.parseLong(""+actual)!=Long.parseLong(""+expected);
         }catch(Exception e){
-            result = tryExpectedType("!=");
+            result = true;//tryExpectedType("!=");
         }
         return result;
     }

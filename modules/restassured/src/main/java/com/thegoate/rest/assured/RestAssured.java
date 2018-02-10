@@ -106,7 +106,9 @@ public class RestAssured extends Rest implements RASpec {
 
     /**
      * COPIED FROM STACKOVERFLOW.
-     *
+     * This high-jacks the stream writer to write to our custom logger implementation.
+     * This will always write to info. Writing the response to the logger is not controlled by the logging level,
+     * but by a separate setting.
      * @return printStream
      */
     public static PrintStream getPrintStream(BleatBox log) {
@@ -125,7 +127,7 @@ public class RestAssured extends Rest implements RASpec {
              */
             @Override
             public void flush() {
-                logger.infoBuffer(this.myStringBuilder.toString());
+                logger.infoBuffer("RestAssured Response", this.myStringBuilder.toString());
                 myStringBuilder = new StringBuilder();
             }
         };
@@ -248,7 +250,7 @@ public class RestAssured extends Rest implements RASpec {
 
     protected void log(Response response) {
         if (doLog()) {
-            LOG.info("response follows");
+            LOG.debug("RestAssured", "response follows");
             response.then().log().all();
             LOG.flush();
         }

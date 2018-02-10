@@ -40,6 +40,7 @@ public interface BleatBox {
     void debug(String message, Throwable t);
     void debug(String title, String message, Throwable t);
     void infoBuffer(String message);
+    void infoBuffer(String title, String message);
     void info(String message);
     void info(String title, String message);
     void info(String message, Throwable t);

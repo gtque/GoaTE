@@ -104,7 +104,7 @@ public class RAAuthBearer extends RestAuthBearer implements RASpec{
 
     protected void log(Response response){
         if(doLog()){
-            LOG.info("response follows");
+            LOG.debug("RAAuthBearer","response follows");
             response.then().log().all();
             LOG.flush();
         }

@@ -46,7 +46,7 @@ public class CompareIntNotEqualTo extends CompareIntTool {
         try{
             result = Integer.parseInt(""+actual)!=Integer.parseInt(""+expected);
         }catch(Exception e){
-            result = tryExpectedType("!=");
+            result = true;//tryExpectedType("!=");
         }
         return result;
     }

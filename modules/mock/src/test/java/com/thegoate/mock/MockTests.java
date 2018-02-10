@@ -83,7 +83,7 @@ public class MockTests extends TestNGEngineMethodDL {
         MockBuilder mb = new MockBuilder();
         String[] greetings = {"1", "2", "3"};
         mb.object().setClass(Simple1.class)
-                .method("aXb").returnValue(20091124).methodThrows(Exception.class)
+                .method("aXb").returnValue(20091124).methodThrows(RuntimeException.class)
                 .method("sayHello").methodParameter("anyString::").returnValues(greetings);
         SimpleWrapper sw = new SimpleWrapper();
         sw.sample = (Simple1) mb.build();
@@ -91,7 +91,7 @@ public class MockTests extends TestNGEngineMethodDL {
         try {
             actual = sw.getAxB();
             fail("should have thrown an exception");
-        }catch(Exception e){
+        }catch(Throwable e){
             LOG.debug("threw an exception, HOORAY!!!");
         }
         assertEquals(actual, -42);

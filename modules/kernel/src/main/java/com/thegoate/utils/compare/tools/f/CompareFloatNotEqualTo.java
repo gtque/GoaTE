@@ -45,7 +45,7 @@ public class CompareFloatNotEqualTo extends CompareFloatTool {
         try{
             result = Float.parseFloat(""+actual)!=Float.parseFloat(""+expected);
         }catch(Exception e){
-            result = tryExpectedType("!=");
+            result = true;//tryExpectedType("!=");
         }
         return result;
     }
