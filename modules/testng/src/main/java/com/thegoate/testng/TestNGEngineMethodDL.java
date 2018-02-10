@@ -35,7 +35,10 @@ import com.thegoate.reflection.GoateReflection;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Factory;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -51,7 +54,7 @@ import java.util.List;
  * The name fields in each should match.
  * Created by Eric Angeli on 5/12/2017.
  */
-public class TestNGEngineMethodDL extends TestNGEngine {
+public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
 
     public TestNGEngineMethodDL() {
         super();
@@ -122,7 +125,7 @@ public class TestNGEngineMethodDL extends TestNGEngine {
         GoateReflection gr = new GoateReflection();
         List<Method> methods = new ArrayList<>();
         gr.getAllMethods(method.getDeclaringClass(), methods);//getClass(), methods);
-        for (Method m : methods) {
+        for (Method m : methods) {//ToDo:make a way to call DL methods from other classes?
             GoateDLP dlp = m.getAnnotation(GoateDLP.class);
             if (m.getName().equals(name) || (dlp != null && dlp.name().equals(name))) {
                 try {
@@ -140,6 +143,17 @@ public class TestNGEngineMethodDL extends TestNGEngine {
 
     @Override
     public void defineDataLoaders() {
+        try {
+            Constructor constructor = getClass().getConstructor(Goate.class);
+            if (constructor!=null){
+                Annotation factor = constructor.getAnnotation(Factory.class);
+                if(factor!=null){
+                    super.defineDataLoaders();
+                }
+            }
+        }catch(Exception e){
+            LOG.info("Define Data Loaders", "Not using factory");
+        }
     }
 
     @Override
