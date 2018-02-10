@@ -44,10 +44,10 @@ public class ExpectTests {
     final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     @Test(groups = {"unit"})
-    public void isEven(){
+    public void isEven() {
         Goate data = new Goate();
-        data.put("check if even.value",4)
-                .put("check if even#1.value",5);
+        data.put("check if even.value", 4)
+                .put("check if even#1.value", 5);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         Expectation e2 = new Expectation(data).from("check if even#1").actual("return").is("!=").expected(true);
         etb.expect("check if even>return,==,boolean::true").expect(e2)
@@ -58,32 +58,32 @@ public class ExpectTests {
     }
 
     @Test(groups = {"unit"})
-    public void isEvenButReallyOdd(){
+    public void isEvenButReallyOdd() {
         Goate data = new Goate();
-        data.put("check if even.value",43);
+        data.put("check if even.value", 43);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check if even>return,==,boolean::true");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertFalse(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
 
     @Test(groups = {"unit"})
-    public void isEvenFail(){
+    public void isEvenFail() {
         Goate data = new Goate();
-        data.put("check if even.value",42);
+        data.put("check if even.value", 42);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check if even>return,==,boolean::true");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertFalse(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
     @Test(groups = {"unit"})
-    public void checkJson(){
+    public void checkJson() {
         Goate data = new Goate();
         String json = "{" +
                 "'a':[" +
@@ -92,17 +92,17 @@ public class ExpectTests {
                 "{'b':44}," +
                 "{'b':45}]" +
                 "}";
-        data.put("check json.value",json);
+        data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>a.*.b,>,int::41");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
     @Test(groups = {"unit"})
-    public void checkJsonNested(){
+    public void checkJsonNested() {
         Goate data = new Goate();
         String json = "{" +
                 "'a':[" +
@@ -115,17 +115,17 @@ public class ExpectTests {
                 "{'b':44}," +
                 "{'b':45}]]" +
                 "}";
-        data.put("check json.value",json);
+        data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>a.*.*.b,>,int::41");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
     @Test(groups = {"unit"})
-    public void checkJsonNestedFailure(){
+    public void checkJsonNestedFailure() {
         Goate data = new Goate();
         String json = "{" +
                 "'a':[" +
@@ -138,17 +138,17 @@ public class ExpectTests {
                 "{'b':44}," +
                 "{'b':45}]]" +
                 "}";
-        data.put("check json.value",json);
+        data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>a.*.*.b,>,int::41");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertFalse(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
     @Test(groups = {"unit"})
-    public void checkJsonNotExist(){
+    public void checkJsonNotExist() {
         Goate data = new Goate();
         String json = "{" +
                 "'a':[" +
@@ -157,17 +157,17 @@ public class ExpectTests {
                 "{'b':44}," +
                 "{'b':45}]" +
                 "}";
-        data.put("check json.value",json);
+        data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>a.*.c,>,int::41");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
     @Test(groups = {"unit"})
-    public void checkJsonBaseElementNotExist(){
+    public void checkJsonBaseElementNotExist() {
         Goate data = new Goate();
         String json = "{" +
                 "'a':[" +
@@ -176,46 +176,57 @@ public class ExpectTests {
                 "{'b':44}," +
                 "{'b':45}]" +
                 "}";
-        data.put("check json.value",json);
+        data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>e.*.c,>,int::41");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
     @Test(groups = {"unit"})
-    public void checkJsonNotJson(){
+    public void checkJsonNotJson() {
         Goate data = new Goate();
         String json = "" +
                 "hello world!";
-        data.put("check json.value",json);
+        data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>e.*.c,>,int::41");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
     @Test(groups = {"unit"})
-    public void checkJsonNullJson(){
+    public void checkJsonNullJson() {
         Goate data = new Goate();
         String json = null;
-        data.put("check json.value",json);
+        data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>e.*.c,>,int::41");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
-        LOG.debug("failed message:\n"+ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
     }
 
-    @Test
-    public void simpleFloatTest(){
-        double f1 = Double.parseDouble("42,000");
-        double f2 = Double.parseDouble("42,000.00");
-        assertTrue(f1==f2);
+    @Test(groups = {"unit"})
+    public void selfDefined() {
+        assertTrue(new Expectation(new Goate()).actual(42).is("==").expected(42).evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void selfDefinedExpectationBuilder() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(new Expectation(new Goate()).actual(42).is("==").expected(42))
+                .expect(new Expectation(new Goate()).actual(42).is("==").expected("42"))
+                .expect(new Expectation(new Goate()).actual(42).is("!=").expected("Fiddle Sticks"))
+                .expect(new Expectation(new Goate()).actual("Hello").is("!=").expected("Howdy"))
+        ;
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        assertTrue(ev.evaluate());
     }
 }

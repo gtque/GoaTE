@@ -50,10 +50,11 @@ public class Expectation {
     Goate data = null;
     Goate expect = new Goate();
     String simpleState = "";
-    Object actual;
+    volatile Object actual;
     String operator = "";
-    Object expected = null;
+    volatile Object expected = null;
     Employee from = null;
+    Object source = null;
     StringBuilder failed = new StringBuilder("");
     List<Goate> fails = new ArrayList<>();
     List<Goate> passes = new ArrayList<>();
@@ -61,6 +62,7 @@ public class Expectation {
 
     public Expectation(Goate data) {
         this.data = data;
+//        from("self_defined");
     }
 
     public String fullName() {
@@ -72,10 +74,14 @@ public class Expectation {
     }
 
     public Expectation from(Object source) {
+        this.source = source;
         if (source instanceof String) {
             this.from = buildSource("" + source);
         } else if (source instanceof Employee) {
             this.from = (Employee) source;
+        }
+        if(name==null||name.isEmpty()){
+            name = "" + source;
         }
         return this;
     }
@@ -123,6 +129,9 @@ public class Expectation {
 
     public Expectation actual(Object actual) {
         this.actual = actual;
+        if(this.source==null){
+            from(actual);
+        }
         simpleState += "a";
         checkState(false);
         return this;
@@ -166,12 +175,29 @@ public class Expectation {
         fails = new ArrayList<>();
         passes = new ArrayList<>();
         boolean result = true;//assume true, and if a failure is detected set to false.
-        if (from != null) {
+        if(from!=null){
+            try{
+                source = from.work();
+            }catch(Throwable e){
+                LOG.error("Expectation", "Problem get the source for comparison: "+ e.getMessage(), e);
+                Goate exp = new Goate();
+                exp.put("from", fullName());
+                exp.put("error", e.getMessage());
+                LOG.error(e.getMessage(), e);
+                failed.append("there was a problem executing the work: " + e.getMessage() + "\n");
+                fails.add(exp);
+                source = null;
+            }
+        }
+        if (source != null) {
             try {
-                Object rtrn = from.work();
+                Object rtrn = source;//from.work();
                 for (String key : expect.keys()) {
 //                    Map<String, Object> exp = (Map<String, Object>) expect.get(key);
                     Goate exp = (Goate) expect.get(key);
+                    if(from==null){
+                        exp.put("actual", "return");
+                    }
                     try {
                         resultC = true;
                         boolean check = check(exp, key, rtrn);
@@ -202,6 +228,7 @@ public class Expectation {
                 fails.add(exp);
             }
         } else {
+
             result = false;
             failed.append("the source of the data to check was not set.");
         }
@@ -323,17 +350,41 @@ public class Expectation {
         }
         Interpreter i = new Interpreter(data);
         Object workerId = i.translate(source);
-        if (workerId instanceof String) {
-            source = "" + workerId;
-            String[] sourceInfo = source.split("#");//if the source does not define an id number, assume 0.
-            this.name = sourceInfo[0];
-            if (sourceInfo.length > 1) {
-                this.id = sourceInfo[1];
-            } else {
-                this.id = "0";
+//        if(workerId.equals("self_defined")){
+//            Expectation self = this;
+//            worker = new Employee() {
+//                @Override
+//                public String[] detailedScrub() {
+//                    return new String[0];
+//                }
+//
+//                @Override
+//                public Employee init() {
+//                    return null;
+//                }
+//
+//                @Override
+//                public Object doWork() {
+//                    Expectation selfie = (Expectation)data.get("exp");
+//                    Goate exp = selfie.getExpectations();
+//                    Goate goat = (Goate)exp.get(0);
+//                    return goat.get("actual");
+//                }
+//            };
+//            worker.setData(new Goate().put("exp", self));
+//        }else {
+            if (workerId instanceof String) {
+                source = "" + workerId;
+                String[] sourceInfo = source.split("#");//if the source does not define an id number, assume 0.
+                this.name = sourceInfo[0];
+                if (sourceInfo.length > 1) {
+                    this.id = sourceInfo[1];
+                } else {
+                    this.id = "0";
+                }
+                worker = Employee.recruit(source, data);
             }
-            worker = Employee.recruit(source, data);
-        }
+//        }
         return worker;
     }
 }
