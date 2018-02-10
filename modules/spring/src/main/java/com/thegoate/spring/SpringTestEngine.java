@@ -27,9 +27,11 @@
 package com.thegoate.spring;
 
 import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
 import com.thegoate.testng.TestNGEngineMethodDL;
+import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.ITest;
 import org.testng.ITestContext;
@@ -47,6 +49,12 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     TestNGEngineMethodDL engine = null;
     protected Goate runData = null;
     protected Goate constantData = null;
+    protected BleatBox LOG = BleatFactory.getLogger(getClass());
+
+    @LocalServerPort
+    int randomServerPort;
+//    @LocalManagementPort
+//    int randomServerAdminPort;
 
     public SpringTestEngine(){
         engine = new TestNGEngineMethodDL();

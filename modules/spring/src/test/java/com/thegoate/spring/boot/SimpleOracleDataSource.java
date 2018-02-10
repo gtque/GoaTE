@@ -1,7 +1,5 @@
 package com.thegoate.spring.boot;
 
-import com.sun.istack.internal.NotNull;
-import oracle.jdbc.connector.OracleLocalTransaction;
 import oracle.jdbc.pool.OracleDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +8,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 
 /**
@@ -18,13 +15,10 @@ import java.sql.SQLException;
  */
 @Configuration
 public class SimpleOracleDataSource {
-    @NotNull
     private String username="c##simpletest";
 
-    @NotNull
     private String password="simple";
 
-    @NotNull
     private String url="jdbc:oracle:thin:@dbcontainer.local.onedatascan.io:1521:DL124X01";
 
     public void setUsername(String username) {

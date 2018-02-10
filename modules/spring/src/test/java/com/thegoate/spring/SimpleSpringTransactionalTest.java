@@ -48,7 +48,7 @@ public class SimpleSpringTransactionalTest extends SpringTransactionalTestEngine
         runData.put("run##", new StaticDL().add("Scenario", "A")).put("run##", new StaticDL().add("Scenario", "B"));
     }
 
-    @Test(groups = {"unit", "spring"})
+    @Test(groups = {"spring"})
     public void test1(){
         assertNotNull(bot);
 //        assertEquals(bot.countRows(), 0);
