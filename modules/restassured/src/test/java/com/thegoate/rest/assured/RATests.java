@@ -69,7 +69,7 @@ public class RATests extends TestNGEngineAnnotatedDL {
     public void getGoogleByEmployee() {
         Goate d = new Goate().put("base url", "https://www.google.com");
         Employee e = new ApiGet().init(d);
-        Response response = (Response) e.doWork();
+        Response response = (Response) e.work();
         assertEquals(response.statusCode(), 200);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(d);
         etb.expect("api response>status code,==,200");

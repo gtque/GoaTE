@@ -28,6 +28,8 @@
 package com.thegoate.staff;
 
 import com.thegoate.Goate;
+import com.thegoate.metrics.Stopwatch;
+import com.thegoate.testng.TestNGEngineMethodDL;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -35,13 +37,18 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by gtque on 4/25/2017.
  */
-public class EmployeeTests {
+public class EmployeeTests extends TestNGEngineMethodDL{
 
     @Test(groups = {"unit"})
     public void simpleEmployeeSize(){
-        Goate data = new Goate().put("val##", 1).put("val##", 2).put("val##", 3);
+        Stopwatch.global.clearAllLaps();
+        Goate data = new Goate().put("val##", 1).put("val##", 2).put("val##", 3).put("lap","simpleEmployeeSize");
         int r = Integer.parseInt("" + Employee.recruit("t_size", data).work());
-        assertEquals(r, 3);
+        assertEquals(r, 4);
+        Stopwatch.global.stop("simpleEmployeeSize");
+        Stopwatch.global.stopAll();
+        LOG.info("Simple Employee Size", "Lap time: " + Stopwatch.global.lap("simpleEmployeeSize").getTime()/1000000L);
+        assertEquals(Stopwatch.global.lap("simpleEmployeeSize").splits().size(),1);
     }
 
     @Test(groups = {"unit"})

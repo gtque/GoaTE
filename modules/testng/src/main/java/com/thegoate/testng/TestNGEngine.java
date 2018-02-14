@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.metrics.Stopwatch;
 import com.thegoate.statics.StaticScrubber;
 import org.testng.ITest;
 import org.testng.ITestContext;
@@ -74,6 +75,9 @@ public abstract class TestNGEngine implements ITest, TestNG {
     @BeforeMethod(alwaysRun = true)
     public void startUp(Method method) {
         methodName = method.getName();
+        if(data!=null&&data.get("lap",null)!=null) {
+            Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
+        }
         String startMessage = "\n" +
                 "***************************Starting Up***************************\n" +
                 "*\t" + getTestName() + "\t*\n";
@@ -85,6 +89,9 @@ public abstract class TestNGEngine implements ITest, TestNG {
     @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         StaticScrubber scrubber = new StaticScrubber();
+        if(data!=null&&data.get("lap",null)!=null) {
+            Stopwatch.global.stop(data.get("lap", Thread.currentThread().getName(), String.class));
+        }
         scrubber.scrub();
         String endMessage = "\n" +
                 "*****************************************************************\n" +

@@ -121,7 +121,7 @@ public class StepsExecutor {
                     }
                 }
                 worker.init(fullData);
-                result = worker.doWork();
+                result = worker.work();
                 Object carryover = fullData.get("carryover", "[]");//process the override values.
                 for (int i = 0; i < Integer.MAX_VALUE; i++) {
                     Object key = new Get(""+i).from(carryover);

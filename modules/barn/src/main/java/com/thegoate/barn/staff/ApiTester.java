@@ -59,7 +59,7 @@ public class ApiTester extends ApiEmployee {
     public Object doWork() {
         Object result = null;
         if(worker!=null){
-            result = worker.doWork();
+            result = worker.work();
         }
         return result;
     }

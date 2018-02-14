@@ -61,7 +61,6 @@ public class HtmlTests extends TestNGEngineMethodDL {
         try{
             td = (Elements)html.get("#table1 tr:eq(2) td:eq(0) input");
             if(td.size()==0){
-//                td = (Elements)html.get("#table1 tr:eq(2) td:eq(0)");
                 if(isSelect){
                     td = (Elements)html.get("#table1 tr:eq(2) td:eq(0) [selected]");
                 }
