@@ -25,26 +25,22 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.dsl.words;
+package com.thegoate.annotations;
 
-import com.thegoate.Goate;
-import com.thegoate.annotations.GoateDescription;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Returns the current System nano time.
+ * This is used to provide a description which is then used
+ * by the Dictionary app or plugins for hover/lookup information while
+ * developing and writing tests.
  * Created by gtque on 4/21/2017.
  */
-@GoateDSL(word = "nanotime")
-@GoateDescription(description = "Returns the current System.nanotime.")
-public class NanoTimeStampDSL extends DSL {
-    public NanoTimeStampDSL(Object value) {
-        super(value);
-    }
-
-    @Override
-    public Object evaluate(Goate data) {
-        return System.nanoTime();
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface GoateDescription {
+    String description();
+    String[] parameters() default {};
 }

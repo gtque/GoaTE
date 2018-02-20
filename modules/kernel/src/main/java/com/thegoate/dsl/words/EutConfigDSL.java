@@ -28,6 +28,7 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.data.PropertyFileDL;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
@@ -48,6 +49,10 @@ import java.util.List;
  * Created by gtque on 5/19/2017.
  */
 @GoateDSL(word = "eut")
+@GoateDescription(description = "Returns the value of the specified property in the defined eut properties file." +
+        "\n The eut can be specified by setting a system or environment variable called eut." +
+        "\n The corresponding  property must be in the eut folder and be named <system/environment variable>.properties",
+    parameters = {"The name of the property","Optional default value."})
 public class EutConfigDSL extends DSL {
     public EutConfigDSL(Object value) {
         super(value);
