@@ -49,7 +49,7 @@ public class StepEmployee extends Employee {
         try {
             worker = (ApiEmployee) af.annotatedWith(GoateJob.class).find(method).using("jobs").build();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            LOG.error("problem finding something to execute a " + method +"\nmake sure you have an implementation library included.", e);
+            LOG.error("Step Init", "problem finding something to execute a " + method +"\nmake sure you have an implementation library included.", e);
         }
         return this;
     }

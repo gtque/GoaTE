@@ -132,7 +132,7 @@ public class StepsExecutor {
                     }
                 }
             } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                LOG.error("problem finding something to execute a " + type + "\nmake sure you have an implementation library included.", e);
+                LOG.error("Step doWork","problem finding something to execute a " + type + "\nmake sure you have an implementation library included.", e);
             }
         }
         return result;

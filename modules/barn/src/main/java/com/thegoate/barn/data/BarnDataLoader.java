@@ -61,7 +61,7 @@ public class BarnDataLoader extends DataLoader {
             Goate rd = new ToGoate(new Get(file).from("file::")).convert();
             if(rd!=null) {
                 if (("" + rd.get("abstract")).equals("true")) {
-                    LOG.debug("skipping: " + file.getName());
+                    LOG.debug("Barn DataLoader","skipping: " + file.getName());
                 } else {
                     rd = extend(rd, rd);
                     rd.drop("abstract");
@@ -71,7 +71,7 @@ public class BarnDataLoader extends DataLoader {
                     }
                 }
             }else{
-                LOG.error("Problem loading test: " + file.getName());
+                LOG.error("Barn DataLoader","Problem loading test: " + file.getName());
             }
         }
         return data;
