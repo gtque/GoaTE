@@ -28,6 +28,7 @@ package com.thegoate.barn.data;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
+import com.thegoate.json.utils.get.GetJsonField;
 import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetFileListFromDir;
@@ -79,9 +80,9 @@ public class BarnDataLoader extends DataLoader {
 
     protected Goate extend(Goate rd, Goate extension) {
         if (extension != null && rd != null) {
-            if (extension.get("extends") != null) {
-                String extensions = "" + rd.get("extends");
-                for(String ext:extensions.split(",")) {
+            String[] extensions = getExtensions(rd, extension);
+            if(extensions!=null){
+                for(String ext:extensions) {
                     ext = ext.trim();
                     if (ext.startsWith("/")) {
                         ext = ext.substring(1);
@@ -95,6 +96,25 @@ public class BarnDataLoader extends DataLoader {
             rd.merge(extension, false);
         }
         return rd;
+    }
+
+    private String[] getExtensions(Goate rd, Goate extension){
+        String[] result=null;
+        if (extension.get("extends") != null) {
+            String extensions = "" + rd.get("extends");
+            if (new GetJsonField("").isType(extensions)) {
+                Goate exts = new ToGoate(extensions).convert();
+                result = new String[exts.size()];
+                int index = 0;
+                for(String ext:exts.keys()){
+                    result[index] = "" + exts.get(ext);
+                    index++;
+                }
+            } else {
+                result = extensions.split(",");
+            }
+        }
+        return result;
     }
 
     protected boolean checkGroups(Goate tc){
