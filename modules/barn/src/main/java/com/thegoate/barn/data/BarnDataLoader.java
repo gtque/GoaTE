@@ -64,11 +64,11 @@ public class BarnDataLoader extends DataLoader {
                 if (("" + rd.get("abstract")).equals("true")) {
                     LOG.debug("Barn DataLoader","skipping: " + file.getName());
                 } else {
-                    rd = extend(rd, rd);
+                    rd = extend(rd, new Goate());
                     rd.drop("abstract");
                     rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
                     if(checkGroups(rd)) {
-                        data.add(rd);
+                        data.add(rd.scrub("extends"));//scrub(rd));
                     }
                 }
             }else{
@@ -78,9 +78,10 @@ public class BarnDataLoader extends DataLoader {
         return data;
     }
 
+
     protected Goate extend(Goate rd, Goate extension) {
         if (extension != null && rd != null) {
-            String[] extensions = getExtensions(rd, extension);
+            String[] extensions = getExtensions(rd);
             if(extensions!=null){
                 for(String ext:extensions) {
                     ext = ext.trim();
@@ -90,7 +91,7 @@ public class BarnDataLoader extends DataLoader {
                     if(ext.contains("${")){
                         ext = ""+new Fill(ext).with(parameters);
                     }
-                    extension.merge(extend(extension, new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert()), false);
+                    extension.merge(extend(new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert(), new Goate()), false);
                 }
             }
             rd.merge(extension, false);
@@ -98,9 +99,9 @@ public class BarnDataLoader extends DataLoader {
         return rd;
     }
 
-    private String[] getExtensions(Goate rd, Goate extension){
+    private String[] getExtensions(Goate rd){
         String[] result=null;
-        if (extension.get("extends") != null) {
+        if (rd.get("extends") != null) {
             String extensions = "" + rd.get("extends");
             if (new GetJsonField("").isType(extensions)) {
                 Goate exts = new ToGoate(extensions).convert();

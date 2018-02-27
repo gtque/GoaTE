@@ -1,0 +1,5 @@
+{
+  "abstract":true,
+  "extends":"a.json",
+  "a":84
+}

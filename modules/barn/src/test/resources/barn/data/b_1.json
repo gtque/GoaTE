@@ -1,0 +1,6 @@
+{
+  "abstract":true,
+  "extends":"a_1.json,b.json",
+  "a":3,
+  "b":10
+}
