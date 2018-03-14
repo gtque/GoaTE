@@ -39,11 +39,16 @@ import org.json.JSONObject;
  */
 public abstract class JsonUtil implements Utility {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Object takeActionOn = null;
-    protected Object nested = null;
+    protected Object takeActionOn;
+    protected Object nested;
+    protected boolean processNested;
+    public JsonUtil(Object val) {
+        processNested = true;
+        init(val);
+    }
 
-    public JsonUtil(Object val){
-        if(val instanceof String){
+    protected void init(Object val){
+        if(val instanceof String && processNested){
             String select = ""+val;
             if((select).contains(">")){
                 nested = select.substring(select.indexOf(">")+1);

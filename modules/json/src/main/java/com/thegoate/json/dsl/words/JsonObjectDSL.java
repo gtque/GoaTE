@@ -24,27 +24,33 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.json.utils.get;
 
-import com.thegoate.testng.TestNGEngineAnnotatedDL;
-import com.thegoate.utils.get.Get;
-import org.testng.annotations.Test;
+package com.thegoate.json.dsl.words;
 
-import static org.testng.Assert.assertEquals;
+import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+import org.json.JSONObject;
 
 /**
- * test get from json.
- * Created by Eric Angeli on 5/19/2017.
+ * Returns the value of the referenced object.
+ * Created by gtque on 4/21/2017.
  */
-public class SimpeGetTest extends TestNGEngineAnnotatedDL {
+@GoateDSL(word = "json object")
+@GoateDescription(description = "Returns a json object based on the given string representation",
+        parameters = {"The string representation of the json object, null, empty or missing produces an empty json object."})
+public class JsonObjectDSL extends DSL {
+    public JsonObjectDSL(Object value) {
+        super(value);
+    }
 
-    @Test(groups = {"unit"})
-    public void simpleGet(){
-        String a = "" + new Get("a").from(new Get("simple.json").from("file::"));
-        assertEquals(a, "b");
-        Object cSize = new Get("c>size()").from(new Get("simple.json").from("file::"));
-        Object cSize2 = new Get("c>length()").from(new Get("simple.json").from("file::"));
-        assertEquals(cSize, 2);
-        assertEquals(cSize2, 2);
+    @Override
+    public Object evaluate(Goate data) {
+        String def = ""+get(1,data);
+        if(def.equals("null")||def.isEmpty()){
+            def = "{}";
+        }
+        return new JSONObject(def);
     }
 }

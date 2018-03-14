@@ -22,6 +22,12 @@ public abstract class CompareJson extends JsonUtil {
         super(val);
     }
 
+    @Override
+    protected void init(Object val){
+        processNested = false;
+        super.init(val);
+    }
+
     public int comparison(String json1, String json2){
         int result = 0;
         int compare1 = compare(json1, json2);
@@ -124,7 +130,7 @@ public abstract class CompareJson extends JsonUtil {
                     result++;
                 }
             } catch (JSONException je) {
-                LOG.warn(key + ": there was a json exception: " + je.getMessage(), je);
+                LOG.debug(key + ": there was a json exception(but this may not be an error): " + je.getMessage(), je);
                 result++;
             }
         }
