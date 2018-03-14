@@ -1,0 +1,8 @@
+{
+  "extends":[
+    "a_1.json",
+    "b_1.json",
+    "c.json"
+  ],
+  "a":100
+}

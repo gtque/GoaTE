@@ -32,6 +32,7 @@ import com.thegoate.annotations.AnnotationEvaluator;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.metrics.Stopwatch;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -75,6 +76,9 @@ public abstract class Employee {
     public Object work() {
         Object result = null;
         try {
+            if(data!=null&&data.get("lap",null)!=null) {
+                Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
+            }
             result = doWork();
         } catch (Throwable t) {
             try {
@@ -88,6 +92,10 @@ public abstract class Employee {
                 e.printStackTrace();
             }
             throw t;
+        }finally {
+            if(data!=null&&data.get("lap",null)!=null) {
+                Stopwatch.global.split(data.get("lap", Thread.currentThread().getName(), String.class));
+            }
         }
         return result;
     }
@@ -116,7 +124,7 @@ public abstract class Employee {
 
     public abstract Employee init();
 
-    public abstract Object doWork();
+    protected abstract Object doWork();
 
     public static Employee recruit(Class job, Goate data) {
         GoateJob theJob = (GoateJob) job.getAnnotation(GoateJob.class);

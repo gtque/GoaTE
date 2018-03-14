@@ -1,0 +1,6 @@
+<howdy>
+    <field1>hello</field1>
+    <field2><field2inner>world</field2inner><field2inner>!</field2inner></field2>
+    <field2><field2inner>world</field2inner><field2inner>!</field2inner></field2>
+    <field3><field2inner>something else.</field2inner></field3>
+</howdy>

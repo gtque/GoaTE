@@ -32,11 +32,14 @@ import com.thegoate.data.StaticDL;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
+
 import static org.testng.Assert.assertEquals;
 
 /**
  * Created by Eric Angeli on 5/11/2017.
  */
+@GoateProvider(name = "sample")
 public class TestNGEngineFactoryDataProviderMethodDL extends TestNGEngineMethodDL {
 
     public TestNGEngineFactoryDataProviderMethodDL(){
@@ -48,11 +51,6 @@ public class TestNGEngineFactoryDataProviderMethodDL extends TestNGEngineMethodD
         super(data);
     }
 
-    public void defineDataLoaders(){
-        runData.put("dl#",new StaticDL().add("b","y").add("a","x"));
-    }
-
-    @GoateProvider(name = "sample")
     @Test(groups = {"unit"})
     public void putRunData() throws Exception {
         assertEquals(data.size(), 3);
@@ -63,12 +61,12 @@ public class TestNGEngineFactoryDataProviderMethodDL extends TestNGEngineMethodD
         assertEquals(data.size(), 4);
     }
 
-    @GoateProvider(name = "com.thegoate.testng.test.SampleDLP")
-    @Test(groups = {"unit"})
+    @Test(groups = {"unit"}, dependsOnMethods = {"putRunData"})
     public void putRunData2() throws Exception {
         assertEquals(data.size(), 4);
         assertEquals(get("b"),"y");
         assertEquals(get("a"),"x");
+        System.out.println("bigdecimal: " + new BigDecimal("1,23,4.56".replace(",","")));
         put("c", 0);
         assertEquals(get("c"),0);
         assertEquals(data.size(), 4);

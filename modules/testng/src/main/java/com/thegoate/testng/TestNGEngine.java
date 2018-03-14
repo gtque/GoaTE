@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.metrics.Stopwatch;
 import com.thegoate.statics.StaticScrubber;
 import org.testng.ITest;
 import org.testng.ITestContext;
@@ -46,7 +47,7 @@ import java.lang.reflect.Method;
  * Created by Eric Angeli on 5/11/2017.
  */
 public abstract class TestNGEngine implements ITest, TestNG {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
+    protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
     protected Goate constantData;
@@ -67,30 +68,40 @@ public abstract class TestNGEngine implements ITest, TestNG {
         init(data);
     }
 
+    public void setLOG(BleatBox box){
+        LOG = box;
+    }
+
     @BeforeMethod(alwaysRun = true)
     public void startUp(Method method) {
         methodName = method.getName();
+        if(data!=null&&data.get("lap",null)!=null) {
+            Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
+        }
         String startMessage = "\n" +
                 "***************************Starting Up***************************\n" +
                 "*\t" + getTestName() + "\t*\n";
         startMessage += data.toString("*\t", "\t*");
         startMessage += "*****************************************************************";
-        LOG.info(startMessage);
+        LOG.info("Start Up", startMessage);
     }
 
     @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         StaticScrubber scrubber = new StaticScrubber();
+        if(data!=null&&data.get("lap",null)!=null) {
+            Stopwatch.global.stop(data.get("lap", Thread.currentThread().getName(), String.class));
+        }
         scrubber.scrub();
         String endMessage = "\n" +
                 "*****************************************************************\n" +
                 "*\t" + getTestName() + "\t*\n";
         endMessage += data.toString("*\t", "\t*");
         endMessage += "***************************Finished Up***************************";
-        LOG.info(endMessage);
+        LOG.info("Shut Down", endMessage);
     }
 
-    protected void init(Goate data) {
+    public void init(Goate data) {
         setData(data);
         setScenario(get("Scenario", "empty::", String.class));
         bumpRunNumber();
@@ -119,9 +130,13 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true);
     }
 
-    protected void initDataLoaders() {
-        runData = new Goate();
-        constantData = new Goate();
+    public void initDataLoaders() {
+        if(runData==null) {
+            runData = new Goate();
+        }
+        if(constantData==null) {
+            constantData = new Goate();
+        }
         defineDataLoaders();
     }
 

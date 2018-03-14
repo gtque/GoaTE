@@ -38,6 +38,9 @@ import java.util.Map;
 /**
  * Builds the dictionary and translates the words.
  * The dictionary is only built one time, the first time an interpreter is needed, and cannot be dynamically modified during test execution.
+ * <br>
+ * For a simple list of words with definitions, you can run GoateDictionary.
+ * This will collect words defined in main source. It will not include anything in test source.
  * Created by gtque on 4/19/2017.
  */
 public class Interpreter {
@@ -99,8 +102,8 @@ public class Interpreter {
 
     /**
      * Builds the dictionary.
-     * Looks for anything annoted as a GoateDSL and adds it to the dictionary.
-     * The last instance a word wins, ie there will only be one version of a word in the dictionary
+     * Looks for anything annotated as a GoateDSL and adds it to the dictionary.
+     * The last instance of a word wins, ie there will only be one version of a word in the dictionary
      * which may produce unexpected results if more than one uses the same word.
      */
     protected void initDictionary() {
@@ -112,5 +115,9 @@ public class Interpreter {
         } catch (Throwable e) {
             LOG.error("Problem initializing dsl: " + e.getMessage(), e);
         }
+    }
+
+    public Map<String,Class> getDictionary(){
+        return dictionary;
     }
 }

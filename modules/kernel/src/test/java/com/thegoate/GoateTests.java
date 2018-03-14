@@ -69,6 +69,7 @@ public class GoateTests {
 
     @Test(groups = {"unit"})
     public void propertyFileDataLoaderFile(){
+        System.out.println(System.currentTimeMillis());
         DataLoader dl = new PropertyFileDL().file(new File(GoateUtils.getFilePath("sample.prop")));
         Goate data = dl.load().get(0);
 

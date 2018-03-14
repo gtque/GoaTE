@@ -61,9 +61,9 @@ public class ExpectationThreadBuilder {
     public ExpectationThreadBuilder expect(Goate expectations){
         if(expectations!=null){
             for(String key:expectations.keys()){
-                if(expectations.get(key) instanceof String) {
-                    expect("" + expectations.get(key));
-                }else if(expectations.get(key) instanceof Expectation){
+                if(expectations.getStrict(key) instanceof String) {
+                    expect("" + expectations.getStrict(key));
+                }else if(expectations.getStrict(key) instanceof Expectation){
                     expect((Expectation)expectations.get(key));
                 }
             }

@@ -28,6 +28,7 @@ package com.thegoate.barn.data;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
+import com.thegoate.json.utils.get.GetJsonField;
 import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetFileListFromDir;
@@ -61,27 +62,28 @@ public class BarnDataLoader extends DataLoader {
             Goate rd = new ToGoate(new Get(file).from("file::")).convert();
             if(rd!=null) {
                 if (("" + rd.get("abstract")).equals("true")) {
-                    LOG.debug("skipping: " + file.getName());
+                    LOG.debug("Barn DataLoader","skipping: " + file.getName());
                 } else {
-                    rd = extend(rd, rd);
+                    rd = extend(rd, new Goate());
                     rd.drop("abstract");
                     rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
                     if(checkGroups(rd)) {
-                        data.add(rd);
+                        data.add(rd.scrub("extends"));//scrub(rd));
                     }
                 }
             }else{
-                LOG.error("Problem loading test: " + file.getName());
+                LOG.error("Barn DataLoader","Problem loading test: " + file.getName());
             }
         }
         return data;
     }
 
+
     protected Goate extend(Goate rd, Goate extension) {
         if (extension != null && rd != null) {
-            if (extension.get("extends") != null) {
-                String extensions = "" + rd.get("extends");
-                for(String ext:extensions.split(",")) {
+            String[] extensions = getExtensions(rd);
+            if(extensions!=null){
+                for(String ext:extensions) {
                     ext = ext.trim();
                     if (ext.startsWith("/")) {
                         ext = ext.substring(1);
@@ -89,12 +91,31 @@ public class BarnDataLoader extends DataLoader {
                     if(ext.contains("${")){
                         ext = ""+new Fill(ext).with(parameters);
                     }
-                    extension.merge(extend(extension, new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert()), false);
+                    extension.merge(extend(new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert(), new Goate()), false);
                 }
             }
             rd.merge(extension, false);
         }
         return rd;
+    }
+
+    private String[] getExtensions(Goate rd){
+        String[] result=null;
+        if (rd.get("extends") != null) {
+            String extensions = "" + rd.get("extends");
+            if (new GetJsonField("").isType(extensions)) {
+                Goate exts = new ToGoate(extensions).convert();
+                result = new String[exts.size()];
+                int index = 0;
+                for(String ext:exts.keys()){
+                    result[index] = "" + exts.get(ext);
+                    index++;
+                }
+            } else {
+                result = extensions.split(",");
+            }
+        }
+        return result;
     }
 
     protected boolean checkGroups(Goate tc){

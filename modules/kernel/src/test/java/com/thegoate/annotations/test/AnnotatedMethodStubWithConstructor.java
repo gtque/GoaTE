@@ -27,7 +27,6 @@
 
 package com.thegoate.annotations.test;
 
-import com.thegoate.Goate;
 import com.thegoate.staff.GoateTask;
 import com.thegoate.staff.GoateTaskContainer;
 

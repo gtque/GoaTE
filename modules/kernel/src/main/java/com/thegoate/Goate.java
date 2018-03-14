@@ -29,6 +29,7 @@ package com.thegoate;
 
 import com.thegoate.dsl.Interpreter;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -81,6 +82,16 @@ public class Goate {
 
     public Object getStrict(String key) {
         return get(key, null, false);
+    }
+
+    public Object get(int index) {
+        Iterator<String> keys = data.keySet().iterator();
+        String key = "";
+        while(index>=0){
+            key = keys.next();
+            index--;
+        }
+        return data.get(key);
     }
 
     public Object get(String key) {

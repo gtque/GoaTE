@@ -28,6 +28,7 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 
@@ -36,6 +37,7 @@ import com.thegoate.dsl.GoateDSL;
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "o")
+@GoateDescription(description = "Returns the value of the object specified by the key.", parameters = {"The key of the object in the goate collection."})
 public class ObjectDSL extends DSL {
     public ObjectDSL(Object value) {
         super(value);

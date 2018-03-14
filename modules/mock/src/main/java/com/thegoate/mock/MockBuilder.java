@@ -36,7 +36,7 @@ import com.thegoate.mock.staff.Mock;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Builds and returns a web driver of the given type.
+ * Builds and returns a mock of the given object.
  * Created by Eric Angeli on 6/28/2017.
  */
 public class MockBuilder {

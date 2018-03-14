@@ -50,7 +50,7 @@ public class ApiTester extends ApiEmployee {
             worker = (ApiEmployee) af.annotatedWith(GoateJob.class).find(method).using("jobs").build();
             worker.init(data);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            LOG.error("problem finding something to execute a " + method +"\nmake sure you have an implementation library included.", e);
+            LOG.error("Barn API Init", "problem finding something to execute a " + method +"\nmake sure you have an implementation library included.", e);
         }
         return this;
     }
@@ -59,7 +59,7 @@ public class ApiTester extends ApiEmployee {
     public Object doWork() {
         Object result = null;
         if(worker!=null){
-            result = worker.doWork();
+            result = worker.work();
         }
         return result;
     }

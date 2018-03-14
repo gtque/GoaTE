@@ -35,7 +35,10 @@ import com.thegoate.reflection.GoateReflection;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Factory;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -51,7 +54,7 @@ import java.util.List;
  * The name fields in each should match.
  * Created by Eric Angeli on 5/12/2017.
  */
-public class TestNGEngineMethodDL extends TestNGEngine {
+public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
 
     public TestNGEngineMethodDL() {
         super();
@@ -95,7 +98,7 @@ public class TestNGEngineMethodDL extends TestNGEngine {
                     rdl.merge(provider.getRunDataLoaders(), true);
                     cdl.merge(provider.getConstantDataLoaders(), true);
                 } else {
-                    Goate[] providers = buildMethodProviders(gp.name());
+                    Goate[] providers = buildMethodProviders(gp.name(), method);
                     if (providers == null) {
                         throw new Exception("Failed to find the DLProvider: " + gp.name());
                     }else{
@@ -117,19 +120,21 @@ public class TestNGEngineMethodDL extends TestNGEngine {
         }
     }
 
-    protected Goate[] buildMethodProviders(String name) {
+    protected Goate[] buildMethodProviders(String name, Method method) {
         Goate[] providers = null;
         GoateReflection gr = new GoateReflection();
         List<Method> methods = new ArrayList<>();
-        gr.getAllMethods(getClass(), methods);
-        for (Method m : methods) {
+        gr.getAllMethods(method.getDeclaringClass(), methods);//getClass(), methods);
+        for (Method m : methods) {//ToDo:make a way to call DL methods from other classes?
             GoateDLP dlp = m.getAnnotation(GoateDLP.class);
             if (m.getName().equals(name) || (dlp != null && dlp.name().equals(name))) {
                 try {
-                    providers = (Goate[]) m.invoke(this);
+                    providers = (Goate[]) m.invoke(method.getDeclaringClass().newInstance());
                     break;
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     LOG.error("Problem defining data loaders for a method: " + name + "\n" + e.getMessage(), e);
+                } catch (InstantiationException e) {
+                    LOG.error("Problem defining data loaders for a method, make sure the test class as a default/empty constructor: " + name + "\n" + e.getMessage(), e);
                 }
             }
         }
@@ -138,6 +143,17 @@ public class TestNGEngineMethodDL extends TestNGEngine {
 
     @Override
     public void defineDataLoaders() {
+        try {
+            Constructor constructor = getClass().getConstructor(Goate.class);
+            if (constructor!=null){
+                Annotation factor = constructor.getAnnotation(Factory.class);
+                if(factor!=null){
+                    super.defineDataLoaders();
+                }
+            }
+        }catch(Exception e){
+            LOG.info("Define Data Loaders", "Not using factory");
+        }
     }
 
     @Override

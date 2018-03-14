@@ -28,6 +28,7 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.utils.fill.Fill;
@@ -37,6 +38,9 @@ import com.thegoate.utils.fill.Fill;
  * Created by gtque on 8/10/2017.
  */
 @GoateDSL(word = "fill")
+@GoateDescription(description = "Returns the filled object filled with corresponding data from the goate collection." +
+        "\n The default is to treat the object as a string, but it will try to find the appropriate fill utility and only use fill string as a default.",
+    parameters = {"The object to be filled, this may be a string or a call to another dsl."})
 public class FillDSL extends DSL {
     public FillDSL(Object value) {
         super(value);

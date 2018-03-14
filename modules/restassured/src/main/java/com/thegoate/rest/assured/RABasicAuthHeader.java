@@ -104,7 +104,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
 
     protected void log(Response response){
         if(doLog()){
-            LOG.info("response follows");
+            LOG.debug("RABasicAuthHeader", "response follows");
             response.then().log().all();
             LOG.flush();
         }

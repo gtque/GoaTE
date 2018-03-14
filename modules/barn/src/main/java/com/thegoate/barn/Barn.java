@@ -51,7 +51,7 @@ import static org.testng.Assert.assertTrue;
 public class Barn extends TestNGEngine {
     protected String label = "barn";//label will be used in the future, but not currently used.
     protected String baseTestCaseDir = "testcases";
-    ExpectEvaluator ev = null;
+    protected ExpectEvaluator ev = null;
     Throwable preFailure = null;
 
     public Barn() {
@@ -71,25 +71,25 @@ public class Barn extends TestNGEngine {
 
     @BeforeMethod(alwaysRun = true)
     public void setup() {
-        LOG.debug("----running setup----");
+        LOG.debug("Barn Setup","----running setup----");
         try {
             steps("setup");
         } catch (Throwable t) {
             preFailure = t;
         }
-        LOG.debug("----finished setup----");
+        LOG.debug("Barn Setup","----finished setup----");
     }
 
     @AfterMethod(alwaysRun = true)
     public void cleanup() {
-        LOG.debug("----running cleanup----");
+        LOG.debug("Cleanup", "----running cleanup----");
         try {
             steps("cleanup");
         } catch (Throwable t) {
             LOG.warn(getTestName(), "Cleanup had a failure: " + t.getMessage(), t);
             throw t;
         }
-        LOG.debug("----finished cleanup----");
+        LOG.debug("Cleanup","----finished cleanup----");
     }
 
     protected void steps(String step) {
@@ -109,7 +109,7 @@ public class Barn extends TestNGEngine {
             LOG.skip(getTestName(), "Skipping test because pre-steps failed: " + preFailure.getMessage());
             throw new SkipException(preFailure.getMessage());
         } else {
-            LOG.debug("----starting execution----");
+            LOG.debug(getTestName(),"----starting execution----");
             try {
                 StepsExecutor steps = new StepsExecutor(data).notOrdered();
                 data.put("_goate_result",steps.doSteps(null).get("0"));
@@ -117,8 +117,8 @@ public class Barn extends TestNGEngine {
                 LOG.fatal(getTestName(), "Encountered a problem executing the test: " + t.getMessage(), t);
                 throw t;
             } finally {
-                LOG.debug("----finished execution----");
-                LOG.debug("----evaluating expectations----");
+                LOG.debug(getTestName(),"----finished execution----");
+                LOG.debug(getTestName(),"----evaluating expectations----");
             }
             try {
                 evaluateExpectations();
@@ -134,14 +134,16 @@ public class Barn extends TestNGEngine {
                         LOG.fail(getTestName(), "FAILED: " + f.toString());
                     }
                 }
-                LOG.debug("----finished expectations----");
+                LOG.debug(getTestName(),"----finished expectations----");
             }
         }
     }
 
     protected void evaluateExpectations() {
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect(data.filter("expect."));
+        etb.expect(data.filter("expect."))
+                .timeout(Long.parseLong(""+data.get("expect.timeout",500L)))
+                .period(Long.parseLong(""+data.get("expect.period",50L)));
         ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
