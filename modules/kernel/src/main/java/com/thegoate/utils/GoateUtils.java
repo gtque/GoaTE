@@ -240,4 +240,12 @@ public class GoateUtils {
         }
         return map;
     }
+
+    public static String tab(int count){
+        StringBuilder tabs = new StringBuilder("");
+        for(;count>0;count--){
+           tabs.append("\t");
+        }
+        return tabs.toString();
+    }
 }
