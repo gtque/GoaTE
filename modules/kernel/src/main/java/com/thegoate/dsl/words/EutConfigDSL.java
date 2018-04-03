@@ -57,20 +57,21 @@ public class EutConfigDSL extends DSL {
     public EutConfigDSL(Object value) {
         super(value);
     }
-
+    protected static Goate eut;
     @Override
     public Object evaluate(Goate data) {
-        Goate eutConfig = (Goate)data.get("_goate_:eutConfig", new Goate());
-        if(eutConfig==null||eutConfig.size()==0) {
-            String eut = "" + data.get("eut", "local");
-            List<Goate> d = new PropertyFileDL().file("eut/"+eut+".properties").load();
+        eut = (Goate)data.get("_goate_:eutConfig", new Goate());
+        eut.put("_init_", true);
+        if(eut==null||eut.size()==0) {
+            String eutProfile = "" + data.get("eut", "local");
+            List<Goate> d = new PropertyFileDL().file("eut/"+eutProfile+".properties").load();
             if(d!=null&&d.size()>0){
-                eutConfig = d.get(0);
-                data.put("_goate_:eutConfig", eutConfig);
+                eut = d.get(0);
+                data.put("_goate_:eutConfig", eut);
             }
         }
         String key = ""+get(1,data);
         Object def = get(2,data);
-        return data.get(key, eutConfig!=null?(eutConfig.get(key)==null?def:eutConfig.get(key)):def);
+        return data.get(key, eut!=null?(eut.get(key)==null?def:eut.get(key)):def);
     }
 }
