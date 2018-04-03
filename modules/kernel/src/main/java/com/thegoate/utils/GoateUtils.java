@@ -76,9 +76,11 @@ public class GoateUtils {
 
         String path = System.getProperty("user.dir") + fileName;
 //        LOG.debug("checking path: " + path);
+        LOG.debug("Goate File Util","checking path: " + path);
         try {
             File temp = new File(path);
             if (!temp.exists()) {
+                LOG.debug("Goate File Util","file did not exist, checking resources...");
                 path = fileName;
                 URL opath = GoateUtils.class.getResource(path);
                 if(opath!=null)
