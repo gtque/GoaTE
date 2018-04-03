@@ -58,11 +58,13 @@ public class EutConfigDSL extends DSL {
         super(value);
     }
     protected static Goate eut = new Goate();
+    protected static volatile boolean loaded = false;
     @Override
     public Object evaluate(Goate data) {
         eut = (Goate)data.get("_goate_:eutConfig", eut);
         eut.put("_init_", true);
-        if(eut==null||eut.size()==0) {
+        if(!loaded) {
+            loaded = true;
             String eutProfile = "" + data.get("eut", "local");
             List<Goate> d = new PropertyFileDL().file("eut/"+eutProfile+".properties").load();
             if(d!=null&&d.size()>0){
