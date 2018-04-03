@@ -57,10 +57,10 @@ public class EutConfigDSL extends DSL {
     public EutConfigDSL(Object value) {
         super(value);
     }
-    protected static Goate eut;
+    protected static Goate eut = new Goate();
     @Override
     public Object evaluate(Goate data) {
-        eut = (Goate)data.get("_goate_:eutConfig", new Goate());
+        eut = (Goate)data.get("_goate_:eutConfig", eut);
         eut.put("_init_", true);
         if(eut==null||eut.size()==0) {
             String eutProfile = "" + data.get("eut", "local");
