@@ -60,7 +60,8 @@ if (javaVersion.contains(".")) {
 }
 
 def vbase = '0.14'
-def v = "${vbase}." + sdf.format(new Date());
+def buildDate = "" + (project.hasProperty("buildDate")?project.buildDate:sdf.format(new Date()))
+def v = "${vbase}." + buildDate
 def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : project.release) : 'beta'
 
 allprojects {

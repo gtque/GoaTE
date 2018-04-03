@@ -61,7 +61,7 @@ public class GoateUtils {
         try{
             Thread.sleep(sleepInMillis);
         } catch (InterruptedException e) {
-            logger.warn("problem sleeping: " + e.getMessage());
+            logger.warn("Goate Sleep Util","problem sleeping: " + e.getMessage());
             Thread.currentThread().interrupt();
         }
     }
@@ -103,10 +103,13 @@ public class GoateUtils {
                         path = path.substring(1);
                     }
                 }
+                temp = new File(path);
 //                LOG.debug("full adjust path: " + path);
             }
+            path = temp.getAbsolutePath();
+            LOG.debug("Goate File Util","file path: " + path);
         } catch (Exception e) {
-            LOG.error("Exception encountered finding file: " + e.getMessage(), e);
+            LOG.error("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
         }
         return path;
     }

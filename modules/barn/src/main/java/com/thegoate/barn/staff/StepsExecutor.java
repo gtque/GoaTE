@@ -153,7 +153,10 @@ public class StepsExecutor {
                 }
             }
         } else {
-            found = new ToGoate(sup.get("" + index, null)).convert();
+            Object f = sup.get("" + index, null);
+            if(f!=null) {
+                found = new ToGoate(f).convert();
+            }
         }
         return found;
     }
