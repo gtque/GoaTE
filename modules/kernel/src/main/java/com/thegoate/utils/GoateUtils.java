@@ -80,11 +80,14 @@ public class GoateUtils {
         try {
             File temp = new File(path);
             if (!temp.exists()) {
-                LOG.debug("Goate File Util","file did not exist, checking resources...");
                 path = fileName;
+                LOG.debug("Goate File Util","file did not exist, checking resources: " + path);
                 URL opath = GoateUtils.class.getResource(path);
-                if(opath!=null)
+                if(opath!=null) {
                     path = GoateUtils.class.getResource(path).toString();
+                }else{
+                    LOG.debug("Goate File Util","did not find the resource");
+                }
 //                LOG.debug("path: " + path);
                 if (path.contains("jar:")) {
                     if(!leaveInJar) {
@@ -105,6 +108,7 @@ public class GoateUtils {
                         path = path.substring(1);
                     }
                 }
+                LOG.debug("Goate File Util","modified path to look in: "+path);
                 temp = new File(path);
 //                LOG.debug("full adjust path: " + path);
             }
