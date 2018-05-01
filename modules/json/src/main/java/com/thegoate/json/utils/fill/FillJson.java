@@ -72,7 +72,7 @@ public class FillJson extends JsonUtil implements FillUtility {
             throw new RuntimeException("FillJson: converting to a json object: " + je.getMessage());
         }
         jsonObject = isJsonObject ? processJSONObject((JSONObject) jsonObject, "", data) : processJSONArray((JSONArray) jsonObject, "", data);
-        json = jsonObject.toString();
+        json = isJsonObject?((JSONObject)jsonObject).toString(4):((JSONArray)jsonObject).toString(4);
         return json;
     }
 
