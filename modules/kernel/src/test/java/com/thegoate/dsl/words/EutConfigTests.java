@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -39,6 +40,11 @@ import static org.testng.Assert.assertEquals;
  * Created by Eric Angeli on 5/19/2017.
  */
 public class EutConfigTests extends TestNGEngineAnnotatedDL {
+
+    @BeforeMethod(alwaysRun = true)
+    public void clearEut(){
+        EutConfigDSL.clear();
+    }
 
     @Test(groups = {"unit"})
     public void fillWithEutTest() {

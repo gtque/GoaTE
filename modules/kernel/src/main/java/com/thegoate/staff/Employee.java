@@ -62,6 +62,10 @@ public abstract class Employee {
         return this;
     }
 
+    protected String parameterName(String parameter){
+        return new StringBuilder(name).append(name.isEmpty()?"":".").append(parameter).toString();
+    }
+
     protected String getName(){
         return name;
     }

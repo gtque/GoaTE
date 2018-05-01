@@ -24,27 +24,33 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools.l;
-
-import com.thegoate.utils.compare.CompareTool;
+package com.thegoate.utils.insert;
 
 /**
- * Created by Eric Angeli on 7/14/2017.
+ * Created by Eric Angeli on 4/18/2018.
  */
-public abstract class CompareLongTool extends CompareTool {
-    public CompareLongTool(Object actual) {
-        super(actual);
-    }
+public interface InsertService {
 
-    @Override
-    public boolean isType(Object check) {
-        boolean istype = false;
-        try{
-            Long.parseLong(""+actual);
-            istype = true;
-        }catch(Throwable e){
-//            LOG.debug(""+actual + " is not a long.");
-        }
-        return istype;
-    }
+    InsertService value(String id, Object value);
+
+    InsertService into(String original);
+
+    InsertService after(String location) throws Exception;
+
+    InsertService before(String location) throws Exception;
+
+    InsertService in(String location) throws Exception;
+
+    InsertService append() throws Exception;
+
+    InsertService replaceExisting(boolean replace);
+
+    InsertService resetLocation();
+
+    InsertService resetInsertValue();
+
+    String insert(boolean setAsOriginal) throws Exception;
+
+    String insert() throws Exception;
+
 }

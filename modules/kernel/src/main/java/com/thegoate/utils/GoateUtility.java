@@ -24,27 +24,34 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools.l;
+package com.thegoate.utils;
 
-import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 /**
- * Created by Eric Angeli on 7/14/2017.
+ * Base goate util class that implements the isType method.
+ * Created by Eric Angeli on 5/19/2017.
  */
-public abstract class CompareLongTool extends CompareTool {
-    public CompareLongTool(Object actual) {
-        super(actual);
+public abstract class GoateUtility implements Utility {
+    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
+    protected Goate takeActionOn;
+    protected Object nested;
+    protected boolean processNested;
+
+    public GoateUtility(Object val) {
+        processNested = true;
+        init(val);
+    }
+
+    protected void init(Object val){
+        this.takeActionOn = (Goate)val;
     }
 
     @Override
     public boolean isType(Object check) {
-        boolean istype = false;
-        try{
-            Long.parseLong(""+actual);
-            istype = true;
-        }catch(Throwable e){
-//            LOG.debug(""+actual + " is not a long.");
-        }
-        return istype;
+        return check instanceof Goate;
     }
+    protected abstract Object processNested(Object subContainer);
 }

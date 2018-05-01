@@ -24,27 +24,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools.l;
+package com.thegoate.utils.compare.tools.string;
 
-import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Created by Eric Angeli on 7/14/2017.
+ * Checks if a string contains the given string.
+ * Created by Eric Angeli on 4/17/2018.
  */
-public abstract class CompareLongTool extends CompareTool {
-    public CompareLongTool(Object actual) {
+@CompareUtil(operator = "contains", type="String")
+@IsDefault
+public class CompareStringContains extends CompareStringTool {
+    public CompareStringContains(Object actual) {
         super(actual);
     }
 
     @Override
-    public boolean isType(Object check) {
-        boolean istype = false;
-        try{
-            Long.parseLong(""+actual);
-            istype = true;
-        }catch(Throwable e){
-//            LOG.debug(""+actual + " is not a long.");
-        }
-        return istype;
+    public boolean evaluate() {
+        String check = ""+expected;
+        String act = "" + actual;
+        return act.contains(check);
     }
 }
