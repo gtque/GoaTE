@@ -26,9 +26,6 @@
  */
 package com.thegoate.json.utils.compare.tools;
 
-import com.thegoate.annotations.IsDefault;
-import com.thegoate.json.JsonUtil;
-import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
 

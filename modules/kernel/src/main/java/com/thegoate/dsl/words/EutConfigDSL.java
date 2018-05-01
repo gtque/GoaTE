@@ -59,6 +59,10 @@ public class EutConfigDSL extends DSL {
     }
     protected static Goate eut = new Goate();
     protected static volatile boolean loaded = false;
+    public static void clear(){
+        loaded = false;
+        eut = new Goate();
+    }
     @Override
     public Object evaluate(Goate data) {
         eut = (Goate)data.get("_goate_:eutConfig", eut);
