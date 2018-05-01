@@ -71,13 +71,13 @@ public class Barn extends TestNGEngine {
 
     @BeforeMethod(alwaysRun = true)
     public void setup() {
-        LOG.debug("Barn Setup","----running setup----");
+        LOG.debug("Barn Setup", "----running setup----");
         try {
             steps("setup");
         } catch (Throwable t) {
             preFailure = t;
         }
-        LOG.debug("Barn Setup","----finished setup----");
+        LOG.debug("Barn Setup", "----finished setup----");
     }
 
     @AfterMethod(alwaysRun = true)
@@ -89,14 +89,14 @@ public class Barn extends TestNGEngine {
             LOG.warn(getTestName(), "Cleanup had a failure: " + t.getMessage(), t);
             throw t;
         }
-        LOG.debug("Cleanup","----finished cleanup----");
+        LOG.debug("Cleanup", "----finished cleanup----");
     }
 
     protected void steps(String step) {
         if (data.size() > 0) {
             StepsExecutor dosteps = new StepsExecutor(data).notOrdered();
-            String steps = ""+data.get(step,"[]");
-            data.put(step+"_result##",dosteps.doSteps(steps));
+            String steps = "" + data.get(step, "[]");
+            data.put(step + "_result##", dosteps.doSteps(steps));
         }
     }
 
@@ -109,21 +109,25 @@ public class Barn extends TestNGEngine {
             LOG.skip(getTestName(), "Skipping test because pre-steps failed: " + preFailure.getMessage());
             throw new SkipException(preFailure.getMessage());
         } else {
-            LOG.debug(getTestName(),"----starting execution----");
             try {
-                StepsExecutor steps = new StepsExecutor(data).notOrdered();
-                data.put("_goate_result",steps.doSteps(null).get("0"));
-            } catch (Throwable t) {
-                LOG.fatal(getTestName(), "Encountered a problem executing the test: " + t.getMessage(), t);
-                throw t;
-            } finally {
-                LOG.debug(getTestName(),"----finished execution----");
-                LOG.debug(getTestName(),"----evaluating expectations----");
-            }
-            try {
+                //the status of preconditions is only printed if one of the preconditions fails.
+                LOG.debug(getTestName(), "----checking preconditions----");
+                evaluatePreconditions();
+                ev = null;//reset to null so that if the test throws an exception
+                //the checks for preconditions don't get printed.
+                try {
+                    LOG.debug(getTestName(), "----starting execution----");
+                    StepsExecutor steps = new StepsExecutor(data).notOrdered();
+                    data.put("_goate_result", steps.doSteps(null).get("0"));
+                } catch (Throwable t) {
+                    LOG.fatal(getTestName(), "Encountered a problem executing the test: " + t.getMessage(), t);
+                    throw t;
+                } finally {
+                    LOG.debug(getTestName(), "----finished execution----");
+                    LOG.debug(getTestName(), "----evaluating expectations----");
+                }
                 evaluateExpectations();
             } catch (Throwable t) {
-//                LOG.warn(getTestName(), "Failed: " + t.getMessage());
                 throw t;
             } finally {
                 if (ev != null) {
@@ -134,18 +138,26 @@ public class Barn extends TestNGEngine {
                         LOG.fail(getTestName(), "FAILED: " + f.toString());
                     }
                 }
-                LOG.debug(getTestName(),"----finished expectations----");
+                LOG.debug(getTestName(), "----finished expectations----");
             }
         }
     }
 
     protected void evaluateExpectations() {
+        evaluate("expect");
+    }
+
+    protected void evaluatePreconditions() {
+        evaluate("preconditions");
+    }
+
+    protected void evaluate(String stage) {
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect(data.filter("expect."))
-                .timeout(Long.parseLong(""+data.get("expect.timeout",500L)))
-                .period(Long.parseLong(""+data.get("expect.period",50L)));
+        etb.expect(data.filter(stage + "."))
+                .timeout(Long.parseLong("" + data.get(stage + ".timeout", data.get("expect.timeout", 500L))))
+                .period(Long.parseLong("" + data.get(stage + ".period", data.get("expect.period", 50L))));
         ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
-        assertTrue(result, ev.failed());
+        assertTrue(result, stage.toUpperCase()+": " + ev.failed());
     }
 }

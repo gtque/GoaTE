@@ -59,25 +59,31 @@ public class BarnDataLoader extends DataLoader {
         List<Goate> data = new ArrayList<>();
         List<File> files = (List<File>) new GetFileListFromDir(parameters.get("dir")).from("filedir::");
         for (File file : files) {
-            Goate rd = new ToGoate(new Get(file).from("file::")).convert();
-            if(rd!=null) {
-                if (("" + rd.get("abstract")).equals("true")) {
-                    LOG.debug("Barn DataLoader","skipping: " + file.getName());
-                } else {
-                    rd = extend(rd, new Goate());
-                    rd.drop("abstract");
-                    rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
-                    if(checkGroups(rd)) {
-                        data.add(rd.scrub("extends"));//scrub(rd));
-                    }
-                }
-            }else{
-                LOG.error("Barn DataLoader","Problem loading test: " + file.getName());
+            Object barn = new Get(file).from("file::");
+            Goate rd = loadBarn(barn, file.getName());
+            if(rd != null && checkGroups(rd)) {
+                data.add(rd.scrub("extends"));//scrub(rd));
             }
         }
         return data;
     }
 
+    public Goate loadBarn(Object barn, String fileName){
+        Goate rd = new ToGoate(barn).convert();
+        if(rd!=null) {
+            if (fileName!=null&&("" + rd.get("abstract")).equals("true")) {
+                LOG.debug("Barn DataLoader","skipping: " + fileName);
+                rd = null;
+            } else {
+                rd = extend(rd, new Goate());
+                rd.drop("abstract");
+                rd.put("Scenario", (fileName!=null?fileName + ":":"") + rd.get("Scenario", ""));
+            }
+        }else{
+            LOG.error("Barn DataLoader","Problem loading barn: " + fileName);
+        }
+        return rd;
+    }
 
     protected Goate extend(Goate rd, Goate extension) {
         if (extension != null && rd != null) {

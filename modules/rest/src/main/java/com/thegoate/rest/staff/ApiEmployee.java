@@ -76,7 +76,7 @@ public abstract class ApiEmployee extends Employee {
 
     @Override
     public String[] detailedScrub(){
-        String[] scrub = {"base url", "method", "headers", "url params", "query params", "path params", "body", "form params", "multipart", "custom params", "security"};
+        String[] scrub = {"base url", "end point", "method", "headers", "url params", "query params", "path params", "body", "form params", "multipart", "custom params", "security"};
         return scrub;
     }
 
