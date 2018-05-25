@@ -28,7 +28,7 @@ public class SimpleAdderEmployee extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         return val1+val2;
     }
 }

@@ -67,6 +67,7 @@ public class Interpreter {
     /**
      * Translates the value based on the given dsl word.
      *
+     * @param key   The key identifying the word to be translated.
      * @param dsl   The dsl word to be translated, if not found the value is simply returned unprocessed.
      * @param value The value, aka parameters, to be translated.
      * @return The translated value.

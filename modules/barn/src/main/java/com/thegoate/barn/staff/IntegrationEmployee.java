@@ -47,7 +47,7 @@ public class IntegrationEmployee extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         StepsExecutor dosteps = new StepsExecutor(data).ordered().override(!Boolean.parseBoolean(""+data.get("doOverride","false")));
         Goate r = dosteps.doSteps(steps);
         return r;

@@ -43,7 +43,7 @@ public class Employee1 extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         return data!=null?data.size():-1;//-1 means the data was null.
     }
 

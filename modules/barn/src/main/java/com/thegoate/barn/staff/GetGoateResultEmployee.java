@@ -46,7 +46,7 @@ public class GetGoateResultEmployee extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         return result;
     }
 

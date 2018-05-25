@@ -85,6 +85,7 @@ public class Barn extends TestNGEngine {
         LOG.debug("Cleanup", "----running cleanup----");
         try {
             steps("cleanup");
+            evaluatePostconditions();
         } catch (Throwable t) {
             LOG.warn(getTestName(), "Cleanup had a failure: " + t.getMessage(), t);
             throw t;
@@ -149,6 +150,10 @@ public class Barn extends TestNGEngine {
 
     protected void evaluatePreconditions() {
         evaluate("preconditions");
+    }
+
+    protected void evaluatePostconditions() {
+        evaluate("postconditions");
     }
 
     protected void evaluate(String stage) {

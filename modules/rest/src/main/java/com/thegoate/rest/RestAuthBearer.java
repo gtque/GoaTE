@@ -32,8 +32,11 @@ package com.thegoate.rest;
  */
 public abstract class RestAuthBearer extends Rest {
     public enum Settings{
-        bearer;
+        bearer,auth_label
     }
+
+    private Object bearerValue = "";
+    private String bearer = "bearer";
 
     @Override
     public RestSpec processCustomData(Enum key, Object value){
@@ -42,9 +45,12 @@ public abstract class RestAuthBearer extends Rest {
 
     @Override
     public RestSpec processCustomData(String key, Object value){
-        if (key.equals(Settings.bearer.name())) {
-            header("Authorization", "bearer " + value);
+        if (key.equalsIgnoreCase(Settings.bearer.name())) {
+            bearerValue = value;
+        } else if(key.equalsIgnoreCase(Settings.auth_label.name())){
+            bearer = ""+value;
         }
+        header("Authorization", bearer + " " + bearerValue);
         return this;
     }
 }

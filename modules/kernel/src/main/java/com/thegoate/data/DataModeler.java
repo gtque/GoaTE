@@ -24,47 +24,47 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
-package com.thegoate.utils.togoate;
+package com.thegoate.data;
 
 import com.thegoate.Goate;
-import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.annotations.AnnotationFactory;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The generic get class.
- * This will attempt to look up the specific get utility for the type detected.
- * Created by Eric Angeli on 5/5/2017.
+ * Created by Eric Angeli on 5/14/2018.
  */
-public class ToGoate extends UnknownUtilType implements ToGoateUtility{
-    boolean autoIncrement = true;
-    ToGoateUtility tool = null;
-    Object original = null;
+public class DataModeler extends DataLoader {
 
-    public ToGoate(Object o){
-        this.original = o;
+    String theSculptor;
+    Goate data;
+
+    public DataModeler(String theSculptor, Goate data){
+        this.data = data;
+        this.theSculptor = theSculptor;
     }
 
     @Override
-    public boolean isType(Object check) {
-        return false;
-    }
-
-    @Override
-    public ToGoateUtility autoIncrement(boolean increment) {
-        this.autoIncrement = increment;
-        return this;
-    }
-
-    @Override
-    public Goate convert() {
-        tool = (ToGoateUtility)buildUtil(original, ToGoateUtil.class);
-        Goate result = null;
-        if(tool!=null){
-            result = tool.autoIncrement(autoIncrement).convert();
+    public List<Goate> load() {
+        List<Goate> runs = new ArrayList<>();
+        try {
+            DataLoader sculptor = (DataLoader) new AnnotationFactory()
+                    .using(GoateDataModeler.class.getMethod("name"))
+                    .annotatedWith(GoateDataModeler.class)
+                    .find(theSculptor)
+                    .build();
+            if (sculptor != null) {
+                runs = sculptor.setParameters(data).load();
+            }
+        }catch(NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error("Data Modeler","Problem loading the data model, nothing will be modeled: "+e.getMessage(), e);
         }
-        if(result==null){
-            LOG.info("Failed to convert: " + original);
+
+        if(runs.size()==0){
+            runs.add(new Goate());
         }
-        return result;
+        return runs;
     }
 }

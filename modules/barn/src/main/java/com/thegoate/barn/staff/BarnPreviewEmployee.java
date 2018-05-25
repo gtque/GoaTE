@@ -57,7 +57,7 @@ public class BarnPreviewEmployee extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         Object result = null;
         if (barnSource instanceof File) {
             barnSource = new GetFileAsString(barnSource).from("file::");

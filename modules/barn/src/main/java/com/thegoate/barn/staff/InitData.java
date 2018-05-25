@@ -54,7 +54,7 @@ public class InitData extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         String carryOver = ""+data.get(getName()+"init", "[]");
         JSONArray ja =  new JSONArray(carryOver);
         for(int i = 0; i<ja.length(); i++){

@@ -28,6 +28,7 @@ package com.thegoate.barn.data;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
+import com.thegoate.data.DataModeler;
 import com.thegoate.json.utils.get.GetJsonField;
 import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.get.Get;
@@ -57,12 +58,13 @@ public class BarnDataLoader extends DataLoader {
             excluded = excludeGroups.split(",");
         }
         List<Goate> data = new ArrayList<>();
-        List<File> files = (List<File>) new GetFileListFromDir(parameters.get("dir")).from("filedir::");
+        Object fo = new GetFileListFromDir(parameters.get("dir")).from("filedir::");
+        List<File> files = (List<File>)fo ;
         for (File file : files) {
             Object barn = new Get(file).from("file::");
             Goate rd = loadBarn(barn, file.getName());
             if(rd != null && checkGroups(rd)) {
-                data.add(rd.scrub("extends"));//scrub(rd));
+                data.add(modelData(rd.scrub("extends")));//scrub(rd));
             }
         }
         return data;
@@ -75,7 +77,7 @@ public class BarnDataLoader extends DataLoader {
                 LOG.debug("Barn DataLoader","skipping: " + fileName);
                 rd = null;
             } else {
-                rd = extend(rd, new Goate());
+                rd = extend(rd, new Goate(),"" + parameters.get("dir",""));
                 rd.drop("abstract");
                 rd.put("Scenario", (fileName!=null?fileName + ":":"") + rd.get("Scenario", ""));
             }
@@ -85,9 +87,10 @@ public class BarnDataLoader extends DataLoader {
         return rd;
     }
 
-    protected Goate extend(Goate rd, Goate extension) {
+    protected Goate extend(Goate rd, Goate extension, String root) {
         if (extension != null && rd != null) {
             String[] extensions = getExtensions(rd);
+            String theRoot = rd.get("_root", root, String.class);
             if(extensions!=null){
                 for(String ext:extensions) {
                     ext = ext.trim();
@@ -97,8 +100,11 @@ public class BarnDataLoader extends DataLoader {
                     if(ext.contains("${")){
                         ext = ""+new Fill(ext).with(parameters);
                     }
-                    extension.merge(extend(new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert(), new Goate()), false);
+                    extension.merge(extend(new ToGoate(new Get(theRoot + "/" + ext).from("file::")).autoIncrement(false).convert(), new Goate(), theRoot), false);
                 }
+            }
+            if(rd.get("expect")!=null){
+                extension.scrub("expect.");
             }
             rd.merge(extension, false);
         }
@@ -145,5 +151,24 @@ public class BarnDataLoader extends DataLoader {
     public BarnDataLoader groups(String label) {
         setParameter("groups", label);
         return this;
+    }
+
+    protected Goate modelData(Goate rd){
+        Goate dl = new ToGoate(rd.get("data modeler",rd.get("data modelers","[]"))).convert();
+        rd = rd.scrub("data modelers").scrub("data modeler");
+        if(dl.size()>0){
+            int index = 0;
+            while(dl.get(""+index)!=null){
+                Goate data = new ToGoate(dl.get(""+index,"{}")).convert();
+                String dlp = data.get("name",null,String.class);
+                if(dlp!=null&&!dlp.isEmpty()){
+                    rd.merge(new DataModeler(dlp, data).load().get(0), false);
+                }
+                index++;
+                //String dlp = dl.get(""+index+".dlp","static barn",String.class);
+                //Goate rd =
+            }
+        }
+        return rd;
     }
 }

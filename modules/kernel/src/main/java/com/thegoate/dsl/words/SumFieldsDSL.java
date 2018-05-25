@@ -25,46 +25,48 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.utils.togoate;
+package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.dsl.GoateDSL;
+import com.thegoate.dsl.PrimitiveDSL;
+
+import java.math.BigDecimal;
 
 /**
- * The generic get class.
- * This will attempt to look up the specific get utility for the type detected.
- * Created by Eric Angeli on 5/5/2017.
+ * Returns a long.
+ * Created by gtque on 9/20/2017.
  */
-public class ToGoate extends UnknownUtilType implements ToGoateUtility{
-    boolean autoIncrement = true;
-    ToGoateUtility tool = null;
-    Object original = null;
-
-    public ToGoate(Object o){
-        this.original = o;
+@GoateDSL(word = "sum")
+@GoateDescription(description = "Sums all the entries in the goate collection, returned as a string.",
+        parameters = {"The filter to apply to the goate data, optional - if omitted will sum every numeric from the goate collection."})
+public class SumFieldsDSL extends PrimitiveDSL {
+    public SumFieldsDSL(Object value) {
+        super(value);
     }
 
     @Override
-    public boolean isType(Object check) {
-        return false;
+    public Class classType() {
+        return Long.TYPE;
     }
 
     @Override
-    public ToGoateUtility autoIncrement(boolean increment) {
-        this.autoIncrement = increment;
-        return this;
-    }
+    public Object evaluate(Goate data) {
+        BigDecimal sum = new BigDecimal("0");
 
-    @Override
-    public Goate convert() {
-        tool = (ToGoateUtility)buildUtil(original, ToGoateUtil.class);
-        Goate result = null;
-        if(tool!=null){
-            result = tool.autoIncrement(autoIncrement).convert();
+        String filter = "" + get(1,data);
+        Goate filtered = data;
+        if(!filter.equalsIgnoreCase("null")&&!filter.isEmpty()){
+            filtered = filtered.filter(filter);
         }
-        if(result==null){
-            LOG.info("Failed to convert: " + original);
+        for(String key:filtered.keys()){
+            try {
+                sum = sum.add(new BigDecimal("" + filtered.get(key)));
+            }catch(Exception e){
+                LOG.debug("Sum","Problem adding: " + filtered.get(key), e);
+            }
         }
-        return result;
+        return sum.toString();
     }
 }

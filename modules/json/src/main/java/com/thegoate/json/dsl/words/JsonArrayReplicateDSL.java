@@ -24,21 +24,41 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.rest.staff;
 
-import com.thegoate.staff.GoateJob;
+package com.thegoate.json.dsl.words;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+import org.json.JSONArray;
 
 /**
- * Defines the generic employee that makes a put call to an api.
- * Created by Eric Angeli on 5/17/2017.
+ * Returns a json array with replicated values.
+ * Created by gtque on 4/21/2017.
  */
-@GoateJob(jobs = {"delete api", "delete patch", "delete"})
-public class ApiDelete extends ApiEmployee {
+@GoateDSL(word = "json array replicate")
+@GoateDescription(description = "Returns a json array with the entries replicated the specified number of times.",
+        parameters = {"The original json array","The number of times to replicate the fields."})
+public class JsonArrayReplicateDSL extends DSL {
+    public JsonArrayReplicateDSL(Object value) {
+        super(value);
+    }
 
     @Override
-    protected Object doWork() {
-        Object response = rest.delete(data.get("end point","", true, String.class));
-        data.put("response", response);
-        return response;
+    public Object evaluate(Goate data) {
+        String def = ""+get(1,data);
+        if(def.equals("null")||def.isEmpty()){
+            def = "[]";
+        }
+        int replicate = Integer.parseInt("" + get(2,data));
+        JSONArray arrayO = new JSONArray(def);
+        JSONArray array = new JSONArray("[]");
+        for(;replicate>0;replicate--){
+            for(int i=0;i<arrayO.length();i++){
+                array.put(arrayO.get(i));
+            }
+        }
+        return array;
     }
 }

@@ -43,7 +43,7 @@ public class CheckEven extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         if(value==42){
             Integer.parseInt("fail");
         }

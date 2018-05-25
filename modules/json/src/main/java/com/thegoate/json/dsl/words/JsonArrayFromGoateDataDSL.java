@@ -24,21 +24,44 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.rest.staff;
 
-import com.thegoate.staff.GoateJob;
+package com.thegoate.json.dsl.words;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+import org.json.JSONArray;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * Defines the generic employee that makes a put call to an api.
- * Created by Eric Angeli on 5/17/2017.
+ * Returns the value of the referenced object.
+ * Created by gtque on 4/21/2017.
  */
-@GoateJob(jobs = {"delete api", "delete patch", "delete"})
-public class ApiDelete extends ApiEmployee {
+@GoateDSL(word = "json array from goate")
+@GoateDescription(description = "Returns a json array built from the goate data",
+        parameters = {"The filter to apply to the goate data, optional - if omitted will add everything from the goate collection."})
+public class JsonArrayFromGoateDataDSL extends DSL {
+    public JsonArrayFromGoateDataDSL(Object value) {
+        super(value);
+    }
 
     @Override
-    protected Object doWork() {
-        Object response = rest.delete(data.get("end point","", true, String.class));
-        data.put("response", response);
-        return response;
+    public Object evaluate(Goate data) {
+        String filter = ""+get(1,data);
+        if(filter.equals("null")||filter.isEmpty()){
+            filter = null;
+        }
+        Goate filtered = data;
+        if(filter!=null){
+            filtered = filtered.filter(filter);
+        }
+        JSONArray array = new JSONArray("[]");
+        for(String key:filtered.keys()){
+            array.put(filtered.get(key));
+        }
+        return array;
     }
 }

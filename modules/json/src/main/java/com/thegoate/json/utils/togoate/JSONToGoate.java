@@ -41,6 +41,7 @@ import org.json.JSONObject;
 @ToGoateUtil
 public class JSONToGoate extends JsonUtil implements ToGoateUtility {
     Goate result;
+    boolean autoIncrement = true;
 
     public JSONToGoate(Object val) {
         super(val);
@@ -51,6 +52,12 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
     @Override
     protected Object processNested(Object subContainer) {
         return subContainer;
+    }
+
+    @Override
+    public ToGoateUtility autoIncrement(boolean increment) {
+        this.autoIncrement = increment;
+        return this;
     }
 
     @Override
@@ -66,7 +73,7 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
                 }
             }
         }
-        result = new Goate();
+        result = new Goate().autoIncrement(autoIncrement);
         if(takeActionOn!=null){
             if(takeActionOn instanceof JSONObject){
                 find((JSONObject) takeActionOn, "");

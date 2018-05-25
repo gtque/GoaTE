@@ -56,7 +56,7 @@ public class ApiTester extends ApiEmployee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         Object result = null;
         if(worker!=null){
             result = worker.work();

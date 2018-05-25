@@ -41,9 +41,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Goate {
     Map<String, Object> data = new ConcurrentHashMap<>();
     Interpreter dictionary;
+    boolean increment = true;
 
     public Goate() {
         dictionary = new Interpreter(this);
+    }
+
+    public Goate autoIncrement(boolean increment){
+        this.increment = increment;
+        return this;
     }
 
     public int size() {
@@ -73,9 +79,13 @@ public class Goate {
 
     public String buildKey(String key) {
         String fullKey = key;
-        while (fullKey.contains("##")) {
-            Goate billy = filter(key.substring(0, key.indexOf("##")));
-            fullKey = key.replace("##", "" + billy.size());
+        if(increment) {
+            while (fullKey.contains("##")) {
+                Goate billy = filter(key.substring(0, key.indexOf("##")));
+                fullKey = key.replace("##", "" + billy.size());
+            }
+        } else {
+            fullKey = key.replace("##", "" + System.nanoTime());
         }
         return fullKey;
     }

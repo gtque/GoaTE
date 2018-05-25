@@ -36,7 +36,7 @@ import com.thegoate.staff.GoateJob;
 public class ApiPut extends ApiEmployee {
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         Object response = rest.put(data.get("end point","", true, String.class));
         data.put("response", response);
         return response;

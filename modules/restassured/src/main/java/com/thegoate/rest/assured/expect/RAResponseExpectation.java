@@ -46,7 +46,7 @@ public class RAResponseExpectation extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         if(response==null){
             LOG.warn("The response was null, make sure it was set correctly in the data collection by putting in with a key of \"response\".");
         }

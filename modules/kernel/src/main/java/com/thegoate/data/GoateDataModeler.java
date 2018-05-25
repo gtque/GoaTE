@@ -24,21 +24,20 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.rest.staff;
+package com.thegoate.data;
 
-import com.thegoate.staff.GoateJob;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Defines the generic employee that makes a put call to an api.
- * Created by Eric Angeli on 5/17/2017.
+ * Annotation used for marking something as a data modeler, which is a special
+ * type of data loader.
+ * Created by Eric Angeli on 5/13/2017.
  */
-@GoateJob(jobs = {"delete api", "delete patch", "delete"})
-public class ApiDelete extends ApiEmployee {
-
-    @Override
-    protected Object doWork() {
-        Object response = rest.delete(data.get("end point","", true, String.class));
-        data.put("response", response);
-        return response;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@IndexAnnotated
+public @interface GoateDataModeler {
+    String name();
 }
