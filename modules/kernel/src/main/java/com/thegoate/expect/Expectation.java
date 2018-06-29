@@ -237,11 +237,27 @@ public class Expectation {
         String act = "" + exp.get("actual");
         if (act.contains("*")) {
             int index = 0;
-            int star = act.indexOf("*");
+            int star = act.indexOf("*")-1;
+            String start = null;
+            String expectedSize = null;
+            int size = -42;
+            if(star>=0){
+                start = ""+act.charAt(star);
+                if(start.equals("[")){
+                    expectedSize = act.substring(star+2,act.indexOf("]"));
+                    try{
+                        size = Integer.parseInt(expectedSize);
+                    } catch(NumberFormatException nfe){
+                        LOG.debug("Expectation", "Detected wildcard with expected, but seems it is malformed, defaulting to any number.", nfe);
+                    }
+                }
+            }
             try {
-                while (true) {
+                boolean running = true;
+                String act1 = size>0?act.replaceFirst("\\[","").replaceFirst(""+size+"]",""):act;
+                while (running) {
                     Goate expt = new Goate().merge(exp, true);
-                    String act2 = act.substring(0, star) + index + act.substring(star + 1);
+                    String act2 = act1.replaceFirst("\\*",""+index);//act.substring(0, star) + index + act.substring(star + 1);
                     String keyt = key.replace(act, act2);
                     expt.put("actual", act2);
                     boolean check = check(expt, keyt, rtrn);
@@ -250,8 +266,20 @@ public class Expectation {
                         result = false;
                     }
                     index++;
+                    if(size>0&&index>size){
+                        running = false;
+                        //if there are more than expected this should fail.
+                        resultC = false;
+                        result = false;
+                    }
                 }
             } catch (Throwable t) {
+                if(size>0&&(index==0||index!=size)){
+                    //this should cause a failure if the expected size is not reached.
+                    //use [*###] where ### is the expected size, ie: [*84]
+                    resultC = false;
+                    result = false;
+                }
                 if (index == 0) {//escape back. This will leave the current result state
                     //that means if the first index is NotFound there is nothing to evaluate, if it should fail
                     //because a field should be present you will have to check for that some other way other than
@@ -321,7 +349,7 @@ public class Expectation {
             data = new Goate();
         }
         if (expectation != null && !expectation.isEmpty()) {
-            String source = "";
+            String source = null;
             if (expectation.contains(">")) {
                 source = expectation.substring(0, expectation.indexOf(">"));
                 expectation = expectation.substring(expectation.indexOf(">") + 1);

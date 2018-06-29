@@ -44,9 +44,17 @@ public class Goate {
     boolean increment = true;
 
     public Goate() {
-        dictionary = new Interpreter(this);
+        init();
     }
 
+    public Goate(Map<String, Object> initialData){
+        init();
+        data.putAll(initialData);
+    }
+
+    protected void init(){
+        dictionary = new Interpreter(this);
+    }
     public Goate autoIncrement(boolean increment){
         this.increment = increment;
         return this;
@@ -198,6 +206,16 @@ public class Goate {
             }
         }
         return filtered;
+    }
+
+    public Goate scrubKeys(String pattern){
+        Goate scrubbed = new Goate();
+        if(data != null){
+            for (Map.Entry<String,Object> entry:data.entrySet()){
+                scrubbed.put(entry.getKey().replaceFirst(pattern,""),entry.getValue());
+            }
+        }
+        return scrubbed;
     }
 
     public Goate filterAndSplitKeyValuePairs(String filter) {

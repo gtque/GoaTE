@@ -60,7 +60,12 @@ public class CompareJsonTests extends TestNGEngineMethodDL {
                         .add("json1", "{\"e\":\"y\",\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"c\"},{\"a\":\"b\"},[\"a\"]]}")
                         .add("json2", "{\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"b\"},{\"a\":\"b\"},[\"a\"]],\"e\":\"y\"}")
                         .add("operator", "==")
-                        .add("expected", false));
+                        .add("expected", false))
+                .put("dl##", new StaticDL().add("Scenario", "Complex json")
+                        .add("json1", "file::complex.json")
+                        .add("json2", "file::complex.json")
+                        .add("operator", "==")
+                        .add("expected", true));
     }
 
     @Test(groups = {"unit"})
