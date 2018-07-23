@@ -146,7 +146,9 @@ public class FillJson extends JsonUtil implements FillUtility {
                 }
                 return false;
             }).collect(Collectors.joining(","));
-            value = data.get(kp);
+            if(!kp.isEmpty()) {
+                value = data.get(kp);
+            }
         }
         return value;
     }
