@@ -69,6 +69,7 @@ public class DeSerializerTests {
         assertEquals(pojo.getaByte(),new Byte("1"));
         assertEquals(pojo.getF(), 4F);
         assertTrue(pojo.isBool());
+        Goate d = new Serializer<>(pojo,SimpleSource.class).toGoate();
     }
 
     @Test(groups = {"unit", "deserialize"})
@@ -177,5 +178,36 @@ public class DeSerializerTests {
         assertEquals(pojo.getCp()[1].getMap().get("Peter"),"Parker");
         assertEquals(pojo.getCp()[1].getMap().get("Tony"),"Stark");
         assertTrue(pojo.getCp()[0].getNested().isBool());
+        Goate d = new Serializer<>(pojo,SimpleSource.class).toGoate();
+
+        Map<String,Object> data2 = new Serializer<>(pojo,SimpleSource.class).toMap(HashMap.class);
+
+        assertTrue(d.size()>50);
+
+        NestedPojos pojo2 = new DeSerializer()
+                .data(data)
+                .from(SimpleSource.class)
+                .build(NestedPojos.class);
+
+        assertEquals(pojo.getNumbers(), pojo2.getNumbers());
+        assertEquals(pojo.getNumbers2(), pojo2.getNumbers2());
+        assertEquals(pojo.getList().get(0), pojo2.getList().get(0));
+        assertEquals(((SimplePojo)pojo2.getList().get(1)).getFieldName(), "Paula");
+        assertTrue(Boolean.parseBoolean(""+pojo2.getMap().get("bryan")));
+        assertFalse(Boolean.parseBoolean(""+pojo2.getMap().get("tarun")));
+        assertEquals(((SimplePojo)(pojo2.getMap2().get("bryan"))).getL(), 84L);
+        assertTrue(Boolean.parseBoolean(""+pojo2.getMap2().get("tarun")));
+        assertEquals(pojo2.getCp()[0].getDate(), LocalDate.parse("2009-11-24", formatter));
+        assertEquals(pojo2.getCp()[0].getNested().getFieldName(),"Hello, world!");
+        assertEquals(pojo2.getCp()[0].getNested().getSomeInt(),42);
+        assertEquals(pojo2.getCp()[0].getNested().getBigD(),new BigDecimal("3.14159"));
+        assertEquals(pojo2.getCp()[0].getNested().getD(), new Double("42.42"));
+        assertEquals(pojo2.getCp()[0].getNested().getC(),'c');
+        assertEquals(pojo2.getCp()[0].getNested().getL(),42L);
+        assertEquals(pojo2.getCp()[0].getNested().getaByte(),new Byte("1"));
+        assertEquals(pojo2.getCp()[0].getNested().getF(), 4F);
+        assertEquals(pojo2.getCp()[1].getMap().get("Peter"),"Parker");
+        assertEquals(pojo2.getCp()[1].getMap().get("Tony"),"Stark");
+        assertTrue(pojo2.getCp()[0].getNested().isBool());
     }
 }

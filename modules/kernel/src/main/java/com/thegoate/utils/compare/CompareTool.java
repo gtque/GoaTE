@@ -27,6 +27,7 @@
 package com.thegoate.utils.compare;
 
 
+import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 
@@ -42,6 +43,8 @@ public abstract class CompareTool implements CompareUtility{
     protected Object expected = null;
     protected Object operator = null;
     protected boolean nested = false;
+    protected Goate health = new Goate();
+
     public CompareTool(Object actual){
         this.actual = actual;
     }
@@ -86,4 +89,8 @@ public abstract class CompareTool implements CompareUtility{
         return this;
     }
 
+    @Override
+    public Goate healthCheck(){
+        return health;
+    }
 }

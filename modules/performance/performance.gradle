@@ -24,41 +24,9 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils;
-
-import com.thegoate.Goate;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-
-/**
- * Base goate util class that implements the isType method.
- * Created by Eric Angeli on 5/19/2017.
- */
-public abstract class GoateUtility implements Utility {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Goate takeActionOn;
-    protected Object nested;
-    protected boolean processNested;
-    protected Goate health = new Goate();
-
-    public GoateUtility(Object val) {
-        processNested = true;
-        init(val);
-    }
-
-    protected void init(Object val){
-        this.takeActionOn = (Goate)val;
-    }
-
-    @Override
-    public boolean isType(Object check) {
-        return check instanceof Goate;
-    }
-
-    @Override
-    public Goate healthCheck(){
-        return health;
-    }
-
-    protected abstract Object processNested(Object subContainer);
+import com.thegoate.gradle.GoateDepends;
+dependencies{
+    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
+    compile d.depends(":kernel", project.internalVersion);
+    testCompile d.depends(":testng", project.internalVersion);
 }

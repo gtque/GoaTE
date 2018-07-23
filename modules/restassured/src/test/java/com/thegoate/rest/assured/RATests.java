@@ -52,7 +52,7 @@ import static org.testng.Assert.assertTrue;
  */
 public class RATests extends TestNGEngineAnnotatedDL {
 
-    @Test(groups = {"unit2"})
+    @Test(groups = {"unit"})
     public void getGoogle() {
         Rest rest = new RABasicAuthHeader();
         Response response = (Response) rest.baseURL("https://www.google.com").get("");
@@ -65,7 +65,7 @@ public class RATests extends TestNGEngineAnnotatedDL {
         assertTrue(result, ev.failed());
     }
 
-    @Test(groups = {"unit2"})
+    @Test(groups = {"unit"})
     public void getGoogleByEmployee() {
         Goate d = new Goate().put("base url", "https://www.google.com");
         Employee e = new ApiGet().init(d);

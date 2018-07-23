@@ -24,41 +24,29 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils;
+package com.thegoate.staff;
 
-import com.thegoate.Goate;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
+import com.thegoate.annotations.GoateDescription;
 
 /**
- * Base goate util class that implements the isType method.
- * Created by Eric Angeli on 5/19/2017.
+ * Created by Eric Angeli on 7/19/2018.
  */
-public abstract class GoateUtility implements Utility {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Goate takeActionOn;
-    protected Object nested;
-    protected boolean processNested;
-    protected Goate health = new Goate();
-
-    public GoateUtility(Object val) {
-        processNested = true;
-        init(val);
-    }
-
-    protected void init(Object val){
-        this.takeActionOn = (Goate)val;
+@GoateJob(jobs = {"noop"})
+@GoateDescription(description = "Does nothing, used to manipulate data in carryover.",
+parameters = {"none."})
+public class NoOp extends Employee {
+    @Override
+    public String[] detailedScrub() {
+        return new String[0];
     }
 
     @Override
-    public boolean isType(Object check) {
-        return check instanceof Goate;
+    public Employee init() {
+        return null;
     }
 
     @Override
-    public Goate healthCheck(){
-        return health;
+    protected Object doWork() {
+        return null;
     }
-
-    protected abstract Object processNested(Object subContainer);
 }

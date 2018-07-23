@@ -157,7 +157,7 @@ public class Barn extends TestNGEngine {
     }
 
     protected void evaluate(String stage) {
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(new Goate().put("parent",data).merge(data,false));
         etb.expect(data.filter(stage + "."))
                 .timeout(Long.parseLong("" + data.get(stage + ".timeout", data.get("expect.timeout", 500L))))
                 .period(Long.parseLong("" + data.get(stage + ".period", data.get("expect.period", 50L))));

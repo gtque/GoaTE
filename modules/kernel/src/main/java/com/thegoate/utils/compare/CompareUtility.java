@@ -27,12 +27,13 @@
 
 package com.thegoate.utils.compare;
 
+import com.thegoate.utils.Utility;
+
 /**
  * Defines the interface for a get utility.
  * Created by Eric Angeli on 5/5/2017.
  */
-public interface CompareUtility {
-    boolean isType(Object check);
+public interface CompareUtility extends Utility{
     boolean evaluate();
     CompareUtility actual(Object actual);
     CompareUtility to(Object expected);

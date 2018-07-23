@@ -26,6 +26,7 @@
  */
 package com.thegoate.xml;
 
+import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.Utility;
@@ -44,6 +45,7 @@ public abstract class XmlUtil implements Utility {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Object takeActionOn = null;
     protected Object nested = null;
+    protected Goate health = new Goate();
 
     public XmlUtil(Object val){
         if(val instanceof String){
@@ -54,6 +56,11 @@ public abstract class XmlUtil implements Utility {
             }
         }
         this.takeActionOn = val;
+    }
+
+    @Override
+    public Goate healthCheck(){
+        return health;
     }
 
     @Override

@@ -24,41 +24,36 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils;
+package com.thegoate.utils.fill.serialize;
 
-import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 
+import java.lang.reflect.Field;
+
 /**
- * Base goate util class that implements the isType method.
- * Created by Eric Angeli on 5/19/2017.
+ * Created by Eric Angeli on 7/10/2018.
  */
-public abstract class GoateUtility implements Utility {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Goate takeActionOn;
-    protected Object nested;
-    protected boolean processNested;
-    protected Goate health = new Goate();
+public class Cereal {
+    private BleatBox LOG = BleatFactory.getLogger(getClass());
+//    protected Class dataSource;
+//
+//    public Cereal from(Class dataSource){
+//        this.dataSource = dataSource;
+//        return this;
+//    }
 
-    public GoateUtility(Object val) {
-        processNested = true;
-        init(val);
+    protected GoateSource findGoateSource(Field field, Class dataSource){
+        GoateSource[] annotations = field.getAnnotationsByType(GoateSource.class);
+        GoateSource gs = null;
+        if(dataSource!=null) {
+            for (GoateSource source : annotations) {
+                if (source.source().equals(dataSource)) {
+                    gs = source;
+                    break;
+                }
+            }
+        }
+        return gs;
     }
-
-    protected void init(Object val){
-        this.takeActionOn = (Goate)val;
-    }
-
-    @Override
-    public boolean isType(Object check) {
-        return check instanceof Goate;
-    }
-
-    @Override
-    public Goate healthCheck(){
-        return health;
-    }
-
-    protected abstract Object processNested(Object subContainer);
 }

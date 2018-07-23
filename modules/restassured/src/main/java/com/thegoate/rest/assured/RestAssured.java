@@ -109,6 +109,7 @@ public class RestAssured extends Rest implements RASpec {
      * This high-jacks the stream writer to write to our custom logger implementation.
      * This will always write to info. Writing the response to the logger is not controlled by the logging level,
      * but by a separate setting.
+     * @param  log The instance of the log implementation to use.
      * @return printStream
      */
     public static PrintStream getPrintStream(BleatBox log) {

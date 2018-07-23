@@ -32,6 +32,7 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.staff.Employee;
 import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.compare.CompareUtility;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.NotFound;
 
@@ -307,9 +308,14 @@ public class Expectation {
             } else {
                 exp.put("actual_value", val);
                 LOG.info("evaluating \"" + fullName() + "\": " + exp.get("actual") + "(" + val + ") " + exp.get("operator") + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
-                if (!(new Compare(val).to(exp.get("expected")).using(exp.get("operator")).evaluate())) {
+                CompareUtility compare = new Compare(val).to(exp.get("expected")).using(exp.get("operator"));
+                if (!(compare.evaluate())) {
                     result = false;
                     failed.append(fullName() + ">" + key + " evaluated to false.\n");
+                    Goate health = compare.healthCheck();
+                    if(health.size()>0){
+                        exp.put("failed", health);
+                    }
                     fails.add(exp);
                 } else {
                     passes.add(exp);

@@ -24,41 +24,25 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils;
+package com.thegoate.spring.boot;
 
-import com.thegoate.Goate;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
- * Base goate util class that implements the isType method.
- * Created by Eric Angeli on 5/19/2017.
+ * Consumes a post body as a PoJo
+ * Created by eangeli on 8/3/2016.
  */
-public abstract class GoateUtility implements Utility {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Goate takeActionOn;
-    protected Object nested;
-    protected boolean processNested;
-    protected Goate health = new Goate();
-
-    public GoateUtility(Object val) {
-        processNested = true;
-        init(val);
+@RestController
+public class PojoEndpoint {
+    @RequestMapping(value = "/pojo", method = POST)
+    public String insertIntoDB(@RequestBody SimplePojo data){
+        String result = ""+data.getId()+":"+data.getMessage().length();
+        return result;
     }
 
-    protected void init(Object val){
-        this.takeActionOn = (Goate)val;
-    }
-
-    @Override
-    public boolean isType(Object check) {
-        return check instanceof Goate;
-    }
-
-    @Override
-    public Goate healthCheck(){
-        return health;
-    }
-
-    protected abstract Object processNested(Object subContainer);
 }

@@ -208,6 +208,23 @@ public class Goate {
         return filtered;
     }
 
+    /**
+     * Simple filter, matches if key does start with the given pattern; ie excludes anything matching the pattern
+     *
+     * @param pattern The pattern to match
+     * @return A Goate collection containing matching elements.
+     */
+    public Goate filterExclude(String pattern) {
+        Goate filtered = new Goate();
+        if (data != null) {
+            for (String key : keys()) {
+                if (!key.matches(pattern+".*")) {
+                    filtered.put(key, getStrict(key));
+                }
+            }
+        }
+        return filtered;
+    }
     public Goate scrubKeys(String pattern){
         Goate scrubbed = new Goate();
         if(data != null){
@@ -265,8 +282,13 @@ public class Goate {
 
     public String toString(String prepadding, String postpadding) {
         StringBuilder sb = new StringBuilder("");
+        boolean appendNewLine = false;
         for (String key : keys()) {
-            sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding).append("\n");
+            if(appendNewLine){
+                sb.append("\n");
+            }
+            appendNewLine = true;
+            sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding);
         }
         return sb.toString();
     }

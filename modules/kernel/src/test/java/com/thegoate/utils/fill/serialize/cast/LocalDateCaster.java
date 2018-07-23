@@ -40,6 +40,7 @@ import java.time.format.DateTimeFormatter;
 @CastUtil
 public class LocalDateCaster implements CastUtility {
     Object date;
+    Goate health = new Goate();
 
     public LocalDateCaster(Object date){
         this.date = date;
@@ -54,6 +55,11 @@ public class LocalDateCaster implements CastUtility {
     @Override
     public boolean isType(Object check) {
         return check.equals(LocalDate.class);
+    }
+
+    @Override
+    public Goate healthCheck(){
+        return health;
     }
 
     @Override

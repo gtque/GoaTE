@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 import static com.thegoate.utils.GoateUtils.tab;
 
@@ -109,7 +110,8 @@ public class FillJson extends JsonUtil implements FillUtility {
             while (keys.hasNext()) {
                 String key = (String) keys.next();
                 Object jsonValue = jsonData.get(key);
-                Object value = data.get(prekey + key);
+                Object value = getValue(prekey + key, data);
+
                 description.append(tab(tabCount)).append(prekey).append(key).append("\n");
                 if (value != null) {
                     if (value.equals("drop field::"))
@@ -135,13 +137,27 @@ public class FillJson extends JsonUtil implements FillUtility {
         return jsonData;
     }
 
+    private Object getValue(String keyPattern, Goate data){
+        Object value = data.get(keyPattern);
+        if(value==null){
+            String kp = data.keys().parallelStream().filter(k -> {
+                if(keyPattern.matches(k)){
+                    return true;
+                }
+                return false;
+            }).collect(Collectors.joining(","));
+            value = data.get(kp);
+        }
+        return value;
+    }
     private JSONArray processJSONArray(JSONArray jsonArray, String prekey, Goate data) {
         tabCount++;
         try {
             ArrayList<String> drop = new ArrayList<>();
             for (int index = 0; index < jsonArray.length(); index++) {
                 Object jsonValue = jsonArray.get(index);
-                Object value = data.get(prekey + index);
+                Object value = getValue(prekey + index, data);
+
                 description.append(tab(tabCount)).append(prekey).append(index).append("\n");
                 if (value != null) {
                     if (value.equals("drop field::"))

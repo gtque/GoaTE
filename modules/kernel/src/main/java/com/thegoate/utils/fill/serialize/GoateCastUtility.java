@@ -39,6 +39,7 @@ public abstract class GoateCastUtility implements CastUtility {
     protected Goate data;
     protected Class dataSource;
     protected Field field;
+    protected Goate health = new Goate();
 
     public GoateCastUtility(){
     }
@@ -46,6 +47,12 @@ public abstract class GoateCastUtility implements CastUtility {
     public GoateCastUtility(Object value){
         this.value = value;
     }
+
+    @Override
+    public Goate healthCheck(){
+        return health;
+    }
+
     @Override
     public CastUtility data(Goate data) {
         this.data = data;

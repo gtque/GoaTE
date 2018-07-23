@@ -28,12 +28,16 @@ package com.thegoate.json.utils.compare;
 
 import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.fill.FillString;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Tests against CompareJson utilities.
@@ -58,7 +62,7 @@ public class CompareJsonTests extends TestNGEngineMethodDL {
                 .add("expected", true))
                 .put("dl##", new StaticDL().add("Scenario", "equals returns false when not equal")
                         .add("json1", "{\"e\":\"y\",\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"c\"},{\"a\":\"b\"},[\"a\"]]}")
-                        .add("json2", "{\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"b\"},{\"a\":\"b\"},[\"a\"]],\"e\":\"y\"}")
+                        .add("json2", "{\"frickle\":\"frackle\",\"c\":\"x\",\"d\":\"hello\",\"r\":[{\"a\":\"b\"},{\"a\":\"b\"},[\"a\"]],\"e\":\"y\"}")
                         .add("operator", "==")
                         .add("expected", false))
                 .put("dl##", new StaticDL().add("Scenario", "Complex json")
@@ -70,6 +74,19 @@ public class CompareJsonTests extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
     public void compareJson() {
-        assertEquals(new Compare(get("json1")).to(get("json2")).using("" + get("operator")).evaluate(), get("expected"));
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        String check = new FillString("json1>json1,${operator},o::json2").with(data).toString();
+        etb.expect(check);
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertEquals(result, get("expected"), ev.failed());
+//        assertTrue(result, ev.failed());
+        if(!result){
+            for (Goate f : ev.fails()) {
+                LOG.fail(getTestName(), "FAILED: " + f.toString());
+            }
+        }
+        //LOG.debug("failed message:\n" + ev.failed());
+//        assertEquals(new Compare(get("json1")).to(get("json2")).using("" + get("operator")).evaluate(), get("expected"));
     }
 }

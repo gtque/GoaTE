@@ -64,7 +64,7 @@ public abstract class CastCollection extends GoateCastUtility {
                 Class[] types = {};
                 try {
                     Method check = typeAnnotation.getMethod("type", types);
-                    type = check.invoke(field.getAnnotation(typeAnnotation), types);
+                    type = check.invoke(field.getAnnotation(typeAnnotation));
 //                    Object u = af.constructor(null).build(c);
 //                    if (check != null && Boolean.parseBoolean("" + check.invoke(field.getAnnotation(typeAnnotation), checkArgs))) {
 //                        utility = u;

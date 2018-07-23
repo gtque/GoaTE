@@ -39,7 +39,7 @@ import java.util.Map;
  * methods, reflection, and access may be used or altered. Use in production code at your own risk.
  * Created by Eric Angeli on 6/26/2018.
  */
-public class DeSerializer {
+public class DeSerializer extends Cereal{
     private BleatBox LOG = BleatFactory.getLogger(getClass());
     private Goate data;
     private Class dataSource;
@@ -58,7 +58,7 @@ public class DeSerializer {
                 GoateReflection gr = new GoateReflection();
                 Map<String, Field> fields = gr.findFields(type);
                 for(Map.Entry<String, Field> field:fields.entrySet()){
-                    GoateSource gs = findGoateSource(field.getValue());
+                    GoateSource gs = findGoateSource(field.getValue(), dataSource);
                     String fieldKey = field.getKey();
                     if(gs!=null){
                         fieldKey = gs.key();
@@ -85,17 +85,6 @@ public class DeSerializer {
         return (T)o;
     }
 
-    private GoateSource findGoateSource(Field field){
-        GoateSource[] annotations = field.getAnnotationsByType(GoateSource.class);
-        GoateSource gs = null;
-        for(GoateSource source:annotations){
-            if(source.source().equals(dataSource)){
-                gs = source;
-                break;
-            }
-        }
-        return gs;
-    }
     private Object buildInstance(Class type) throws IllegalAccessException, InstantiationException {
         if(type==null){
             LOG.error("Build Pojo", "Can't build the pojo if you don't tell me what to build.");

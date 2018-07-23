@@ -167,6 +167,7 @@ public class StepsExecutor {
                 if (d != null) {
                     if (("" + d.get("#")).equals("" + index)) {
                         found = d;
+                        found.put("parent", data);
                         break;
                     }
                 } else {

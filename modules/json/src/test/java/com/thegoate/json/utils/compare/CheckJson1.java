@@ -24,41 +24,31 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils;
+package com.thegoate.json.utils.compare;
 
-import com.thegoate.Goate;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.GoateJob;
 
 /**
- * Base goate util class that implements the isType method.
- * Created by Eric Angeli on 5/19/2017.
+ * Simple employee that checks if the parameter in CheckEven##.value is even or not.
+ * Created by Eric Angeli on 5/10/2017.
  */
-public abstract class GoateUtility implements Utility {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Goate takeActionOn;
-    protected Object nested;
-    protected boolean processNested;
-    protected Goate health = new Goate();
-
-    public GoateUtility(Object val) {
-        processNested = true;
-        init(val);
-    }
-
-    protected void init(Object val){
-        this.takeActionOn = (Goate)val;
+@GoateJob(jobs = {"json1"})
+public class CheckJson1 extends Employee {
+    Object value = "{}";
+    @Override
+    public Employee init() {
+        value = data;//""+data.get(getName()+"");
+        return this;
     }
 
     @Override
-    public boolean isType(Object check) {
-        return check instanceof Goate;
+    protected Object doWork() {
+        return value;
     }
 
     @Override
-    public Goate healthCheck(){
-        return health;
+    public String[] detailedScrub(){
+        return null;
     }
-
-    protected abstract Object processNested(Object subContainer);
 }

@@ -26,15 +26,11 @@
  */
 package com.thegoate.xml.utils.get;
 
-import com.thegoate.Goate;
-import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetUtil;
 import com.thegoate.utils.get.GetUtility;
-import com.thegoate.utils.get.NotFound;
 import com.thegoate.xml.HtmlUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 /**
  * Get the field from the given json.

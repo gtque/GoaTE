@@ -27,6 +27,7 @@
 package com.thegoate.utils.get;
 
 
+import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 
@@ -41,6 +42,8 @@ public abstract class GetTool implements GetUtility{
     protected Object selector = null;
     protected Object nested = null;
     protected Object container = null;
+    protected Goate health = new Goate();
+
     public GetTool(Object selector){
         if(selector instanceof String){
             String select = ""+selector;
@@ -52,6 +55,11 @@ public abstract class GetTool implements GetUtility{
         this.selector = selector;
     }
 
+    @Override
+    public Goate healthCheck(){
+        return health;
+    }
+    
     /**
      * The from implementation should, in most cases,
      * call processNested on the result and return that value.

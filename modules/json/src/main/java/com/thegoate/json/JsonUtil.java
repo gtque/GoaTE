@@ -26,6 +26,7 @@
  */
 package com.thegoate.json;
 
+import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.Utility;
@@ -42,6 +43,8 @@ public abstract class JsonUtil implements Utility {
     protected Object takeActionOn;
     protected Object nested;
     protected boolean processNested;
+    protected Goate health = new Goate();
+
     public JsonUtil(Object val) {
         processNested = true;
         init(val);
@@ -56,6 +59,11 @@ public abstract class JsonUtil implements Utility {
             }
         }
         this.takeActionOn = val;
+    }
+
+    @Override
+    public Goate healthCheck(){
+        return health;
     }
 
     @Override

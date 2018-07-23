@@ -24,41 +24,27 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils;
+
+package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
 
 /**
- * Base goate util class that implements the isType method.
- * Created by Eric Angeli on 5/19/2017.
+ * Returns the value of the referenced object.
+ * Created by gtque on 7/19/2018.
  */
-public abstract class GoateUtility implements Utility {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Goate takeActionOn;
-    protected Object nested;
-    protected boolean processNested;
-    protected Goate health = new Goate();
-
-    public GoateUtility(Object val) {
-        processNested = true;
-        init(val);
-    }
-
-    protected void init(Object val){
-        this.takeActionOn = (Goate)val;
+@GoateDSL(word = "parent")
+@GoateDescription(description = "Returns the value of the object specified by the key from the parent.", parameters = {"The key of the object in the goate collection."})
+public class ParentDSL extends DSL {
+    public ParentDSL(Object value) {
+        super(value);
     }
 
     @Override
-    public boolean isType(Object check) {
-        return check instanceof Goate;
+    public Object evaluate(Goate data) {
+        return ((Goate)data.get("parent", new Goate())).get(""+get(1,data));
     }
-
-    @Override
-    public Goate healthCheck(){
-        return health;
-    }
-
-    protected abstract Object processNested(Object subContainer);
 }
