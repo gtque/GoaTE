@@ -38,8 +38,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:+"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
         classpath 'goate:gradle8:0.3.201705310130'
     }
