@@ -73,9 +73,13 @@ public class RestAssured extends Rest implements RASpec {
         SSLConfig sslc = new SSLConfig().allowAllHostnames().relaxedHTTPSValidation();
         rac = rac.sslConfig(sslc);
         rac = rac.logConfig(lc);
-        rac = rac.headerConfig(headerConfig()
-                .overwriteHeadersWithName("Authorization")
-                .overwriteHeadersWithName("Content-Type"));
+        if(spec.getHeaders().keys().toArray().length>0) {
+            rac = rac.headerConfig(headerConfig()
+                    .overwriteHeadersWithName("Content-Type", spec.getHeaders().keysArray()));
+        } else {
+            rac = rac.headerConfig(headerConfig()
+                    .overwriteHeadersWithName("Content-Type"));
+        }
         int timeout = spec.getTimeout();
         rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout*1000));
         rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));
@@ -97,6 +101,12 @@ public class RestAssured extends Rest implements RASpec {
             }
         }
         return mySpec;
+    }
+
+    @Override
+    public RestSpec config(){
+        init(specification, this);
+        return this;
     }
 
     @Override

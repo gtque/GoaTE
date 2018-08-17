@@ -53,6 +53,12 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     }
 
     @Override
+    public RestSpec config(){
+        RestAssured.init(specification, this);
+        return this;
+    }
+
+    @Override
     public BleatBox getLog(){
         return LOG;
     }

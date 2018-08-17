@@ -119,6 +119,8 @@ public interface RestSpec {
 
     String getBaseURL();
 
+    RestSpec config();
+
     Object get(String endpoint);
 
     Object put(String endpoint);

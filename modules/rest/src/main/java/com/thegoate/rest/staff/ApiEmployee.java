@@ -70,6 +70,7 @@ public abstract class ApiEmployee extends Employee {
             spec.multipartData(data.filterAndSplitKeyValuePairs("multipart"));
             spec.customData(data.filterAndSplitKeyValuePairs("custom params."));
             spec.timeout(Integer.parseInt(""+data.get("rest.timeout",15)));
+            spec.config();
         }
         return spec;
     }

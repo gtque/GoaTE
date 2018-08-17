@@ -37,6 +37,7 @@ import com.thegoate.utils.get.NotFound;
 import com.thegoate.utils.togoate.ToGoate;
 import io.restassured.response.Response;
 
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -98,6 +99,8 @@ public class GetRAResponse extends GetTool implements ResetStatic {
                 result = r.cookie(selector.toString().substring("cookie".length()).trim());
             }else if(selector.toString().startsWith("detailedCookie")){
                 result = r.detailedCookie(selector.toString().substring("detailedCookie".length()).trim());
+            }else if(selector.toString().startsWith("body as input stream")||selector.toString().startsWith("input stream")){
+                result = new InputStreamReader(r.asInputStream());
             }else{
                 Goate g = null;
                 if(resp.containsKey(container)){
