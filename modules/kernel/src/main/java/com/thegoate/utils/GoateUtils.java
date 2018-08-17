@@ -70,9 +70,26 @@ public class GoateUtils {
         return getFilePath(file, false, false);
     }
 
+    public static String moveUpDir(String fileName){
+        while(fileName.contains("../")){
+            String temp = fileName.substring(0,fileName.indexOf("../"));
+            if(temp.endsWith("/")){
+                temp = temp.substring(0,temp.length()-1);
+            }
+            int upFolderIndex = temp.lastIndexOf("/");
+            if(upFolderIndex>0){
+                temp = temp.substring(0,upFolderIndex);
+            }
+            fileName = temp + fileName.substring(fileName.indexOf("../")+2);
+
+        }
+        return fileName;
+    }
     public static String getFilePath(String fileName,boolean leaveInJar, boolean force) {
         if (fileName.indexOf("/") != 0&&fileName.indexOf("\\")!=0)
             fileName = "/"+fileName;
+
+        fileName = moveUpDir(fileName);
 
         String path = System.getProperty("user.dir") + fileName;
 //        LOG.debug("checking path: " + path);
@@ -91,9 +108,16 @@ public class GoateUtils {
 //                LOG.debug("path: " + path);
                 if (path.contains("jar:")) {
                     if(!leaveInJar) {
-                        String tempPath = new Copy().file(opath).to("temp" + path.substring(path.lastIndexOf("/")), force);
-                        if (tempPath == null) {
-                            path = new File("temp" + path.substring(path.lastIndexOf("/"))).getAbsolutePath();
+                        File tf = new File("temp"+fileName);
+                        if(force||!tf.exists()) {
+                            String tempPath = new Copy().file(opath).to("temp" + fileName, force);
+                            if (tempPath == null) {
+                                path = new File("temp" + path.substring(path.lastIndexOf("/"))).getAbsolutePath();
+                            } else {
+                                path = new File(tempPath).getAbsolutePath();
+                            }
+                        } else {
+                            path = tf.getAbsolutePath();
                         }
                     }else{
                         path = path.replace("jar:","");

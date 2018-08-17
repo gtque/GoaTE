@@ -40,6 +40,8 @@ import java.nio.file.Paths;
  */
 @GetUtil
 public class GetFileAsString extends GetTool{
+    boolean explode = false;
+    boolean overwrite = false;
 
     public GetFileAsString(){
         super("file::");
@@ -54,6 +56,15 @@ public class GetFileAsString extends GetTool{
         return (""+check).equalsIgnoreCase("file::");
     }
 
+    public GetFileAsString explode(){
+        this.explode = true;
+        return this;
+    }
+
+    public GetFileAsString overwrite(){
+        this.overwrite = true;
+        return this;
+    }
     @Override
     public Object from(Object container) {
         Object result = new NotFound(""+selector);
@@ -67,7 +78,7 @@ public class GetFileAsString extends GetTool{
             String file = "" + selector;
 
             if (!file.equals("") && !file.equalsIgnoreCase("null")) {
-                String fullPath = GoateUtils.getFilePath(file);
+                String fullPath = GoateUtils.getFilePath(file, !explode, overwrite);
                 try {
                     if (fullPath.contains(":")) {
                         if (fullPath.indexOf("/") == 0) {

@@ -72,6 +72,15 @@ public class Goate {
         return data.keySet();
     }
 
+    public String[] keysArray() {
+        String[] keys = new String[data.keySet().size()];
+        int i = 0;
+        for(String key:data.keySet()){
+            keys[i] = key;
+            i++;
+        }
+        return keys;
+    }
     public Goate put(String key, Object value) {
         if (data == null) {
             data = new ConcurrentHashMap<>();
