@@ -30,8 +30,11 @@ import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.data.DataModeler;
 import com.thegoate.json.utils.get.GetJsonField;
+import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.file.Delete;
 import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.GetFileAsString;
 import com.thegoate.utils.get.GetFileListFromDir;
 import com.thegoate.utils.togoate.ToGoate;
 
@@ -49,6 +52,7 @@ public class BarnDataLoader extends DataLoader {
     String[] excluded = {};
     @Override
     public List<Goate> load() {
+        cleanTempRoot("" + parameters.get("dir",""));
         String testGroups = parameters.get("testGroups","", String.class);
         String excludeGroups = parameters.get("excludeGroups", "", String.class);
         if(!testGroups.trim().isEmpty()) {
@@ -68,6 +72,17 @@ public class BarnDataLoader extends DataLoader {
             }
         }
         return data;
+    }
+
+    private void cleanTempRoot(String theRoot){
+        if(!theRoot.isEmpty()){
+            if(theRoot.endsWith("/")){
+                theRoot += "..";
+            } else {
+                theRoot += "/..";
+            }
+            new Delete().rm(GoateUtils.getFilePath("temp/"+theRoot));
+        }
     }
 
     public Goate loadBarn(Object barn, String fileName){
@@ -94,13 +109,18 @@ public class BarnDataLoader extends DataLoader {
             if(extensions!=null){
                 for(String ext:extensions) {
                     ext = ext.trim();
-                    if (ext.startsWith("/")) {
-                        ext = ext.substring(1);
+                    if (ext.startsWith("/")||ext.startsWith("\\")) {
+//                        ext = ext.substring(1);
+                        theRoot = "";
+                    } else {
+                        if(!theRoot.endsWith("/")) {
+                            theRoot += "/";
+                        }
                     }
                     if(ext.contains("${")){
                         ext = ""+new Fill(ext).with(parameters);
                     }
-                    extension.merge(extend(new ToGoate(new Get(theRoot + "/" + ext).from("file::")).autoIncrement(false).convert(), new Goate(), theRoot), false);
+                    extension.merge(extend(new ToGoate(new GetFileAsString(theRoot + ext).explode().from("file::")).autoIncrement(false).convert(), new Goate(), theRoot), false);
                 }
             }
             if(rd.get("expect")!=null){
