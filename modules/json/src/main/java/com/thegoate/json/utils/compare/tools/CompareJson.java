@@ -28,6 +28,7 @@ package com.thegoate.json.utils.compare.tools;
 
 import com.thegoate.json.JsonUtil;
 import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.compare.CompareUtility;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +39,7 @@ import java.util.Iterator;
  * Base class for comparing json.
  * Created by Eric Angeli on 10/5/2017.
  */
-public abstract class CompareJson extends JsonUtil {
+public abstract class CompareJson extends JsonUtil implements CompareUtility {
 
     String json1 = null;
     String json2;

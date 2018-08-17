@@ -34,7 +34,7 @@ import com.thegoate.utils.compare.CompareUtility;
  * Created by Eric Angeli on 5/9/2017.
  */
 @CompareUtil(operator = "==", type = "json")
-public class CompareJsonEqualTo extends CompareJson implements CompareUtility {
+public class CompareJsonEqualTo extends CompareJson {
 
     Object expected = null;
 

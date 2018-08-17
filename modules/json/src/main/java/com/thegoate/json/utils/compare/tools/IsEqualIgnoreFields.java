@@ -44,7 +44,7 @@ import org.json.JSONObject;
  */
 @IsDefault
 @CompareUtil(operator = "isEqualIgnoreFields", type = "json")
-public class IsEqualIgnoreFields extends CompareJson implements CompareUtility {
+public class IsEqualIgnoreFields extends CompareJson {
     Object expected = null;
     public IsEqualIgnoreFields(Object actual) {
         super(actual);

@@ -81,6 +81,17 @@ public class FillJsonTests extends TestNGEngineMethodDL {
                                 "]")
                         .add("operator", "==")
                         .add("expected", true))
+                .put("dl##", new StaticDL().add("Scenario", "regex pattern matching")
+                        .add("json1", "[{\"dropme\":42,\"empty\":\"should be empty\",\"isnull\":\"should be null\",\"e\":\"42\",\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"45\",\"g\":\"g\"},{\"a\":\"b\"},[\"b\"]]}]")
+                        .add("json2", "[{\"empty\":\"\",\"isnull\":null,\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"c\",\"g\":\"h\"},{\"a\":\"b\"},[\"a\"]],\"e\":\"y\"}]")
+                        .add("e", "y")
+                        .add("[0-9]\\.dropme", "drop field::")
+                        .add("0.empty", "empty field::")
+                        .add("0.isnull", "null field::")
+                        .add("0.r.0", "json object::{\"a\":\"c\"\\,\"g\":\"h\"}")
+                        .add("0.r.2.0", "a")
+                        .add("operator", "==")
+                        .add("expected", true))
         ;
     }
 
