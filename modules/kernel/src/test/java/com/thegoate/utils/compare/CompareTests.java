@@ -311,6 +311,10 @@ public class CompareTests {
     }
 
     @Test(groups = {"unit"})
+    public void stringIsEmpty(){
+        assertTrue(new Compare("").to(true).using("isEmpty").evaluate(),"The String was apparently not empty.");
+    }
+    @Test(groups = {"unit"})
     public void objectStringEqualTo(){
         assertTrue(new Compare("hello").to("hello").using("==").evaluate());
     }

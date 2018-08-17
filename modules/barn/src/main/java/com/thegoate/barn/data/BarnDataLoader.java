@@ -28,9 +28,13 @@ package com.thegoate.barn.data;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
+import com.thegoate.data.DataModeler;
 import com.thegoate.json.utils.get.GetJsonField;
+import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.file.Delete;
 import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.GetFileAsString;
 import com.thegoate.utils.get.GetFileListFromDir;
 import com.thegoate.utils.togoate.ToGoate;
 
@@ -48,6 +52,7 @@ public class BarnDataLoader extends DataLoader {
     String[] excluded = {};
     @Override
     public List<Goate> load() {
+        cleanTempRoot("" + parameters.get("dir",""));
         String testGroups = parameters.get("testGroups","", String.class);
         String excludeGroups = parameters.get("excludeGroups", "", String.class);
         if(!testGroups.trim().isEmpty()) {
@@ -57,42 +62,69 @@ public class BarnDataLoader extends DataLoader {
             excluded = excludeGroups.split(",");
         }
         List<Goate> data = new ArrayList<>();
-        List<File> files = (List<File>) new GetFileListFromDir(parameters.get("dir")).from("filedir::");
+        Object fo = new GetFileListFromDir(parameters.get("dir")).from("filedir::");
+        List<File> files = (List<File>)fo ;
         for (File file : files) {
-            Goate rd = new ToGoate(new Get(file).from("file::")).convert();
-            if(rd!=null) {
-                if (("" + rd.get("abstract")).equals("true")) {
-                    LOG.debug("Barn DataLoader","skipping: " + file.getName());
-                } else {
-                    rd = extend(rd, new Goate());
-                    rd.drop("abstract");
-                    rd.put("Scenario", file.getName() + ":" + rd.get("Scenario", ""));
-                    if(checkGroups(rd)) {
-                        data.add(rd.scrub("extends"));//scrub(rd));
-                    }
-                }
-            }else{
-                LOG.error("Barn DataLoader","Problem loading test: " + file.getName());
+            Object barn = new Get(file).from("file::");
+            Goate rd = loadBarn(barn, file.getName());
+            if(rd != null && checkGroups(rd)) {
+                data.add(modelData(rd.scrub("extends")));//scrub(rd));
             }
         }
         return data;
     }
 
+    private void cleanTempRoot(String theRoot){
+        if(!theRoot.isEmpty()){
+            if(theRoot.endsWith("/")){
+                theRoot += "..";
+            } else {
+                theRoot += "/..";
+            }
+            new Delete().rm(GoateUtils.getFilePath("temp/"+theRoot));
+        }
+    }
 
-    protected Goate extend(Goate rd, Goate extension) {
+    public Goate loadBarn(Object barn, String fileName){
+        Goate rd = new ToGoate(barn).convert();
+        if(rd!=null) {
+            if (fileName!=null&&("" + rd.get("abstract")).equals("true")) {
+                LOG.debug("Barn DataLoader","skipping: " + fileName);
+                rd = null;
+            } else {
+                rd = extend(rd, new Goate(),"" + parameters.get("dir",""));
+                rd.drop("abstract");
+                rd.put("Scenario", (fileName!=null?fileName + ":":"") + rd.get("Scenario", ""));
+            }
+        }else{
+            LOG.error("Barn DataLoader","Problem loading barn: " + fileName);
+        }
+        return rd;
+    }
+
+    protected Goate extend(Goate rd, Goate extension, String root) {
         if (extension != null && rd != null) {
             String[] extensions = getExtensions(rd);
+            String theRoot = rd.get("_root", root, String.class);
             if(extensions!=null){
                 for(String ext:extensions) {
                     ext = ext.trim();
-                    if (ext.startsWith("/")) {
-                        ext = ext.substring(1);
+                    if (ext.startsWith("/")||ext.startsWith("\\")) {
+//                        ext = ext.substring(1);
+                        theRoot = "";
+                    } else {
+                        if(!theRoot.endsWith("/")) {
+                            theRoot += "/";
+                        }
                     }
                     if(ext.contains("${")){
                         ext = ""+new Fill(ext).with(parameters);
                     }
-                    extension.merge(extend(new ToGoate(new Get("" + parameters.get("dir") + "/" + ext).from("file::")).convert(), new Goate()), false);
+                    extension.merge(extend(new ToGoate(new GetFileAsString(theRoot + ext).explode().from("file::")).autoIncrement(false).convert(), new Goate(), theRoot), false);
                 }
+            }
+            if(rd.get("expect")!=null){
+                extension.scrub("expect.");
             }
             rd.merge(extension, false);
         }
@@ -139,5 +171,24 @@ public class BarnDataLoader extends DataLoader {
     public BarnDataLoader groups(String label) {
         setParameter("groups", label);
         return this;
+    }
+
+    protected Goate modelData(Goate rd){
+        Goate dl = new ToGoate(rd.get("data modeler",rd.get("data modelers","[]"))).convert();
+        rd = rd.scrub("data modelers").scrub("data modeler");
+        if(dl.size()>0){
+            int index = 0;
+            while(dl.get(""+index)!=null){
+                Goate data = new ToGoate(dl.get(""+index,"{}")).convert();
+                String dlp = data.get("name",null,String.class);
+                if(dlp!=null&&!dlp.isEmpty()){
+                    rd.merge(new DataModeler(dlp, data).load().get(0), false);
+                }
+                index++;
+                //String dlp = dl.get(""+index+".dlp","static barn",String.class);
+                //Goate rd =
+            }
+        }
+        return rd;
     }
 }

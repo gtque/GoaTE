@@ -61,7 +61,7 @@ public class GoateUtils {
         try{
             Thread.sleep(sleepInMillis);
         } catch (InterruptedException e) {
-            logger.warn("problem sleeping: " + e.getMessage());
+            logger.warn("Goate Sleep Util","problem sleeping: " + e.getMessage());
             Thread.currentThread().interrupt();
         }
     }
@@ -70,25 +70,54 @@ public class GoateUtils {
         return getFilePath(file, false, false);
     }
 
+    public static String moveUpDir(String fileName){
+        while(fileName.contains("../")){
+            String temp = fileName.substring(0,fileName.indexOf("../"));
+            if(temp.endsWith("/")){
+                temp = temp.substring(0,temp.length()-1);
+            }
+            int upFolderIndex = temp.lastIndexOf("/");
+            if(upFolderIndex>0){
+                temp = temp.substring(0,upFolderIndex);
+            }
+            fileName = temp + fileName.substring(fileName.indexOf("../")+2);
+
+        }
+        return fileName;
+    }
     public static String getFilePath(String fileName,boolean leaveInJar, boolean force) {
         if (fileName.indexOf("/") != 0&&fileName.indexOf("\\")!=0)
             fileName = "/"+fileName;
 
+        fileName = moveUpDir(fileName);
+
         String path = System.getProperty("user.dir") + fileName;
 //        LOG.debug("checking path: " + path);
+        LOG.debug("Goate File Util","checking path: " + path);
         try {
             File temp = new File(path);
             if (!temp.exists()) {
                 path = fileName;
+                LOG.debug("Goate File Util","file did not exist, checking resources: " + path);
                 URL opath = GoateUtils.class.getResource(path);
-                if(opath!=null)
+                if(opath!=null) {
                     path = GoateUtils.class.getResource(path).toString();
+                }else{
+                    LOG.debug("Goate File Util","did not find the resource");
+                }
 //                LOG.debug("path: " + path);
                 if (path.contains("jar:")) {
                     if(!leaveInJar) {
-                        String tempPath = new Copy().file(opath).to("temp" + path.substring(path.lastIndexOf("/")), force);
-                        if (tempPath == null) {
-                            path = new File("temp" + path.substring(path.lastIndexOf("/"))).getAbsolutePath();
+                        File tf = new File("temp"+fileName);
+                        if(force||!tf.exists()) {
+                            String tempPath = new Copy().file(opath).to("temp" + fileName, force);
+                            if (tempPath == null) {
+                                path = new File("temp" + path.substring(path.lastIndexOf("/"))).getAbsolutePath();
+                            } else {
+                                path = new File(tempPath).getAbsolutePath();
+                            }
+                        } else {
+                            path = tf.getAbsolutePath();
                         }
                     }else{
                         path = path.replace("jar:","");
@@ -103,10 +132,14 @@ public class GoateUtils {
                         path = path.substring(1);
                     }
                 }
+                LOG.debug("Goate File Util","modified path to look in: "+path);
+                temp = new File(path);
 //                LOG.debug("full adjust path: " + path);
             }
+            path = temp.getAbsolutePath();
+            LOG.debug("Goate File Util","file path: " + path);
         } catch (Exception e) {
-            LOG.error("Exception encountered finding file: " + e.getMessage(), e);
+            LOG.error("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
         }
         return path;
     }
@@ -239,5 +272,13 @@ public class GoateUtils {
             map.add(c.getDeclaredField("m"));
         }
         return map;
+    }
+
+    public static String tab(int count){
+        StringBuilder tabs = new StringBuilder("");
+        for(;count>0;count--){
+           tabs.append("\t");
+        }
+        return tabs.toString();
     }
 }

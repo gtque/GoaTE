@@ -41,9 +41,23 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Goate {
     Map<String, Object> data = new ConcurrentHashMap<>();
     Interpreter dictionary;
+    boolean increment = true;
 
     public Goate() {
+        init();
+    }
+
+    public Goate(Map<String, Object> initialData){
+        init();
+        data.putAll(initialData);
+    }
+
+    protected void init(){
         dictionary = new Interpreter(this);
+    }
+    public Goate autoIncrement(boolean increment){
+        this.increment = increment;
+        return this;
     }
 
     public int size() {
@@ -58,6 +72,15 @@ public class Goate {
         return data.keySet();
     }
 
+    public String[] keysArray() {
+        String[] keys = new String[data.keySet().size()];
+        int i = 0;
+        for(String key:data.keySet()){
+            keys[i] = key;
+            i++;
+        }
+        return keys;
+    }
     public Goate put(String key, Object value) {
         if (data == null) {
             data = new ConcurrentHashMap<>();
@@ -73,9 +96,13 @@ public class Goate {
 
     public String buildKey(String key) {
         String fullKey = key;
-        while (fullKey.contains("##")) {
-            Goate billy = filter(key.substring(0, key.indexOf("##")));
-            fullKey = key.replace("##", "" + billy.size());
+        if(increment) {
+            while (fullKey.contains("##")) {
+                Goate billy = filter(key.substring(0, key.indexOf("##")));
+                fullKey = key.replace("##", "" + billy.size());
+            }
+        } else {
+            fullKey = key.replace("##", "" + System.nanoTime());
         }
         return fullKey;
     }
@@ -190,6 +217,33 @@ public class Goate {
         return filtered;
     }
 
+    /**
+     * Simple filter, matches if key does start with the given pattern; ie excludes anything matching the pattern
+     *
+     * @param pattern The pattern to match
+     * @return A Goate collection containing matching elements.
+     */
+    public Goate filterExclude(String pattern) {
+        Goate filtered = new Goate();
+        if (data != null) {
+            for (String key : keys()) {
+                if (!key.matches(pattern+".*")) {
+                    filtered.put(key, getStrict(key));
+                }
+            }
+        }
+        return filtered;
+    }
+    public Goate scrubKeys(String pattern){
+        Goate scrubbed = new Goate();
+        if(data != null){
+            for (Map.Entry<String,Object> entry:data.entrySet()){
+                scrubbed.put(entry.getKey().replaceFirst(pattern,""),entry.getValue());
+            }
+        }
+        return scrubbed;
+    }
+
     public Goate filterAndSplitKeyValuePairs(String filter) {
         return filterAndSplitKeyValuePairs(filter, ":=");
     }
@@ -237,8 +291,13 @@ public class Goate {
 
     public String toString(String prepadding, String postpadding) {
         StringBuilder sb = new StringBuilder("");
+        boolean appendNewLine = false;
         for (String key : keys()) {
-            sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding).append("\n");
+            if(appendNewLine){
+                sb.append("\n");
+            }
+            appendNewLine = true;
+            sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding);
         }
         return sb.toString();
     }

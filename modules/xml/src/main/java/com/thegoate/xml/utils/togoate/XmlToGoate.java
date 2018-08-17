@@ -45,6 +45,7 @@ import static com.thegoate.xml.XmlHelper.generatePreLable;
 @ToGoateUtil
 public class XmlToGoate extends XmlUtil implements ToGoateUtility {
     Goate result;
+    boolean autoIncrement = true;
 
     public XmlToGoate(Object val) {
         super(val);
@@ -55,6 +56,12 @@ public class XmlToGoate extends XmlUtil implements ToGoateUtility {
     @Override
     protected Object processNested(Object subContainer) {
         return subContainer;
+    }
+
+    @Override
+    public ToGoateUtility autoIncrement(boolean increment) {
+        this.autoIncrement = increment;
+        return this;
     }
 
     @Override
@@ -86,7 +93,7 @@ public class XmlToGoate extends XmlUtil implements ToGoateUtility {
 
     private Goate processChildNodes(NodeList nodes, String preLabel) {
         Goate nodeInformation = buildNodeListInformation(nodes);
-        Goate o = new Goate();
+        Goate o = new Goate().autoIncrement(autoIncrement);
         for (int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
             if(node.getNodeType()==Node.ELEMENT_NODE) {

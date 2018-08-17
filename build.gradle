@@ -38,18 +38,19 @@ buildscript {
     }
     dependencies {
         classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:+"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
         classpath 'goate:gradle8:0.3.201705310130'
     }
 }
 
-apply plugin: 'mongo'
-mongo {
-    port 27017
-    storageLocation "mongo"
-}
+//apply plugin: 'mongo'
+//
+//mongo {
+//    port 27017
+//    storageLocation "mongo"
+//}
 
 //-Dorg.gradle.java.home=<path to jdk>
 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
@@ -59,8 +60,9 @@ if (javaVersion.contains(".")) {
     javaVersion = javaVersion.substring(("" + javaVersion).indexOf(".") + 1);
 }
 
-def vbase = '0.13'
-def v = "${vbase}." + sdf.format(new Date());
+def vbase = '0.14'
+def buildDate = "" + (project.hasProperty("buildDate")?project.buildDate:sdf.format(new Date()))
+def v = "${vbase}." + buildDate
 def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : project.release) : 'beta'
 
 allprojects {
@@ -98,8 +100,8 @@ configurations.all {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.14' //version required
+wrapper {
+    gradleVersion = '4.8.1' //version required
 }
 
 subprojects {
@@ -133,7 +135,7 @@ subprojects {
         testCompile 'ch.qos.logback:logback-access:1.1.7'
         testCompile 'ch.qos.logback:logback-core:1.1.7'
         testCompile 'org.codehaus.janino:janino:2.7.8'
-        compileOnly "org.atteo.classindex:classindex:3.3"
+        annotationProcessor "org.atteo.classindex:classindex:3.3"
     }
 
     jar.baseName = projectName
@@ -323,7 +325,7 @@ task jacocoMergedReport(type: JacocoReport) {
     reports {
         xml.enabled false
         csv.enabled false
-        html.destination "$buildDir/reports/jacoco"
+        html.destination file("$buildDir/reports/jacoco")
     }
 
     classDirectories = files(getJacocoClassDirs().collect {

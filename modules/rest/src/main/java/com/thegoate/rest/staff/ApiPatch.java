@@ -36,7 +36,7 @@ import com.thegoate.staff.GoateJob;
 public class ApiPatch extends ApiEmployee {
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         Object response = rest.patch(data.get("end point","", true, String.class));
         data.put("response", response);
         return response;

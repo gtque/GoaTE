@@ -36,6 +36,7 @@ import com.thegoate.utils.UnknownUtilType;
  * Created by Eric Angeli on 5/5/2017.
  */
 public class ToGoate extends UnknownUtilType implements ToGoateUtility{
+    boolean autoIncrement = true;
     ToGoateUtility tool = null;
     Object original = null;
 
@@ -49,11 +50,17 @@ public class ToGoate extends UnknownUtilType implements ToGoateUtility{
     }
 
     @Override
+    public ToGoateUtility autoIncrement(boolean increment) {
+        this.autoIncrement = increment;
+        return this;
+    }
+
+    @Override
     public Goate convert() {
         tool = (ToGoateUtility)buildUtil(original, ToGoateUtil.class);
         Goate result = null;
         if(tool!=null){
-            result = tool.convert();
+            result = tool.autoIncrement(autoIncrement).convert();
         }
         if(result==null){
             LOG.info("Failed to convert: " + original);

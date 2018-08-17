@@ -27,6 +27,7 @@
 package com.thegoate.data;
 
 import com.thegoate.Goate;
+import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.get.GetFileAsString;
 
 import java.io.File;
@@ -44,29 +45,45 @@ public class PropertyFileDL extends DataLoader {
     @Override
     public List<Goate> load() {
         List<Goate> data = new ArrayList<>();
-        String pf = ""+new GetFileAsString(parameters.get("file")).from("file::");
-        Goate props = new Goate();
-        if(pf!=null&&!pf.isEmpty()) {
-            pf = pf.replace("\n\r","\r").replace("\r","\n");
-            for (String line:pf.split("\n")){
-                if(line!=null&&!line.isEmpty()&&!line.startsWith("#")) {
-                    String[] prop = line.split("=");
-                    if (prop.length >= 2) {
-                        props.put(prop[0].trim(),prop[1].trim());
-                    }
-                }
-            }
-        }
+        Goate props = loadProperties(new Goate(), "" + parameters.get("file"));
         data.add(props);
         return data;
     }
 
-    public PropertyFileDL file(String file){
+    private Goate loadProperties(Goate props, String file) {
+        if (props != null && file != null && new File(GoateUtils.getFilePath(file)).exists()) {
+            String pf = "" + new GetFileAsString(file).from("file::");
+            if (!pf.isEmpty()) {
+                pf = pf.replace("\n\r", "\r").replace("\r", "\n");
+                for (String line : pf.split("\n")) {
+                    if (line != null && !line.isEmpty() && !line.startsWith("#")) {
+                        String[] prop = line.split("=");
+                        if (prop.length >= 2) {
+                            props.put(prop[0].trim(), prop[1].trim());
+                        }
+                    }
+                }
+            }
+            String[] files;
+            String ext = props.get("extends", null, String.class);
+            if (ext != null) {
+                files = ext.split(",");
+            } else {
+                files = new String[0];
+            }
+            for (String extendedFile : files) {
+                props = loadProperties(props.filterExclude("extends"), extendedFile);
+            }
+        }
+        return props;
+    }
+
+    public PropertyFileDL file(String file) {
         setParameter("file", file);
         return this;
     }
 
-    public PropertyFileDL file(File file){
+    public PropertyFileDL file(File file) {
         setParameter("file", file);
         return this;
     }

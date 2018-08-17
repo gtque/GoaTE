@@ -43,7 +43,7 @@ public class CheckJson extends Employee {
     }
 
     @Override
-    public Object doWork() {
+    protected Object doWork() {
         return value;
     }
 

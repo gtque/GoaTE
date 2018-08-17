@@ -120,13 +120,34 @@ public class StepsExecutor {
                         break;
                     }
                 }
+                //this is to undo the scrubbed data.
+                Object imports = fullData.get("import", "[]");//process the import values.
+                for (int i = 0; i < Integer.MAX_VALUE; i++) {
+                    Object key = new Get(""+i).from(imports);
+                    if (key != null && !(key instanceof NotFound)) {
+                        fullData.put("" + key, data.get("" + key, "null::"));
+                    }else{
+                        break;
+                    }
+                }
                 worker.init(fullData);
                 result = worker.work();
+                fullData.put("_job_result", result);
                 Object carryover = fullData.get("carryover", "[]");//process the override values.
                 for (int i = 0; i < Integer.MAX_VALUE; i++) {
                     Object key = new Get(""+i).from(carryover);
                     if (key != null && !(key instanceof NotFound)) {
-                        data.put("" + key, fullData.get("" + key, "null::"));
+                        String aKey = ""+key;
+                        String bKey = aKey;
+                        String cKey = aKey;
+                        if(aKey.contains(":=")){
+                            bKey = bKey.substring(bKey.indexOf(":=")+2);
+                            aKey = aKey.substring(0,aKey.indexOf(":="));
+                            cKey = bKey;
+                        }else{
+                            bKey = "null::";
+                        }
+                        data.put("" + aKey, fullData.get(cKey, bKey));
                     }else{
                         break;
                     }
@@ -146,6 +167,7 @@ public class StepsExecutor {
                 if (d != null) {
                     if (("" + d.get("#")).equals("" + index)) {
                         found = d;
+                        found.put("parent", data);
                         break;
                     }
                 } else {
@@ -153,7 +175,10 @@ public class StepsExecutor {
                 }
             }
         } else {
-            found = new ToGoate(sup.get("" + index, null)).convert();
+            Object f = sup.get("" + index, null);
+            if(f!=null) {
+                found = new ToGoate(f).convert();
+            }
         }
         return found;
     }

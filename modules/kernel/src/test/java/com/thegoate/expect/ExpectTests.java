@@ -117,10 +117,56 @@ public class ExpectTests {
                 "}";
         data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect("check json>a.*.*.b,>,int::41");
+        etb.expect("check json>a.*.[*4].b,>,int::41");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonNestedTooMany() {
+        Goate data = new Goate();
+        String json = "{" +
+                "'a':[" +
+                "[{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]," +
+                "[{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]]" +
+                "}";
+        data.put("check json.value", json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>a.*.[*3].b,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertFalse(result, ev.failed());
+        LOG.debug("failed message:\n" + ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonNestedTooFew() {
+        Goate data = new Goate();
+        String json = "{" +
+                "'a':[" +
+                "[{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]," +
+                "[{'b':42}," +
+                "{'b':43}," +
+                "{'b':44}," +
+                "{'b':45}]]" +
+                "}";
+        data.put("check json.value", json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("check json>a.*.[*5].b,>,int::41");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertFalse(result, ev.failed());
         LOG.debug("failed message:\n" + ev.failed());
     }
 
@@ -226,6 +272,16 @@ public class ExpectTests {
                 .expect(new Expectation(new Goate()).actual(42).is("!=").expected("Fiddle Sticks"))
                 .expect(new Expectation(new Goate()).actual("Hello").is("!=").expected("Howdy"))
         ;
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        assertTrue(ev.evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void selfDefinedDefinition(){
+        Goate data = new Goate();
+        data.put("id", "42a");
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(new Expectation(data).define("o::id,==,42a"));
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         assertTrue(ev.evaluate());
     }

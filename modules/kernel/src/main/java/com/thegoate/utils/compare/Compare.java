@@ -26,6 +26,7 @@
  */
 package com.thegoate.utils.compare;
 
+import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.UnknownUtilType;
@@ -51,6 +52,10 @@ public class Compare extends UnknownUtilType implements CompareUtility {
         return false;
     }
 
+    @Override
+    public Goate healthCheck(){
+        return tool!=null?tool.healthCheck():new Goate();
+    }
     @Override
     public boolean evaluate() {
         if(tool==null){

@@ -56,7 +56,7 @@ public class AnnotatedMethodStubWithConstructor {
         return age * multiplier;
     }
 
-    @GoateTask(task = "void ${var}")
+    @GoateTask(task = "void with constructor ${var}")
     public void checkBoolean(boolean pass) throws Exception{
         if(!pass){
             throw new Exception("FAIL");

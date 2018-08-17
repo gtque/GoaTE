@@ -31,6 +31,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,10 @@ import java.util.Map;
  * Created by gtque on 4/24/2017.
  */
 public class GoateReflection {
+
+    public Constructor findConstructor(Class theClass, Object[] args){
+        return findConstructor(theClass.getConstructors(), args);
+    }
 
     public Constructor findConstructor(Constructor<?>[] constructors, Object[] args) {
         Constructor p = null;
@@ -96,8 +101,13 @@ public class GoateReflection {
     }
 
     public boolean isPrimitive(Class c) {
-        return c.equals(Boolean.class) || c.equals(Byte.class) || c.equals(Integer.class) || c.equals(Double.class)
-                || c.equals(Float.class) || c.equals(Long.class) || c.equals(Character.class);
+        return c.equals(Boolean.class) || c.equals(Boolean.TYPE)
+                || c.equals(Byte.class) || c.equals(Byte.TYPE)
+                || c.equals(Integer.class) || c.equals(Integer.TYPE)
+                || c.equals(Double.class) || c.equals(Double.TYPE)
+                || c.equals(Float.class) || c.equals(Float.TYPE)
+                || c.equals(Long.class) || c.equals(Long.TYPE)
+                || c.equals(Character.class) || c.equals(Character.TYPE);
     }
 
     public List<Method> getDeclaredMethods(Class klass) {
@@ -158,6 +168,12 @@ public class GoateReflection {
             throw new NoSuchMethodException("" + theMethod + " could not be found in " + theClass);
         }
         return result;
+    }
+
+    public Map<String, Field> findFields(Class theClass){
+        Map<String, Field> fields = new HashMap<>();
+        findFields(theClass, fields);
+        return fields;
     }
 
     public void findFields(Class theClass, Map<String, Field> fieldMap) {

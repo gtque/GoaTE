@@ -26,6 +26,7 @@
  */
 package com.thegoate.json;
 
+import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.Utility;
@@ -39,11 +40,18 @@ import org.json.JSONObject;
  */
 public abstract class JsonUtil implements Utility {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Object takeActionOn = null;
-    protected Object nested = null;
+    protected Object takeActionOn;
+    protected Object nested;
+    protected boolean processNested;
+    protected Goate health = new Goate();
 
-    public JsonUtil(Object val){
-        if(val instanceof String){
+    public JsonUtil(Object val) {
+        processNested = true;
+        init(val);
+    }
+
+    protected void init(Object val){
+        if(val instanceof String && processNested){
             String select = ""+val;
             if((select).contains(">")){
                 nested = select.substring(select.indexOf(">")+1);
@@ -51,6 +59,11 @@ public abstract class JsonUtil implements Utility {
             }
         }
         this.takeActionOn = val;
+    }
+
+    @Override
+    public Goate healthCheck(){
+        return health;
     }
 
     @Override

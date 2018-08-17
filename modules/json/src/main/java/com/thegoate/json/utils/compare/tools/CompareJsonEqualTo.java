@@ -26,9 +26,6 @@
  */
 package com.thegoate.json.utils.compare.tools;
 
-import com.thegoate.annotations.IsDefault;
-import com.thegoate.json.JsonUtil;
-import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
 
@@ -37,7 +34,7 @@ import com.thegoate.utils.compare.CompareUtility;
  * Created by Eric Angeli on 5/9/2017.
  */
 @CompareUtil(operator = "==", type = "json")
-public class CompareJsonEqualTo extends CompareJson implements CompareUtility {
+public class CompareJsonEqualTo extends CompareJson {
 
     Object expected = null;
 

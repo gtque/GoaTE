@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
 @FillUtil
 @IsDefault
 public class FillString implements FillUtility{
-
+    Goate health = new Goate();
     String fill = "";
     List<String> fillList = new ArrayList<>();
 
@@ -54,6 +54,11 @@ public class FillString implements FillUtility{
     @Override
     public boolean isType(Object check) {
         return check instanceof String;
+    }
+
+    @Override
+    public Goate healthCheck(){
+        return health;
     }
 
     @Override

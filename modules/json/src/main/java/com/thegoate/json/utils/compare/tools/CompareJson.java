@@ -1,7 +1,34 @@
+/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
 package com.thegoate.json.utils.compare.tools;
 
 import com.thegoate.json.JsonUtil;
 import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.compare.CompareUtility;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,22 +39,29 @@ import java.util.Iterator;
  * Base class for comparing json.
  * Created by Eric Angeli on 10/5/2017.
  */
-public abstract class CompareJson extends JsonUtil {
+public abstract class CompareJson extends JsonUtil implements CompareUtility {
 
     String json1 = null;
     String json2;
-    boolean checkingContains = false;
-
+    boolean checkingContains = true;
+    boolean secondCheck = false;
     public CompareJson(Object val) {
         super(val);
     }
 
-    public int comparison(String json1, String json2){
-        int result = 0;
+    @Override
+    protected void init(Object val) {
+        processNested = false;
+        super.init(val);
+    }
+
+    public int comparison(String json1, String json2) {
+        checkingContains = false;
+        secondCheck = false;
         int compare1 = compare(json1, json2);
+        secondCheck = true;
         int compare2 = compare(json2, json1);
-        result = compare1 + compare2;
-        return result;
+        return compare1 + compare2;
     }
 
     /**
@@ -81,11 +115,11 @@ public abstract class CompareJson extends JsonUtil {
             return 1;
         }
         //int compare2 = isJsonObject ? compare((JSONObject) jsonObject2, (JSONObject) jsonObject) : compare((JSONArray) jsonObject2, (JSONArray) jsonObject);
-        result = isJsonObject ? compare((JSONObject) jsonObject, (JSONObject) jsonObject2) : compare((JSONArray) jsonObject, (JSONArray) jsonObject2);
+        result = isJsonObject ? compare((JSONObject) jsonObject, (JSONObject) jsonObject2, "", false) : compare((JSONArray) jsonObject, (JSONArray) jsonObject2, "");
         return result;
     }
 
-    public int compare(JSONObject j1, JSONObject j2) {
+    public int compare(JSONObject j1, JSONObject j2, String baseKey, boolean checkingArray) {
         Iterator it = j1.keys();
         int result = 0;
         while (it.hasNext()) {
@@ -96,45 +130,68 @@ public abstract class CompareJson extends JsonUtil {
                 if (o != null && o2 != null) {
                     if (o instanceof JSONObject) {
                         if (o2 instanceof JSONObject) {
-                            result += compare((JSONObject) o, (JSONObject) o2);
+                            result += compare((JSONObject) o, (JSONObject) o2, baseKey + key + ".", checkingArray);
                         } else {
+                            if(!checkingArray&&!secondCheck) {
+                                health.put("mismatched##", baseKey + key + ": " + o + " != " + o2);
+                            }
                             LOG.debug(key + ": the object was a json object, but the other one was not.");
                             result++;
                         }
                     } else if (o instanceof JSONArray) {
                         if (o2 instanceof JSONArray) {
-                            result += compare((JSONArray) o, (JSONArray) o2);
+                            result += compare((JSONArray) o, (JSONArray) o2, baseKey + key + ".");
                         } else {
+                            if(!checkingArray&&!secondCheck) {
+                                health.put("mismatched##", baseKey + key + ": " + o + " != " + o2);
+                            }
                             LOG.debug(key + ": the object was a json array, but the other one was not.");
                             result++;
                         }
-                    } else if (!new Compare(o).to(o2).using("==").evaluate()){//o.equals(o2)) {
+                    } else if (!new Compare(o).to(o2).using("==").evaluate()) {//o.equals(o2)) {
 //                        if (!CompareNumeric.isNumeric("" + o) || (new CompareNumeric().actual(o).notEqualTo("" + o2))) {
-                            LOG.debug(key + ": the objects values were not equal. " + o + " != " + o2);
-                            result++;
+                        if(!checkingArray&&!secondCheck) {
+                            health.put("mismatched##", baseKey + key + ": " + o + " != " + o2);
+                        }
+                        LOG.debug(key + ": the objects values were not equal. " + o + " != " + o2);
+                        result++;
 //                        }
                     }
                 } else if (o == null && o2 == null) {
                     LOG.debug(key + ": both objects were null");
                 } else if (o != null) {
+                    if(!checkingArray&&!secondCheck) {
+                        health.put("mismatched##", baseKey + key + ": " + o + " != " + o2);
+                    }
                     LOG.debug(key + ": the second object was null");
                     result++;
-                } else if (o2 != null) {
+                } else {//o2!=null && o1==null
+                    if(!checkingArray&&!secondCheck) {
+                        health.put("mismatched##", baseKey + key + ": " + o + " != " + o2);
+                    }
                     LOG.debug(key + ": the first object was null");
                     result++;
                 }
             } catch (JSONException je) {
-                LOG.warn(key + ": there was a json exception: " + je.getMessage(), je);
+                if(!checkingArray) {
+                    String error = je.getMessage();
+                    if(error.lastIndexOf("\n")==error.length()-1){
+                        error = error.substring(0,error.length()-1);
+                    }
+                    health.put("json exception##", baseKey + key + ": " + error);
+                }
+                LOG.debug(key + ": there was a json exception(but this may not be an error): " + je.getMessage(), je);
                 result++;
             }
         }
         return result;
     }
 
-    public int compare(JSONArray j1, JSONArray j2) {
+    public int compare(JSONArray j1, JSONArray j2, String baseKey) {
         int result = 0;
         if (j1.length() != j2.length()) {
-            if (!checkingContains) {
+            if (!checkingContains&&!secondCheck) {
+                health.put("mismatched##", "json arrays different length: " + j1.length() + " != " + j2.length());
                 result++;
                 LOG.debug("comparing two arrays of different lengths.");
             }
@@ -148,22 +205,22 @@ public abstract class CompareJson extends JsonUtil {
                 if (o != null && o2 != null) {
                     if (o instanceof JSONObject) {
                         if (o2 instanceof JSONObject) {
-                            r2 = compare((JSONObject) o, (JSONObject) o2);
+                            r2 = compare((JSONObject) o, (JSONObject) o2, baseKey + i + ".", true);
                         } else {
                             LOG.debug(i2 + ": the object was a json object, but the other one was not.");
                             r2++;
                         }
                     } else if (o instanceof JSONArray) {
                         if (o2 instanceof JSONArray) {
-                            r2 = compare((JSONArray) o, (JSONArray) o2);
+                            r2 = compare((JSONArray) o, (JSONArray) o2, baseKey + i + ".");
                         } else {
                             LOG.debug(i2 + ": the object was a json array, but the other one was not.");
                             r2++;
                         }
-                    } else if (!new Compare(o).to(o2).using("==").evaluate()){//o.equals(o2)) {
+                    } else if (!new Compare(o).to(o2).using("==").evaluate()) {//o.equals(o2)) {
 //                        if (!CompareNumeric.isNumeric("" + o) || (new CompareNumeric().actual("" + o).notEqualTo("" + o2))) {
-                            LOG.debug(i2 + ": the objects values were not equal. " + o + " != " + o2);
-                            r2++;
+                        LOG.debug(i2 + ": the objects values were not equal. " + o + " != " + o2);
+                        r2++;
 //                        }
                     }
                 } else if (o != null) {
@@ -178,7 +235,8 @@ public abstract class CompareJson extends JsonUtil {
                     break;
                 }
             }
-            if (!found) {
+            if (!found&&!secondCheck) {
+                health.put("not found##", baseKey + i + ":" + o);
                 LOG.debug("the object was not found in the other array.");
                 result++;
             }

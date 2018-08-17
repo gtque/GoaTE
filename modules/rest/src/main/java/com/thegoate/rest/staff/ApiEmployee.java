@@ -70,13 +70,14 @@ public abstract class ApiEmployee extends Employee {
             spec.multipartData(data.filterAndSplitKeyValuePairs("multipart"));
             spec.customData(data.filterAndSplitKeyValuePairs("custom params."));
             spec.timeout(Integer.parseInt(""+data.get("rest.timeout",15)));
+            spec.config();
         }
         return spec;
     }
 
     @Override
     public String[] detailedScrub(){
-        String[] scrub = {"base url", "method", "headers", "url params", "query params", "path params", "body", "form params", "multipart", "custom params", "security"};
+        String[] scrub = {"base url", "end point", "method", "headers", "url params", "query params", "path params", "body", "form params", "multipart", "custom params", "security"};
         return scrub;
     }
 

@@ -34,5 +34,6 @@ import com.thegoate.utils.Utility;
  * Created by Eric Angeli on 5/19/2017.
  */
 public interface ToGoateUtility extends Utility {
+    ToGoateUtility autoIncrement(boolean increment);//true should be default, used to indicate how ## should be handled.
     Goate convert();
 }

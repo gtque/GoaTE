@@ -22,3 +22,4 @@ Closure setProjectFolders = {
 
 include modules
 setProjectFolders()
+enableFeaturePreview('STABLE_PUBLISHING')

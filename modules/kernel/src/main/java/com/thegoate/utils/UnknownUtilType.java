@@ -27,6 +27,7 @@
 
 package com.thegoate.utils;
 
+import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.logging.BleatBox;
@@ -47,6 +48,11 @@ import java.util.Map;
  */
 public class UnknownUtilType {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
+    protected Goate health = new Goate();
+
+    public Goate healthCheck(){
+        return health;
+    }
 
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util) {
         return buildUtil(obj, util, obj);

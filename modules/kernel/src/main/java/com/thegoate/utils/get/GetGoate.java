@@ -53,7 +53,11 @@ public class GetGoate extends GetTool{
     public Object from(Object container) {
         Object result = new NotFound(""+selector);
         if(container instanceof Goate){
-            result = ((Goate)container).get(""+selector);
+            if(((Goate)container).getStrict(""+selector)==null){
+                result = new NotFound(""+selector);
+            } else {
+                result = ((Goate) container).get("" + selector);
+            }
         }
         result = processNested(result);//process nested gets.
         return result;

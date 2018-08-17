@@ -32,6 +32,7 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.staff.Employee;
 import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.compare.CompareUtility;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.NotFound;
 
@@ -62,7 +63,6 @@ public class Expectation {
 
     public Expectation(Goate data) {
         this.data = data;
-//        from("self_defined");
     }
 
     public String fullName() {
@@ -80,7 +80,7 @@ public class Expectation {
         } else if (source instanceof Employee) {
             this.from = (Employee) source;
         }
-        if(name==null||name.isEmpty()){
+        if (name == null || name.isEmpty()) {
             name = "" + source;
         }
         return this;
@@ -120,7 +120,6 @@ public class Expectation {
     public Expectation add(Expectation expectation) {
         Goate ex = expectation.getExpectations();
         for (String key : ex.keys()) {
-//            Map<String, Object> exp = (Map<String, Object>) ex.get(key);
             Goate exp = (Goate) ex.get(key);
             actual(exp.getStrict("actual")).is("" + exp.getStrict("operator")).expected(exp.getStrict("expected"));
         }
@@ -129,7 +128,7 @@ public class Expectation {
 
     public Expectation actual(Object actual) {
         this.actual = actual;
-        if(this.source==null){
+        if (this.source == null) {
             from(actual);
         }
         simpleState += "a";
@@ -155,7 +154,6 @@ public class Expectation {
         if ((simpleState.length() == 3 && simpleState.contains("a") && simpleState.contains("i") && simpleState.contains("c")) || force) {
             if (actual != null && operator != null && !operator.isEmpty()) {//must at least set actual and operator fields.
                 String key = "" + actual + operator + expected;
-//                Map<String, Object> exp = new ConcurrentHashMap<>();
                 Goate exp = new Goate();
                 exp.put("actual", actual);
                 exp.put("operator", operator);
@@ -175,11 +173,11 @@ public class Expectation {
         fails = new ArrayList<>();
         passes = new ArrayList<>();
         boolean result = true;//assume true, and if a failure is detected set to false.
-        if(from!=null){
-            try{
+        if (from != null) {
+            try {
                 source = from.work();
-            }catch(Throwable e){
-                LOG.error("Expectation", "Problem get the source for comparison: "+ e.getMessage(), e);
+            } catch (Throwable e) {
+                LOG.error("Expectation", "Problem get the source for comparison: " + e.getMessage(), e);
                 Goate exp = new Goate();
                 exp.put("from", fullName());
                 exp.put("error", e.getMessage());
@@ -193,9 +191,8 @@ public class Expectation {
             try {
                 Object rtrn = source;//from.work();
                 for (String key : expect.keys()) {
-//                    Map<String, Object> exp = (Map<String, Object>) expect.get(key);
                     Goate exp = (Goate) expect.get(key);
-                    if(from==null){
+                    if (from == null) {
                         exp.put("actual", "return");
                     }
                     try {
@@ -241,11 +238,27 @@ public class Expectation {
         String act = "" + exp.get("actual");
         if (act.contains("*")) {
             int index = 0;
-            int star = act.indexOf("*");
+            int star = act.indexOf("*")-1;
+            String start = null;
+            String expectedSize = null;
+            int size = -42;
+            if(star>=0){
+                start = ""+act.charAt(star);
+                if(start.equals("[")){
+                    expectedSize = act.substring(star+2,act.indexOf("]"));
+                    try{
+                        size = Integer.parseInt(expectedSize);
+                    } catch(NumberFormatException nfe){
+                        LOG.debug("Expectation", "Detected wildcard with expected, but seems it is malformed, defaulting to any number.", nfe);
+                    }
+                }
+            }
             try {
-                while (true) {
+                boolean running = true;
+                String act1 = size>0?act.replaceFirst("\\[","").replaceFirst(""+size+"]",""):act;
+                while (running) {
                     Goate expt = new Goate().merge(exp, true);
-                    String act2 = act.substring(0, star) + index + act.substring(star + 1);
+                    String act2 = act1.replaceFirst("\\*",""+index);//act.substring(0, star) + index + act.substring(star + 1);
                     String keyt = key.replace(act, act2);
                     expt.put("actual", act2);
                     boolean check = check(expt, keyt, rtrn);
@@ -254,8 +267,20 @@ public class Expectation {
                         result = false;
                     }
                     index++;
+                    if(size>0&&index>size){
+                        running = false;
+                        //if there are more than expected this should fail.
+                        resultC = false;
+                        result = false;
+                    }
                 }
             } catch (Throwable t) {
+                if(size>0&&(index==0||index!=size)){
+                    //this should cause a failure if the expected size is not reached.
+                    //use [*###] where ### is the expected size, ie: [*84]
+                    resultC = false;
+                    result = false;
+                }
                 if (index == 0) {//escape back. This will leave the current result state
                     //that means if the first index is NotFound there is nothing to evaluate, if it should fail
                     //because a field should be present you will have to check for that some other way other than
@@ -273,16 +298,24 @@ public class Expectation {
             }
             if (val instanceof NotFound) {
                 if (!exp.get("operator").equals("doesNotExist")) {
-                    LOG.info("" + exp.get("actual") + " was not found, but this does not necessarily indicate a failure.");
+                    LOG.info("" + exp.get("actual") + " was not found, but this does not necessarily indicate a failure, to check if something is not present use 'doesNotExist'.");
                     exp.put("actual_value", "_NOT_FOUND_");
                     throw new RuntimeException("Did not find: " + exp.get("actual"));
+                } else {
+                    exp.put("actual_value", val);
+                    passes.add(exp);
                 }
             } else {
                 exp.put("actual_value", val);
                 LOG.info("evaluating \"" + fullName() + "\": " + exp.get("actual") + "(" + val + ") " + exp.get("operator") + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
-                if (!(new Compare(val).to(exp.get("expected")).using(exp.get("operator")).evaluate())) {
+                CompareUtility compare = new Compare(val).to(exp.get("expected")).using(exp.get("operator"));
+                if (!(compare.evaluate())) {
                     result = false;
                     failed.append(fullName() + ">" + key + " evaluated to false.\n");
+                    Goate health = compare.healthCheck();
+                    if(health.size()>0){
+                        exp.put("failed", health);
+                    }
                     fails.add(exp);
                 } else {
                     passes.add(exp);
@@ -322,7 +355,7 @@ public class Expectation {
             data = new Goate();
         }
         if (expectation != null && !expectation.isEmpty()) {
-            String source = "";
+            String source = null;
             if (expectation.contains(">")) {
                 source = expectation.substring(0, expectation.indexOf(">"));
                 expectation = expectation.substring(expectation.indexOf(">") + 1);
@@ -334,7 +367,7 @@ public class Expectation {
             Object act = i.translate(parts[0]);
             actual(act);
             if (parts.length > 1) {
-                is(""+i.translate(parts[1]));
+                is("" + i.translate(parts[1]));
             }
             if (parts.length > 2) {
                 expected(i.translate(parts[2]));
@@ -350,41 +383,17 @@ public class Expectation {
         }
         Interpreter i = new Interpreter(data);
         Object workerId = i.translate(source);
-//        if(workerId.equals("self_defined")){
-//            Expectation self = this;
-//            worker = new Employee() {
-//                @Override
-//                public String[] detailedScrub() {
-//                    return new String[0];
-//                }
-//
-//                @Override
-//                public Employee init() {
-//                    return null;
-//                }
-//
-//                @Override
-//                public Object doWork() {
-//                    Expectation selfie = (Expectation)data.get("exp");
-//                    Goate exp = selfie.getExpectations();
-//                    Goate goat = (Goate)exp.get(0);
-//                    return goat.get("actual");
-//                }
-//            };
-//            worker.setData(new Goate().put("exp", self));
-//        }else {
-            if (workerId instanceof String) {
-                source = "" + workerId;
-                String[] sourceInfo = source.split("#");//if the source does not define an id number, assume 0.
-                this.name = sourceInfo[0];
-                if (sourceInfo.length > 1) {
-                    this.id = sourceInfo[1];
-                } else {
-                    this.id = "0";
-                }
-                worker = Employee.recruit(source, data);
+        if (workerId instanceof String) {
+            source = "" + workerId;
+            String[] sourceInfo = source.split("#");//if the source does not define an id number, assume 0.
+            this.name = sourceInfo[0];
+            if (sourceInfo.length > 1) {
+                this.id = sourceInfo[1];
+            } else {
+                this.id = "0";
             }
-//        }
+            worker = Employee.recruit(source, data);
+        }
         return worker;
     }
 }
