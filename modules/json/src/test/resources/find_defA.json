@@ -1,0 +1,6 @@
+{
+  "value": "Goku",
+  "key": "data\\.[0-9]*\\.[0-9]*\\.check",
+  "from result": false,
+  "json": "file::find.json"
+}
