@@ -70,6 +70,17 @@ public abstract class Employee {
         return name;
     }
 
+    protected String getNameDef(){
+        return name + ".definition";
+    }
+
+    public Employee initData(){
+        if(data==null) {
+            data = new Goate();
+        }
+        return this;
+    }
+
     public Employee setData(Goate data) {
         this.data = data;
         //no point in processing the annotations until the data is set.
@@ -105,7 +116,7 @@ public abstract class Employee {
     }
 
     public Goate scrub(Goate data){
-        String[] baseScrub = {"Scenario", "job", "abstract", "extends", "groups", "expect", "override"};
+        String[] baseScrub = {"Scenario", "job", "abstract", "extends", "groups", "expect", "override", getName()+"\\.definition"};
         Goate scrubbed = clean(new Goate().merge(data,false),baseScrub);
         return clean(scrubbed, detailedScrub());
     }

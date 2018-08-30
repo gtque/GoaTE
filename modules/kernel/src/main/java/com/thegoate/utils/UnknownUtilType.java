@@ -76,8 +76,9 @@ public class UnknownUtilType {
         Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
         if(utils!=null) {
             for (String key : utils.keySet()){
+                Class c = Object.class;
                 try {
-                    Class c = utils.get(key);
+                    c = utils.get(key);
                     Annotation d = c.getAnnotation(IsDefault.class);
                     if(d!=null){
                         def = c;
@@ -90,7 +91,7 @@ public class UnknownUtilType {
                         }
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |InstantiationException e) {
-                    LOG.warn("The class did not have isType, cannot determine if that class is the correct type. " + e.getMessage());
+                    LOG.debug("The class ("+c.getName()+") did not have isType, cannot determine if that class is the correct type. " + e.getMessage());
                 }
             }
         }
@@ -99,7 +100,7 @@ public class UnknownUtilType {
                 try{
                     utility = af.constructor(null).build(def);
                 } catch (IllegalAccessException | InvocationTargetException |InstantiationException e){
-                    LOG.warn("Problem instantiating the default utility: " + e.getMessage(), e);
+                    LOG.debug("Problem instantiating the default utility ("+def.getName()+"): " + e.getMessage(), e);
                 }
             }
         }

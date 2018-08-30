@@ -236,6 +236,7 @@ public class Expectation {
         boolean result = true;
         Object val = null;
         String act = "" + exp.get("actual");
+        String actP = act;
         if (act.contains("*")) {
             int index = 0;
             int star = act.indexOf("*")-1;
@@ -246,8 +247,14 @@ public class Expectation {
                 start = ""+act.charAt(star);
                 if(start.equals("[")){
                     expectedSize = act.substring(star+2,act.indexOf("]"));
+                    actP = expectedSize;
                     try{
-                        size = Integer.parseInt(expectedSize);
+                        if(expectedSize.contains(",")){
+                            String[] es = expectedSize.split(",");
+                            index = Integer.parseInt(es[0]);
+                            expectedSize = es.length>1?es[1]:"";
+                        }
+                        size = Integer.parseInt(expectedSize)+index;
                     } catch(NumberFormatException nfe){
                         LOG.debug("Expectation", "Detected wildcard with expected, but seems it is malformed, defaulting to any number.", nfe);
                     }
@@ -255,7 +262,7 @@ public class Expectation {
             }
             try {
                 boolean running = true;
-                String act1 = size>0?act.replaceFirst("\\[","").replaceFirst(""+size+"]",""):act;
+                String act1 = size>0||index>0?act.replaceFirst("\\[","").replaceFirst(""+actP+"]",""):act;
                 while (running) {
                     Goate expt = new Goate().merge(exp, true);
                     String act2 = act1.replaceFirst("\\*",""+index);//act.substring(0, star) + index + act.substring(star + 1);

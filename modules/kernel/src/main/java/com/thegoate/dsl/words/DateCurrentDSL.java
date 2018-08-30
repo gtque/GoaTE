@@ -24,26 +24,36 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
-import com.thegoate.utils.get.GetFileAsString;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Created by Eric Angeli on 7/5/2017.
+ * Returns the value of the referenced object.
+ * Created by gtque on 3/10/2018.
  */
-@GoateDSL(word = "file")
-public class LoadFile extends DSL {
-
-    public LoadFile(Object value){
+@GoateDSL(word = "date")
+@GoateDescription(description = "returns current (local) date time in the given format.",
+        parameters = {"the format for the date"})
+public class DateCurrentDSL extends DSL {
+    public DateCurrentDSL(Object value) {
         super(value);
     }
 
     @Override
     public Object evaluate(Goate data) {
-        String filePath = ""+get(1,data);
-        return new GetFileAsString(filePath).explode().from("file::");
+        String datePattern = "" + get(1, data);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(datePattern);
+        LOG.debug("Date Reformat", "Pattern: " + datePattern);
+        LocalDateTime date = LocalDateTime.now();
+        return date.format(dtf);
     }
 }

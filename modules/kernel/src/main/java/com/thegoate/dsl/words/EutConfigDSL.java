@@ -68,7 +68,8 @@ import java.util.List;
         "\ndefault=eut/local.properties"+
         "\npattern=${profile}"+
         "\nextension=properties"+
-        "\nlocation=eut",
+        "\nlocation=eut" +
+        "\ndefault.profile=localdev",
     parameters = {"The name of the property","Optional default value."})
 public class EutConfigDSL extends DSL {
     public EutConfigDSL(Object value) {
@@ -96,7 +97,7 @@ public class EutConfigDSL extends DSL {
             if(configs.size()>0){
                 config = configs.get(0);
             }
-            if(data.get("eut", data.get("profile",null))==null){
+            if(data.get("eut", data.get("profile",config.get("default.profile", null)))==null){
                 LOG.debug("eut", "No profile found, will default to default properties.");
             }
             path = config.get("location", path, String.class);

@@ -24,26 +24,41 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.dsl.words;
+package com.thegoate.utils.compare.tools.date;
 
-import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
-import com.thegoate.utils.get.GetFileAsString;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.utils.compare.CompareUtil;
+
+import java.text.SimpleDateFormat;
 
 /**
- * Created by Eric Angeli on 7/5/2017.
+ * Checks if a string is empty or not.
+ * Returns true only if actual is not null and is empty and if expected is true.
+ * Returns true if actual is not empty or null and if expected is false.
+ * Use == null or != null to check for null.
+ * example: field1,==,null::
+ * Created by Eric Angeli on 7/7/2017.
  */
-@GoateDSL(word = "file")
-public class LoadFile extends DSL {
-
-    public LoadFile(Object value){
-        super(value);
+@CompareUtil(operator = "dateIsPatternSkipNull", type = "String")
+@IsDefault
+public class CompareDateStringIsPatternSkipNull extends CompareTool {
+    public CompareDateStringIsPatternSkipNull(Object actual) {
+        super(actual);
     }
 
     @Override
-    public Object evaluate(Goate data) {
-        String filePath = ""+get(1,data);
-        return new GetFileAsString(filePath).explode().from("file::");
+    public boolean evaluate() {
+        String act = "" + actual;
+        boolean result = true;
+        if(actual!=null&&!act.equals("null")&&!act.trim().isEmpty()){
+            result = new CompareDateStringIsPattern(actual).to(expected).evaluate();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isType(Object check) {
+        return true;
     }
 }

@@ -57,13 +57,17 @@ public class ToGoate extends UnknownUtilType implements ToGoateUtility{
 
     @Override
     public Goate convert() {
-        tool = (ToGoateUtility)buildUtil(original, ToGoateUtil.class);
         Goate result = null;
-        if(tool!=null){
-            result = tool.autoIncrement(autoIncrement).convert();
-        }
-        if(result==null){
-            LOG.info("Failed to convert: " + original);
+        if(original instanceof Goate){
+            result = (Goate)original;
+        } else {
+            tool = (ToGoateUtility) buildUtil(original, ToGoateUtil.class);
+            if (tool != null) {
+                result = tool.autoIncrement(autoIncrement).convert();
+            }
+            if (result == null) {
+                LOG.info("Failed to convert: " + original);
+            }
         }
         return result;
     }

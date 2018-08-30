@@ -314,8 +314,19 @@ public class CompareTests {
     public void stringIsEmpty(){
         assertTrue(new Compare("").to(true).using("isEmpty").evaluate(),"The String was apparently not empty.");
     }
+
     @Test(groups = {"unit"})
     public void objectStringEqualTo(){
         assertTrue(new Compare("hello").to("hello").using("==").evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void dateIsPattern(){
+        assertTrue(new Compare("2009-11-24").to("yyyy-MM-dd").using("dateIsPattern").evaluate(),"The date did not match the pattern.");
+    }
+
+    @Test(groups = {"unit"})
+    public void dateIsPatternDoesNotMatch(){
+        assertFalse(new Compare("2009/11/24").to("yyyy/MMM/dd").using("dateIsPattern").evaluate(),"The date matched the pattern.");
     }
 }
