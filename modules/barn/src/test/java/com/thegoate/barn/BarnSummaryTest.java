@@ -24,33 +24,20 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.barn.data;
+package com.thegoate.barn;
 
-import com.thegoate.Goate;
-import com.thegoate.data.DataLoader;
-import com.thegoate.testng.TestNGEngineMethodDL;
-import com.thegoate.utils.GoateUtils;
+import com.thegoate.barn.staff.BarnSummaryReportEmployee;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
-import static org.testng.Assert.assertEquals;
-
 /**
- * Test the Barn data loader
- * Created by Eric Angeli on 2/26/2018.
+ * This shows how to create a simple test for collecting and printing a summary of barn tests.
+ * Created by Eric Angeli on 4/18/2018.
  */
-public class TestBarnDataLoader extends TestNGEngineMethodDL {
-
+public class BarnSummaryTest {
     @Test(groups = {"unit"})
-    public void nestedExtends(){
-        GoateUtils.setEnvironment("testGroups", null);
-        GoateUtils.setEnvironment("excludeGroups", null);
-        DataLoader dl = new BarnDataLoader().testCaseDirectory("barn/data");
-        List<Goate> list = dl.load();
-        assertEquals(list.size(),1);
-        Goate d = list.get(0);
-        LOG.debug("Nested Extends", d.toString());
-        assertEquals(d.size(),6);
+    public void barnSummary(){
+        BarnSummaryReportEmployee bsr = new BarnSummaryReportEmployee();
+        bsr.root("testcases/apis").groups("").exclude("").jobType("api").simple().init();
+        System.out.println(""+bsr.work());
     }
 }
