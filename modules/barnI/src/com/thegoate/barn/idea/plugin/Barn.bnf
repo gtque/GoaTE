@@ -1,0 +1,20 @@
+{
+  parserClass="com.thegoate.barn.idea.plugin.parser.BarnParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Barn"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.thegoate.barn.idea.plugin.psi"
+  psiImplPackage="com.thegoate.barn.idea.plugin.psi.impl"
+
+  elementTypeHolderClass="com.thegoate.barn.idea.plugin.psi.BarnTypes"
+  elementTypeClass="com.thegoate.barn.idea.plugin.psi.BarnElementType"
+  tokenTypeClass="com.thegoate.barn.idea.plugin.psi.BarnTokenType"
+}
+
+barnFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY
