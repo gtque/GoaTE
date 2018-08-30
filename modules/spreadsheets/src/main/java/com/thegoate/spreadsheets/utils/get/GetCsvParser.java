@@ -27,6 +27,7 @@
 package com.thegoate.spreadsheets.utils.get;
 
 import com.thegoate.spreadsheets.csv.CSVParser;
+import com.thegoate.spreadsheets.csv.CSVRecord;
 import com.thegoate.spreadsheets.utils.CsvParserUtil;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetUtil;
@@ -61,7 +62,7 @@ public class GetCsvParser extends CsvParserUtil implements GetUtility {
         CSVParser csv = (CSVParser)container;
         if(selector.equals("headers")){
             try {
-                result = csv.getRecords().get(0);
+                result = new CSVRecord(csv,csv.getRecords().get(0));//csv.getRecords().get(0);
             }catch(IOException ioe){
                 LOG.debug("Get Csv Field", "Problem getting headers: " + ioe.getMessage(), ioe);
             }
@@ -80,7 +81,7 @@ public class GetCsvParser extends CsvParserUtil implements GetUtility {
         }else if(selector.startsWith("get row#")) {
             try {
                 int rowNumber = Integer.parseInt((selector.substring(selector.indexOf("#")+1).trim()));
-                result = csv.getRecords().get(rowNumber);
+                result = new CSVRecord(csv,csv.getRecords().get(rowNumber));
             }catch(IOException ioe){
                 LOG.debug("Get Csv Field", "Problem "+selector+": " + ioe.getMessage(), ioe);
             }

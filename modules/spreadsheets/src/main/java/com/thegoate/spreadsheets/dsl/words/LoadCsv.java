@@ -31,6 +31,7 @@ import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.spreadsheets.csv.CSVParser;
+import com.thegoate.spreadsheets.csv.CSVRecord;
 import com.thegoate.spreadsheets.staff.GetCsvEmployee;
 
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class LoadCsv extends DSL {
         }
         Object val = null;
         try{
-            val = row>=0?csv.getRecords().get(row):csv;
+            val = row>=0?new CSVRecord(csv,csv.getRecords().get(row)):csv;
         } catch (IOException e) {
             LOG.debug("Load CSV", "Failed to get records: " + e.getMessage(), e);
         }

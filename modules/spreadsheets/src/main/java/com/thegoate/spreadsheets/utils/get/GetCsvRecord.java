@@ -26,20 +26,18 @@
  */
 package com.thegoate.spreadsheets.utils.get;
 
-import com.thegoate.spreadsheets.utils.CsvParserUtil;
+import com.thegoate.spreadsheets.csv.CSVRecord;
+import com.thegoate.spreadsheets.utils.CsvRecordUtil;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetUtil;
 import com.thegoate.utils.get.GetUtility;
-import org.apache.commons.csv.CSVRecord;
-
-import java.io.IOException;
 
 /**
  * Get the field from the given json.
  * Created by Eric Angeli on 5/19/2017.
  */
 @GetUtil
-public class GetCsvRecord extends CsvParserUtil implements GetUtility {
+public class GetCsvRecord extends CsvRecordUtil implements GetUtility {
 
     public GetCsvRecord(Object val) {
         super(val);

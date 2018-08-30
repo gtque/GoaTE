@@ -52,7 +52,7 @@ public class GetCsvEmployee extends Employee {
 
     @Override
     public Employee init() {
-        Goate theData = new ToGoate(data.get(getName()+".definition","{}").toString()).convert()
+        Goate theData = new ToGoate(data.get(getName()+".definition","{}")).convert()
                 .merge(scrub(data),false);
         boolean fromResult = theData.get("from result", false, Boolean.class);
         if(!fromResult){

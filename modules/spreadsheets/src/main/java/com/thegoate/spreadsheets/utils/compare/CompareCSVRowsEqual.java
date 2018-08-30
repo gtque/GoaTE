@@ -34,9 +34,9 @@ import com.thegoate.utils.compare.CompareUtil;
  * Created by Eric Angeli on 8/10/2018.
  */
 @CompareUtil(operator = "==", type = "csv")
-public class ComareCSVRowsEqual extends CompareCsvRecord {
+public class CompareCSVRowsEqual extends CompareCsvRecord {
 
-    public ComareCSVRowsEqual(Object val) {
+    public CompareCSVRowsEqual(Object val) {
         super(val);
     }
 

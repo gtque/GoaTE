@@ -26,7 +26,11 @@
  */
 package com.thegoate.spreadsheets;
 
+import com.thegoate.Goate;
+import com.thegoate.spreadsheets.csv.CSVParser;
+import com.thegoate.spreadsheets.staff.GetCsvEmployee;
 import com.thegoate.spreadsheets.utils.SheetUtils;
+import com.thegoate.spreadsheets.utils.get.GetCsvParser;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import org.testng.annotations.Test;
 
@@ -59,5 +63,19 @@ public class CSVTest extends TestNGEngineMethodDL {
         assertEquals(sheet.get(1,1),"42,g");
         assertEquals(sheet.get("c",0,"e"),"e");
         assertEquals(sheet.get(2,0,3),3);
+    }
+
+    @Test(groups = {"unit"})
+    public void getCSVByHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        if(data==null){
+            data = new Goate();
+        }
+        Goate def = new Goate();
+        data.put(".definition", def);
+        def.put("file","sample.csv");
+        GetCsvEmployee csv = new GetCsvEmployee();
+        CSVParser parser = (CSVParser)csv.init(data).work();
+        GetCsvParser gp = new GetCsvParser("get row#1>a");
+        assertEquals(gp.from(parser), "b");
     }
 }

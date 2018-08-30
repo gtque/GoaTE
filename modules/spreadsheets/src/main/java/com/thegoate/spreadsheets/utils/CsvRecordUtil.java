@@ -26,7 +26,7 @@
  */
 package com.thegoate.spreadsheets.utils;
 
-import org.apache.commons.csv.CSVRecord;
+import com.thegoate.spreadsheets.csv.CSVRecord;
 
 /**
  * Created by Eric Angeli on 8/9/2018.
