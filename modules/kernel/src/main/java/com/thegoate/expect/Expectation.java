@@ -200,6 +200,8 @@ public class Expectation {
                         boolean check = check(exp, key, rtrn);
                         if (!check) {
                             result = false;
+                            failed.append(fullName() + ">" + key + " evaluated to false.\n");
+                            fails.add(exp);
                         }
                     } catch (Throwable t) {
                         if (key.contains("*")) {

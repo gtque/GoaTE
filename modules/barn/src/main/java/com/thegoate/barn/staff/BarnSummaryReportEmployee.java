@@ -74,25 +74,25 @@ public class BarnSummaryReportEmployee extends Employee {
 
     public BarnSummaryReportEmployee root(String root){
         initData();
-        data.put("barn root", root);
+        definition.put("barn root", root);
         return this;
     }
 
     public BarnSummaryReportEmployee groups(String groups){
         initData();
-        data.put("barn groups", groups);
+        definition.put("barn groups", groups);
         return this;
     }
 
     public BarnSummaryReportEmployee exclude(String exclude){
         initData();
-        data.put("barn exclude", exclude);
+        definition.put("barn exclude", exclude);
         return this;
     }
 
     public BarnSummaryReportEmployee jobType(String type){
         initData();
-        data.put("barn type", type);
+        definition.put("barn type", type);
         return this;
     }
 
@@ -103,10 +103,10 @@ public class BarnSummaryReportEmployee extends Employee {
 
     @Override
     public Employee init() {
-        barnRoot = data.get(parameterName("barn root"),"", String.class);
-        groups = data.get(parameterName("barn groups"),"", String.class);
-        exclude = data.get(parameterName("barn exclude"),"", String.class);
-        type = data.get(parameterName("barn type"),"", String.class).toUpperCase(Locale.ROOT);
+        barnRoot = definition.get("barn root","", String.class);
+        groups = definition.get("barn groups","", String.class);
+        exclude = definition.get("barn exclude","", String.class);
+        type = definition.get("barn type","", String.class).toUpperCase(Locale.ROOT);
         return this;
     }
 

@@ -1,14 +1,14 @@
 {
-  parserClass="com.thegoate.barn.idea.plugin.parser.BarnParser"
+  parserClass="com.thegoate.barn.idea.plugin.generated.parser.BarnParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="Barn"
   psiImplClassSuffix="Impl"
-  psiPackage="com.thegoate.barn.idea.plugin.psi"
-  psiImplPackage="com.thegoate.barn.idea.plugin.psi.impl"
+  psiPackage="com.thegoate.barn.idea.plugin.generated.psi"
+  psiImplPackage="com.thegoate.barn.idea.plugin.generated.psi.impl"
 
-  elementTypeHolderClass="com.thegoate.barn.idea.plugin.psi.BarnTypes"
+  elementTypeHolderClass="com.thegoate.barn.idea.plugin.generated.psi.BarnTypes"
   elementTypeClass="com.thegoate.barn.idea.plugin.psi.BarnElementType"
   tokenTypeClass="com.thegoate.barn.idea.plugin.psi.BarnTokenType"
 }

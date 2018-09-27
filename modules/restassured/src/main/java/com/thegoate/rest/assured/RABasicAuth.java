@@ -118,7 +118,8 @@ public class RABasicAuth extends RestAuthBasicUserPW implements RASpec{
 
     @Override
     public RequestSpecification getSpec() {
-        specification.auth().preemptive().basic(user, password);
+        specification = RestAssured.init(given(), this);
+        specification = specification.auth().preemptive().basic(user, password);
         return specification;
     }
 }

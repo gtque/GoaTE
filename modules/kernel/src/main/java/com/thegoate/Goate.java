@@ -68,6 +68,14 @@ public class Goate {
         return size;
     }
 
+    public Map<String,Object> data(){
+        Map<String,Object> mapped = new ConcurrentHashMap<>();
+        for(String key:keys()){
+            mapped.put(key, get(key));
+        }
+        return mapped;
+    }
+
     public Set<String> keys() {
         return data.keySet();
     }

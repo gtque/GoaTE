@@ -46,6 +46,7 @@ import org.json.JSONObject;
 @CompareUtil(operator = "isEqualIgnoreFields", type = "json")
 public class IsEqualIgnoreFields extends CompareJson {
     Object expected = null;
+
     public IsEqualIgnoreFields(Object actual) {
         super(actual);
     }
@@ -59,16 +60,22 @@ public class IsEqualIgnoreFields extends CompareJson {
     public boolean evaluate() {
         JSONObject expectedDef = new JSONObject(expected.toString());
         Goate drop = new Goate();
-        Object expectedJson = expectedDef.has("expected json")?expectedDef.get("expected json"):expectedDef;
-        if(expectedDef!=null&&expectedDef.has("_goate_ignore")) {
+        Object expectedJson = expectedDef.has("expected json") ? expectedDef.get("expected json") : expectedDef;
+        if(expectedDef.has("_goate_ignore")) {
             JSONArray ignored = expectedDef.getJSONArray("_goate_ignore");
-            for (int i = 0; i < ignored.length(); i++) {
-                drop.put(ignored.getString(i), "drop field::");
-            }
+            defineIgnore(drop, ignored);
+        }
+        if (drop.size()>0) {
             expectedJson = new FillJson(expectedJson).with(drop);
             takeActionOn = new FillJson(takeActionOn).with(drop);
         }
         return new CompareJsonEqualTo(takeActionOn).to(expectedJson).evaluate();
+    }
+
+    protected void defineIgnore(Goate drop, JSONArray ignored) {
+        for (int i = 0; i < ignored.length(); i++) {
+            drop.put(ignored.getString(i), "drop field::");
+        }
     }
 
     public CompareUtility actual(Object actual) {

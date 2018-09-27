@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.thegoate.barn.idea.barni</id>
   <name>BarnI</name>
-  <version>0.14</version>
+  <version>0.15</version>
   <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
   <description><![CDATA[
@@ -26,6 +26,8 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory implementation="com.thegoate.barn.idea.plugin.BarnFileTypeFactory"/>
+    <fileEditorProvider implementation="com.thegoate.barn.idea.plugin.editor.BarnFileEditorProvider"/>
+    <!--<fileEditorProvider implementation="com.thegoate.barn.idea.plugin.editor.BarnPreviewFileEditorProvider"/>-->
     <lang.parserDefinition language="BARN" implementationClass="com.thegoate.barn.idea.plugin.BarnParserDefinition"/>
   </extensions>
 

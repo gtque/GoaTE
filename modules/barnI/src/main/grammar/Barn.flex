@@ -1,8 +1,8 @@
-package com.thegoate.barn.idea.plugin;
+package com.thegoate.barn.idea.plugin.generated;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import com.thegoate.barn.idea.plugin.psi.BarnTypes;
+import com.thegoate.barn.idea.plugin.generated.psi.BarnTypes;
 import com.intellij.psi.TokenType;
 
 %%

@@ -53,7 +53,7 @@ public class LoadCsv extends DSL {
         String filePath = ""+get(1,data);
         Goate definition = new Goate();
         definition.put("file", filePath);
-        CSVParser csv =  (CSVParser)new GetCsvEmployee().setData(definition).init().work();
+        CSVParser csv =  (CSVParser)new GetCsvEmployee().init(definition).work();
         String i = ""+get(2,data);
         int row = -42;
         if(!i.equals("null")){

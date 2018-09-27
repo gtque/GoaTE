@@ -118,6 +118,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
 
     @Override
     public RequestSpecification getSpec() {
+        specification = RestAssured.init(given(), this);
         return specification;
     }
 }

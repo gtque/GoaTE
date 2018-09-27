@@ -26,16 +26,33 @@
  */
 package com.thegoate.barn.idea.plugin;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.fileTypes.*;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by Eric Angeli on 8/17/2018.
  */
-public class BarnFileTypeFactory extends FileTypeFactory {
+public class BarnFileTypeFactory extends FileTypeFactory implements ApplicationComponent {
+
+    public static BarnFileTypeFactory getInstance() {
+        Application application = ApplicationManager.getApplication();
+        return application.getComponent(BarnFileTypeFactory.class);
+    }
 
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
         fileTypeConsumer.consume(BarnFileType.INSTANCE);
+    }
+
+    public boolean isBarn(VirtualFile file){
+        return file.getExtension().equalsIgnoreCase("barn");
+    }
+
+    public FileType getBarnFileType(){
+        return BarnFileType.INSTANCE;
     }
 }

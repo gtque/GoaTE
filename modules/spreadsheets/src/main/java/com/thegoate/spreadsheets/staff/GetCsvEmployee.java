@@ -52,11 +52,9 @@ public class GetCsvEmployee extends Employee {
 
     @Override
     public Employee init() {
-        Goate theData = new ToGoate(data.get(getName()+".definition","{}")).convert()
-                .merge(scrub(data),false);
-        boolean fromResult = theData.get("from result", false, Boolean.class);
+        boolean fromResult = definition.get("from result", false, Boolean.class);
         if(!fromResult){
-            String fileName = theData.get("file",null, String.class);
+            String fileName = definition.get("file",null, String.class);
             if(fileName!=null){
                 try {
                     Reader in = new FileReader(GoateUtils.getFilePath(fileName));

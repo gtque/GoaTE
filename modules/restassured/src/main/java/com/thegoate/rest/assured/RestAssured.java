@@ -73,7 +73,7 @@ public class RestAssured extends Rest implements RASpec {
         SSLConfig sslc = new SSLConfig().allowAllHostnames().relaxedHTTPSValidation();
         rac = rac.sslConfig(sslc);
         rac = rac.logConfig(lc);
-        if(spec.getHeaders().keys().toArray().length>0) {
+        if (spec.getHeaders().keys().toArray().length > 0) {
             rac = rac.headerConfig(headerConfig()
                     .overwriteHeadersWithName("Content-Type", spec.getHeaders().keysArray()));
         } else {
@@ -81,7 +81,7 @@ public class RestAssured extends Rest implements RASpec {
                     .overwriteHeadersWithName("Content-Type"));
         }
         int timeout = spec.getTimeout();
-        rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout*1000));
+        rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout * 1000));
         rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));
         return specification.config(rac);
     }
@@ -104,13 +104,13 @@ public class RestAssured extends Rest implements RASpec {
     }
 
     @Override
-    public RestSpec config(){
+    public RestSpec config() {
         init(specification, this);
         return this;
     }
 
     @Override
-    public BleatBox getLog(){
+    public BleatBox getLog() {
         return LOG;
     }
 
@@ -119,7 +119,8 @@ public class RestAssured extends Rest implements RASpec {
      * This high-jacks the stream writer to write to our custom logger implementation.
      * This will always write to info. Writing the response to the logger is not controlled by the logging level,
      * but by a separate setting.
-     * @param  log The instance of the log implementation to use.
+     *
+     * @param log The instance of the log implementation to use.
      * @return printStream
      */
     public static PrintStream getPrintStream(BleatBox log) {
@@ -148,6 +149,7 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setHeaders(RequestSpecification spec, Goate headers) {
         if (headers != null && spec != null) {
+//            spec.headers(headers.data());
             for (String key : headers.keys()) {
                 spec.header(key, headers.get(key));
             }
@@ -156,6 +158,7 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setURLParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
+//            spec.params(params.data());
             for (String key : params.keys()) {
                 spec.param(key, params.get(key));
             }
@@ -164,6 +167,7 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setQueryParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
+//            spec.queryParams(params.data());
             for (String key : params.keys()) {
                 spec.queryParam(key, params.get(key));
             }
@@ -172,6 +176,7 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setPathParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
+//            spec.pathParams(params.data());
             for (String key : params.keys()) {
                 spec.pathParam(key, params.get(key));
             }
@@ -269,6 +274,8 @@ public class RestAssured extends Rest implements RASpec {
 
     @Override
     public RequestSpecification getSpec() {
+        specification = RestAssured.init(given(), this);
         return specification;
     }
+
 }

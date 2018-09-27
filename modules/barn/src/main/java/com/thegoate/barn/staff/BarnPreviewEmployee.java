@@ -51,8 +51,8 @@ public class BarnPreviewEmployee extends Employee {
 
     @Override
     public Employee init() {
-        barnSource = data.get(parameterName("barn source"), "{}");
-        barnRoot = data.get(parameterName("barn root"),"", String.class);
+        barnSource = definition.get("barn source", "{}");
+        barnRoot = definition.get("barn root","", String.class);
         return this;
     }
 

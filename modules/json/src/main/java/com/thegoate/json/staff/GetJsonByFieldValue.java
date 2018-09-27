@@ -47,12 +47,8 @@ import com.thegoate.utils.togoate.ToGoate;
                 "json: the json to look in, required if not from result",})
 public class GetJsonByFieldValue extends Employee {
 
-    Goate definition;
-
     @Override
     public Employee init() {
-        definition = new ToGoate(data.get(getNameDef(), "{}")).convert()
-                .merge(scrub(data), false);
         return this;
     }
 

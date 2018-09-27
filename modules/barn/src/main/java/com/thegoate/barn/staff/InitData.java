@@ -55,13 +55,13 @@ public class InitData extends Employee {
 
     @Override
     protected Object doWork() {
-        String carryOver = ""+data.get(getName()+"init", "[]");
+        String carryOver = ""+definition.get("init", "[]");
         JSONArray ja =  new JSONArray(carryOver);
         for(int i = 0; i<ja.length(); i++){
             String key = ja.getString(i);
-            data.get(key);
+            definition.get(key);
         }
-        data.put("carryover", carryOver);
+        definition.put("carryover", carryOver);
         return this;
     }
 }

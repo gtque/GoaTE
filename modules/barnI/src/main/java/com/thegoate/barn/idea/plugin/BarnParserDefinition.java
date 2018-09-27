@@ -37,9 +37,9 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.thegoate.barn.idea.plugin.parser.BarnParser;
+import com.thegoate.barn.idea.plugin.generated.parser.BarnParser;
 import com.thegoate.barn.idea.plugin.psi.BarnFile;
-import com.thegoate.barn.idea.plugin.psi.BarnTypes;
+import com.thegoate.barn.idea.plugin.generated.psi.BarnTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
