@@ -107,7 +107,6 @@ public class CSVRecord {
     /**
      * Returns the number of this record in the parsed CSV file.
      * <p>
-     * <p>
      * <strong>ATTENTION:</strong> If your CSV input has multi-line values, the returned number does not correspond to
      * the current line number of the parser that created this record.
      * </p>
@@ -121,7 +120,6 @@ public class CSVRecord {
 
     /**
      * Tells whether the record size matches the header size.
-     * <p>
      * <p>
      * Returns true if the sizes for this record match and false if not. Some programs can export files that fail this
      * test but still produce parsable files.

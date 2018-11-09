@@ -25,22 +25,34 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.utils.togoate;
+package com.thegoate.dsl.words;
 
+import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
-import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+import com.thegoate.utils.get.Get;
 
 /**
- * Annotate something as a utility that converts something to a goate object.
- * Created by Eric Angeli on 5/5/2017.
+ * Returns the value of the referenced object.
+ * Created by gtque on 10/17/2018.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@GoateDescription(description = "Identifies a ToGoate utility")
-@Info
-@IndexAnnotated
-public @interface ToGoateUtil {
+@GoateDSL(word = "get")
+@GoateDescription(description = "Returns the value of the object specified by the key from the given object (if specified, otherwise assumes test data collection)",
+        parameters = {"The key of the object to retrieve",
+        "The object containing the thing to be retrieved, optional: uses the goate data collection if not specified."})
+public class GetDSL extends DSL {
+    public GetDSL(Object value) {
+        super(value);
+    }
+
+    @Override
+    public Object evaluate(Goate data) {
+        String key = ""+get(1,data);
+        Object obj = get(2,data);
+        if(obj==null){
+            obj = data;
+        }
+        return new Get(key).from(obj);
+    }
 }

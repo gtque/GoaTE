@@ -27,6 +27,8 @@
 
 package com.thegoate.staff;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -37,6 +39,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by gtque on 4/21/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Identifies a job.")
+@Info(classifier = "jobs")
 @IndexAnnotated
 public @interface GoateJob {
     String[] jobs();

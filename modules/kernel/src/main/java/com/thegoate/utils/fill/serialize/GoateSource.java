@@ -26,6 +26,8 @@
  */
 package com.thegoate.utils.fill.serialize;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Repeatable;
@@ -36,6 +38,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 6/26/2018.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Used to define a mapping from a source to the field in the pojo.")
+@Info
 @Repeatable(GoateSources.class)
 @IndexAnnotated
 public @interface GoateSource {

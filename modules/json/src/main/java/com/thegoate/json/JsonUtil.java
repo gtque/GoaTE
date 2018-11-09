@@ -29,6 +29,7 @@ package com.thegoate.json;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.Utility;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +45,7 @@ public abstract class JsonUtil implements Utility {
     protected Object nested;
     protected boolean processNested;
     protected Goate health = new Goate();
+    protected Goate data;
 
     public JsonUtil(Object val) {
         processNested = true;
@@ -59,6 +61,12 @@ public abstract class JsonUtil implements Utility {
             }
         }
         this.takeActionOn = val;
+    }
+
+    @Override
+    public JsonUtil setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     @Override

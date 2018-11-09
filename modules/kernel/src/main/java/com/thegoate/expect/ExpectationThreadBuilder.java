@@ -88,7 +88,7 @@ public class ExpectationThreadBuilder {
                 Expectation expTemp = map.get(expectation.fullName()).getExpectation();
                 expTemp.addNewExpectation().add(expectation);
             }else{
-                ExpectThreadExecuter et = new ExpectThreadExecuter(expectation).timeout(timeoutMS).period(period);
+                ExpectThreadExecuter et = new ExpectThreadExecuter(expectation.setData(data)).timeout(timeoutMS).period(period);
                 map.put(expectation.fullName(), et);
                 e.add(et);
             }

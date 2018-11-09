@@ -27,6 +27,8 @@
 
 package com.thegoate.mock.annotations;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -37,6 +39,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 9/19/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Identifies mock utilities.")
+@Info(classifier = "type")
 @IndexAnnotated
 public @interface Mocker {
     String type();

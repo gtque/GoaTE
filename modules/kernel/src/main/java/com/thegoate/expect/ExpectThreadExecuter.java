@@ -50,6 +50,7 @@ public class ExpectThreadExecuter extends Thread {
     long startTime = 0;
     long endTime = 0;
     StringBuilder failed = new StringBuilder("");
+    Goate data;
 
     public ExpectThreadExecuter(Expectation expectation) {
         this.expectation = expectation;
@@ -66,6 +67,11 @@ public class ExpectThreadExecuter extends Thread {
 
     public ExpectThreadExecuter period(long period) {
         this.period = period;
+        return this;
+    }
+
+    public ExpectThreadExecuter setData(Goate data) {
+        this.data = data;
         return this;
     }
 

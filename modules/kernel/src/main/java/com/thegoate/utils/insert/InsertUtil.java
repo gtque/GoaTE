@@ -24,33 +24,22 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+
 package com.thegoate.utils.insert;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
- * Created by Eric Angeli on 4/18/2018.
+ * Created by Eric Angeli on 5/5/2017.
  */
-public interface InsertService {
-
-    InsertService value(String id, Object value);
-
-    InsertService into(String original);
-
-    InsertService after(String location) throws Exception;
-
-    InsertService before(String location) throws Exception;
-
-    InsertService in(String location) throws Exception;
-
-    InsertService append() throws Exception;
-
-    InsertService replaceExisting(boolean replace);
-
-    InsertService resetLocation();
-
-    InsertService resetInsertValue();
-
-    String insert(boolean setAsOriginal) throws Exception;
-
-    String insert() throws Exception;
-
+@Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Identifies insert utilities.")
+@Info
+@IndexAnnotated
+public @interface InsertUtil {
 }

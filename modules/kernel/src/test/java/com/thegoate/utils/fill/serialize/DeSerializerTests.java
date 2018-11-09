@@ -27,6 +27,7 @@
 package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.Goate;
+import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.utils.fill.serialize.pojos.ComplexPojo;
 import com.thegoate.utils.fill.serialize.pojos.NestedPojos;
 import com.thegoate.utils.fill.serialize.pojos.SimplePojo;
@@ -70,6 +71,8 @@ public class DeSerializerTests {
         assertEquals(pojo.getF(), 4F);
         assertTrue(pojo.isBool());
         Goate d = new Serializer<>(pojo,SimpleSource.class).toGoate();
+        String json = new GoateToJSON(d).convert();
+        System.out.println("serialized: " + json);
     }
 
     @Test(groups = {"unit", "deserialize"})

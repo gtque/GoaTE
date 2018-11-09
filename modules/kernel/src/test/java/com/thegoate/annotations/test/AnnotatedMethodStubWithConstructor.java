@@ -38,12 +38,19 @@ public class AnnotatedMethodStubWithConstructor {
 
     String name = "Alex";
     int age = 42;
+    int two = 0;
+
     public AnnotatedMethodStubWithConstructor(String name){
         this.name = name;
     }
 
     public AnnotatedMethodStubWithConstructor(int age){
         this.age = age;
+    }
+
+    public AnnotatedMethodStubWithConstructor(int age, int two){
+        this.age = age;
+        this.two = two;
     }
 
     @GoateTask(task = "say howdy")
@@ -62,4 +69,10 @@ public class AnnotatedMethodStubWithConstructor {
             throw new Exception("FAIL");
         }
     }
+
+    @GoateTask(task = "multiply three numbers constructor times ${var} times ${var}")
+    public int multiply3(int multiplier, int secondMultiplier){
+        return age * multiplier * secondMultiplier;
+    }
+
 }

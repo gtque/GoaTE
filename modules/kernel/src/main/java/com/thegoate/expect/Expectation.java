@@ -318,6 +318,7 @@ public class Expectation {
                 exp.put("actual_value", val);
                 LOG.info("evaluating \"" + fullName() + "\": " + exp.get("actual") + "(" + val + ") " + exp.get("operator") + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
                 CompareUtility compare = new Compare(val).to(exp.get("expected")).using(exp.get("operator"));
+                compare.setData(data);
                 if (!(compare.evaluate())) {
                     result = false;
                     failed.append(fullName() + ">" + key + " evaluated to false.\n");
@@ -365,10 +366,12 @@ public class Expectation {
         }
         if (expectation != null && !expectation.isEmpty()) {
             String source = null;
+            if(expectation.startsWith(">>")){
+                expectation = ""+data.getStrict(expectation.substring(2));
+            }
             if (expectation.contains(">")) {
                 source = expectation.substring(0, expectation.indexOf(">"));
                 expectation = expectation.substring(expectation.indexOf(">") + 1);
-
             }
             String[] parts = expectation.split(",");
             Interpreter i = new Interpreter(data);
@@ -382,6 +385,11 @@ public class Expectation {
                 expected(i.translate(parts[2]));
             }
         }
+        return this;
+    }
+
+    public Expectation setData(Goate data){
+        this.data = data;
         return this;
     }
 

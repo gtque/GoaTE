@@ -42,10 +42,18 @@ public abstract class CsvUtil implements Utility {
     protected Object nested;
     protected boolean processNested;
     protected Goate health = new Goate();
+    protected Goate data;
 
     public CsvUtil(Object val) {
         processNested = true;
         init(val);
+    }
+
+
+    @Override
+    public CsvUtil setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     protected void init(Object val){

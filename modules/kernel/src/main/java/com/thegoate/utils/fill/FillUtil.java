@@ -27,6 +27,8 @@
 
 package com.thegoate.utils.fill;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -36,6 +38,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 5/5/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Identifies fill utilities.")
+@Info
 @IndexAnnotated
 public @interface FillUtil {
 }

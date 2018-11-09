@@ -24,23 +24,37 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.utils.insert;
 
-package com.thegoate.utils.togoate;
-
-import com.thegoate.annotations.GoateDescription;
-import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.thegoate.Goate;
 
 /**
- * Annotate something as a utility that converts something to a goate object.
- * Created by Eric Angeli on 5/5/2017.
+ * Created by Eric Angeli on 4/18/2018.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@GoateDescription(description = "Identifies a ToGoate utility")
-@Info
-@IndexAnnotated
-public @interface ToGoateUtil {
+public interface InsertUtility {
+
+    InsertUtility value(String id, Object value);
+
+    InsertUtility into(String original);
+
+    InsertUtility after(String location) throws Exception;
+
+    InsertUtility before(String location) throws Exception;
+
+    InsertUtility in(String location) throws Exception;
+
+    InsertUtility append() throws Exception;
+
+    InsertUtility replaceExisting(boolean replace);
+
+    InsertUtility resetLocation();
+
+    InsertUtility resetInsertValue();
+
+    Object insert(boolean setAsOriginal) throws Exception;
+
+    Object insert() throws Exception;
+
+    Object insert(Goate data) throws Exception;
+
 }

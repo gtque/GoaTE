@@ -26,7 +26,6 @@
  */
 package com.thegoate.utils.fill.serialize;
 
-import com.thegoate.Goate;
 import com.thegoate.utils.Utility;
 
 import java.lang.reflect.Field;
@@ -36,7 +35,6 @@ import java.lang.reflect.Field;
  */
 public interface CastUtility extends Utility{
     <T> T cast(Class<T> type);
-    CastUtility data(Goate data);
     CastUtility dataSource(Class dataSource);
     CastUtility field(Field field);
 }

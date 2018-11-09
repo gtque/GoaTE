@@ -26,6 +26,8 @@
  */
 package com.thegoate.utils.fill.serialize;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -35,6 +37,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 6/26/2018.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Used to identify cast utility implementations.")
+@Info
 @IndexAnnotated
 public @interface CastUtil {
 }

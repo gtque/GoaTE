@@ -25,22 +25,24 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.utils.togoate;
+package com.thegoate.info;
 
 import com.thegoate.annotations.GoateDescription;
-import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotate something as a utility that converts something to a goate object.
- * Created by Eric Angeli on 5/5/2017.
+ * Use on GoaTE annotations for auto building
+ * indexes/encyclopedia for reference and auto completion.
+ * Created by gtque on 11/1/2018.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@GoateDescription(description = "Identifies a ToGoate utility")
-@Info
+@GoateDescription(description = "Annotate GoaTE annotation with @Info to automatically pick it up in the encyclopedia.")
+@Info(classifier = "classifier")
 @IndexAnnotated
-public @interface ToGoateUtil {
+public @interface Info {
+    String classifier() default "";
+    String[] tags() default {};
 }

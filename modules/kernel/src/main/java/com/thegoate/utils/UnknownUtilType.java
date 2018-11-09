@@ -46,9 +46,21 @@ import java.util.Map;
  * and call buildUtil in the constructor.
  * Created by gtque on 5/4/2017.
  */
-public class UnknownUtilType {
+public class UnknownUtilType implements Utility {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate health = new Goate();
+    protected Goate data = null;
+
+    @Override
+    public boolean isType(Object check) {
+        return false;
+    }
+
+    @Override
+    public UnknownUtilType setData(Goate data){
+        this.data = data;
+        return this;
+    }
 
     public Goate healthCheck(){
         return health;
@@ -99,6 +111,7 @@ public class UnknownUtilType {
             if(def!=null){
                 try{
                     utility = af.constructor(null).build(def);
+                    ((Utility)utility).setData(data);
                 } catch (IllegalAccessException | InvocationTargetException |InstantiationException e){
                     LOG.debug("Problem instantiating the default utility ("+def.getName()+"): " + e.getMessage(), e);
                 }

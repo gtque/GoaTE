@@ -30,6 +30,7 @@ package com.thegoate.utils.compare;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.UnknownUtilType;
 
 /**
  * Base class for Compare Utilities. Adds logger, and class level variables.
@@ -44,6 +45,7 @@ public abstract class CompareTool implements CompareUtility{
     protected Object operator = null;
     protected boolean nested = false;
     protected Goate health = new Goate();
+    protected Goate data;
 
     public CompareTool(Object actual){
         this.actual = actual;
@@ -70,6 +72,12 @@ public abstract class CompareTool implements CompareUtility{
             result = compare.actual(actual).to(expected).evaluate();
         }
         return result;
+    }
+
+    @Override
+    public CompareTool setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     @Override

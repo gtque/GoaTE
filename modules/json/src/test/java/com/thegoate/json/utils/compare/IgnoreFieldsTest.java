@@ -1,5 +1,9 @@
 package com.thegoate.json.utils.compare;
 
+import com.thegoate.Goate;
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.Expectation;
+import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.json.utils.compare.tools.CompareJsonEqualTo;
 import com.thegoate.json.utils.compare.tools.IsEqualIgnoreFields;
 import com.thegoate.utils.compare.CompareUtility;
@@ -331,15 +335,31 @@ public class IgnoreFieldsTest {
             "        \"totalElements\": 4,\n" +
             "        \"totalPages\": 1,\n" +
             "        \"number\": 0\n" +
-            "    }\n" +
+            "    },\n" +
+            "   \"_goate_ignore\": [" +
+            "   \"_embedded\\\\.codeTypes\\\\.[0-9]{1,}\\\\._links\"" +
+            "]" +
             "}";
     @Test(groups = {"unit"})
     public void regexPatternTest(){
+        Goate data = new Goate();
+        data.put("actual", actual)
+                .put("expected2", expected2);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(new Expectation(data).define("o::actual,isEqualIgnoreFields,o::expected2"));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean resultact = ev.evaluate();
         CompareUtility comp = new IsEqualIgnoreFields(actual).to(expected);
+        CompareUtility compa = new IsEqualIgnoreFields(actual).to(expected2);
+        //CompareUtility compact = new IsEqualIgnoreFields(actual).to(actual);
         CompareUtility comp2 = new CompareJsonEqualTo(actual).to(expected);
         boolean result = comp.evaluate();
+        boolean resulta = compa.evaluate();
+        //boolean resultact = compact.evaluate();
         System.out.println(comp.healthCheck());
         assertTrue(result);
+        assertTrue(resulta);
+        assertTrue(resultact);
         assertFalse(comp2.evaluate());
     }
 }

@@ -63,7 +63,7 @@ public class LocalDateCaster implements CastUtility {
     }
 
     @Override
-    public CastUtility data(Goate data){
+    public CastUtility setData(Goate data){
         return this;
     }
 

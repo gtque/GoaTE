@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Loads the file specified in from into a string and returns it.
+ * Gets a rest assure
  * Created by Eric Angeli on 5/18/2017.
  */
 @GetUtil

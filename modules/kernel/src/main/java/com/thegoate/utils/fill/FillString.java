@@ -29,6 +29,7 @@ package com.thegoate.utils.fill;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.UnknownUtilType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class FillString implements FillUtility{
     Goate health = new Goate();
     String fill = "";
     List<String> fillList = new ArrayList<>();
-
+    Goate data;
     public FillString(Object fill){
         this.fill = ""+fill;
     }
@@ -54,6 +55,12 @@ public class FillString implements FillUtility{
     @Override
     public boolean isType(Object check) {
         return check instanceof String;
+    }
+
+    @Override
+    public FillUtility setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     @Override

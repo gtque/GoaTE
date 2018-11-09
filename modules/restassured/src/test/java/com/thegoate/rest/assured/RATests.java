@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.rest.Rest;
+import com.thegoate.rest.RestCall;
 import com.thegoate.rest.staff.ApiGet;
 import com.thegoate.rest.staff.ApiPost;
 import com.thegoate.staff.Employee;
@@ -56,6 +57,18 @@ public class RATests extends TestNGEngineAnnotatedDL {
     public void getGoogle() {
         Rest rest = new RABasicAuthHeader();
         Response response = (Response) rest.baseURL("https://www.google.com").get("");
+        data.put("response", response);
+        assertEquals(response.statusCode(), 200);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("api response>status code,==,200");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void getGoogleRest() {
+        Response response = (Response)new RestCall().baseURL("https://www.google.com").get("");
         data.put("response", response);
         assertEquals(response.statusCode(), 200);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);

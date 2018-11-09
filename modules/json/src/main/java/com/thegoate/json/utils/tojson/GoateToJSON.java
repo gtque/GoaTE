@@ -80,7 +80,7 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                         if (!keyFull.isEmpty()) {
                             exists = checkKey(json, keyFull);
                         }
-                        if (!exists) {
+                        if (!exists||!keyFull.isEmpty()) {
                             exists = checkKey(json, dKey);
                         }
                     } catch (Exception e) {
@@ -94,9 +94,9 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                         }
                     } else {
                         if(!strict) {
-                            json = new InsertJson(key, takeActionOn.get(dKey)).into(json).in(keyFull).insert();
+                            json = ""+new InsertJson(key, takeActionOn.get(dKey)).into(json).in(keyFull).insert();
                         } else {
-                            json = new InsertJson(key, takeActionOn.getStrict(dKey)).into(json).in(keyFull).insert();
+                            json = ""+new InsertJson(key, takeActionOn.getStrict(dKey)).into(json).in(keyFull).insert();
                         }
                     }
 //                    json = Insert.json(key, to.getObject()).into(json).in(keyFull).insert();

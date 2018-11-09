@@ -72,7 +72,6 @@ public class CSVParser {
     /**
      * Creates a CSV parser using the given {@link CSVFormat}.
      * <p>
-     * <p>
      * If you do not read all records from the given {@code reader}, you should call {@link #close()} on the parser,
      * unless you close the {@code reader}.
      * </p>
@@ -109,7 +108,6 @@ public class CSVParser {
     /**
      * Creates a CSV parser using the given {@link CSVFormat}
      * <p>
-     * <p>
      * If you do not read all records from the given {@code reader}, you should call {@link #close()} on the parser,
      * unless you close the {@code reader}.
      * </p>
@@ -141,7 +139,6 @@ public class CSVParser {
     /**
      * Creates a parser for the given URL.
      * <p>
-     * <p>
      * If you do not read all records from the given {@code url}, you should call {@link #close()} on the parser, unless
      * you close the {@code url}.
      * </p>
@@ -164,7 +161,6 @@ public class CSVParser {
     /**
      * Customized CSV parser using the given {@link CSVFormat}
      * <p>
-     * <p>
      * If you do not read all records from the given {@code reader}, you should call {@link #close()} on the parser,
      * unless you close the {@code reader}.
      * </p>
@@ -180,7 +176,6 @@ public class CSVParser {
 
     /**
      * Customized CSV parser using the given {@link CSVFormat}
-     * <p>
      * <p>
      * If you do not read all records from the given {@code reader}, you should call {@link #close()} on the parser,
      * unless you close the {@code reader}.
@@ -211,7 +206,6 @@ public class CSVParser {
 
     /**
      * Returns the current line number in the input stream.
-     * <p>
      * <p>
      * <strong>ATTENTION:</strong> If your CSV input has multi-line values, the returned number does not correspond to
      * the record number.
@@ -262,7 +256,6 @@ public class CSVParser {
     /**
      * Returns the current record number in the input stream.
      * <p>
-     * <p>
      * <strong>ATTENTION:</strong> If your CSV input has multi-line values, the returned number does not correspond to
      * the line number.
      * </p>
@@ -276,7 +269,6 @@ public class CSVParser {
     /**
      * Parses the CSV input according to the given format and returns the content as a list of
      * {@link CSVRecord CSVRecords}.
-     * <p>
      * <p>
      * The returned content starts at the current parse-position in the stream.
      * </p>
@@ -302,7 +294,6 @@ public class CSVParser {
 
     /**
      * Returns an iterator on the records.
-     * <p>
      * <p>
      * An {@link IOException} caught during the iteration are re-thrown as an
      * {@link IllegalStateException}.

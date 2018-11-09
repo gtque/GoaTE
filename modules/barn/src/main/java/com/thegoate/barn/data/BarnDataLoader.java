@@ -51,6 +51,7 @@ public class BarnDataLoader extends DataLoader {
     String[] groups = {};
     String[] excluded = {};
     String defaultGroup = "barn";
+    boolean check_abstract = true;
 
     @Override
     public List<Goate> load() {
@@ -90,7 +91,7 @@ public class BarnDataLoader extends DataLoader {
     public Goate loadBarn(Object barn, String fileName){
         Goate rd = new ToGoate(barn).convert();
         if(rd!=null) {
-            if (fileName!=null&&("" + rd.get("abstract")).equals("true")) {
+            if (fileName!=null&&(check_abstract&&("" + rd.get("abstract")).equals("true"))) {
                 LOG.debug("Barn DataLoader","skipping: " + fileName);
                 rd = null;
             } else {
@@ -179,6 +180,14 @@ public class BarnDataLoader extends DataLoader {
     }
     public BarnDataLoader defaultGroup(String label){
         this.defaultGroup = label;
+        return this;
+    }
+    public BarnDataLoader ignoreAbstract(){
+        this.check_abstract = false;
+        return this;
+    }
+    public BarnDataLoader checkAbstract(){
+        this.check_abstract = true;
         return this;
     }
     protected Goate modelData(Goate rd){

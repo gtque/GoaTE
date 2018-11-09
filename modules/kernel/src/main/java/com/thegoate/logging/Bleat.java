@@ -26,6 +26,8 @@
  */
 package com.thegoate.logging;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -36,6 +38,10 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 6/5/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Add this annotation to your BleatBox implementation. " +
+        "There should only be one bleatbox implementation in your class path. " +
+        "Otherwise there is no guarantee which one will be used.")
+@Info
 @IndexAnnotated
 public @interface Bleat {
 }

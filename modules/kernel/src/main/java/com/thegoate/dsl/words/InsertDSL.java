@@ -25,22 +25,30 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.utils.togoate;
+package com.thegoate.dsl.words;
 
+import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
-import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+import com.thegoate.utils.insert.Insert;
 
 /**
- * Annotate something as a utility that converts something to a goate object.
- * Created by Eric Angeli on 5/5/2017.
+ * Returns the value of object after inserting the given values.
+ * Created by gtque on 8/10/2017.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@GoateDescription(description = "Identifies a ToGoate utility")
-@Info
-@IndexAnnotated
-public @interface ToGoateUtil {
+@GoateDSL(word = "insert")
+@GoateDescription(description = "Returns the object inserted with corresponding data from the goate collection." +
+        "\n The default is to treat the object as a string, but it will try to find the appropriate insert utility and only use insert string as a default.",
+    parameters = {"The object to have things inserted into, this may be a string or a call to another dsl.",
+    "The data to insert into the object, should have to fields in it: data and mapping (mapping is optional)"})
+public class InsertDSL extends DSL {
+    public InsertDSL(Object value) {
+        super(value);
+    }
+
+    @Override
+    public Object evaluate(Goate data) {
+        return null;//new Insert(get(1,data)).with(data);
+    }
 }
