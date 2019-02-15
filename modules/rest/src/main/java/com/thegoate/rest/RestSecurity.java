@@ -27,31 +27,28 @@
 package com.thegoate.rest;
 
 /**
- * Base class for using bearer authentication.
- * Created by Eric Angeli on 5/16/2017.
+ * If there are any required (or optional) values listed for the auth type, you must
+ * use customParam to set those values.
+ * example: new RestCall().customParam(RestSecurity.BasicAuth.requiredUser, "userid").
+ * Created by Eric Angeli on 11/28/2018.
  */
-public abstract class RestAuthBearer extends Rest {
-    public enum Settings{
-        bearer,auth_label
+public class RestSecurity {
+
+    public static class BasicAuth{
+        public static final String id = "basic auth";
+        public static final String requiredUser = RestAuthBasicUserPW.Settings.user.name();
+        public static final String requiredPassword = RestAuthBasicUserPW.Settings.password.name();
     }
 
-    private Object bearerValue = "";
-    private String bearer = "bearer";
-
-    @Override
-    public RestSpec processCustomData(Enum key, Object value){
-        return processCustomData(key.name(), value);
+    public static class BasicAuthHeader{
+        public static final String id = "basic auth header";
+        public static final String requiredUser = RestAuthBasicUserPW.Settings.user.name();
+        public static final String requiredPassword = RestAuthBasicUserPW.Settings.password.name();
     }
 
-    @Override
-    public RestSpec processCustomData(String key, Object value){
-        if (key.equalsIgnoreCase(Settings.bearer.name())) {
-            bearerValue = value;
-            bearer = key;
-        } else if(key.equalsIgnoreCase(Settings.auth_label.name())){
-            bearer = ""+value;
-        }
-        header("Authorization", bearer + " " + bearerValue);
-        return this;
+    public static class BearerToken{
+        public static final String id = "bearer token";
+        public static final String requiredToken = RestAuthBearer.Settings.bearer.name();
+        public static final String optionalAuthLabel = RestAuthBearer.Settings.auth_label.name();
     }
 }

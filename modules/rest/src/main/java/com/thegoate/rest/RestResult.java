@@ -27,31 +27,34 @@
 package com.thegoate.rest;
 
 /**
- * Base class for using bearer authentication.
- * Created by Eric Angeli on 5/16/2017.
+ * Created by Eric Angeli on 11/26/2018.
  */
-public abstract class RestAuthBearer extends Rest {
-    public enum Settings{
-        bearer,auth_label
+public class RestResult {
+    public static final String statusCode = "status code";
+    public static final String bodyAsAString = "body as a string";
+    public static final String body = "body";
+    public static final String responseTime = "response time";
+    public static final String sessionId = "session id";
+    public static final String statusLine = "status line";
+    public static final String json = "json";
+    public static final String xml = "xml";
+    public static final String html = "html";
+
+    public static final String header(String header) {
+        return "header " + header;
     }
 
-    private Object bearerValue = "";
-    private String bearer = "bearer";
-
-    @Override
-    public RestSpec processCustomData(Enum key, Object value){
-        return processCustomData(key.name(), value);
+    public static final String cookie(String cookie) {
+        return "cookie " + cookie;
     }
 
-    @Override
-    public RestSpec processCustomData(String key, Object value){
-        if (key.equalsIgnoreCase(Settings.bearer.name())) {
-            bearerValue = value;
-            bearer = key;
-        } else if(key.equalsIgnoreCase(Settings.auth_label.name())){
-            bearer = ""+value;
-        }
-        header("Authorization", bearer + " " + bearerValue);
-        return this;
+    public static final String detailedCookie(String cookie) {
+        return "detailedCookie " + cookie;
+    }
+
+    public static final String inputStream = "input stream";
+
+    public static final String getField(String field){
+        return field;
     }
 }

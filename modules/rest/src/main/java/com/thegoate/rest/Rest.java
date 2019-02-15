@@ -240,8 +240,9 @@ public abstract class Rest implements RestSpec {
     public RestSpec customData(Goate data){
         if(data!=null) {
             for (String key : data.keys()) {
-                custom.put(key,data.get(key));
-                processCustomData(key, data.get(key));
+                String keyC = ""+data.get("_cust_key:"+key,key);
+                custom.put(keyC,data.get(key));
+                processCustomData(keyC, data.get(key));
             }
         }
         return this;
