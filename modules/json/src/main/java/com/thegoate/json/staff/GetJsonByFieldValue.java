@@ -35,8 +35,7 @@ import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
 
 /**
- * Gets a specific result number.
- * Useful when used as part of expectations for an integration or multistep test case.
+ * Finds a json field by value.
  * Created by Eric Angeli on 8/27/2018.
  */
 @GoateJob(jobs = {"json by value"})
@@ -46,6 +45,40 @@ import com.thegoate.utils.togoate.ToGoate;
                 "from result: true if from result, optional, defaults to false",
                 "json: the json to look in, required if not from result",})
 public class GetJsonByFieldValue extends Employee {
+
+    public static GetJsonByFieldValue value(Object value){
+        return new GetJsonByFieldValue().valueToFind(value);
+    }
+
+    public GetJsonByFieldValue valueToFind(Object value){
+        definition.put("value", value);
+        return this;
+    }
+
+    public GetJsonByFieldValue pathPattern(String pattern){
+        definition.put("path", pattern);
+        return this;
+    }
+
+    public GetJsonByFieldValue fromResult(){
+        return fromResult(true);
+    }
+
+    public GetJsonByFieldValue fromResult(boolean fromResult){
+        definition.put("from result", fromResult);
+        return this;
+    }
+
+    public GetJsonByFieldValue from(Object source){
+        definition.put("from result", true);
+        definition.put("_goate_result", source);
+        return this;
+    }
+
+    public GetJsonByFieldValue json(Object json){
+        definition.put("json", json).put("from result", false);
+        return this;
+    }
 
     @Override
     public Employee init() {
@@ -59,11 +92,11 @@ public class GetJsonByFieldValue extends Employee {
         Object theJson = definition.get("json", "{}");
         boolean fromResult = definition.get("from result", false, Boolean.class);
         Object value = definition.get("value", null);
-        String field = definition.get("key", ".*", String.class);
+        String field = definition.get("key", definition.get("node.path", ".*"), String.class);
         if (!fromResult) {
             json = new JSONToGoate(theJson).convert();
         } else {
-            json = new JSONToGoate(new Get("body as a string").from(data.get("_goate_result", "{}"))).convert();
+            json = new JSONToGoate(new Get("body as a string").from(definition.get("_goate_result", "{}"))).convert();
         }
         Goate filtered = json.filter(field);
         for (String key : filtered.keys()) {
@@ -82,7 +115,7 @@ public class GetJsonByFieldValue extends Employee {
 
     @Override
     public String[] detailedScrub() {
-        String[] scrub = {};
+        String[] scrub = {"path", "key", "value", "from result", "json"};
         return scrub;
     }
 }

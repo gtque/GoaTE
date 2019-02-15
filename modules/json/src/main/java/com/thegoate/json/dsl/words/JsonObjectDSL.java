@@ -34,7 +34,7 @@ import com.thegoate.dsl.GoateDSL;
 import org.json.JSONObject;
 
 /**
- * Returns the value of the referenced object.
+ * Returns a json object.
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "json object")
@@ -45,6 +45,13 @@ public class JsonObjectDSL extends DSL {
         super(value);
     }
 
+    public static Object jsonObject(String jsonString){
+        return jsonObject(jsonString, new Goate());
+    }
+
+    public static Object jsonObject(String jsonString, Goate data){
+        return new JsonObjectDSL("json object::"+jsonString).evaluate(data);
+    }
     @Override
     public Object evaluate(Goate data) {
         String def = ""+get(1,data);
