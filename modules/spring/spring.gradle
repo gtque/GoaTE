@@ -30,8 +30,8 @@ dependencies{
     compile d.depends(":kernel", project.internalVersion);
     compile d.depends(":json", project.internalVersion);
     compile d.depends(":testng", project.internalVersion)
-    compile "org.springframework:spring-test:5.0.1.RELEASE"
-    compile "org.springframework:spring-tx:5.0.1.RELEASE"
+    compile "org.springframework:spring-test:5.1.3.RELEASE"
+    compile "org.springframework:spring-tx:5.1.3.RELEASE"
     compile "org.springframework.boot:spring-boot-test:1.5.8.RELEASE"
     testCompile "org.springframework:spring-aop:5.0.1.RELEASE"
     testCompile "org.springframework:spring-beans:5.0.1.RELEASE"
