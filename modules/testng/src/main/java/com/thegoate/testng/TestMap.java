@@ -26,35 +26,12 @@
  */
 package com.thegoate.testng;
 
-import com.thegoate.Goate;
-import com.thegoate.data.DataLoader;
-import com.thegoate.expect.Expectation;
-import org.testng.ITestContext;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The interface for TestNG based test classes.
- * Created by Eric Angeli on 5/11/2017.
+ * Created by Eric Angeli on 11/28/2018.
  */
-public interface TestNG {
-    Object[][] dataLoader(ITestContext context) throws Exception;
-    void defineDataLoaders();
-    void defineDataLoaders(Goate runData, Goate constantData);
-    Goate getRunDataLoader();
-    Goate getConstantDataLoader();
-    Goate getData();
-    void setData(Goate data);
-    void setRunNumber(int number);
-    void bumpRunNumber();
-    int getRunNumber();
-    void setScenario(String scenario);
-    String getScenario();
-    Object get(String key);
-    Object get(String key, Object def);
-    <T>T get(String key, Object def, Class<T> type);
-    TestNG put(String key, Object val);
-    TestNG expect(Expectation expectation);
-    TestNG evalPeriod(long periodMS);
-    TestNG evalTimeout(long periodMS);
-    void evaluate();
-    TestNG clearExpectations();
+public class TestMap {
+    public static Map<String, TestNG> tests = new ConcurrentHashMap<>();
 }
