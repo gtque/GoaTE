@@ -329,7 +329,7 @@ task jacocoMergedReport(type: JacocoReport) {
     }
 
     classDirectories = files(getJacocoClassDirs().collect {
-        fileTree(dir: it, exclude: ['com/**/gradle/**'])
+        fileTree(dir: it, exclude: ['com/**/gradle/**','com/**/performance/**','com/**/barn/idea/**'])
     })
     sourceDirectories = getJacocoSrcDirs()
 
