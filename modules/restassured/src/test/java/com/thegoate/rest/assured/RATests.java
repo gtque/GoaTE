@@ -28,20 +28,17 @@ package com.thegoate.rest.assured;
 
 import com.thegoate.Goate;
 import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestCall;
+import com.thegoate.rest.RestResult;
 import com.thegoate.rest.staff.ApiGet;
-import com.thegoate.rest.staff.ApiPost;
 import com.thegoate.staff.Employee;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
-import io.restassured.config.RestAssuredConfig;
-import io.restassured.config.SSLConfig;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import org.testng.annotations.Test;
 
-import static io.restassured.RestAssured.given;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -68,14 +65,39 @@ public class RATests extends TestNGEngineAnnotatedDL {
 
     @Test(groups = {"unit"})
     public void getGoogleRest() {
-        Response response = (Response)new RestCall().baseURL("https://www.google.com").get("");
+        Response response = (Response) new RestCall()
+                .baseURL("https://www.google.com")
+//                .get("/".concat(eut("endpoint.base","api")).concat("/payment-advice/{paymentAdviceId}"));
+                .get("");
         data.put("response", response);
-        assertEquals(response.statusCode(), 200);
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect("api response>status code,==,200");
-        ExpectEvaluator ev = new ExpectEvaluator(etb);
-        boolean result = ev.evaluate();
-        assertTrue(result, ev.failed());
+
+//        assertEquals(response.statusCode(), 200);
+//        etb.expect("api response>status code,==,200");
+        Employee callYahoo = new CallYahoo();
+        expect(new Expectation(data).actual(response.statusCode()).is("==").expected(200));
+        expect(Expectation.build()
+                .actual(RestResult.statusCode)
+                .from(response)
+                .isEqualTo(200));
+        expect(Expectation.build()
+                .actual(RestResult.statusCode)
+                .from(response)
+                .isNotEqualTo(RestResult.statusCode)
+                .fromExpected("{\"status code\": 201}"));
+        expect(Expectation.build()
+                .actual(RestResult.bodyAsAString)
+                .from(response)
+                .isNotEqualTo(RestResult.bodyAsAString)
+                .fromExpected(callYahoo));
+        expect(Expectation.build()
+                .actual(RestResult.statusCode)
+                .from(response)
+                .isEqualTo(RestResult.statusCode)
+                .fromExpected(callYahoo));
+        expect(Expectation.build()
+                .actual(200)
+                .isEqualTo(RestResult.statusCode)
+                .fromExpected(callYahoo));
     }
 
     @Test(groups = {"unit"})

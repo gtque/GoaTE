@@ -24,13 +24,28 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends;
-dependencies{
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
-    compile "io.rest-assured:rest-assured:+"
-    compile "com.github.dzieciou.testing:curl-logger:+"
-    compile d.depends(":kernel", project.internalVersion);
-    compile d.depends(":rest", project.internalVersion);
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile d.depends(":json", project.internalVersion);
+package com.thegoate.rest.assured;
+
+import com.thegoate.rest.RestCall;
+import com.thegoate.staff.Employee;
+
+/**
+ * Created by Eric Angeli on 11/26/2018.
+ */
+public class CallYahoo extends Employee {
+    @Override
+    public String[] detailedScrub() {
+        return new String[0];
+    }
+
+    @Override
+    protected Employee init() {
+        return this;
+    }
+
+    @Override
+    protected Object doWork() {
+        RestCall rest = new RestCall().baseURL("https://www.yahoo.com");
+        return rest.get("");
+    }
 }
