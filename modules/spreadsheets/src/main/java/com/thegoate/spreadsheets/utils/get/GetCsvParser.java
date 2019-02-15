@@ -46,6 +46,21 @@ public class GetCsvParser extends CsvParserUtil implements GetUtility {
         super(val);
     }
 
+    /**
+     * Helpful definitions of what can be accessed from a csv page.
+     */
+    public static class page {
+        public static String headers = "headers";
+        public static String rowCount = "rowCount";
+        public static String colCount = "colCount";
+        public static String getRow(int rowNumber){
+            return getRow(""+rowNumber);
+        }
+        public static String getRow(String rowNumber){
+            return "get row#"+rowNumber;
+        }
+    }
+
     @Override
     protected Object processNested(Object subContainer) {
         Object result = subContainer;

@@ -24,18 +24,13 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.spreadsheets.utils;
+package com.thegoate.spreadsheets.pojo;
+
+import com.thegoate.utils.fill.serialize.GoateSourceDef;
 
 /**
- * Created by Eric Angeli on 8/9/2018.
+ * Created by Eric Angeli on 6/26/2018.
  */
-public abstract class CsvUtil extends SpreadSheetUtil {
-    public CsvUtil(Object val){
-        super(val);
-    }
-
-    @Override
-    public boolean isType(Object check) {
-        return check instanceof CSVSheet;
-    }
+@GoateSourceDef(id = "csv source")
+public @interface CsvSource {
 }

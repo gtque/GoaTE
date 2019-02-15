@@ -24,18 +24,35 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.spreadsheets.utils;
+package com.thegoate.spreadsheets.pojo;
+
+import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
 
 /**
- * Created by Eric Angeli on 8/9/2018.
+ * Created by Eric Angeli on 12/7/2018.
  */
-public abstract class CsvUtil extends SpreadSheetUtil {
-    public CsvUtil(Object val){
-        super(val);
+@GoatePojo(id = "csv to json map pojo")
+public class MapCsvPojo {
+
+    @GoateSource(source = CsvSource.class, key="nick")
+    private String a = null;
+    @GoateSource(source = CsvSource.class, key="paul")
+    private String z = null;
+
+    public String getA() {
+        return a;
     }
 
-    @Override
-    public boolean isType(Object check) {
-        return check instanceof CSVSheet;
+    public void setA(String a) {
+        this.a = a;
+    }
+
+    public String getZ() {
+        return z;
+    }
+
+    public void setZ(String z) {
+        this.z = z;
     }
 }

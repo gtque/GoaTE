@@ -26,34 +26,22 @@
  */
 package com.thegoate.spreadsheets.utils.get;
 
-import com.thegoate.spreadsheets.csv.CSVRecord;
-import com.thegoate.spreadsheets.utils.CsvRecordUtil;
+import com.thegoate.spreadsheets.utils.SheetUtils;
+import com.thegoate.spreadsheets.utils.SpreadSheetUtil;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetUtil;
 import com.thegoate.utils.get.GetUtility;
+import com.thegoate.utils.get.NotFound;
 
 /**
- * Get the field from the given json.
+ * Get from the excel sheet.
  * Created by Eric Angeli on 5/19/2017.
  */
 @GetUtil
-public class GetCsvRecord extends CsvRecordUtil implements GetUtility {
+public class GetSpreadSheet extends SpreadSheetUtil implements GetUtility {
 
-    public GetCsvRecord(Object val) {
+    public GetSpreadSheet(Object val) {
         super(val);
-    }
-
-    /**
-     * Helpful definitions of what can be accessed from a csv row.
-     */
-    public static class row {
-        public static String colCount = "colCount";
-        public static String getColumn(String header){
-            return header;
-        }
-        public static String getColumn(int columnNumber){
-            return ""+columnNumber;
-        }
     }
 
     @Override
@@ -69,19 +57,35 @@ public class GetCsvRecord extends CsvRecordUtil implements GetUtility {
     public Object from(Object container) {
         Object result = null;
         String selector = "" + takeActionOn;
-        CSVRecord csv = (CSVRecord) container;
-        if (selector.startsWith("colCount")) {
-            result = csv.size();
+        SheetUtils sheet = (SheetUtils) container;
+        if (selector.equals("headers")) {
+            result = sheet.headers();//csv.getRecords().get(0);
+        } else if (selector.startsWith("rowCount")) {
+            result = sheet.rowCount();
+        } else if (selector.startsWith("colCount")) {
+            result = sheet.headers().size();
+        } else if (selector.startsWith("get row#")) {
+            int rowNumber = Integer.parseInt((selector.substring(selector.indexOf("#") + 1).trim()));
+            result = sheet.getRow(rowNumber);//new CSVRecord(excel,excel.getRecords().get(rowNumber));
+        } else if (selector.startsWith("load sheet:=")) {
+            String sheetname = selector.substring(selector.indexOf(":=") + 2).trim();
+            sheet.sheet(sheetname).load();
+            result = sheet;
         } else {
-            try{
-                int colNumber = Integer.parseInt(selector);
-                result = csv.get(colNumber);
-            }catch(Exception e){
-                try {
-                    result = csv.get(selector);
-                }catch(Exception e2){
-                    LOG.debug("Get CSV Record", "Failed to get " + selector + ": " + e.getMessage(), e2);
+            String[] cellId = selector.split("\\.");
+            boolean reloaded = false;
+            String originalSheet = sheet.sheetName();
+            if (selector.contains(":")) {
+                String sheetName = selector.substring(0, cellId[0].indexOf(":"));
+                cellId[0] = cellId[0].replace(sheetName + ":", "");
+                if (!sheetName.equals(originalSheet)) {
+                    sheet.sheet(sheetName).load();
+                    reloaded = true;
                 }
+            }
+            result = sheet.get(cellId[1], Integer.parseInt(cellId[0]), new NotFound(selector));
+            if (reloaded) {
+                sheet.sheet(originalSheet).load();
             }
         }
         result = processNested(result);

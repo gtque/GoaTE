@@ -29,13 +29,13 @@ package com.thegoate.spreadsheets.utils;
 /**
  * Created by Eric Angeli on 8/9/2018.
  */
-public abstract class CsvUtil extends SpreadSheetUtil {
-    public CsvUtil(Object val){
+public abstract class ExcelUtil extends SpreadSheetUtil {
+    public ExcelUtil(Object val){
         super(val);
     }
 
     @Override
     public boolean isType(Object check) {
-        return check instanceof CSVSheet;
+        return check instanceof ExcelSheet;
     }
 }

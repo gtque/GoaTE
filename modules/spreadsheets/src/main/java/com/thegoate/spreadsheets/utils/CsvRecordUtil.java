@@ -31,7 +31,7 @@ import com.thegoate.spreadsheets.csv.CSVRecord;
 /**
  * Created by Eric Angeli on 8/9/2018.
  */
-public abstract class CsvRecordUtil extends CsvUtil {
+public abstract class CsvRecordUtil extends SpreadSheetUtil {
     public CsvRecordUtil(Object val){
         super(val);
     }
