@@ -61,8 +61,14 @@ public class Compare extends UnknownUtilType implements CompareUtility {
         if(tool==null){
             buildTool();
         }
-        tool.to(expected).using(operator);
-        return tool.evaluate();
+        boolean result = false;
+        try {
+            tool.to(expected).using(operator);
+            result = tool.evaluate();
+        }catch (Exception e){
+            LOG.debug("Compare", "Failed to compare: " + e.getMessage(), e);
+        }
+        return result;
     }
 
     protected void buildTool(){

@@ -31,6 +31,8 @@ import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.utils.get.GetFileAsString;
 
+import java.io.File;
+
 /**
  * Created by Eric Angeli on 7/5/2017.
  */
@@ -39,6 +41,18 @@ public class LoadFile extends DSL {
 
     public LoadFile(Object value){
         super(value);
+    }
+
+    public static String fileAsAString(String filePath){
+        return fileAsAString(filePath, new Goate());
+    }
+
+    public static String fileAsAString(File file){
+        return fileAsAString(file, new Goate());
+    }
+
+    public static String fileAsAString(Object file, Goate data){
+        return ""+new LoadFile("file::"+file).evaluate(data);
     }
 
     @Override

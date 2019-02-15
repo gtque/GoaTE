@@ -43,6 +43,10 @@ public class ConcatDSL extends DSL {
         super(value);
     }
 
+    public static String concat(String value){
+        return value;
+    }
+
     @Override
     public Object evaluate(Goate data) {
         StringBuilder concat = new StringBuilder("");

@@ -34,11 +34,12 @@ import com.thegoate.dsl.GoateDSL;
 import com.thegoate.utils.insert.Insert;
 
 /**
+ * NOT YET SUPPORTED!!!
  * Returns the value of object after inserting the given values.
  * Created by gtque on 8/10/2017.
  */
 @GoateDSL(word = "insert")
-@GoateDescription(description = "Returns the object inserted with corresponding data from the goate collection." +
+@GoateDescription(description = "NOT YET SUPPORTED!!! Returns the object inserted with corresponding data from the goate collection." +
         "\n The default is to treat the object as a string, but it will try to find the appropriate insert utility and only use insert string as a default.",
     parameters = {"The object to have things inserted into, this may be a string or a call to another dsl.",
     "The data to insert into the object, should have to fields in it: data and mapping (mapping is optional)"})

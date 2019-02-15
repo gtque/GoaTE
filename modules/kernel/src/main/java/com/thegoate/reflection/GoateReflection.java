@@ -37,11 +37,12 @@ import java.util.Map;
 
 /**
  * Some simple custom methods for reflection.
+ * This class cannot use BleatBox, it causes a circular dependency.
  * Created by gtque on 4/24/2017.
  */
 public class GoateReflection {
 
-    public Constructor findConstructor(Class theClass, Object[] args){
+    public Constructor findConstructor(Class theClass, Object[] args) {
         return findConstructor(theClass.getConstructors(), args);
     }
 
@@ -110,6 +111,67 @@ public class GoateReflection {
                 || c.equals(Character.class) || c.equals(Character.TYPE);
     }
 
+    public boolean isBoolean(Object c) {
+        String cs = "" + c;
+        return (c instanceof Boolean) || cs.equalsIgnoreCase("true") || cs.equalsIgnoreCase("false");
+    }
+
+    public boolean isByte(Object c) {
+        String cs = "" + c;
+        boolean result = false;
+        try {
+            Byte.parseByte(cs);
+            result = true;
+        } catch (Throwable e) {
+//            LOG.debug(""+actual + " is not a float.");
+        }
+        return result;
+    }
+    public boolean isInteger(Object c) {
+        String cs = "" + c;
+        boolean result = false;
+        try {
+            Integer.parseInt(cs);
+            result = true;
+        } catch (Throwable e) {
+//            LOG.debug(""+actual + " is not a float.");
+        }
+        return result;
+    }
+    public boolean isDouble(Object c) {
+        String cs = "" + c;
+        boolean result = false;
+        try {
+            Double.parseDouble(cs);
+            result = true;
+        } catch (Throwable e) {
+//            LOG.debug(""+actual + " is not a float.");
+        }
+        return result;
+    }
+    public boolean isFloat(Object c) {
+        String cs = "" + c;
+        boolean result = false;
+        try {
+            Float.parseFloat(cs);
+            result = true;
+        } catch (Throwable e) {
+//            LOG.debug(""+actual + " is not a float.");
+        }
+        return result;
+    }
+    public boolean isLong(Object c) {
+        String cs = "" + c;
+        boolean result = false;
+        try {
+            Long.parseLong(cs);
+            result = true;
+        } catch (Throwable e) {
+//            LOG.debug(""+actual + " is not a float.");
+        }
+        return result;
+    }
+
     public List<Method> getDeclaredMethods(Class klass) {
         List<Method> methods = new ArrayList<>();
         for (Method m : klass.getDeclaredMethods()) {
@@ -170,7 +232,7 @@ public class GoateReflection {
         return result;
     }
 
-    public Map<String, Field> findFields(Class theClass){
+    public Map<String, Field> findFields(Class theClass) {
         Map<String, Field> fields = new HashMap<>();
         findFields(theClass, fields);
         return fields;
@@ -179,11 +241,22 @@ public class GoateReflection {
     public void findFields(Class theClass, Map<String, Field> fieldMap) {
         if (fieldMap != null) {
             for (Field f : theClass.getDeclaredFields()) {
-                fieldMap.put(f.getName(), f);
+                if(!f.getName().contains("$jacocoData")) {
+                    fieldMap.put(f.getName(), f);
+                }
             }
             if (theClass.getSuperclass() != null) {
                 findFields(theClass.getSuperclass(), fieldMap);
             }
         }
+    }
+
+    public Class findClass(String theClass) {
+        Class<?> cls = null;
+        try {
+            cls = Class.forName(theClass);
+        } catch (ClassNotFoundException ignored) {
+        }
+        return cls;
     }
 }

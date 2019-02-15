@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Returns the value of the referenced object.
+ * Returns the formated date as a string.
  * Created by gtque on 3/10/2018.
  */
 @GoateDSL(word = "date reformat")
@@ -45,6 +45,14 @@ import java.time.format.DateTimeFormatter;
 public class DateReformatDSL extends DSL {
     public DateReformatDSL(Object value) {
         super(value);
+    }
+
+    public static String dateReformat(String originalPattern, String date, String newPattern){
+        return dateReformat(originalPattern, date, newPattern, new Goate());
+    }
+
+    public static String dateReformat(String originalPattern, String date, String newPattern, Goate data){
+        return ""+new DateReformatDSL("date reformat::"+originalPattern+","+date+","+newPattern).evaluate(data);
     }
 
     @Override

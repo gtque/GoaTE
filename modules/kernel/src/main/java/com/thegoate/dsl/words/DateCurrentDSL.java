@@ -48,6 +48,14 @@ public class DateCurrentDSL extends DSL {
         super(value);
     }
 
+    public static String date(String format) {
+        return date(format, new Goate());
+    }
+
+    public static String date(String format, Goate data){
+        return ""+new DateCurrentDSL("date::"+format).evaluate(data);
+    }
+
     @Override
     public Object evaluate(Goate data) {
         String datePattern = "" + get(1, data);

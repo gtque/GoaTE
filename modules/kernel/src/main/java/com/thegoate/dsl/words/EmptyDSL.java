@@ -32,7 +32,7 @@ import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 
 /**
- * Returns the current System nano time.
+ * Returns an empty string.
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "empty")

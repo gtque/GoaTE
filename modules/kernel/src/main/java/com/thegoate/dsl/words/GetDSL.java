@@ -42,8 +42,17 @@ import com.thegoate.utils.get.Get;
         parameters = {"The key of the object to retrieve",
         "The object containing the thing to be retrieved, optional: uses the goate data collection if not specified."})
 public class GetDSL extends DSL {
+
     public GetDSL(Object value) {
         super(value);
+    }
+
+    public static String getDef(String key){
+        return getDef(key, null);
+    }
+
+    public static String getDef(String key, Object source){
+        return "get::"+key+(source!=null?(","+source):"");
     }
 
     @Override

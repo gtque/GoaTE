@@ -86,6 +86,20 @@ public class EutConfigDSL extends DSL {
         loaded = false;
         eut = new Goate();
     }
+
+    public static String eut(String key){
+        return eut(key,null);
+    }
+
+    public static String eut(String key, String defaultValue) {
+        return eut(key, defaultValue, new Goate());
+    }
+
+    public static String eut(String key, String defaultValue, Goate data){
+        EutConfigDSL eut = new EutConfigDSL("eut::"+key+(defaultValue==null?"":(","+defaultValue)));
+        return ""+eut.evaluate(data);
+    }
+
     @Override
     public Object evaluate(Goate data) {
         eut = (Goate)data.get("_goate_:eutConfig", eut);

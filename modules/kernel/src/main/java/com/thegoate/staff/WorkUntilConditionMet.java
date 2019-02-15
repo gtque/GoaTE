@@ -29,6 +29,7 @@ package com.thegoate.staff;
 import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.utils.togoate.ToGoate;
 
@@ -53,6 +54,53 @@ public class WorkUntilConditionMet extends Employee {
     private Long period = 1000L;
     private boolean lastReturn = false;
 
+    public WorkUntilConditionMet returnLast(){
+        lastReturn = true;
+        definition.put("return last", lastReturn);
+        return this;
+    }
+
+    public WorkUntilConditionMet job(String job){
+        return setJob(job);
+    }
+
+    public WorkUntilConditionMet job(Employee job){
+        return setJob(job);
+    }
+
+    private WorkUntilConditionMet setJob(Object job){
+        Goate work = definition.get("work", new Goate(), Goate.class);
+        work.put("job", job);
+        return this;
+    }
+
+    public WorkUntilConditionMet expect(Expectation expectation){
+        Goate expect = definition.get("expect", new Goate(), Goate.class);
+        expect.put(""+expect.size(), expectation);
+        return this;
+    }
+
+    public WorkUntilConditionMet expectTimeout(long timeoutMS){
+        definition.put("expect.timeout", timeoutMS);
+        return this;
+    }
+
+    public WorkUntilConditionMet expectPeriod(long periodMS){
+        definition.put("expect.period", periodMS);
+        return this;
+    }
+
+    public WorkUntilConditionMet period(long periodMS){
+        super.period(periodMS);
+        definition.put("period", period);
+        return this;
+    }
+
+    public WorkUntilConditionMet timeout(long timeoutMS){
+        definition.put("timeout", timeoutMS);
+        return this;
+    }
+
     @Override
     public String[] detailedScrub() {
         return new String[]{"timeout", "work", "expect"};
@@ -63,7 +111,11 @@ public class WorkUntilConditionMet extends Employee {
         Goate actualJobDefinition = new ToGoate(definition.get("work", new Goate())).convert();
         timeout = Long.parseLong("" + definition.get("timeout", timeout));
         period = Long.parseLong("" + definition.get("period", period));
-        actualJob = recruit("" + actualJobDefinition.get("job"), actualJobDefinition, data);
+        if(actualJobDefinition.get("job") instanceof Employee){
+            actualJob = (Employee)actualJobDefinition.get("job");
+        } else {
+            actualJob = recruit("" + actualJobDefinition.get("job"), actualJobDefinition, data);
+        }
         lastReturn = Boolean.parseBoolean(""+definition.get("return last", lastReturn));
         return this;
     }

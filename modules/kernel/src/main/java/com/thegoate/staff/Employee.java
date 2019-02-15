@@ -56,6 +56,10 @@ public abstract class Employee {
     protected Goate data;
     protected Goate definition = new Goate();
     protected String name = "";
+    protected volatile long startTime = 0L;
+    protected volatile Object result = null;
+    protected long period = 50L;
+    protected boolean periodHasBeenSet = false;
 
     public HealthRecord getHrReport() {
         return hr;
@@ -100,8 +104,33 @@ public abstract class Employee {
         return this;
     }
 
-    public Object work() {
-        Object result = null;
+    public Employee defaultPeriod(long period){
+        if(!periodHasBeenSet){
+            this.period = period;
+        }
+        return this;
+    }
+
+    public Employee period(long period){
+        this.period = period;
+        periodHasBeenSet = true;
+        return this;
+    }
+
+    public synchronized final Object syncWork(){
+        return syncWork(period);
+    }
+
+    public synchronized final Object syncWork(long waitMs){
+        if(System.currentTimeMillis()-startTime>waitMs){
+            result = work();
+            startTime = System.currentTimeMillis();
+        }
+        return result;
+    }
+
+    public final Object work() {
+        result = null;
         try {
             if(data!=null&&data.get("lap",null)!=null) {
                 Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
@@ -144,6 +173,10 @@ public abstract class Employee {
 
     public abstract String[] detailedScrub();
 
+    public final Employee build(){
+        return init();
+    }
+
     public Employee init(Goate data) {
         setData(data);
         if(data!=null) {
@@ -153,6 +186,11 @@ public abstract class Employee {
             definition.merge(scrub(data), false);
         }
         return init();
+    }
+
+    public Employee mergeData(Goate data){
+        definition.merge(scrub(data),false);
+        return this;
     }
 
     protected abstract Employee init();

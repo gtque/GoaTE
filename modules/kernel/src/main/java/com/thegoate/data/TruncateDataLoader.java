@@ -24,32 +24,37 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
-package com.thegoate.dsl.words;
+package com.thegoate.data;
 
 import com.thegoate.Goate;
-import com.thegoate.annotations.GoateDescription;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * Syntactic sugar for setting the field in some collection to an empty value.
- * Created by gtque on 4/21/2017.
+ * Created by Eric Angeli on 1/16/2019.
  */
-@GoateDSL(word = "empty field")
-@GoateDescription(description = "Simple returns 'empty field::'," +
-        "\n which is syntactic sugar that is used by utils to take the appropriate action.")
-public class EmptyFieldDSL extends DSL {
-    public EmptyFieldDSL(Object value) {
-        super(value);
-    }
+public abstract class TruncateDataLoader extends DataLoader {
 
-    public static String emptyField(){
-        return "empty field::";
-    }
-
-    @Override
-    public Object evaluate(Goate data) {
-        return "empty field::";
+    protected void truncate(List<Goate> data, List<Goate> dataToMerge){
+        if((""+parameters.get("truncate",false)).equalsIgnoreCase("true")) {
+            if(data.size()>dataToMerge.size()){
+                Iterator it = data.iterator();
+                int i = 0;
+                List<Object> drop = new ArrayList<>();
+                while(it.hasNext()){
+                    if(i>=dataToMerge.size()){
+                        drop.add(it.next());
+                    } else {
+                        it.next();
+                    }
+                    i++;
+                }
+                for(Object o:drop){
+                    data.remove(o);
+                }
+            }
+        }
     }
 }

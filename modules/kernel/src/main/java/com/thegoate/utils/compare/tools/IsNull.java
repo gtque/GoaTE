@@ -24,32 +24,32 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+package com.thegoate.utils.compare.tools;
 
-package com.thegoate.dsl.words;
-
-import com.thegoate.Goate;
-import com.thegoate.annotations.GoateDescription;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Syntactic sugar for setting the field in some collection to an empty value.
- * Created by gtque on 4/21/2017.
+ * Checks if null or not.
+ * Created by Eric Angeli on 5/9/2017.
  */
-@GoateDSL(word = "empty field")
-@GoateDescription(description = "Simple returns 'empty field::'," +
-        "\n which is syntactic sugar that is used by utils to take the appropriate action.")
-public class EmptyFieldDSL extends DSL {
-    public EmptyFieldDSL(Object value) {
-        super(value);
-    }
+@CompareUtil(operator = "isNull", type = "object")
+@IsDefault
+public class IsNull extends CompareTool {
 
-    public static String emptyField(){
-        return "empty field::";
+    public IsNull(Object actual) {
+        super(actual);
     }
 
     @Override
-    public Object evaluate(Goate data) {
-        return "empty field::";
+    public boolean isType(Object check) {
+        return true;
+    }
+
+    @Override
+    public boolean evaluate() {
+        Boolean check = Boolean.parseBoolean(""+expected);
+        return check == (actual == null);
     }
 }

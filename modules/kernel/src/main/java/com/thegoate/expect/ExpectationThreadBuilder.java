@@ -43,6 +43,11 @@ public class ExpectationThreadBuilder {
     Goate data = null;
     long timeoutMS = 0;
     long period = 50;
+    boolean built = false;
+
+    public boolean isBuilt(){
+        return built;
+    }
 
     public ExpectationThreadBuilder timeout(long timeoutMS){
         this.timeoutMS = timeoutMS;
@@ -88,11 +93,12 @@ public class ExpectationThreadBuilder {
                 Expectation expTemp = map.get(expectation.fullName()).getExpectation();
                 expTemp.addNewExpectation().add(expectation);
             }else{
-                ExpectThreadExecuter et = new ExpectThreadExecuter(expectation.setData(data)).timeout(timeoutMS).period(period);
+                ExpectThreadExecuter et = new ExpectThreadExecuter(expectation.setData(data).period(period-1)).timeout(timeoutMS).period(period);
                 map.put(expectation.fullName(), et);
                 e.add(et);
             }
         }
+        built = true;
         return e;
     }
 }

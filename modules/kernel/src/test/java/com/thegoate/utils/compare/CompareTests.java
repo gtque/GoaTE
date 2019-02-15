@@ -329,4 +329,19 @@ public class CompareTests {
     public void dateIsPatternDoesNotMatch(){
         assertFalse(new Compare("2009/11/24").to("yyyy/MMM/dd").using("dateIsPattern").evaluate(),"The date matched the pattern.");
     }
+
+    @Test(groups = {"unit"})
+    public void isNullTrue(){
+        assertTrue(new Compare(null).to(true).using("isNull").evaluate(),"They where not null?");
+    }
+
+    @Test(groups = {"unit"})
+    public void isNullFalse(){
+        assertFalse(new Compare(null).to(false).using("isNull").evaluate(),"They where not null?");
+    }
+
+    @Test(groups = {"unit"})
+    public void isNullFalseTrue(){
+        assertTrue(new Compare("mustard").to(false).using("isNull").evaluate(),"They where not null?");
+    }
 }

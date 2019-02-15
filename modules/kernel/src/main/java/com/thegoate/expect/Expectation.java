@@ -27,11 +27,13 @@
 package com.thegoate.expect;
 
 import com.thegoate.Goate;
+import com.thegoate.dsl.GoateDSL;
 import com.thegoate.dsl.Interpreter;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.staff.Employee;
 import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.NotFound;
@@ -47,6 +49,7 @@ import java.util.List;
 public class Expectation {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     String name = "";
+    String expectedName = "";
     String id = "";
     Goate data = null;
     Goate expect = new Goate();
@@ -54,7 +57,10 @@ public class Expectation {
     volatile Object actual;
     String operator = "";
     volatile Object expected = null;
-    Employee from = null;
+    long period = 50L;
+    Object from = null;
+    Object fromExpected = null;
+    Object fromExpectedResult = null;
     Object source = null;
     StringBuilder failed = new StringBuilder("");
     List<Goate> fails = new ArrayList<>();
@@ -65,22 +71,47 @@ public class Expectation {
         this.data = data;
     }
 
+    public static Expectation build(){
+        return build(null);
+    }
+
+    public static Expectation build(Goate data){
+        if(data == null){
+            data = new Goate();
+        }
+        return new Expectation(data);
+    }
+
     public String fullName() {
-        return name + "#" + id;
+        return name + "#" + id + (expectedName.isEmpty()?"":"::" + expectedName);
     }
 
     public String id() {
         return this.id;
     }
 
+    public Expectation period(long period){
+        this.period = period;
+        return this;
+    }
+
     public Expectation from(Object source) {
+        return from(source, true);
+    }
+
+    protected Expectation from(Object source, boolean setFrom){
         this.source = source;
         if (source instanceof String) {
             this.from = buildSource("" + source);
-        } else if (source instanceof Employee) {
-            this.from = (Employee) source;
+            if(this.from==null&&setFrom){
+                this.from = source;
+            }
+        } else {
+            if(source!=null&&!source.equals(actual)) {
+                this.from = source;
+            }
         }
-        if (name == null || name.isEmpty()) {
+        if (name == null || name.isEmpty() || name.equals(actual)) {
             name = "" + source;
         }
         return this;
@@ -129,11 +160,53 @@ public class Expectation {
     public Expectation actual(Object actual) {
         this.actual = actual;
         if (this.source == null) {
-            from(actual);
+            from(actual,false);
         }
         simpleState += "a";
         checkState(false);
         return this;
+    }
+
+    public Expectation isEqualTo(Object expected){
+        return is("==").expected(expected);
+    }
+
+    public Expectation isNotEqualTo(Object expected){
+        return is("!=").expected(expected);
+    }
+
+    public Expectation isGreaterThan(Object expected){
+        return is(">").expected(expected);
+    }
+
+    public Expectation isGreaterThanOrEqualTo(Object expected){
+        return is(">=").expected(expected);
+    }
+
+    public Expectation isLessThan(Object expected){
+        return is("<").expected(expected);
+    }
+
+    public Expectation isLessThanOrEqualTo(Object expected){
+        return is("<=").expected(expected);
+    }
+
+    public Expectation isPresent(Object expected){
+        boolean isPresent = true;
+        try{
+            isPresent = Boolean.parseBoolean(""+expected);
+        } catch (Exception e){
+            LOG.debug("Expectation isPresent", "Failed to detect state of expected isPresent, defaulting to true.");
+        }
+        return isPresent?is("isPresent").expected(expected):is("doesNotExist").expected("true");
+    }
+
+    public Expectation isEmpty(Object expected){
+        return is("isEmpty").expected(expected);
+    }
+
+    public Expectation isNull(Object expected){
+        return is("isNull").expected(expected);
     }
 
     public Expectation is(String operator) {
@@ -141,6 +214,11 @@ public class Expectation {
         simpleState += "i";
         checkState(false);
         return this;
+    }
+
+    public Expectation is(Class operator){
+        CompareUtil cu = (CompareUtil)operator.getAnnotation(CompareUtil.class);
+        return is(cu.operator());
     }
 
     public Expectation expected(Object expected) {
@@ -175,7 +253,11 @@ public class Expectation {
         boolean result = true;//assume true, and if a failure is detected set to false.
         if (from != null) {
             try {
-                source = from.work();
+                if(from instanceof Employee) {
+                    source = ((Employee)from).defaultPeriod(period).syncWork();
+                }else{
+                    source = from;
+                }
             } catch (Throwable e) {
                 LOG.error("Expectation", "Problem get the source for comparison: " + e.getMessage(), e);
                 Goate exp = new Goate();
@@ -189,6 +271,7 @@ public class Expectation {
         }
         if (source != null) {
             try {
+                LOG.debug("Expectation", "evaluating expectation: " + fullName());
                 Object rtrn = source;//from.work();
                 for (String key : expect.keys()) {
                     Goate exp = (Goate) expect.get(key);
@@ -227,10 +310,10 @@ public class Expectation {
                 fails.add(exp);
             }
         } else {
-
             result = false;
             failed.append("the source of the data to check was not set.");
         }
+        fromExpectedResult = null;
         return result;
     }
 
@@ -270,6 +353,9 @@ public class Expectation {
                     String act2 = act1.replaceFirst("\\*",""+index);//act.substring(0, star) + index + act.substring(star + 1);
                     String keyt = key.replace(act, act2);
                     expt.put("actual", act2);
+                    if(expt.get("expected") instanceof String){
+                        expt.put("expected",expt.get("expected","",String.class).replaceAll("\\\\%","_mwi_").replaceAll("\\%",""+index));
+                    }
                     boolean check = check(expt, keyt, rtrn);
                     if (!check) {
                         resultC = false;
@@ -316,17 +402,19 @@ public class Expectation {
                 }
             } else {
                 exp.put("actual_value", val);
+                Object expV = getExpectedValue(exp.get("expected"));
+                exp.put("expected_value", expV);
                 LOG.info("evaluating \"" + fullName() + "\": " + exp.get("actual") + "(" + val + ") " + exp.get("operator") + (exp.get("expected") == null ? "" : " " + exp.get("expected")));
-                CompareUtility compare = new Compare(val).to(exp.get("expected")).using(exp.get("operator"));
+                CompareUtility compare = new Compare(val).to(expV).using(exp.get("operator"));
                 compare.setData(data);
                 if (!(compare.evaluate())) {
                     result = false;
-                    failed.append(fullName() + ">" + key + " evaluated to false.\n");
+//                    failed.append(fullName()).append(">").append(key).append(" evaluated to false.\n");
                     Goate health = compare.healthCheck();
                     if(health.size()>0){
                         exp.put("failed", health);
                     }
-                    fails.add(exp);
+//                    fails.add(exp);
                 } else {
                     passes.add(exp);
                 }
@@ -336,7 +424,10 @@ public class Expectation {
     }
 
     public String failed() {
-        return failed.append(from.getHrReport().printRecords()).toString();
+        if(from instanceof Employee) {
+            failed.append(((Employee)from).getHrReport().printRecords());
+        }
+        return failed.toString();
     }
 
     public List<Goate> fails() {
@@ -345,6 +436,21 @@ public class Expectation {
 
     public List<Goate> passes() {
         return passes;
+    }
+
+    protected Object getExpectedValue(Object exp){
+        Object result = exp;
+        if(fromExpected!=null){
+            if(fromExpectedResult==null){
+                if(fromExpected instanceof Employee) {
+                    fromExpectedResult = ((Employee)fromExpected).defaultPeriod(period).syncWork();
+                } else {
+                    fromExpectedResult = fromExpected;
+                }
+            }
+            result = new Get(exp).from(fromExpectedResult);
+        }
+        return result;
     }
 
     /**
@@ -388,9 +494,24 @@ public class Expectation {
         return this;
     }
 
+    public Expectation fromExpected(Object from){
+        this.fromExpected =  from;
+        expectedName = "" + from;
+        checkState(false);
+        return this;
+    }
+
     public Expectation setData(Goate data){
         this.data = data;
+        initFrom(data, from);
+        initFrom(data, fromExpected);
         return this;
+    }
+
+    protected void initFrom(Goate data, Object init){
+        if(init!=null&&init instanceof Employee){
+            ((Employee) init).mergeData(data);
+        }
     }
 
     protected Employee buildSource(String source) {

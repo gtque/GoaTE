@@ -44,6 +44,14 @@ public class InitDSL extends DSL {
         super(value);
     }
 
+    public static Object init(String key){
+        return init(key, new Goate());
+    }
+
+    public static Object init(String key, Goate data){
+        return new InitDSL("init::"+key).evaluate(data);
+    }
+
     @Override
     public Object evaluate(Goate data) {
         data.put(key, get(1,data));
