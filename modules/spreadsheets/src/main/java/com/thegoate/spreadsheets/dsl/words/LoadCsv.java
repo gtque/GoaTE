@@ -27,44 +27,110 @@
 package com.thegoate.spreadsheets.dsl.words;
 
 import com.thegoate.Goate;
-import com.thegoate.annotations.GoateDescription;
-import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
-import com.thegoate.spreadsheets.csv.CSVParser;
-import com.thegoate.spreadsheets.csv.CSVRecord;
-import com.thegoate.spreadsheets.staff.GetCsvEmployee;
+import com.thegoate.utils.GoateUtils;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.Reader;
 
 /**
- * Created by Eric Angeli on 8/09/2018.
+ * Created by Eric Angeli on 12/5/2018.
  */
 @GoateDSL(word = "csv")
-@GoateDescription(description = "Loads the specified CSV into a CsvParser, if a row number is specified then it returns the CsvRecord for that row.",
-parameters = {"The path to the csv file", "The row number to return, optional:if not specified the entire CsvParser is returned."})
-public class LoadCsv extends DSL {
-
-    public LoadCsv(Object value){
+public class LoadCsv extends LoadSpreadSheet {
+    public LoadCsv(Object value) {
         super(value);
     }
+    public static Object loadCsv(String file) {
+        return loadCsv(GoateUtils.getFilePath(file), new Goate());
+    }
 
-    @Override
-    public Object evaluate(Goate data) {
-        String filePath = ""+get(1,data);
-        Goate definition = new Goate();
-        definition.put("file", filePath);
-        CSVParser csv =  (CSVParser)new GetCsvEmployee().init(definition).work();
-        String i = ""+get(2,data);
-        int row = -42;
-        if(!i.equals("null")){
-            row = Integer.parseInt(i);
-        }
-        Object val = null;
-        try{
-            val = row>=0?new CSVRecord(csv,csv.getRecords().get(row)):csv;
-        } catch (IOException e) {
-            LOG.debug("Load CSV", "Failed to get records: " + e.getMessage(), e);
-        }
-        return val;
+    public static Object loadCsv(String file, boolean firstRowIsHeader) {
+        return loadCsv(GoateUtils.getFilePath(file), -1, firstRowIsHeader, null, new Goate());
+    }
+
+    public static Object loadCsv(String file, Goate data) {
+        return loadCsv(GoateUtils.getFilePath(file), -1, data);
+    }
+
+    public static Object loadCsv(String file, int rowNumber) {
+        return loadCsv(GoateUtils.getFilePath(file), rowNumber, new Goate());
+    }
+
+    public static Object loadCsv(String file, int rowNumber, boolean firstRowIsHeader) {
+        return loadCsv(GoateUtils.getFilePath(file), rowNumber, firstRowIsHeader, null, new Goate());
+    }
+
+    public static Object loadCsv(String file, int rowNumber, Goate data) {
+        return loadCsv(GoateUtils.getFilePath(file), rowNumber, false, null, data);
+    }
+
+    public static Object loadCsv(Reader stream){
+        return loadCsv(stream, -1, false, new Goate());
+    }
+
+    public static Object loadCsv(Reader stream, Goate data){
+        return loadCsv(stream, -1, false, data);
+    }
+
+    public static Object loadCsv(Reader stream, int row){
+        return loadCsv(stream, row, false, new Goate());
+    }
+
+    public static Object loadCsv(Reader stream, int row, Goate data){
+        return loadCsv(stream, row, false, data);
+    }
+
+    public static Object loadCsv(Reader stream, boolean firstRowIsHeader){
+        return loadCsv(stream, -1, firstRowIsHeader, new Goate());
+    }
+
+    public static Object loadCsv(Reader stream, boolean firstRowIsHeader, Goate data){
+        return loadCsv(stream, -1, firstRowIsHeader, data);
+    }
+
+    public static Object loadCsv(Reader stream, int row, boolean firstRowIsHeader){
+        return loadCsv(stream, row, firstRowIsHeader, new Goate());
+    }
+
+    public static Object loadCsv(Reader stream, int row, boolean firstRowIsHeader, Goate data){
+        return loadCsv("reader.csv", row, firstRowIsHeader, stream, data);
+    }
+
+    public static Object loadCsv(File file){
+        return loadCsv(file, new Goate());
+    }
+
+    public static Object loadCsv(File file, Goate data){
+        return loadCsv(file, -1, false, data);
+    }
+
+    public static Object loadCsv(File file, int row){
+        return loadCsv(file, row, false, new Goate());
+    }
+
+    public static Object loadCsv(File file, int row, Goate data){
+        return loadCsv(file, row, false, data);
+    }
+
+    public static Object loadCsv(File file, boolean firstRowIsHeader){
+        return loadCsv(file, -1, firstRowIsHeader, new Goate());
+    }
+
+    public static Object loadCsv(File file, boolean firstRowIsHeader, Goate data){
+        return loadCsv(file, -1, firstRowIsHeader, data);
+    }
+
+    public static Object loadCsv(File file, int row, boolean firstRowIsHeader) {
+        return loadCsv(file, row, firstRowIsHeader, new Goate());
+    }
+
+    public static Object loadCsv(File file, int row, boolean firstRowIsHeader, Goate data){
+        return loadCsv("file.csv", row, firstRowIsHeader, file, data);
+    }
+    public static Object loadCsv(String file, int rowNumber, boolean firstRowIsHeader, Object fileObject, Goate data) {
+        String row = (rowNumber >= 0 ? ("," + rowNumber) : "");
+        String firstRow = ","+firstRowIsHeader;
+        return new LoadCsv("csv::" + file + row + firstRow).setFile(fileObject).evaluate(data);
     }
 }

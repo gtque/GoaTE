@@ -26,55 +26,77 @@
  */
 package com.thegoate.spreadsheets.staff;
 
-import com.thegoate.Goate;
-import com.thegoate.spreadsheets.csv.CSVParser;
+import com.thegoate.spreadsheets.utils.SheetUtils;
 import com.thegoate.staff.Employee;
 import com.thegoate.staff.GoateJob;
-import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.get.Get;
-import com.thegoate.utils.togoate.ToGoate;
-import org.apache.commons.csv.CSVFormat;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.File;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
 
 /**
- * Gets a specific result number.
+ * Loads a csv file either from the path or result.
  * Useful when used as part of expectations for an integration or multistep test case.
  * Created by Eric Angeli on 5/22/2017.
  */
 @GoateJob(jobs = {"get csv"})
 public class GetCsvEmployee extends Employee {
 
-    CSVParser csv = null;
+    SheetUtils csv = null;
+//    CSVParser csv = null;
+
+//    public GetCsvEmployee fromResult(){
+//        definition.put("from result", true);
+//        return this;
+//    }
+
+//    public GetCsvEmployee from(Object source){
+//        //definition.put("from result", true);
+//        definition.put("_goate_result", source);
+//        return this;
+//    }
+
+    public GetCsvEmployee from(String path){
+        definition.put("file", path);
+        return this;
+    }
+
+    public GetCsvEmployee from(File file){
+        definition.put("file", file);
+        return this;
+    }
+
+    public GetCsvEmployee from(Reader in){
+        definition.put("file", in);
+        return this;
+    }
 
     @Override
     public Employee init() {
         boolean fromResult = definition.get("from result", false, Boolean.class);
-        if(!fromResult){
-            String fileName = definition.get("file",null, String.class);
-            if(fileName!=null){
-                try {
-                    Reader in = new FileReader(GoateUtils.getFilePath(fileName));
-                    csv = new CSVParser(CSVFormat.RFC4180.parse(in));
-                } catch (IOException e) {
-                    LOG.debug("Get CSV", "Problem loading csv: " + e.getMessage(), e);
-                }
+        if(fromResult) {
+            definition.put("file", new Get("input stream").from(definition.get("_goate_result")));
+        }
+        try {
+            if (definition.get("file") instanceof String) {
+                csv = SheetUtils.build("" + definition.get("file"));
+            } else if (definition.get("file") instanceof File) {
+                csv = SheetUtils.build(null, null, (File)definition.get("file"));
+            } else if (definition.get("file") instanceof Reader) {
+                csv = SheetUtils.build(null, null, (Reader) definition.get("file"));
             }
-        }else{
-            try {
-                csv = new CSVParser(CSVFormat.RFC4180.parse((InputStreamReader)new Get("input stream").from(data.get("_goate_result"))));
-            } catch (IOException e) {
-                LOG.debug("Get CSV", "Problem loading csv: " + e.getMessage(), e);
-            }
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            LOG.error("Get CSV", "Problem loading csv file:"+ e.getMessage(), e);
         }
         return this;
     }
 
     @Override
     protected Object doWork() {
+        if(csv!=null){
+            csv.load();
+        }
         return csv;
     }
 

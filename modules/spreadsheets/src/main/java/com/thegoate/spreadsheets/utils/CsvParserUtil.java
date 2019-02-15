@@ -31,7 +31,7 @@ import com.thegoate.spreadsheets.csv.CSVParser;
 /**
  * Created by Eric Angeli on 8/9/2018.
  */
-public abstract class CsvParserUtil extends CsvUtil {
+public abstract class CsvParserUtil extends SpreadSheetUtil {
     public CsvParserUtil(Object val){
         super(val);
     }
