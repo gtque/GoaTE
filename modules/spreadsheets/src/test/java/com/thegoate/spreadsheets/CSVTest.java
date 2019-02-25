@@ -26,11 +26,16 @@
  */
 package com.thegoate.spreadsheets;
 
+import com.thegoate.Goate;
+import com.thegoate.data.DataLoader;
+import com.thegoate.spreadsheets.data.SpreadSheetAbstractedDL;
 import com.thegoate.spreadsheets.utils.SheetUtils;
 import com.thegoate.testng.TestNGEngineMethodDL;
+import com.thegoate.utils.GoateUtils;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
@@ -59,5 +64,51 @@ public class CSVTest extends TestNGEngineMethodDL {
         assertEquals(sheet.get(1,1),"42,g");
         assertEquals(sheet.get("c",0,"e"),"e");
         assertEquals(sheet.get(2,0,3),3);
+    }
+
+    @Test(groups = {"unit"})
+    public void loadSimpleAbstractCSV() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", ""+GoateUtils.getProperty("eut",GoateUtils.getProperty("profile", "foobar")));
+        String fileName = ((SpreadSheetAbstractedDL)(new SpreadSheetAbstractedDL().fileName("scenarios/foo.json"))).getFileName();
+        SheetUtils sheet = SheetUtils.build(fileName,"the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
+        sheet.load();
+        assertEquals(sheet.get("a",0),"b");
+        assertEquals(sheet.get("a",1),"false");
+        assertEquals(sheet.get(0,0),"b");
+        assertEquals(sheet.get("c",0,"e"),"e");
+        assertEquals(sheet.get(2,0,3),3);
+    }
+
+    @Test(groups = {"unit"})
+    public void loadSimpleAbstractCSVNoHeaders() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", ""+GoateUtils.getProperty("eut",GoateUtils.getProperty("profile", "foobar")));
+        String fileName = ((SpreadSheetAbstractedDL)(new SpreadSheetAbstractedDL().fileName("scenarios/foo.json"))).getFileName();
+        SheetUtils sheet = SheetUtils.build(fileName,"the sheet name does not matter.").firstRowIsNotHeader();
+        sheet.load();
+        assertEquals(sheet.get(0,0),"a");
+        assertEquals(sheet.get(1,1),"42,g");
+        assertEquals(sheet.get("c",0,"e"),"e");
+        assertEquals(sheet.get(2,0,3),3);
+    }
+
+
+    @Test(groups = {"unit"})
+    public void CSVAbstractDLTest() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", ""+GoateUtils.getProperty("eut",GoateUtils.getProperty("profile", "foobar")));
+        DataLoader dl = new SpreadSheetAbstractedDL().fileName("scenarios/foo.json").firstRowIsHeader(true);
+        List<Goate> dataList = dl.load();
+        assertEquals(dataList.get(0).get("a"),"b");
+        assertEquals(dataList.get(1).get("z"),"42,g");
+        assertEquals(dataList.size(),2);
+    }
+
+    @Test(groups = {"unit"})
+    public void CSVAbstractDLTestNoHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", ""+GoateUtils.getProperty("eut",GoateUtils.getProperty("profile", "foobar")));
+        DataLoader dl = new SpreadSheetAbstractedDL().fileName("scenarios/foo.json").firstRowIsHeader(false);
+        List<Goate> dataList = dl.load();
+        assertEquals(dataList.get(0).get("0"),"a");
+        assertEquals(dataList.get(1).get("1"),"42,g");
+        assertEquals(dataList.size(),3);
     }
 }

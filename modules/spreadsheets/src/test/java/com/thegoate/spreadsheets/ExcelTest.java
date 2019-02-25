@@ -28,9 +28,11 @@ package com.thegoate.spreadsheets;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
+import com.thegoate.spreadsheets.data.SpreadSheetAbstractedDL;
 import com.thegoate.spreadsheets.data.SpreadSheetDL;
 import com.thegoate.spreadsheets.utils.SheetUtils;
 import com.thegoate.testng.TestNGEngineMethodDL;
+import com.thegoate.utils.GoateUtils;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -85,4 +87,50 @@ public class ExcelTest extends TestNGEngineMethodDL {
         assertEquals(dataList.size(),3);
     }
 
+    @Test(groups = {"unit"})
+    public void loadSimpleAbstractExcel() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", ""+GoateUtils.getProperty("eut",GoateUtils.getProperty("profile", "foobar")));
+        String fileName = ((SpreadSheetAbstractedDL)(new SpreadSheetAbstractedDL().fileName("scenarios/bar.json"))).getFileName();
+        SheetUtils sheet = SheetUtils.build(fileName,"Sheet1").firstRowIsNotHeader().firstRowIsHeader();
+        sheet.load();
+        assertEquals(sheet.get("a",0),"b");
+        assertEquals(sheet.get("a",1),"FALSE");
+        assertEquals(sheet.get(0,0),"b");
+        assertEquals(Integer.parseInt(""+sheet.get("z",0)),42);
+        assertEquals(sheet.get("z",1),"42.01");
+        assertEquals(sheet.get("c",0,"e"),"e");
+        assertEquals(sheet.get(2,0,3),3);
+    }
+
+    @Test(groups = {"unit"})
+    public void loadSimpleAbstractExcelNoHeaders() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", ""+GoateUtils.getProperty("eut",GoateUtils.getProperty("profile", "foobar")));
+        String fileName = ((SpreadSheetAbstractedDL)(new SpreadSheetAbstractedDL().fileName("scenarios/bar.json"))).getFileName();
+        SheetUtils sheet = SheetUtils.build(fileName,"Sheet1").firstRowIsNotHeader();
+        sheet.load();
+        assertEquals(sheet.get(0,0),"a");
+        assertEquals(sheet.get(1,1),"42");
+        assertEquals(sheet.get("c",0,"e"),"e");
+        assertEquals(sheet.get(2,0,3),3);
+    }
+
+    @Test(groups = {"unit"})
+    public void ExcelSheetAbstractDLTest() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", ""+GoateUtils.getProperty("eut",GoateUtils.getProperty("profile", "foobar")));
+        DataLoader dl = new SpreadSheetAbstractedDL().fileName("scenarios/bar.json").sheetName("Sheet1");
+        List<Goate> dataList = dl.load();
+        assertEquals(dataList.get(0).get("a"),"b");
+        assertEquals(dataList.get(1).get("z"),"42.01");
+        assertEquals(dataList.size(),2);
+    }
+
+    @Test(groups = {"unit"})
+    public void ExcelSheetAbstractDLTestNoHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", ""+GoateUtils.getProperty("eut",GoateUtils.getProperty("profile", "foobar")));
+        DataLoader dl = new SpreadSheetAbstractedDL().fileName("scenarios/bar.json").sheetName("Sheet1").firstRowIsHeader(false);
+        List<Goate> dataList = dl.load();
+        assertEquals(dataList.get(0).get("0"),"a");
+        assertEquals(dataList.get(1).get("1"),"42");
+        assertEquals(dataList.size(),3);
+    }
 }

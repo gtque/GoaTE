@@ -34,5 +34,6 @@ dependencies{
     compile "org.apache.poi:poi-ooxml:+"
     compile "org.apache.poi:poi-ooxml-schemas:+"
     compile 'org.apache.commons:commons-csv:+';
+    compile d.depends(":json", project.internalVersion);
     testCompile d.depends(":testng", project.internalVersion);
 }
