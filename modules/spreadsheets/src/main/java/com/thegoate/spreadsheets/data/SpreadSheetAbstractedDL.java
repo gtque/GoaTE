@@ -24,16 +24,42 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends;
-dependencies{
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
-    compile d.depends(":kernel", project.internalVersion);
-    compile 'org.apache.poi:poi:+';
-    compile "org.apache.poi:poi-scratchpad:+"
-    compile "org.apache.poi:poi-excelant:+"
-    compile "org.apache.poi:poi-ooxml:+"
-    compile "org.apache.poi:poi-ooxml-schemas:+"
-    compile 'org.apache.commons:commons-csv:+';
-    testCompile d.depends(":json", project.internalVersion);
-    testCompile d.depends(":testng", project.internalVersion);
+package com.thegoate.spreadsheets.data;
+
+import com.thegoate.Goate;
+import com.thegoate.utils.fill.FillString;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.togoate.ToGoate;
+
+
+/**
+ * Reads an abstract data location of a spreadsheet
+ * from a json name / value pair, populates the interpolated
+ * path segments and updates fileName to the actual path.
+ *
+ * Created by Brian Hill on 2019-02-28
+ */
+public class SpreadSheetAbstractedDL extends SpreadSheetDL {
+
+    private String fileName;
+
+    @Override
+    public SpreadSheetDL fileName(String file){
+        fileName = file;
+        Goate rd = new ToGoate(new Get(file).from("file::")).convert();
+
+        if (rd.get("spreadsheet") != null)
+            fileName= "" + rd.get("spreadsheet");
+
+        if(fileName.contains("${"))
+            fileName = ""+new FillString(fileName).with(parameters);
+
+        setParameter("fileName", fileName);
+
+        return this;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
 }
