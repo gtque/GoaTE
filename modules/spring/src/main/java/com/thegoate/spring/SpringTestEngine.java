@@ -27,6 +27,7 @@
 package com.thegoate.spring;
 
 import com.thegoate.Goate;
+import com.thegoate.expect.Expectation;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
@@ -35,6 +36,7 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.ITest;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -159,6 +161,31 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     @Override
     public TestNG put(String key, Object val) {
         return engine.put(key, val);
+    }
+
+    @Override
+    public TestNG expect(Expectation expectation) {
+        return engine.expect(expectation);
+    }
+
+    @Override
+    public TestNG evalPeriod(long periodMS) {
+        return engine.evalPeriod(periodMS);
+    }
+
+    @Override
+    public TestNG evalTimeout(long timeoutMS) {
+        return engine.evalTimeout(timeoutMS);
+    }
+
+    @Override
+    public void evaluate() {
+        engine.evaluate();
+    }
+
+    @Override
+    public TestNG clearExpectations() {
+        return engine.clearExpectations();
     }
 
     @Override

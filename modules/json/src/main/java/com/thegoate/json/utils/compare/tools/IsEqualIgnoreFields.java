@@ -29,8 +29,12 @@ package com.thegoate.json.utils.compare.tools;
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.json.utils.fill.FillJson;
+import com.thegoate.json.utils.tojson.ToJson;
+import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.utils.fill.Fill;
+import com.thegoate.utils.togoate.ToGoate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -46,6 +50,7 @@ import org.json.JSONObject;
 @CompareUtil(operator = "isEqualIgnoreFields", type = "json")
 public class IsEqualIgnoreFields extends CompareJson {
     Object expected = null;
+
     public IsEqualIgnoreFields(Object actual) {
         super(actual);
     }
@@ -57,18 +62,29 @@ public class IsEqualIgnoreFields extends CompareJson {
 
     @Override
     public boolean evaluate() {
-        JSONObject expectedDef = new JSONObject(expected.toString());
+        Goate expectedDef = new ToGoate(expected).convert();
         Goate drop = new Goate();
-        Object expectedJson = expectedDef.has("expected json")?expectedDef.get("expected json"):expectedDef;
-        if(expectedDef!=null&&expectedDef.has("_goate_ignore")) {
-            JSONArray ignored = expectedDef.getJSONArray("_goate_ignore");
-            for (int i = 0; i < ignored.length(); i++) {
-                drop.put(ignored.getString(i), "drop field::");
-            }
+        JSONArray ignored = new JSONArray(""+expectedDef.get("_goate_ignore","[]"));
+        expectedDef.merge(data,false);
+        Object expectedJson = expectedDef.get("expected json", new JSONObject(expected.toString()));
+        defineIgnore(drop, ignored);
+        Object tao = null;
+        if (drop.size()>0) {
             expectedJson = new FillJson(expectedJson).with(drop);
-            takeActionOn = new FillJson(takeActionOn).with(drop);
+            tao = new ToJson(takeActionOn).convert();
+            tao = new FillJson(tao).with(drop);
         }
-        return new CompareJsonEqualTo(takeActionOn).to(expectedJson).evaluate();
+        CompareUtility compare = new Compare(tao).to(expectedJson).using("==");
+        boolean result = compare.evaluate();
+        health = compare.healthCheck();
+        return result;
+    }
+
+    protected void defineIgnore(Goate drop, JSONArray ignored) {
+        for (int i = 0; ignored!=null&&i < ignored.length(); i++) {
+            drop.put(ignored.getString(i), "drop field::");
+        }
+        drop.put("_goate_ignore", "drop field::");
     }
 
     public CompareUtility actual(Object actual) {

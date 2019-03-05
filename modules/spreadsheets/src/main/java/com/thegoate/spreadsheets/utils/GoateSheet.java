@@ -26,6 +26,8 @@
  */
 package com.thegoate.spreadsheets.utils;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -36,6 +38,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 9/14/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Used to indicate supported file type.")
+@Info
 @IndexAnnotated
 public @interface GoateSheet {
     String[] fileTypes();

@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Loads the file specified in from into a string and returns it.
+ * Gets a rest assure
  * Created by Eric Angeli on 5/18/2017.
  */
 @GetUtil
@@ -73,6 +73,9 @@ public class GetRAResponse extends GetTool implements ResetStatic {
     @Override
     public Object from(Object container) {
         Object result = null;
+        if((""+selector).contains("get_from_rest_response::")) {
+            selector = (""+selector).replace("get_from_rest_response::","");
+        }
         if(container!=null){
             Response r = (Response)container;
             if(selector.equals("status code")){

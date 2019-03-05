@@ -37,7 +37,7 @@ public class ApiPut extends ApiEmployee {
 
     @Override
     protected Object doWork() {
-        Object response = rest.put(data.get("end point","", true, String.class));
+        Object response = rest.put(definition.get("end point","", true, String.class));
         data.put("response", response);
         return response;
     }

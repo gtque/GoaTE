@@ -50,6 +50,7 @@ public class ExpectThreadExecuter extends Thread {
     long startTime = 0;
     long endTime = 0;
     StringBuilder failed = new StringBuilder("");
+    Goate data;
 
     public ExpectThreadExecuter(Expectation expectation) {
         this.expectation = expectation;
@@ -69,10 +70,16 @@ public class ExpectThreadExecuter extends Thread {
         return this;
     }
 
-    public Expectation getExpectation(){
+    public ExpectThreadExecuter setData(Goate data) {
+        this.data = data;
+        return this;
+    }
+
+    public Expectation getExpectation() {
         return expectation;
     }
-    public boolean isRunning(){
+
+    public boolean isRunning() {
         return running;
     }
 
@@ -85,8 +92,8 @@ public class ExpectThreadExecuter extends Thread {
             long current = System.currentTimeMillis();
             while (executing && !status && (current - startTime) <= timeoutMS) {
                 status = expectation.evaluate();
-                if(!status){
-                GoateUtils.sleep(period, LOG);
+                if (!status) {
+                    GoateUtils.sleep(period, LOG);
                 }
 //                if(Thread.interrupted()){
 //                    executing = false;
@@ -102,29 +109,29 @@ public class ExpectThreadExecuter extends Thread {
         running = false;
     }
 
-    public boolean status(){
+    public boolean status() {
         return this.status;
     }
 
-    public String failedMessage(){
+    public String failedMessage() {
         return failed.toString();
     }
 
-    public List<Goate> fails(){
-        return expectation!=null?expectation.fails():new ArrayList<>();
+    public List<Goate> fails() {
+        return expectation != null ? expectation.fails() : new ArrayList<>();
     }
 
-    public List<Goate> passes(){
-        return expectation!=null?expectation.passes():new ArrayList<>();
+    public List<Goate> passes() {
+        return expectation != null ? expectation.passes() : new ArrayList<>();
     }
 
     @Override
-    public void start(){
+    public void start() {
         running = true;
         LOG.debug("starting: " + expectation.fullName());
         try {
             super.start();
-        }catch (Throwable t){
+        } catch (Throwable t) {
             LOG.debug("problem starting: " + expectation.fullName(), t);
             throw t;
         }

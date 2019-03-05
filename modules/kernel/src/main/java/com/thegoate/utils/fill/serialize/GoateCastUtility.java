@@ -53,8 +53,9 @@ public abstract class GoateCastUtility implements CastUtility {
         return health;
     }
 
+
     @Override
-    public CastUtility data(Goate data) {
+    public CastUtility setData(Goate data) {
         this.data = data;
         return this;
     }

@@ -47,21 +47,41 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @GoateDSL(word = "do")
 public class RunTask extends DSL {
+    Goate parameters = new Goate();
+
     public RunTask(Object value) {
         super(value);
     }
 
     AnnotationFactory af = new AnnotationFactory();
 
+    public static RunTask task(String task){
+        return new RunTask("do::"+task);
+    }
+
+    public RunTask parameter(String key, Object value){
+        parameters.put(key, value);
+        return this;
+    }
+
+    public Object run(){
+        return run(new Goate());
+    }
+
+    public Object run(Goate data){
+        return evaluate(data);
+    }
+
     @Override
     public Object evaluate(Goate data){
-        String task = "" + get(1, data);
+        parameters.merge(data, false);
+        String task = "" + get(1, parameters);
         Object result = null;
         Object[] constructorParams = null;
         if(definition.size()>2){
             constructorParams = new Object[definition.size()-2];
             for(int i = 0; i<constructorParams.length;i++){
-                constructorParams[i] = get(i+2,data);
+                constructorParams[i] = get(i+2,parameters);
             }
         }
         try {
@@ -71,7 +91,7 @@ public class RunTask extends DSL {
                     .constructorArgs(constructorParams);
             Object owner = findOwner();
             Method m = findTask();
-            Object[] args = buildArgs(m, task, data);
+            Object[] args = buildArgs(m, task, parameters);
             try {
                 boolean accessible = m.isAccessible();
                 LOG.debug("class: " + m.getDeclaringClass());

@@ -32,7 +32,7 @@ import com.thegoate.dsl.GoateDSL;
 import com.thegoate.dsl.PrimitiveDSL;
 
 /**
- * Returns the current System nano time.
+ * Returns the boolean representation of the value.
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "boolean")

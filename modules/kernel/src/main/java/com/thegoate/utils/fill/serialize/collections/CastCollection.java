@@ -92,7 +92,11 @@ public abstract class CastCollection extends GoateCastUtility {
             else if(value instanceof Class) {
                 c = (Class) value;
             } else {
-                c = value.getClass();
+                if(t != null){
+                    c = (Class)t;
+                } else {
+                    c = value.getClass();
+                }
             }
         }
         return c;

@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Returns the value of the referenced object.
+ * Returns the shifted date as a string.
  * Created by gtque on 3/10/2018.
  */
 @GoateDSL(word = "date shift")
@@ -45,6 +45,14 @@ import java.time.format.DateTimeFormatter;
 public class DateShiftDSL extends DSL {
     public DateShiftDSL(Object value) {
         super(value);
+    }
+
+    public static String dateShift(String pattern, String date, int numberOfDaysToShift){
+        return dateShift(pattern, date, numberOfDaysToShift, new Goate());
+    }
+
+    public static String dateShift(String pattern, String date, int numberOfDaysToShift, Goate data){
+        return ""+new DateReformatDSL("date shift::"+pattern+","+date+","+numberOfDaysToShift).evaluate(data);
     }
 
     @Override

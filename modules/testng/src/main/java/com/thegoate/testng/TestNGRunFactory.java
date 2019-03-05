@@ -43,7 +43,7 @@ import java.util.List;
 public class TestNGRunFactory {
     static final BleatBox LOG = BleatFactory.getLogger(TestNGRunFactory.class);
 
-    public static Object[][] loadRuns(Goate runData, Goate constantData, boolean atLeastOneRun) {
+    public static Object[][] loadRuns(Goate runData, Goate constantData, boolean atLeastOneRun, String[] include, String[] exclude) {
         List<Goate> runs = new ArrayList<>();
         Goate constants = new Goate();
         if (runData != null) {
@@ -66,6 +66,7 @@ public class TestNGRunFactory {
             runs.add(null);
         }
         runs = filter(runs);
+//        runs = filterGroups(runs, include, exclude);
         if (constants.size() > 0) {
             for (Goate data : runs) {
                 int i = -42;
@@ -89,6 +90,18 @@ public class TestNGRunFactory {
         }
         Object[][] empty = {};
         return rawData.length>0?rawData:empty;
+    }
+
+    protected static List<Goate> filterGroups(List<Goate> runs, String[] include, String[] exclude){
+        List<Goate> filteredInc = new ArrayList<>();
+        List<Goate> filtered = new ArrayList<>();
+        if(include!=null&&include.length>0){
+            for(Goate run:runs){
+                Object groups = run.get("groups", include);
+            }
+        }
+
+        return filtered;
     }
 
     protected static List<Goate> filter(List<Goate> runs) {

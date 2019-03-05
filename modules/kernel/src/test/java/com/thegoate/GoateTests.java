@@ -30,6 +30,7 @@ package com.thegoate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.data.PropertyFileDL;
 import com.thegoate.data.StaticDL;
+import com.thegoate.map.EnumMap;
 import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
@@ -45,11 +46,47 @@ import static org.testng.Assert.assertEquals;
 public class GoateTests {
 
     @Test(groups = {"unit"})
+    public void testEnumMapping(){
+        String key = EnumMap.map("frickle").to(STACKLES.class).toString();
+        assertEquals(key, "frackle");
+    }
+
+    public enum STACKLES{
+        crackle("crickle"),frackle("frickle");
+        String column = "";
+        STACKLES(String column){
+            this.column = column;
+        }
+        public boolean map(String key){
+            return column.equals(key);
+        }
+    }
+
+    @Test(groups = {"unit"})
     public void addAutoIncrement(){
-        Goate data = new Goate().put("test##", "a").put("atest", "nanotime::").put("test2","c").put("test##", "b");
+        Goate data = new Goate()
+                .put("test##", "a")
+                .put("atest", "nanotime::")
+                .put("test2","c")
+                .put("test##", "b");
         assertEquals(data.size(), 3);
         assertEquals(data.get("test2"),"b");
     }
+
+    @Test(groups = {"unit"})
+    public void addAutoIncrementNested(){
+        Goate data = new Goate()
+                .put("test##.##", "a")
+                .put("test##", "b")
+                .put("test id0", "pinky malinky")
+                .put("test##.##", "c")
+                .put("test0.##", "a1");
+        assertEquals(data.size(), 5);
+        assertEquals(data.get("test1"),"b");
+        assertEquals(data.get("test0.1"),"a1");
+        assertEquals(data.get("test2.0"),"c");
+    }
+
     @Test(groups = {"unit"})
     public void staticDataLoader(){
         DataLoader dl = new StaticDL().add("test##", "a").add("atest", "nanotime::").add("test2","c").add("test##", "b");
@@ -72,7 +109,7 @@ public class GoateTests {
         System.out.println(System.currentTimeMillis());
         DataLoader dl = new PropertyFileDL().file(new File(GoateUtils.getFilePath("sample.prop")));
         Goate data = dl.load().get(0);
-
+        System.out.println("goate data: \n" + data.toString());
         assertEquals(data.size(), 5);
         assertEquals(data.get("test3"),"d");
     }

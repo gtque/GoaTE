@@ -28,7 +28,9 @@ import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
     compile "io.rest-assured:rest-assured:+"
+    compile "com.github.dzieciou.testing:curl-logger:+"
     compile d.depends(":kernel", project.internalVersion);
     compile d.depends(":rest", project.internalVersion);
     testCompile d.depends(":testng", project.internalVersion);
+    testCompile d.depends(":json", project.internalVersion);
 }

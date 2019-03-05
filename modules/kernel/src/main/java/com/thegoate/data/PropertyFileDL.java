@@ -59,7 +59,12 @@ public class PropertyFileDL extends DataLoader {
                     if (line != null && !line.isEmpty() && !line.startsWith("#")) {
                         String[] prop = line.split("=");
                         if (prop.length >= 2) {
-                            props.put(prop[0].trim(), prop[1].trim());
+                            String key = prop[0].trim();
+                            if(key.endsWith("##")){
+                                props.put(prop[0].trim(), prop[1].trim());
+                            } else {
+                                props.get(prop[0].trim(), prop[1].trim());
+                            }
                         }
                     }
                 }

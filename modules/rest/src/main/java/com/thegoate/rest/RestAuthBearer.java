@@ -47,6 +47,7 @@ public abstract class RestAuthBearer extends Rest {
     public RestSpec processCustomData(String key, Object value){
         if (key.equalsIgnoreCase(Settings.bearer.name())) {
             bearerValue = value;
+            bearer = key;
         } else if(key.equalsIgnoreCase(Settings.auth_label.name())){
             bearer = ""+value;
         }

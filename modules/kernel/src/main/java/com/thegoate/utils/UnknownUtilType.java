@@ -46,9 +46,21 @@ import java.util.Map;
  * and call buildUtil in the constructor.
  * Created by gtque on 5/4/2017.
  */
-public class UnknownUtilType {
+public class UnknownUtilType implements Utility {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate health = new Goate();
+    protected Goate data = null;
+
+    @Override
+    public boolean isType(Object check) {
+        return false;
+    }
+
+    @Override
+    public UnknownUtilType setData(Goate data){
+        this.data = data;
+        return this;
+    }
 
     public Goate healthCheck(){
         return health;
@@ -66,6 +78,15 @@ public class UnknownUtilType {
         return buildUtil(obj, util, obj, id, identifier);
     }
 
+    /**
+     * Attempts to find and build the correct implementation of the utility.
+     * @param obj
+     * @param util
+     * @param val
+     * @param id
+     * @param identifier
+     * @return
+     */
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier) {
         Object utility = null;
         Class def = null;
@@ -76,21 +97,26 @@ public class UnknownUtilType {
         Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
         if(utils!=null) {
             for (String key : utils.keySet()){
+                Class c = Object.class;
                 try {
-                    Class c = utils.get(key);
-                    Annotation d = c.getAnnotation(IsDefault.class);
-                    if(d!=null){
+                    c = utils.get(key);
+                    IsDefault d = (IsDefault)c.getAnnotation(IsDefault.class);
+                    if(d!=null&&!d.forType()){
                         def = c;
                     }else {
                         Class[] types = {Object.class};
                         Method check = c.getMethod("isType", types);
                         Object u = af.constructor(null).build(c);
                         if (check != null && Boolean.parseBoolean(""+check.invoke(u, checkArgs))) {
-                            utility = u;
+                            if(d!=null&&d.forType()){
+                                def = c;
+                            } else {
+                                utility = u;
+                            }
                         }
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |InstantiationException e) {
-                    LOG.warn("The class did not have isType, cannot determine if that class is the correct type. " + e.getMessage());
+                    LOG.debug("The class ("+c.getName()+") did not have isType, cannot determine if that class is the correct type. " + e.getMessage());
                 }
             }
         }
@@ -98,8 +124,9 @@ public class UnknownUtilType {
             if(def!=null){
                 try{
                     utility = af.constructor(null).build(def);
+                    ((Utility)utility).setData(data);
                 } catch (IllegalAccessException | InvocationTargetException |InstantiationException e){
-                    LOG.warn("Problem instantiating the default utility: " + e.getMessage(), e);
+                    LOG.debug("Problem instantiating the default utility ("+def.getName()+"): " + e.getMessage(), e);
                 }
             }
         }

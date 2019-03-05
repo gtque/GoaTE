@@ -70,6 +70,17 @@ public class RunTaskTest {
     }
 
     @Test(groups = {"unit"})
+    public void runMultiple3(){
+        Goate data = new Goate();
+        data.put("test", "do::multiply three numbers constructor times ${x} times ${y},o::constructorValue,o::paul")
+                .put("paul", 100)
+                .put("constructorValue",10).put("x",2).put("y",3);
+        String nt = "" + data.get("test");
+        LOG.debug("output: " + nt);
+        Assert.assertEquals(nt, "60");
+    }
+
+    @Test(groups = {"unit"})
     public void runGoodbye(){
         Goate data = new Goate();
         data.put("test", "do::say goodbye");

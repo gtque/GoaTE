@@ -29,6 +29,7 @@ package com.thegoate.xml;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.Utility;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -46,6 +47,7 @@ public abstract class XmlUtil implements Utility {
     protected Object takeActionOn = null;
     protected Object nested = null;
     protected Goate health = new Goate();
+    protected Goate data;
 
     public XmlUtil(Object val){
         if(val instanceof String){
@@ -61,6 +63,12 @@ public abstract class XmlUtil implements Utility {
     @Override
     public Goate healthCheck(){
         return health;
+    }
+
+    @Override
+    public XmlUtil setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     @Override

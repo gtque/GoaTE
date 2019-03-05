@@ -33,11 +33,8 @@ import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import org.json.JSONArray;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 /**
- * Returns the value of the referenced object.
+ * Returns a json array built from the filtered data in goate data.
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "json array from goate")
@@ -46,6 +43,14 @@ import java.util.Map.Entry;
 public class JsonArrayFromGoateDataDSL extends DSL {
     public JsonArrayFromGoateDataDSL(Object value) {
         super(value);
+    }
+
+    public static Object jsonArrayFromGoate(String filter){
+        return jsonArrayFromGoate(filter, new Goate());
+    }
+
+    public static Object jsonArrayFromGoate(String filter, Goate data){
+        return new JsonArrayFromGoateDataDSL("json array from goate::"+filter).evaluate(data);
     }
 
     @Override

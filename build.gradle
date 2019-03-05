@@ -60,7 +60,7 @@ if (javaVersion.contains(".")) {
     javaVersion = javaVersion.substring(("" + javaVersion).indexOf(".") + 1);
 }
 
-def vbase = '0.14'
+def vbase = '0.15'
 def buildDate = "" + (project.hasProperty("buildDate")?project.buildDate:sdf.format(new Date()))
 def v = "${vbase}." + buildDate
 def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : project.release) : 'beta'
@@ -329,7 +329,7 @@ task jacocoMergedReport(type: JacocoReport) {
     }
 
     classDirectories = files(getJacocoClassDirs().collect {
-        fileTree(dir: it, exclude: ['com/**/gradle/**'])
+        fileTree(dir: it, exclude: ['com/**/gradle/**','com/**/performance/**','com/**/barn/idea/**'])
     })
     sourceDirectories = getJacocoSrcDirs()
 

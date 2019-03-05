@@ -41,7 +41,7 @@ public class GetGoateResultEmployee extends Employee {
 
     @Override
     public Employee init() {
-        result = data.get("_goate_result");
+        result = definition.get("_goate_result");
         return this;
     }
 

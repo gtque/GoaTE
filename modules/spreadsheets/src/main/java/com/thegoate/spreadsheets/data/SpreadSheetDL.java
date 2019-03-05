@@ -53,7 +53,10 @@ public class SpreadSheetDL extends DataLoader {
             SheetUtils sheet = SheetUtils.build(fileName, sheetName).firstRowIsHeader(firstRow);
             Goate info = sheet.load();
             for(String key:info.keys()){
-                data.add((Goate)info.get(key));
+                Goate page = (Goate)info.get(key);
+                for(String row:page.keys()){
+                    data.add((Goate)page.get(row));
+                }
             }
         } catch(Exception e){
             LOG.error("failed to load spread sheet ("+fileName+"): "+e.getMessage(), e);

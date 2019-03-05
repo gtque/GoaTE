@@ -44,6 +44,10 @@ public class EmptyFieldDSL extends DSL {
         super(value);
     }
 
+    public static String emptyField(){
+        return "empty field::";
+    }
+
     @Override
     public Object evaluate(Goate data) {
         return "empty field::";

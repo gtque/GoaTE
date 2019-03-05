@@ -44,6 +44,10 @@ public class DropFieldDSL extends DSL {
         super(value);
     }
 
+    public static String dropField(){
+        return "drop field::";
+    }
+    
     @Override
     public Object evaluate(Goate data) {
         return "drop field::";

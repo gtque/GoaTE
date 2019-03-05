@@ -226,3 +226,5 @@ pip-log.txt
 .idea
 out/*
 **/out
+classes/*
+**/gen/**/*.java

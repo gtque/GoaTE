@@ -24,33 +24,40 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.insert;
+package com.thegoate.spreadsheets.utils.compare;
+
+import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Created by Eric Angeli on 4/18/2018.
+ * Compares a csv record (aka a row) to another csv record)<br>
+ * returns true of they are equal, otherwise false.
+ * Created by Eric Angeli on 8/10/2018.
  */
-public interface InsertService {
+@CompareUtil(operator = "==", type = "csv")
+public class CompareCSVRowsEqual extends CompareCsvRecord {
 
-    InsertService value(String id, Object value);
+    public CompareCSVRowsEqual(Object val) {
+        super(val);
+    }
 
-    InsertService into(String original);
+    @Override
+    protected Object processNested(Object subContainer) {
+        return null;
+    }
 
-    InsertService after(String location) throws Exception;
-
-    InsertService before(String location) throws Exception;
-
-    InsertService in(String location) throws Exception;
-
-    InsertService append() throws Exception;
-
-    InsertService replaceExisting(boolean replace);
-
-    InsertService resetLocation();
-
-    InsertService resetInsertValue();
-
-    String insert(boolean setAsOriginal) throws Exception;
-
-    String insert() throws Exception;
-
+    @Override
+    public boolean evaluate() {
+        boolean result = actual.size()==expected.size();
+        if(result) {
+            for (int i = 0; i < actual.size(); i++) {
+                if (!actual.get(i).equals(expected.get(i))) {
+                    result = false;
+                    health.put("not equal##", "("+i+"): " + actual.get(i) + " != " + expected.get(i));
+                }
+            }
+        } else {
+            health.put("number of columns##", "different number of columns: " + actual.size() + " != " + expected.size());
+        }
+        return result;
+    }
 }

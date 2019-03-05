@@ -1,0 +1,107 @@
+{
+  "_embedded": {
+    "customers": [
+      {
+        "id": "2c9e82a55e5208a3015e524c7ff90004",
+        "createdBy": "wi00",
+        "createDate": "2017-09-05T17:48:18.000+0000",
+        "lastModifiedBy": "wi00",
+        "lastModificationDate": "2017-09-05T22:17:19.000+0000",
+        "udfResourceList": [
+        ],
+        "customerNumber": "PB3",
+        "dbaName": "DBA PB PB3",
+        "legalName": "LN PB PB3",
+        "taxIdNumber": null,
+        "localTaxIdNumber": null,
+        "dunsNumber": null,
+        "nonAccrualStatus": "Accrual",
+        "organizationUnit": "PBFCO2/PBBU1/PBCC1",
+        "status": "Active",
+        "customerType": "Dealer",
+        "customerTypeCode": "DLR",
+        "productType": "New Cars",
+        "securitizationCode": null,
+        "securitizationClassCode": null,
+        "insuranceExpirationDate": null,
+        "insuranceLimitAmount": 0,
+        "defaultIndicator": false,
+        "lastBilledDate": "2017-06-30",
+        "defaultDisbursementTypeCode": "CHECK",
+        "defaultDisbursementTypeDesc": "Check",
+        "defaultDisbursementTypeId": "2AF98611657A278EE0530100007FEBF7",
+        "defaultReceiptTypeCode": "CHECK",
+        "defaultReceiptTypeDesc": "Check",
+        "defaultReceiptTypeId": "2AF986116580278EE0530100007FEBF7",
+        "orgUnitId": "8ac2a3d05c9c99f9015c9dd11b3d007b",
+        "currencyTypeId": "2AF98611673D278EE0530100007FEBF7",
+        "currencyTypeCode": "USD",
+        "currencyTypeDesc": "Dollars",
+        "_links": {
+          "self": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004"
+          },
+          "customerCollateralTypes": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/customer-collateral-type"
+          },
+          "disburseBankAccounts": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/bank-account?entityId=2c9e82a55e5208a3015e524c7ff90004&bankCashType=DISBURSE"
+          },
+          "receiptBankAccounts": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/bank-account?entityId=2c9e82a55e5208a3015e524c7ff90004&bankCashType=RECEIPT"
+          },
+          "nonAmortizedPrincipalAccountDetails": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/account-detail?accountDetailType=NON_AMORT_PRINCIPAL"
+          },
+          "amortizedPrincipalInterestAccountDetails": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/account-detail?accountDetailType=AMORT_PRINCIPAL_INTEREST"
+          },
+          "nonAmortizedInterestAccountDetails": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/account-detail?accountDetailType=INTEREST"
+          },
+          "loanFeeAccountDetails": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/account-detail?accountDetailType=LOAN_FEE"
+          },
+          "customerFeeAccountDetails": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/account-detail?accountDetailType=CUSTOMER_FEE"
+          },
+          "insuranceAccountDetails": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/account-detail?accountDetailType=INSURANCE"
+          },
+          "taxAccountDetails": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/account-detail?accountDetailType=TAXES"
+          },
+          "creditBalance": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/credit-balance"
+          },
+          "primaryAddress": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/address"
+          },
+          "parentCustomer": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004"
+          },
+          "addresses": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/address"
+          },
+          "contacts": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/contact"
+          },
+          "userDefinedFields": {
+            "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e524c7ff90004/user-defined-field"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://www.local.onedatascan.io:7005/svc-facade-wms/customer/2c9e82a55e5208a3015e5227bc200001/children"
+    }
+  },
+  "page": {
+    "size": 1,
+    "totalElements": 1,
+    "totalPages": 1,
+    "number": 0
+  }
+}

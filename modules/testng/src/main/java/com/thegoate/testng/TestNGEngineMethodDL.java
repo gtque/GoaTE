@@ -33,6 +33,7 @@ import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.reflection.GoateReflection;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
@@ -74,7 +75,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         Goate rdl = new Goate();
         Goate cdl = new Goate();
         buildDataLoaders(rdl, cdl, method);
-        return TestNGRunFactory.loadRuns(rdl, cdl, false);
+        return TestNGRunFactory.loadRuns(rdl, cdl, false,testContext.getIncludedGroups(),testContext.getExcludedGroups());
     }
 
     protected void buildDataLoaders(Goate rdl, Goate cdl, Method method) {

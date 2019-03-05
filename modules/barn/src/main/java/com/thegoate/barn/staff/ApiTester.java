@@ -44,11 +44,11 @@ public class ApiTester extends ApiEmployee {
 
     @Override
     public Employee init() {
-        String method = "" + data.get("method", "get");//default to get if not specified.
+        String method = "" + definition.get("method", "get");//default to get if not specified.
         AnnotationFactory af = new AnnotationFactory();
         try {
             worker = (ApiEmployee) af.annotatedWith(GoateJob.class).find(method).using("jobs").build();
-            worker.init(data);
+            worker.init(definition);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error("Barn API Init", "problem finding something to execute a " + method +"\nmake sure you have an implementation library included.", e);
         }

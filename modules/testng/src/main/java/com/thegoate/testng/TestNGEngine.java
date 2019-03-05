@@ -28,24 +28,34 @@ package com.thegoate.testng;
 
 import com.thegoate.Goate;
 
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.Expectation;
+import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.metrics.Stopwatch;
 import com.thegoate.statics.StaticScrubber;
 import org.testng.ITest;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.testng.Assert.assertTrue;
 
 
 /**
  * The base class for writing TestNG classes.
  * Created by Eric Angeli on 5/11/2017.
  */
+@Listeners({TestNGEvaluateListener.class})
 public abstract class TestNGEngine implements ITest, TestNG {
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
@@ -57,6 +67,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     protected boolean includeClassMethodInName = true;
     ITestContext testContext = null;
     XmlTest xt = null;
+    protected ExpectationThreadBuilder etb;
 
     public static int number = 0;
 
@@ -78,11 +89,13 @@ public abstract class TestNGEngine implements ITest, TestNG {
         if(data!=null&&data.get("lap",null)!=null) {
             Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
         }
+        etb = new ExpectationThreadBuilder(data);
         String startMessage = "\n" +
                 "***************************Starting Up***************************\n" +
                 "*\t" + getTestName() + "\t*\n";
         startMessage += data.toString("*\t", "\t*");
         startMessage += "*****************************************************************";
+        TestMap.tests.put(getTestName(), this);
         LOG.info("Start Up", startMessage);
     }
 
@@ -127,7 +140,8 @@ public abstract class TestNGEngine implements ITest, TestNG {
             xt = context.getCurrentXmlTest();
         }
         initDataLoaders();
-        return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true);
+
+        return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true,testContext.getIncludedGroups(),testContext.getExcludedGroups());
     }
 
     public void initDataLoaders() {
@@ -213,6 +227,71 @@ public abstract class TestNGEngine implements ITest, TestNG {
     @Override
     public TestNG put(String key, Object val) {
         data.put(key, val);
+        return this;
+    }
+
+    @Override
+    public TestNGEngine expect(Expectation expectation){
+        if(etb!=null){
+            etb.expect(expectation);
+        }
+        return this;
+    }
+
+    @Override
+    public TestNGEngine evalPeriod(long periodMS){
+        if(etb!=null){
+            etb.period(periodMS);
+        }
+        return this;
+    }
+
+    @Override
+    public TestNGEngine evalTimeout(long periodMS){
+        if(etb!=null){
+            etb.period(periodMS);
+        }
+        return this;
+    }
+
+    @Override
+    public void evaluate(){
+        if(etb.isBuilt()) {
+            LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
+        } else {
+            ExpectEvaluator ev = new ExpectEvaluator(etb);
+            boolean result = ev.evaluate();
+            logStatuses(ev);
+            assertTrue(result, ev.failed());
+        }
+    }
+
+    protected void logStatuses(ExpectEvaluator ev){
+        StringBuilder ps = new StringBuilder();
+        for(Goate p:ev.passes()){
+            try {
+                ps.append(p.toString());
+                ps.append("\n--------------------\n");
+            } catch (Exception e){
+                LOG.info("Evaulate", "A problem was encountered trying to publish the passed expectations: " + e.getMessage(), e);
+            }
+        }
+        LOG.debug("passed:\n" + ps.toString());
+        StringBuilder fs = new StringBuilder();
+        for(Goate p:ev.fails()){
+            try {
+                fs.append(p.toString());
+                fs.append("\n--------------------\n");
+            } catch (Exception e){
+                LOG.info("Evaulate", "A problem was encountered trying to publish the failed expectations: " + e.getMessage(), e);
+            }
+        }
+        LOG.debug("failed:\n" + fs.toString());
+    }
+
+    @Override
+    public TestNGEngine clearExpectations(){
+        etb = new ExpectationThreadBuilder(data);
         return this;
     }
 }

@@ -31,5 +31,6 @@ dependencies{
     compile "org.atteo.classindex:classindex:3.3"
     testCompile d.depends(":testng", project.internalVersion);
     testCompile d.depends(":json", project.internalVersion);
+    testCompile d.depends(":spreadsheets", project.internalVersion);
 //    testCompile d.depends(":xml", project.internalVersion);
 }

@@ -44,7 +44,7 @@ public class StepEmployee extends Employee {
 
     @Override
     public Employee init() {
-        String method = "" + data.get("method", "get");//default to get if not specified.
+        String method = "" + definition.get("method", "get");//default to get if not specified.
         AnnotationFactory af = new AnnotationFactory();
         try {
             worker = (ApiEmployee) af.annotatedWith(GoateJob.class).find(method).using("jobs").build();

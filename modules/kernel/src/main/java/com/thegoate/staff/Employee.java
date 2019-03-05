@@ -33,6 +33,7 @@ import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.metrics.Stopwatch;
+import com.thegoate.utils.togoate.ToGoate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -44,6 +45,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Defines an employee object. An employee does some type of work by calling the work method.<br>
  * In order to make full use of an employee with other GoaTE frameworks, they should be annotated
  * with {@literal @}GoateJob to provide a list of jobs the employee fills.
+ * Use param(key) or param(key,default) to get the parameters for the job or directly access definition.
+ * When manipulating or setting the test run data use the class variable data.
  * Created by gtque on 4/21/2017.
  */
 public abstract class Employee {
@@ -51,7 +54,12 @@ public abstract class Employee {
     protected final static BleatBox slog = BleatFactory.getLogger(Employee.class);
     protected HealthRecord hr = new HealthRecord();
     protected Goate data;
+    protected Goate definition = new Goate();
     protected String name = "";
+    protected volatile long startTime = 0L;
+    protected volatile Object result = null;
+    protected long period = 50L;
+    protected boolean periodHasBeenSet = false;
 
     public HealthRecord getHrReport() {
         return hr;
@@ -70,6 +78,25 @@ public abstract class Employee {
         return name;
     }
 
+    protected String getNameDef(){
+        return name + ".definition";
+    }
+
+    public Employee initData(){
+        if(data==null) {
+            data = new Goate();
+        }
+        return this;
+    }
+
+    protected Object param(String paramName) {
+        return param(paramName, null);
+    }
+
+    protected Object param(String paramName, Object def){
+        return definition!=null?definition.get(paramName,def):def;
+    }
+
     public Employee setData(Goate data) {
         this.data = data;
         //no point in processing the annotations until the data is set.
@@ -77,8 +104,33 @@ public abstract class Employee {
         return this;
     }
 
-    public Object work() {
-        Object result = null;
+    public Employee defaultPeriod(long period){
+        if(!periodHasBeenSet){
+            this.period = period;
+        }
+        return this;
+    }
+
+    public Employee period(long period){
+        this.period = period;
+        periodHasBeenSet = true;
+        return this;
+    }
+
+    public synchronized final Object syncWork(){
+        return syncWork(period);
+    }
+
+    public synchronized final Object syncWork(long waitMs){
+        if(System.currentTimeMillis()-startTime>waitMs){
+            result = work();
+            startTime = System.currentTimeMillis();
+        }
+        return result;
+    }
+
+    public final Object work() {
+        result = null;
         try {
             if(data!=null&&data.get("lap",null)!=null) {
                 Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
@@ -105,7 +157,7 @@ public abstract class Employee {
     }
 
     public Goate scrub(Goate data){
-        String[] baseScrub = {"Scenario", "job", "abstract", "extends", "groups", "expect", "override"};
+        String[] baseScrub = {"Scenario", "job", "abstract", "extends", "groups", "expect", "override", getName()+"\\.definition"};
         Goate scrubbed = clean(new Goate().merge(data,false),baseScrub);
         return clean(scrubbed, detailedScrub());
     }
@@ -121,12 +173,27 @@ public abstract class Employee {
 
     public abstract String[] detailedScrub();
 
-    public Employee init(Goate data) {
-        setData(data);
+    public final Employee build(){
         return init();
     }
 
-    public abstract Employee init();
+    public Employee init(Goate data) {
+        setData(data);
+        if(data!=null) {
+            Object def = data.get(getName() + ".definition");
+            def = def != null ? def : data;
+            definition = new ToGoate(def).convert();
+            definition.merge(scrub(data), false);
+        }
+        return init();
+    }
+
+    public Employee mergeData(Goate data){
+        definition.merge(scrub(data),false);
+        return this;
+    }
+
+    protected abstract Employee init();
 
     protected abstract Object doWork();
 
@@ -140,6 +207,10 @@ public abstract class Employee {
     }
 
     public static Employee recruit(String job, Goate data) {
+        return recruit(job, data, new Goate());
+    }
+
+    public static Employee recruit(String job, Goate definition, Goate parentData){
         Employee employee = null;
         String id = "";
         if(job.contains("#")){
@@ -156,7 +227,10 @@ public abstract class Employee {
             }
         }
         if (employee != null) {
-            employee.init(data);
+            if(definition!=null) {
+                definition.merge(employee.scrub(parentData), false);
+            }
+            employee.init(definition);
         }
         return employee;
     }

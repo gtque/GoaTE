@@ -29,6 +29,7 @@ package com.thegoate.xml;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.Utility;
 
 import org.jsoup.Jsoup;
@@ -43,6 +44,7 @@ public abstract class HtmlUtil implements Utility {
     protected Object takeActionOn = null;
     protected Object nested = null;
     protected Goate health = new Goate();
+    protected Goate data;
 
     public HtmlUtil(Object val){
         if(val instanceof String){
@@ -53,6 +55,12 @@ public abstract class HtmlUtil implements Utility {
             }
         }
         this.takeActionOn = val;
+    }
+
+    @Override
+    public HtmlUtil setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     @Override

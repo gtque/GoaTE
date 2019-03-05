@@ -28,10 +28,13 @@
 package com.thegoate;
 
 import com.thegoate.dsl.Interpreter;
+import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.togoate.ToGoate;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,15 +50,16 @@ public class Goate {
         init();
     }
 
-    public Goate(Map<String, Object> initialData){
+    public Goate(Map<String, Object> initialData) {
         init();
         data.putAll(initialData);
     }
 
-    protected void init(){
+    protected void init() {
         dictionary = new Interpreter(this);
     }
-    public Goate autoIncrement(boolean increment){
+
+    public Goate autoIncrement(boolean increment) {
         this.increment = increment;
         return this;
     }
@@ -68,19 +72,28 @@ public class Goate {
         return size;
     }
 
+    public Map<String, Object> data() {
+        Map<String, Object> mapped = new ConcurrentHashMap<>();
+        for (String key : keys()) {
+            mapped.put(key, get(key));
+        }
+        return mapped;
+    }
+
     public Set<String> keys() {
-        return data.keySet();
+        return new TreeSet<>(data.keySet());
     }
 
     public String[] keysArray() {
         String[] keys = new String[data.keySet().size()];
         int i = 0;
-        for(String key:data.keySet()){
+        for (String key : data.keySet()) {
             keys[i] = key;
             i++;
         }
         return keys;
     }
+
     public Goate put(String key, Object value) {
         if (data == null) {
             data = new ConcurrentHashMap<>();
@@ -89,17 +102,17 @@ public class Goate {
         if (key.contains("##")) {
             key = buildKey(key);
         }
-        data.put(key, value==null?"null::":value);//can't put null in a map, so wrap in the null dsl.
+        data.put(key, value == null ? "null::" : value);//can't put null in a map, so wrap in the null dsl.
 //        }
         return this;
     }
 
     public String buildKey(String key) {
         String fullKey = key;
-        if(increment) {
+        if (increment) {
             while (fullKey.contains("##")) {
-                Goate billy = filter(key.substring(0, key.indexOf("##")));
-                fullKey = key.replace("##", "" + billy.size());
+                Goate billy = filter(fullKey.substring(0, fullKey.indexOf("##")) + "[0-9]+");
+                fullKey = fullKey.replaceFirst("##", "" + billy.size());
             }
         } else {
             fullKey = key.replace("##", "" + System.nanoTime());
@@ -114,7 +127,7 @@ public class Goate {
     public Object get(int index) {
         Iterator<String> keys = data.keySet().iterator();
         String key = "";
-        while(index>=0){
+        while (index >= 0) {
             key = keys.next();
             index--;
         }
@@ -165,8 +178,8 @@ public class Goate {
         return type.cast(value);
     }
 
-    public Object processDSL(Object value){
-        return processDSL("",value);
+    public Object processDSL(Object value) {
+        return processDSL("", value);
     }
 
     public Object processDSL(String key, Object value) {
@@ -189,10 +202,10 @@ public class Goate {
         return this;
     }
 
-    public Goate scrub(String pattern){
+    public Goate scrub(String pattern) {
         Goate scrub = filter(pattern);
-        if(scrub!=null){
-            for(String key: scrub.keys()){
+        if (scrub != null) {
+            for (String key : scrub.keys()) {
                 drop(key);
             }
         }
@@ -206,17 +219,26 @@ public class Goate {
      * @return A Goate collection containing matching elements.
      */
     public Goate filter(String pattern) {
+        return filterStrict(pattern+".*");
+    }
+
+    /**
+     * Simple filter, matches if key matches the given pattern
+     *
+     * @param pattern The pattern to match
+     * @return A Goate collection containing matching elements.
+     */
+    public Goate filterStrict(String pattern) {
         Goate filtered = new Goate();
         if (data != null) {
             for (String key : keys()) {
-                if (key.matches(pattern+".*")) {
+                if (key.matches(pattern)) {
                     filtered.put(key, getStrict(key));
                 }
             }
         }
         return filtered;
     }
-
     /**
      * Simple filter, matches if key does start with the given pattern; ie excludes anything matching the pattern
      *
@@ -227,18 +249,19 @@ public class Goate {
         Goate filtered = new Goate();
         if (data != null) {
             for (String key : keys()) {
-                if (!key.matches(pattern+".*")) {
+                if (!key.matches(pattern + ".*")) {
                     filtered.put(key, getStrict(key));
                 }
             }
         }
         return filtered;
     }
-    public Goate scrubKeys(String pattern){
+
+    public Goate scrubKeys(String pattern) {
         Goate scrubbed = new Goate();
-        if(data != null){
-            for (Map.Entry<String,Object> entry:data.entrySet()){
-                scrubbed.put(entry.getKey().replaceFirst(pattern,""),entry.getValue());
+        if (data != null) {
+            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                scrubbed.put(entry.getKey().replaceFirst(pattern, ""), entry.getValue());
             }
         }
         return scrubbed;
@@ -253,16 +276,15 @@ public class Goate {
         if (data != null) {
             Goate info = filter(filter);
             for (String key : info.keys()) {
-                String def = "" + info.get(key, "");
-                if (def != null) {
-                    if (!def.contains(split)) {
-                        def = "" + processDSL(def);
-                    }
-                    if (def.contains(split)) {
-                        String k = def.substring(0, def.indexOf(split));
-                        String v = def.substring(def.indexOf(split) + split.length());
-                        filtered.put("" + processDSL(k), processDSL(v));
-                    }
+                Object strictDef = info.getStrict(key);
+                String def = "" + (strictDef == null ? "" : strictDef);
+                if (!def.contains(split)) {
+                    def = "" + processDSL(def);
+                }
+                if (def.contains(split)) {
+                    String k = def.substring(0, def.indexOf(split));
+                    String v = def.substring(def.indexOf(split) + split.length());
+                    filtered.put("" + processDSL(k), processDSL(v));
                 }
             }
         }
@@ -293,12 +315,34 @@ public class Goate {
         StringBuilder sb = new StringBuilder("");
         boolean appendNewLine = false;
         for (String key : keys()) {
-            if(appendNewLine){
+            if (appendNewLine) {
                 sb.append("\n");
             }
             appendNewLine = true;
-            sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding);
+            sb.append(prepadding).append(key).append(":").append(data.get(key)).append(postpadding);
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object check) {
+        boolean result = false;
+        if(!(check instanceof Goate)){
+            Goate castCheck = new ToGoate(check).convert();
+            if(castCheck!=null){
+                check = castCheck;
+            }
+        }
+        if (check instanceof Goate) {
+            Goate gCheck = (Goate) check;
+            result = true;
+            for (String key : keys()) {
+                result = new Compare(get(key)).to(gCheck.get(key)).using("==").evaluate();
+                if (!result) {
+                    break;
+                }
+            }
+        }
+        return result;
     }
 }

@@ -50,8 +50,8 @@ public class AnnotationFactory {
 
     public static volatile Map<String, Map<String, Class>> directory = new ConcurrentHashMap<>();
 
-    public AnnotationFactory(){
-        if(directory==null){
+    public AnnotationFactory() {
+        if (directory == null) {
             directory = new ConcurrentHashMap<>();
         }
     }
@@ -98,8 +98,8 @@ public class AnnotationFactory {
         return this;
     }
 
-    public AnnotationFactory using(String check){
-        if(annotation!=null){
+    public AnnotationFactory using(String check) {
+        if (annotation != null) {
             try {
                 using(annotation.getMethod(check));
             } catch (NoSuchMethodException e) {
@@ -109,6 +109,7 @@ public class AnnotationFactory {
         this.checkName = check;
         return this;
     }
+
     public AnnotationFactory using(Method check) {
         this.check = check;
         return this;
@@ -116,7 +117,7 @@ public class AnnotationFactory {
 
     public AnnotationFactory annotatedWith(Class<? extends java.lang.annotation.Annotation> annotation) {
         this.annotation = annotation;
-        if(checkName!=null){
+        if (checkName != null) {
             using(checkName);
         }
         return this;
@@ -186,7 +187,9 @@ public class AnnotationFactory {
     public AnnotationFactory buildDirectory() {
         if (!directory.containsKey(annotation.getCanonicalName())) {
             directory.put(annotation.getCanonicalName(), new ConcurrentHashMap<>());
-            Map<String, Class> listing = directory.get(annotation.getCanonicalName());
+        }
+        Map<String, Class> listing = directory.get(annotation.getCanonicalName());
+        if (listing.size() == 0) {
             for (Class<?> klass : ClassIndex.getAnnotated(annotation)) {
                 String theClass = klass.getCanonicalName();
                 try {
@@ -213,16 +216,19 @@ public class AnnotationFactory {
                     }
                 } catch (ClassNotFoundException | NullPointerException | IllegalAccessException | InvocationTargetException e) {
                     LOG.error("could not get the class: " + theClass + "; " + e.getMessage(), e);
+                } catch (NoClassDefFoundError ncdfe) {
+                    LOG.error("Build Directory", "This shouldn't have happened, but a class in the list was not found." + ncdfe.getMessage(), ncdfe);
                 }
             }
         }
         return this;
     }
 
-    public AnnotationFactory constructor(Constructor constructor){
+    public AnnotationFactory constructor(Constructor constructor) {
         this.constructor = constructor;
         return this;
     }
+
     public Object build(Class klass) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Object o = null;
         if (klass != null) {

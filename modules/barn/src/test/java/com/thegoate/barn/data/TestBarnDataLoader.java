@@ -51,6 +51,6 @@ public class TestBarnDataLoader extends TestNGEngineMethodDL {
         assertEquals(list.size(),1);
         Goate d = list.get(0);
         LOG.debug("Nested Extends", d.toString());
-        assertEquals(d.size(),5);
+        assertEquals(d.size(),6);
     }
 }

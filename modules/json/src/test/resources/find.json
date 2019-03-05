@@ -1,0 +1,28 @@
+{
+  "data": [
+    [
+      {
+        "name": "b",
+        "check": 42
+      }
+    ],
+    [
+      {
+        "name": "c",
+        "check": false
+      }
+    ],
+    [
+      {
+        "name": "a",
+        "check": "Goku"
+      }
+    ],
+    [
+      {
+        "name": "d",
+        "check": "pickles"
+      }
+    ]
+  ]
+}

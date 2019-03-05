@@ -31,6 +31,7 @@ import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
+import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.fill.serialize.DeSerializer;
 import com.thegoate.utils.fill.serialize.GoatePojo;
 import com.thegoate.utils.fill.serialize.GoateSourceDef;
@@ -42,22 +43,60 @@ import com.thegoate.utils.fill.serialize.GoateSourceDef;
 @GoateDescription(description = "Builds the given pojo from the data from the specified source.",
         parameters = {"the id of the pojo to be built, must be annotated with GoatePojo", "the id of the source the data comes from,(an empty object annotated with GoateSourceDef used in GoateSource annotation [source] on fields in the pojo), this parameter is optional, but recommended."})
 public class PojoDSL extends DSL {
+    Goate fieldValues = new Goate();
 
     public PojoDSL(Object value) {
         super(value);
     }
 
+    public static PojoDSL pojo(Class theClass){
+        return pojo(theClass.getName(), (String)null);
+    }
+
+    public static PojoDSL pojo(Class theClass, Class source){
+        return pojo(theClass.getName(), source.getName());
+    }
+
+    public static PojoDSL pojo(Class theClass, String source){
+        return pojo(theClass.getName(), source);
+    }
+
+    public static PojoDSL pojo(String id){
+        return pojo(id, (String)null);
+    }
+
+    public static PojoDSL pojo(String id, Class source){
+        return pojo(id, source.getName());
+    }
+
+    public static PojoDSL pojo(String id, String source){
+        return new PojoDSL("pojo::"+id+(source==null||source.isEmpty()?"":(","+source)));
+    }
+
+    public PojoDSL setField(String field, Object value){
+        fieldValues.put(field, value);
+        return this;
+    }
+
+    public Object build(){
+        return build(new Goate());
+    }
+
+    public Object build(Goate data){
+        return evaluate(data);
+    }
     @Override
     public Object evaluate(Goate data) {
-        Class pojo = find("" + get(1,data), GoatePojo.class);
+        fieldValues.merge(data, false);
+        Class pojo = find("" + get(1,fieldValues), GoatePojo.class);
         DeSerializer deSerializer = new DeSerializer();
-        deSerializer.data(data);
-        Object so = get(2, data);
+        deSerializer.data(fieldValues);
+        Object so = get(2, fieldValues);
         if(so!=null){
             deSerializer.from(find(""+so, GoateSourceDef.class));
         }
         if(pojo==null){
-            LOG.debug("Pojo DSL", "Failed to find the pojo: "+get(1, data)+". Make sure the id is correct.");
+            LOG.debug("Pojo DSL", "Failed to find the pojo: "+get(1, fieldValues)+". Make sure the id is correct.");
         }
         return pojo!=null?deSerializer.build(pojo):null;
     }
@@ -68,7 +107,13 @@ public class PojoDSL extends DSL {
             AnnotationFactory af = new AnnotationFactory().using(annotationType.getMethod("id")).doDefault().annotatedWith(annotationType).buildDirectory();
             found = af.find(id).lookUp();
         } catch (NoSuchMethodException e) {
-            LOG.error("Pojo DSL", "Problem looking up class: " + e.getMessage(), e);
+            LOG.debug("Pojo DSL", "Problem looking up class: " + e.getMessage(), e);
+        }
+        if(found==null){
+            found = new GoateReflection().findClass(id);
+        }
+        if(found==null){
+            LOG.error("Pojo DSL", "Could not find the class: " + id);
         }
         return found;
     }

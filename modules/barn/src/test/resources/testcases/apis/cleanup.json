@@ -4,7 +4,7 @@
   "cleanup":[
     {
       "job":"api",
-      "base url":"http://msn.com",
+      "base url":"https://www.msn.com/",
       "method":"get",
       "end point":"",
       "security":"none"

@@ -50,6 +50,9 @@ import java.util.List;
 public class BarnDataLoader extends DataLoader {
     String[] groups = {};
     String[] excluded = {};
+    String defaultGroup = "barn";
+    boolean check_abstract = true;
+
     @Override
     public List<Goate> load() {
         cleanTempRoot("" + parameters.get("dir",""));
@@ -88,7 +91,7 @@ public class BarnDataLoader extends DataLoader {
     public Goate loadBarn(Object barn, String fileName){
         Goate rd = new ToGoate(barn).convert();
         if(rd!=null) {
-            if (fileName!=null&&("" + rd.get("abstract")).equals("true")) {
+            if (fileName!=null&&(check_abstract&&("" + rd.get("abstract")).equals("true"))) {
                 LOG.debug("Barn DataLoader","skipping: " + fileName);
                 rd = null;
             } else {
@@ -152,14 +155,13 @@ public class BarnDataLoader extends DataLoader {
 
     protected boolean checkGroups(Goate tc){
         boolean result = false;
+        String group = tc.get("groups", "", String.class)+","+parameters.get("groups",defaultGroup);
         if(groups.length==0){
             result = true;
         } else {
-            String group = tc.get("groups", "", String.class)+","+parameters.get("groups","");
             result = Arrays.stream(groups).parallel().anyMatch(group::contains);
         }
         if(excluded.length!=0){
-            String group = tc.get("groups", "", String.class)+","+parameters.get("groups","");
             result = result && !(Arrays.stream(excluded).parallel().anyMatch(group::contains));
         }
         return result;
@@ -169,10 +171,25 @@ public class BarnDataLoader extends DataLoader {
         return this;
     }
     public BarnDataLoader groups(String label) {
-        setParameter("groups", label);
+        setParameter("testGroups", label);
         return this;
     }
-
+    public BarnDataLoader excludes(String label) {
+        setParameter("excludeGroups", label);
+        return this;
+    }
+    public BarnDataLoader defaultGroup(String label){
+        this.defaultGroup = label;
+        return this;
+    }
+    public BarnDataLoader ignoreAbstract(){
+        this.check_abstract = false;
+        return this;
+    }
+    public BarnDataLoader checkAbstract(){
+        this.check_abstract = true;
+        return this;
+    }
     protected Goate modelData(Goate rd){
         Goate dl = new ToGoate(rd.get("data modeler",rd.get("data modelers","[]"))).convert();
         rd = rd.scrub("data modelers").scrub("data modeler");

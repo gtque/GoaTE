@@ -29,14 +29,28 @@ package com.thegoate.spreadsheets;
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.spreadsheets.data.SpreadSheetAbstractedDL;
+import com.thegoate.expect.Expectation;
+import com.thegoate.spreadsheets.dsl.words.LoadCsv;
+import com.thegoate.spreadsheets.pojo.CsvSource;
+import com.thegoate.spreadsheets.pojo.MapCsvPojo;
+import com.thegoate.spreadsheets.staff.GetCsvEmployee;
 import com.thegoate.spreadsheets.utils.SheetUtils;
+import com.thegoate.spreadsheets.utils.togoate.SpreadSheetToGoate;
+import com.thegoate.json.utils.togoate.JSONToGoate;
+
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.get.Get;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import static com.thegoate.dsl.words.LoadFile.fileAsAString;
+import static com.thegoate.utils.get.Nested.nested;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -47,23 +61,44 @@ public class CSVTest extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
     public void loadSimpleCSV() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        SheetUtils sheet = SheetUtils.build("sample.csv","the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
+        SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
         sheet.load();
-        assertEquals(sheet.get("a",0),"b");
-        assertEquals(sheet.get("a",1),"false");
-        assertEquals(sheet.get(0,0),"b");
-        assertEquals(sheet.get("c",0,"e"),"e");
-        assertEquals(sheet.get(2,0,3),3);
+        assertEquals(sheet.get("a", 0), "b");
+        assertEquals(sheet.get("a", 1), "false");
+        assertEquals(sheet.get(0, 0), "b");
+        assertEquals(sheet.get("c", 0, "e"), "e");
+        assertEquals(sheet.get(2, 0, 3), 3);
     }
 
     @Test(groups = {"unit"})
     public void loadSimpleCSVNoHeaders() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        SheetUtils sheet = SheetUtils.build("sample.csv","the sheet name does not matter.").firstRowIsNotHeader();
+        SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader();
         sheet.load();
-        assertEquals(sheet.get(0,0),"a");
-        assertEquals(sheet.get(1,1),"42,g");
-        assertEquals(sheet.get("c",0,"e"),"e");
-        assertEquals(sheet.get(2,0,3),3);
+        assertEquals(sheet.get(0, 0), "a");
+        assertEquals(sheet.get(1, 1), "42,g");
+        assertEquals(sheet.get("c", 0, "e"), "e");
+        assertEquals(sheet.get(2, 0, 3), 3);
+    }
+
+    @Test(groups = {"unit"})
+    public void getCSVByHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        if (data == null) {
+            data = new Goate();
+        }
+        Goate def = new Goate();
+        data.put(".definition", def);
+        def.put("file", "sample.csv");
+        GetCsvEmployee csv = new GetCsvEmployee();
+        Object parser = csv.init(data).work();
+        Get gp = new Get("get row#0>a");
+        assertEquals(gp.from(parser), "b");
+    }
+
+    @Test(groups = {"unit"})
+    public void loadCSVByHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        Object parser = LoadCsv.loadCsv("sample.csv", true);
+        Get gp = new Get("get row#0>a");
+        assertEquals(gp.from(parser), "b");
     }
 
     @Test(groups = {"unit"})
@@ -110,5 +145,67 @@ public class CSVTest extends TestNGEngineMethodDL {
         assertEquals(dataList.get(0).get("0"),"a");
         assertEquals(dataList.get(1).get("1"),"42,g");
         assertEquals(dataList.size(),3);
+    }
+
+	@Test(groups = {"unit"})
+    public void loadCSVByHeaderFromFile() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("sample.csv")), true);
+        Get gp = new Get(nested("get row#0", "a"));
+        assertEquals(gp.from(parser), "b");
+    }
+
+    @Test(groups = {"unit"})
+    public void mapCsvToJsonKeys() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map.csv")), true);
+        Goate data = new SpreadSheetToGoate(parser).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
+
+    @Test(groups = {"unit"})
+    public void mapWithDifferentKeysCsvToJsonKeys() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
+        Goate data = new SpreadSheetToGoate(parser).mapTo(CSVTOJSON.class).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
+
+    @Test(groups = {"unit"})
+    public void mapWithDifferentKeysMapCsvToJsonKeys() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
+        Map<String,String> map = new HashMap<>();
+        map.put("a", "nick");
+        map.put("z", "paul");
+        Goate data = new SpreadSheetToGoate(parser).mapTo(map).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
+
+    @Test(groups = {"unit"})
+    public void mapWithDifferentKeysPojoCsvToJsonKeys() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
+        Goate data = new SpreadSheetToGoate(parser).mapToPojo(MapCsvPojo.class, CsvSource.class).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
+
+    public enum CSVTOJSON{
+        a("nick"), z("paul");
+        String csvValue;
+        CSVTOJSON(String value){
+            this.csvValue = value;
+        }
+
+        public boolean map(String value){
+            return csvValue.equals(value);
+        }
     }
 }

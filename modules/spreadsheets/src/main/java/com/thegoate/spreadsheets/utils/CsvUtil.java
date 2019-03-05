@@ -26,43 +26,16 @@
  */
 package com.thegoate.spreadsheets.utils;
 
-import com.thegoate.Goate;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.Utility;
-import org.apache.commons.csv.CSVParser;
-
 /**
- * Base json util class that implements the isType method.
- * Created by Eric Angeli on 5/19/2017.
+ * Created by Eric Angeli on 8/9/2018.
  */
-public abstract class CsvUtil implements Utility {
-    protected final BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Object takeActionOn;
-    protected Object nested;
-    protected boolean processNested;
-    protected Goate health = new Goate();
-
-    public CsvUtil(Object val) {
-        processNested = true;
-        init(val);
-    }
-
-    protected void init(Object val){
-        if(val instanceof String && processNested){
-            String select = ""+val;
-            if((select).contains(">")){
-                nested = select.substring(select.indexOf(">")+1);
-                val = select.substring(0,select.indexOf(">"));
-            }
-        }
-        this.takeActionOn = val;
+public abstract class CsvUtil extends SpreadSheetUtil {
+    public CsvUtil(Object val){
+        super(val);
     }
 
     @Override
-    public Goate healthCheck(){
-        return health;
+    public boolean isType(Object check) {
+        return check instanceof CSVSheet;
     }
-
-    protected abstract Object processNested(Object subContainer);
 }

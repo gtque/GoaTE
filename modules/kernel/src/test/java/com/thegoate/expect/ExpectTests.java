@@ -33,8 +33,16 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.thegoate.dsl.words.LoadFile.fileAsAString;
+import static com.thegoate.expect.ExpectMatchWildcardIndexPath.matchWildcardIndex;
+import static com.thegoate.expect.ExpectWildcardIndexPath.wildcardIndex;
+import static org.testng.Assert.*;
 
 /**
  * Test expect framework.
@@ -49,7 +57,7 @@ public class ExpectTests {
         data.put("check if even.value", 4)
                 .put("check if even#1.value", 5);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        Expectation e2 = new Expectation(data).from("check if even#1").actual("return").is("!=").expected(true);
+        Expectation e2 = new Expectation(data).from("check if even#1").actual("return").isNotEqualTo(true);//.is("!=").expected(true);
         etb.expect("check if even>return,==,boolean::true").expect(e2)
                 .expect("check if even>return,!=,boolean::false");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
@@ -113,11 +121,67 @@ public class ExpectTests {
                 "[{'b':42}," +
                 "{'b':43}," +
                 "{'b':44}," +
-                "{'b':45}]]" +
+                "{'b':45}]]," +
+                "'z':[" +
+                "[{'y':42}," +
+                "{'y':43}," +
+                "{'y':44}," +
+                "{'y':45}]," +
+                "[{'y':42}," +
+                "{'y':43}," +
+                "{'y':44}," +
+                "{'y':45}]]" +
                 "}";
         data.put("check json.value", json);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>a.*.[*4].b,>,int::41");
+//        etb.expect(Expectation.build().actual("a.*.*.b").from(json).isEqualTo("z.%.\\%.y").fromExpected(json));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        StringBuilder ps = new StringBuilder();
+        for(Goate p:ev.passes()){
+            ps.append(p.toString());
+            ps.append("\n--------------------\n");
+        }
+        LOG.debug("passed:\n" + ps.toString());
+        StringBuilder fs = new StringBuilder();
+        for(Goate p:ev.fails()){
+            fs.append(p.toString());
+            fs.append("\n--------------------\n");
+        }
+        LOG.debug("failed:\n" + fs.toString());
+        assertTrue(result, ev.failed());
+    }
+
+    @Test
+    public void regexSampler() {
+        String pattern = "a.123.v.5.78950.z";
+        String pattern2 = "a.%.v.\\%.\\\\%.z";
+        String pattern3 = "a.\\%.v.\\\\%.%.5.z";
+        String[] index = pattern.split("[0-9]+");
+        Arrays.stream(index).forEach(i -> System.out.println(i));
+        System.out.println(index.length);
+        Expectation e = new Expectation(new Goate());
+        String p = "" + e.calculateKey(pattern2, pattern);
+        String p3 = "" + e.calculateKey(pattern3, pattern);
+        System.out.println(p);
+        System.out.println(p3);
+        assertEquals(p, pattern);
+        assertEquals(p3, "a.5.v.78950.123.5.z");
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonFromFileNested() {
+        Goate data = new Goate();
+        String json = fileAsAString("data/simpleNested.json");
+        data.put("check json.value", json);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(
+                Expectation.build()
+                        .actual("a.".concat(wildcardIndex()).concat(".").concat(wildcardIndex()).concat(".").concat(wildcardIndex()).concat(".x"))
+                        .from(json)
+                        .isEqualTo("b.".concat(matchWildcardIndex()).concat(".").concat(matchWildcardIndex(1)).concat(".").concat(matchWildcardIndex(2)).concat(".y"))
+                        .fromExpected(json));
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
@@ -277,7 +341,7 @@ public class ExpectTests {
     }
 
     @Test(groups = {"unit"})
-    public void selfDefinedDefinition(){
+    public void selfDefinedDefinition() {
         Goate data = new Goate();
         data.put("id", "42a");
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);

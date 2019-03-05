@@ -37,7 +37,7 @@ public class ApiPost extends ApiEmployee {
 
     @Override
     protected Object doWork() {
-        Object response = rest.post(data.get("end point","", true, String.class));
+        Object response = rest.post(definition.get("end point","", true, String.class));
         data.put("response", response);
         return response;
     }

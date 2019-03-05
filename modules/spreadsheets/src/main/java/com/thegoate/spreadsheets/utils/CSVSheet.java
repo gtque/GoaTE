@@ -32,9 +32,14 @@ import com.thegoate.utils.GoateUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Provides support for csv files and is the default.
@@ -43,60 +48,95 @@ import java.util.Iterator;
  */
 @IsDefault
 @GoateSheet(fileTypes = {"csv"})
-public class CSVSheet extends SheetUtils{
+public class CSVSheet extends SheetUtils {
+
+    @Override
+    public SheetUtils sheet(String sheetName) {
+        return this;
+    }
 
     @Override
     public Goate load() {
         data = new Goate();
-        if(fileName!=null&&!fileName.isEmpty()){
+        Reader in = null;
+        Goate sheetData = new Goate();
+        if (fileName != null && !fileName.isEmpty() && (file == null || !(file instanceof Reader))) {
             fileName = GoateUtils.getFilePath(fileName);
             try {
-                Reader in = new FileReader(fileName);
-                Iterable<CSVRecord> records =CSVFormat.RFC4180.parse(in);
+                if (new File(fileName).exists()) {
+                    in = new FileReader(fileName);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        if (file != null || in == null) {
+            if (file instanceof Reader) {
+                in = (Reader) file;
+            } else {
+                try {
+                    in = new FileReader((File) file);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (in != null) {
+            try {
+                Iterable<CSVRecord> records = CSVFormat.RFC4180.parse(in);
                 boolean headersFound = false;
                 int row = 0;
-                for(CSVRecord record : records){
+                for (CSVRecord record : records) {
                     Iterator iterator = record.iterator();
                     int count = 0;
                     Goate theRow = new Goate();
-                    while(iterator.hasNext()) {
+                    List<String> headerList = new ArrayList<>();
+                    while (iterator.hasNext()) {
                         Object value = iterator.next();
                         if (firstRowIsHeader && !headersFound) {
-                            headers.add(""+value);
-                        }else{
-                            String id = ""+count;
-                            if(firstRowIsHeader){
-                                id = headers.get(count);
+                            headerList.add("" + value);
+                        } else {
+                            String id = "" + count;
+                            if (firstRowIsHeader) {
+                                id = headers.get(sheetName).get(count);
                             }
                             theRow.put(id, value);
                         }
                         count++;
                     }
-                    if(headersFound||!firstRowIsHeader) {
-                        data.put(""+row, theRow);
+                    if (headersFound || !firstRowIsHeader) {
+                        sheetData.put("" + row, theRow);
                         row++;
+                    } else {
+                        headers.put(sheetName, headerList);
                     }
                     headersFound = true;
                 }
-            }catch(Exception e){
-                LOG.warn("problem loading csv file ("+fileName+"):"+e.getMessage(), e);
+                data.put(sheetName, sheetData);
+            } catch (Exception e) {
+                LOG.warn("problem loading csv file (" + fileName + "):" + e.getMessage(), e);
             }
         }
         return data;
     }
 
     @Override
-    public SheetUtils set(int col, int row, Object value) {
-        return null;
+    public int rowCount() {
+        return data.get(sheetName, new Goate(), Goate.class).size();
     }
 
     @Override
-    public SheetUtils set(String col, int row, Object value) {
-        return null;
+    public SheetUtils createNew() {
+        return this;
     }
 
     @Override
     public SheetUtils writeToFile() {
         return null;
+    }
+
+    @Override
+    public SheetUtils close() {
+        return this;
     }
 }

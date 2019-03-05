@@ -30,6 +30,7 @@ package com.thegoate.utils.get;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.UnknownUtilType;
 
 /**
  * Base class for Get Utilities. Adds logger, and class level variables.
@@ -43,6 +44,7 @@ public abstract class GetTool implements GetUtility{
     protected Object nested = null;
     protected Object container = null;
     protected Goate health = new Goate();
+    protected Goate data;
 
     public GetTool(Object selector){
         if(selector instanceof String){
@@ -53,6 +55,12 @@ public abstract class GetTool implements GetUtility{
             }
         }
         this.selector = selector;
+    }
+
+    @Override
+    public GetTool setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     @Override

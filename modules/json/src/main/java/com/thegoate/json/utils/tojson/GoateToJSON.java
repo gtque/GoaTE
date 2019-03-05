@@ -32,6 +32,8 @@ import com.thegoate.json.utils.get.GetJsonField;
 import com.thegoate.json.utils.insert.InsertJson;
 import com.thegoate.utils.GoateUtility;
 import com.thegoate.utils.get.NotFound;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +43,7 @@ import java.util.Set;
 /**
  * Created by Eric Angeli on 4/18/2018.
  */
+@ToJsonUtil
 public class GoateToJSON extends GoateUtility implements ToJsonUtility{
 
     public GoateToJSON(Object val) {
@@ -78,7 +81,7 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                         if (!keyFull.isEmpty()) {
                             exists = checkKey(json, keyFull);
                         }
-                        if (!exists) {
+                        if (!exists||!keyFull.isEmpty()) {
                             exists = checkKey(json, dKey);
                         }
                     } catch (Exception e) {
@@ -92,9 +95,9 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                         }
                     } else {
                         if(!strict) {
-                            json = new InsertJson(key, takeActionOn.get(dKey)).into(json).in(keyFull).insert();
+                            json = ""+new InsertJson(key, takeActionOn.get(dKey)).into(json).in(keyFull).insert();
                         } else {
-                            json = new InsertJson(key, takeActionOn.getStrict(dKey)).into(json).in(keyFull).insert();
+                            json = ""+new InsertJson(key, takeActionOn.getStrict(dKey)).into(json).in(keyFull).insert();
                         }
                     }
 //                    json = Insert.json(key, to.getObject()).into(json).in(keyFull).insert();
@@ -103,9 +106,22 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                 }
             }
         }
-        return json;
+        return prettyPrint(json);
     }
 
+    protected String prettyPrint(String json){
+        String pretty = json;
+        try{
+            pretty = new JSONObject(json).toString(3);
+        } catch (Exception e){
+            try{
+                pretty = new JSONArray(json).toString(3);
+            } catch(Exception e2) {
+                LOG.warn("Goate To Json", "Failed to pretty print the json", e);
+            }
+        }
+        return  pretty;
+    }
     protected List<String> filteredKeys(Set<String> keys){
         List<String> list = new ArrayList<>();
         if(keys!=null){

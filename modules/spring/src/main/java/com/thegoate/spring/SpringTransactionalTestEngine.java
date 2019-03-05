@@ -27,12 +27,14 @@
 package com.thegoate.spring;
 
 import com.thegoate.Goate;
+import com.thegoate.expect.Expectation;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.ITest;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -151,6 +153,31 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     @Override
     public TestNG put(String key, Object val) {
         return engine.put(key, val);
+    }
+
+    @Override
+    public TestNG expect(Expectation expectation) {
+        return engine.expect(expectation);
+    }
+
+    @Override
+    public TestNG evalPeriod(long periodMS) {
+        return engine.evalPeriod(periodMS);
+    }
+
+    @Override
+    public TestNG evalTimeout(long timeoutMS) {
+        return engine.evalTimeout(timeoutMS);
+    }
+
+    @Override
+    public void evaluate() {
+        engine.evaluate();
+    }
+
+    @Override
+    public TestNG clearExpectations() {
+        return engine.clearExpectations();
     }
 
     @Override

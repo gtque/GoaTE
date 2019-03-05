@@ -24,40 +24,35 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.spreadsheets.utils.compare;
+package com.thegoate.spreadsheets.pojo;
 
-import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
 
 /**
- * Compares a csv record (aka a row) to another csv record)<br>
- * returns true of they are equal, otherwise false.
- * Created by Eric Angeli on 8/10/2018.
+ * Created by Eric Angeli on 12/7/2018.
  */
-@CompareUtil(operator = "==", type = "csv")
-public class ComareCSVRowsEqual extends CompareCsvRecord {
+@GoatePojo(id = "csv to json map pojo")
+public class MapCsvPojo {
 
-    public ComareCSVRowsEqual(Object val) {
-        super(val);
+    @GoateSource(source = CsvSource.class, key="nick")
+    private String a = null;
+    @GoateSource(source = CsvSource.class, key="paul")
+    private String z = null;
+
+    public String getA() {
+        return a;
     }
 
-    @Override
-    protected Object processNested(Object subContainer) {
-        return null;
+    public void setA(String a) {
+        this.a = a;
     }
 
-    @Override
-    public boolean evaluate() {
-        boolean result = actual.size()==expected.size();
-        if(result) {
-            for (int i = 0; i < actual.size(); i++) {
-                if (!actual.get(i).equals(expected.get(i))) {
-                    result = false;
-                    health.put("not equal##", "("+i+"): " + actual.get(i) + " != " + expected.get(i));
-                }
-            }
-        } else {
-            health.put("number of columns##", "different number of columns: " + actual.size() + " != " + expected.size());
-        }
-        return result;
+    public String getZ() {
+        return z;
+    }
+
+    public void setZ(String z) {
+        this.z = z;
     }
 }

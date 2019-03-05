@@ -37,7 +37,7 @@ public class ApiPatch extends ApiEmployee {
 
     @Override
     protected Object doWork() {
-        Object response = rest.patch(data.get("end point","", true, String.class));
+        Object response = rest.patch(definition.get("end point","", true, String.class));
         data.put("response", response);
         return response;
     }

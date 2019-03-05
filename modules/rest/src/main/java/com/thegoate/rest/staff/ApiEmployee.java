@@ -44,7 +44,7 @@ public abstract class ApiEmployee extends Employee {
 
     @Override
     public Employee init() {
-        String security = "" + data.get("security", "none");
+        String security = "" + definition.get("security", "none");
         try {
             rest = findAndBuildRestSpec(security);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
@@ -58,18 +58,18 @@ public abstract class ApiEmployee extends Employee {
         AnnotationFactory af = new AnnotationFactory();
         spec = (RestSpec)af.annotatedWith(GoateRest.class).find(security).using("security").build();
         if(spec!=null) {
-            spec.baseURL(data.get("base url", null, true, String.class));
-            spec.headers(data.filterAndSplitKeyValuePairs("headers."));
-            spec.urlParams(data.filterAndSplitKeyValuePairs("url params."));
-            spec.queryParams(data.filterAndSplitKeyValuePairs("query params."));
-            spec.pathParams(data.filterAndSplitKeyValuePairs("path params."));
-            if(data.get("body")!=null) {
-                spec.body(data.get("body"));
+            spec.baseURL(definition.get("base url", null, true, String.class));
+            spec.headers(definition.filterAndSplitKeyValuePairs("headers."));
+            spec.urlParams(definition.filterAndSplitKeyValuePairs("url params."));
+            spec.queryParams(definition.filterAndSplitKeyValuePairs("query params."));
+            spec.pathParams(definition.filterAndSplitKeyValuePairs("path params."));
+            if(definition.get("body")!=null) {
+                spec.body(definition.get("body"));
             }
-            spec.formData(data.filterAndSplitKeyValuePairs("form params."));
-            spec.multipartData(data.filterAndSplitKeyValuePairs("multipart"));
-            spec.customData(data.filterAndSplitKeyValuePairs("custom params."));
-            spec.timeout(Integer.parseInt(""+data.get("rest.timeout",15)));
+            spec.formData(definition.filterAndSplitKeyValuePairs("form params."));
+            spec.multipartData(definition.filterAndSplitKeyValuePairs("multipart"));
+            spec.customData(definition.filterAndSplitKeyValuePairs("custom params."));
+            spec.timeout(Integer.parseInt(""+definition.get("rest.timeout",15)));
             spec.config();
         }
         return spec;

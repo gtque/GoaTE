@@ -33,7 +33,7 @@ import com.thegoate.staff.GoateJob;
  * Simple employee that checks if the parameter in CheckEven##.value is even or not.
  * Created by Eric Angeli on 5/10/2017.
  */
-@GoateJob(jobs = {"check json"})
+@GoateJob(jobs = {"check json","check paul"})
 public class CheckJson extends Employee {
     String value = "{}";
     @Override

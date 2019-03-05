@@ -50,7 +50,7 @@ public class Get extends UnknownUtilType implements GetUtility{
     @Override
     public Object from(Object container) {
         tool = (GetUtility)buildUtil(container, GetUtil.class, find);
-        Object result = null;
+        Object result = new NotFound("Get tool not found, make sure a proper get util is implemented or on the class path.");
         if(tool!=null){
             result = tool.from(container);
         }
