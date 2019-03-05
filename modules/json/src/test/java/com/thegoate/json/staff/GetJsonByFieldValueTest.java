@@ -28,6 +28,7 @@ package com.thegoate.json.staff;
 
 import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
+import com.thegoate.metrics.Stopwatch;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.get.Get;
 import org.testng.annotations.Factory;
@@ -61,13 +62,17 @@ public class GetJsonByFieldValueTest extends TestNGEngineMethodDL {
                         .add("expected", "c"))
                 .put("dl##", new StaticDL().add("Scenario", "find d by pickles")
                         .add(".definition", "file::find_defD.json")
-                        .add("expected", "d"));
+                        .add("expected", "d"))
+                .put("dl##", new StaticDL().add("Scenario", "find nested by cc")
+                        .add(".definition", "file::find_defD.json")
+                        .add("expected", 2)
+                        .add("check field","size()"));
     }
 
     @Test(groups = {"unit"})
     public void findObjectInArray(){
         Object found = new GetJsonByFieldValue().init(data).work();
-        String actual = "" + new Get("name").from(found);
-        assertEquals(actual, data.get("expected"));
+        String actual = "" + new Get(get("check field","name")).from(found);
+        assertEquals(actual, ""+data.get("expected"));
     }
 }

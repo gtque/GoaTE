@@ -42,4 +42,5 @@ import java.lang.annotation.RetentionPolicy;
 @Info
 @IndexAnnotated
 public @interface IsDefault {
+    boolean forType() default false;
 }

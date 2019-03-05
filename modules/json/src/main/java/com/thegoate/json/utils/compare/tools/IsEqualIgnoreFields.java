@@ -29,8 +29,11 @@ package com.thegoate.json.utils.compare.tools;
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.json.utils.fill.FillJson;
+import com.thegoate.json.utils.tojson.ToJson;
+import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.togoate.ToGoate;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,17 +62,19 @@ public class IsEqualIgnoreFields extends CompareJson {
 
     @Override
     public boolean evaluate() {
-        Goate expectedDef = new ToGoate(expected.toString()).convert();
+        Goate expectedDef = new ToGoate(expected).convert();
         Goate drop = new Goate();
         JSONArray ignored = new JSONArray(""+expectedDef.get("_goate_ignore","[]"));
         expectedDef.merge(data,false);
         Object expectedJson = expectedDef.get("expected json", new JSONObject(expected.toString()));
         defineIgnore(drop, ignored);
+        Object tao = null;
         if (drop.size()>0) {
             expectedJson = new FillJson(expectedJson).with(drop);
-            takeActionOn = new FillJson(takeActionOn).with(drop);
+            tao = new ToJson(takeActionOn).convert();
+            tao = new FillJson(tao).with(drop);
         }
-        CompareUtility compare = new CompareJsonEqualTo(takeActionOn).to(expectedJson);
+        CompareUtility compare = new Compare(tao).to(expectedJson).using("==");
         boolean result = compare.evaluate();
         health = compare.healthCheck();
         return result;

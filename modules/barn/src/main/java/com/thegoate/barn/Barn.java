@@ -125,12 +125,7 @@ public class Barn extends TestNGEngine {
                 throw t;
             } finally {
                 if (ev != null) {
-                    for (Goate p : ev.passes()) {
-                        LOG.pass(getTestName(), "PASSED: " + p.toString());
-                    }
-                    for (Goate f : ev.fails()) {
-                        LOG.fail(getTestName(), "FAILED: " + f.toString());
-                    }
+                    logStatuses(ev);
                 }
                 LOG.debug(getTestName(), "----finished expectations----");
                 cleanup();

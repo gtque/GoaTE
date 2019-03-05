@@ -47,20 +47,22 @@ public abstract class SheetUtils {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = new Goate();
     protected String fileName = "";
-    protected String sheetName = ""+System.nanoTime();
+    protected String sheetName = "" + System.nanoTime();
     protected Map<String, List<String>> headers = new ConcurrentHashMap<>();
     protected boolean firstRowIsHeader = true;
     protected boolean loadAllData = false;
     protected Object file = null;
 
     public abstract int rowCount();
-    public Goate getRow(int rowNumber){
-        return currentSheet().get(""+rowNumber,new Goate(), Goate.class);
+
+    public Goate getRow(int rowNumber) {
+        return currentSheet().get("" + rowNumber, new Goate(), Goate.class);
     }
 
-    public Goate currentSheet(){
+    public Goate currentSheet() {
         return data.get(sheetName, new Goate(), Goate.class);
     }
+
     public SheetUtils newFile(String fileName) {
         file(fileName);
         return newFile();
@@ -70,24 +72,24 @@ public abstract class SheetUtils {
         return createNew();
     }
 
-    public SheetUtils loadAllData(){
+    public SheetUtils loadAllData() {
         this.loadAllData = true;
         return this;
     }
 
-    public SheetUtils stopAtFirstEmptyRow(){
+    public SheetUtils stopAtFirstEmptyRow() {
         this.loadAllData = false;
         return this;
     }
 
     public abstract SheetUtils createNew();
 
-    public SheetUtils file(File file){
+    public SheetUtils file(File file) {
         this.file = file;
         return this;
     }
 
-    public SheetUtils file(Reader file){
+    public SheetUtils file(Reader file) {
         this.file = file;
         return this;
     }
@@ -102,7 +104,7 @@ public abstract class SheetUtils {
         return this;
     }
 
-    public String sheetName(){
+    public String sheetName() {
         return sheetName;
     }
 
@@ -111,7 +113,7 @@ public abstract class SheetUtils {
     }
 
     public List<String> headers(String sheetName) {
-        return headers.get(sheetName)==null?new ArrayList<>():headers.get(sheetName);
+        return headers.get(sheetName) == null ? new ArrayList<>() : headers.get(sheetName);
     }
 
     public SheetUtils firstRowIsNotHeader() {
@@ -192,7 +194,7 @@ public abstract class SheetUtils {
     public abstract SheetUtils close();
 
     public static SheetUtils build(String fileName) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        return build(fileName, (String)null);
+        return build(fileName, (String) null);
     }
 
     public static SheetUtils build(String fileName, File file) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -204,7 +206,7 @@ public abstract class SheetUtils {
     }
 
     public static SheetUtils build(String fileName, String sheetName) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        return build(fileName, sheetName, (File)null);
+        return build(fileName, sheetName, (File) null);
     }
 
     public static SheetUtils build(String fileName, String sheetName, File file) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -212,20 +214,28 @@ public abstract class SheetUtils {
     }
 
     public static SheetUtils build(String fileName, String sheetName, Reader file) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        return getUtil(getExt(fileName)).file(fileName).sheet(sheetName).file(file);
+        SheetUtils util = getUtil(getExt(fileName));
+        util.file(fileName);
+        util.sheet(sheetName);
+        util.file(file);
+        return util;
     }
 
-    protected static String getExt(String fileName){
+    protected static String getExt(String fileName) {
         String ext = "";
-        int extIndex = fileName.lastIndexOf(".");
+        int extIndex = fileName == null ? -1 : fileName.lastIndexOf(".");
         if (extIndex >= 0 && extIndex < fileName.length() - 1) {
             ext = fileName.substring(extIndex + 1);
+        }
+        if(!ext.equalsIgnoreCase("xls")&&!ext.equalsIgnoreCase("xlsx")){
+            ext = "csv";
         }
         return ext;
     }
 
     protected static SheetUtils getUtil(String ext) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         AnnotationFactory af = new AnnotationFactory();
-        return (SheetUtils) af.annotatedWith(GoateSheet.class).find(ext).using("fileTypes").build();
+        af.annotatedWith(GoateSheet.class).find(ext).using("fileTypes");
+        return (SheetUtils) af.build();
     }
 }

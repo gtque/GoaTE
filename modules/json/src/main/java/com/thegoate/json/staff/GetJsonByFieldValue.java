@@ -34,6 +34,9 @@ import com.thegoate.staff.GoateJob;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Finds a json field by value.
  * Created by Eric Angeli on 8/27/2018.
@@ -50,13 +53,18 @@ public class GetJsonByFieldValue extends Employee {
         return new GetJsonByFieldValue().valueToFind(value);
     }
 
+    public GetJsonByFieldValue root(String rootPattern){
+        definition.put("root", rootPattern);
+        return this;
+    }
+
     public GetJsonByFieldValue valueToFind(Object value){
         definition.put("value", value);
         return this;
     }
 
     public GetJsonByFieldValue pathPattern(String pattern){
-        definition.put("path", pattern);
+        definition.put("key", pattern);
         return this;
     }
 
@@ -89,6 +97,7 @@ public class GetJsonByFieldValue extends Employee {
     protected Object doWork() {
         Goate json;
         String foundKey = "";
+        String root = definition.get("root", null, String.class);
         Object theJson = definition.get("json", "{}");
         boolean fromResult = definition.get("from result", false, Boolean.class);
         Object value = definition.get("value", null);
@@ -98,24 +107,43 @@ public class GetJsonByFieldValue extends Employee {
         } else {
             json = new JSONToGoate(new Get("body as a string").from(definition.get("_goate_result", "{}"))).convert();
         }
-        Goate filtered = json.filter(field);
-        for (String key : filtered.keys()) {
-            if (filtered.get(key) != null && filtered.get(key).equals(value)) {
-                foundKey = key;
-                break;
+        List<Object> roots = new ArrayList<>();
+        if (root == null) {
+            roots.add(json);
+        } else {
+            for(String key:json.filterStrict(root).keys()){
+                roots.add(json.get(key));
             }
         }
-        if (foundKey.contains(".")) {
-            foundKey = foundKey.substring(0, foundKey.lastIndexOf("."));
-        } else {
-            foundKey = "";
+        for (Object oj : roots) {
+            Goate jt = new ToGoate(oj).convert();
+            Goate filtered = jt.filterStrict(field);
+            for (String key : filtered.keys()) {
+                if (filtered.get(key) != null && filtered.get(key).equals(value)) {
+                    foundKey = key;
+                    break;
+                }
+            }
+            if(!foundKey.isEmpty()) {
+                if (root == null) {
+                    if (foundKey.contains(".")) {
+                        foundKey = foundKey.substring(0, foundKey.lastIndexOf("."));
+                    } else {
+                        foundKey = "";
+                    }
+                } else {
+                    theJson = oj;
+                    foundKey = "";
+                }
+                break;
+            }
         }
         return foundKey.isEmpty() ? theJson : json.get(foundKey);
     }
 
     @Override
     public String[] detailedScrub() {
-        String[] scrub = {"path", "key", "value", "from result", "json"};
+        String[] scrub = {"root", "path", "key", "value", "from result", "json"};
         return scrub;
     }
 }

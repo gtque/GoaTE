@@ -29,6 +29,7 @@ package com.thegoate.json.utils.compare.tools;
 import com.thegoate.json.JsonUtil;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.utils.get.NotFound;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -126,7 +127,12 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
             String key = (String) it.next();
             try {
                 Object o = j1.get(key);
-                Object o2 = j2.get(key);
+                Object o2 = new NotFound("Field Not found");
+                try{
+                    o2 = j2.get(key);
+                } catch (Exception e){
+                    LOG.debug("Compare Json", "Field not found in expected: " + key);
+                }
                 if (o != null && o2 != null) {
                     if (o instanceof JSONObject) {
                         if (o2 instanceof JSONObject) {

@@ -73,6 +73,9 @@ public class GetRAResponse extends GetTool implements ResetStatic {
     @Override
     public Object from(Object container) {
         Object result = null;
+        if((""+selector).contains("get_from_rest_response::")) {
+            selector = (""+selector).replace("get_from_rest_response::","");
+        }
         if(container!=null){
             Response r = (Response)container;
             if(selector.equals("status code")){

@@ -29,6 +29,7 @@ package com.thegoate;
 
 import com.thegoate.dsl.Interpreter;
 import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.togoate.ToGoate;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -110,7 +111,7 @@ public class Goate {
         String fullKey = key;
         if (increment) {
             while (fullKey.contains("##")) {
-                Goate billy = filter(fullKey.substring(0, fullKey.indexOf("##")) + "*[0-9]");
+                Goate billy = filter(fullKey.substring(0, fullKey.indexOf("##")) + "[0-9]+");
                 fullKey = fullKey.replaceFirst("##", "" + billy.size());
             }
         } else {
@@ -218,17 +219,26 @@ public class Goate {
      * @return A Goate collection containing matching elements.
      */
     public Goate filter(String pattern) {
+        return filterStrict(pattern+".*");
+    }
+
+    /**
+     * Simple filter, matches if key matches the given pattern
+     *
+     * @param pattern The pattern to match
+     * @return A Goate collection containing matching elements.
+     */
+    public Goate filterStrict(String pattern) {
         Goate filtered = new Goate();
         if (data != null) {
             for (String key : keys()) {
-                if (key.matches(pattern + ".*")) {
+                if (key.matches(pattern)) {
                     filtered.put(key, getStrict(key));
                 }
             }
         }
         return filtered;
     }
-
     /**
      * Simple filter, matches if key does start with the given pattern; ie excludes anything matching the pattern
      *
@@ -309,7 +319,7 @@ public class Goate {
                 sb.append("\n");
             }
             appendNewLine = true;
-            sb.append(prepadding).append(key).append("=").append(data.get(key)).append(postpadding);
+            sb.append(prepadding).append(key).append(":").append(data.get(key)).append(postpadding);
         }
         return sb.toString();
     }
@@ -317,6 +327,12 @@ public class Goate {
     @Override
     public boolean equals(Object check) {
         boolean result = false;
+        if(!(check instanceof Goate)){
+            Goate castCheck = new ToGoate(check).convert();
+            if(castCheck!=null){
+                check = castCheck;
+            }
+        }
         if (check instanceof Goate) {
             Goate gCheck = (Goate) check;
             result = true;

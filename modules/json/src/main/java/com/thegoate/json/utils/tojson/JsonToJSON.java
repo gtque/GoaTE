@@ -24,41 +24,42 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.expect;
+package com.thegoate.json.utils.tojson;
 
-import com.thegoate.Goate;
-import com.thegoate.annotations.GoateDescription;
-import com.thegoate.dsl.DSL;
-import com.thegoate.dsl.GoateDSL;
+import com.thegoate.json.JsonUtil;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
- * Useful for building paths in expectations with a wildcard index, such as json arrays.
- * Created by Eric Angeli on 11/29/2018.
+ * Created by Eric Angeli on 4/18/2018.
  */
-@GoateDSL(word = "matchWildcardIndex")
-@GoateDescription(description = "uses the same index for the corresponding wildCardIndex, must be used in conjunction with wildcardIndex. Typically used in the expected path of an expectation.",
-        parameters = {"matchIndex:=the index value to be matched in the 'actual' key path."})
-public class ExpectMatchWildcardIndexPath extends DSL {
+@ToJsonUtil
+public class JsonToJSON extends JsonUtil implements ToJsonUtility{
 
-    public ExpectMatchWildcardIndexPath(Object value) {
-        super(value);
+    public JsonToJSON(Object val) {
+        super(val);
     }
 
-    public static String matchWildcardIndex() {
-        return "%";
-    }
-
-    public static String matchWildcardIndex(int matchIndex) {
-        StringBuilder wc = new StringBuilder("");
-        for (; matchIndex > 0; matchIndex--) {
-            wc.append("\\");
-        }
-        return wc.append("%").toString();
+    boolean strict = false;
+    @Override
+    protected Object processNested(Object subContainer) {
+        return null;
     }
 
     @Override
-    public Object evaluate(Goate data) {
-        Object first = get(1, data);
-        return matchWildcardIndex(Integer.parseInt("" + first));
+    public String convertStrict(){
+        strict = true;
+        return convert();
     }
+
+    @Override
+    public String convert() {
+        if(takeActionOn instanceof JSONObject){
+            takeActionOn = ((JSONObject)takeActionOn).toString(4);
+        } else if(takeActionOn instanceof JSONArray){
+            takeActionOn = ((JSONArray)takeActionOn).toString(4);
+        }
+        return takeActionOn.toString();
+    }
+
 }

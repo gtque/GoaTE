@@ -32,6 +32,7 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,8 +48,8 @@ public class ExpectEvaluator {
 
     List<ExpectThreadExecuter> expectations = null;
     StringBuilder failed = new StringBuilder("");
-    List<Goate> fails = new ArrayList<>();
-    List<Goate> passes = new ArrayList<>();
+    volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
+    volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
 
     public ExpectEvaluator(ExpectationThreadBuilder etb){
         buildExpectations(etb);

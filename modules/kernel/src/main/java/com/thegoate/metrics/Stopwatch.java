@@ -53,7 +53,7 @@ public class Stopwatch {
 
     public Timer lap(String lap){
         LOG.debug("Stopwatch", "lap: " + lap);
-        return timers.get("lap", new Timer(), Timer.class);
+        return timers.get(lap, new Timer(), Timer.class);
     }
 
     public Stopwatch start(){

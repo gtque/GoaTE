@@ -30,29 +30,29 @@ package com.thegoate.rest;
  * Created by Eric Angeli on 11/26/2018.
  */
 public class RestResult {
-    public static final String statusCode = "status code";
-    public static final String bodyAsAString = "body as a string";
-    public static final String body = "body";
-    public static final String responseTime = "response time";
-    public static final String sessionId = "session id";
-    public static final String statusLine = "status line";
-    public static final String json = "json";
-    public static final String xml = "xml";
-    public static final String html = "html";
+    public static final String statusCode = "get_from_rest_response::status code";
+    public static final String bodyAsAString = "get_from_rest_response::body as a string";
+    public static final String body = "get_from_rest_response::body";
+    public static final String responseTime = "get_from_rest_response::response time";
+    public static final String sessionId = "get_from_rest_response::session id";
+    public static final String statusLine = "get_from_rest_response::status line";
+    public static final String json = "get_from_rest_response::json";
+    public static final String xml = "get_from_rest_response::xml";
+    public static final String html = "get_from_rest_response::html";
 
     public static final String header(String header) {
-        return "header " + header;
+        return "get_from_rest_response::header " + header;
     }
 
     public static final String cookie(String cookie) {
-        return "cookie " + cookie;
+        return "get_from_rest_response::cookie " + cookie;
     }
 
     public static final String detailedCookie(String cookie) {
-        return "detailedCookie " + cookie;
+        return "get_from_rest_response::detailedCookie " + cookie;
     }
 
-    public static final String inputStream = "input stream";
+    public static final String inputStream = "get_from_rest_response::input stream";
 
     public static final String getField(String field){
         return field;

@@ -1,0 +1,7 @@
+{
+  "value": "cc",
+  "from result": false,
+  "root": "data\\.[0-9]*",
+  "key": "[0-9]*\\.name",
+  "json": "file::find_nested.json"
+}

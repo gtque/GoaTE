@@ -351,11 +351,9 @@ public class IgnoreFieldsTest {
         boolean resultact = ev.evaluate();
         CompareUtility comp = new IsEqualIgnoreFields(actual).to(expected);
         CompareUtility compa = new IsEqualIgnoreFields(actual).to(expected2);
-        //CompareUtility compact = new IsEqualIgnoreFields(actual).to(actual);
         CompareUtility comp2 = new CompareJsonEqualTo(actual).to(expected);
         boolean result = comp.evaluate();
         boolean resulta = compa.evaluate();
-        //boolean resultact = compact.evaluate();
         System.out.println(comp.healthCheck());
         assertTrue(result);
         assertTrue(resulta);

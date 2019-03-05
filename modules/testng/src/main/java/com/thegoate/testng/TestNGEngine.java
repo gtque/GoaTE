@@ -261,14 +261,32 @@ public abstract class TestNGEngine implements ITest, TestNG {
         } else {
             ExpectEvaluator ev = new ExpectEvaluator(etb);
             boolean result = ev.evaluate();
-            for (Goate p : ev.passes()) {
-                LOG.pass(getTestName(), "PASSED: " + p.toString());
-            }
-            for (Goate f : ev.fails()) {
-                LOG.fail(getTestName(), "FAILED: " + f.toString());
-            }
+            logStatuses(ev);
             assertTrue(result, ev.failed());
         }
+    }
+
+    protected void logStatuses(ExpectEvaluator ev){
+        StringBuilder ps = new StringBuilder();
+        for(Goate p:ev.passes()){
+            try {
+                ps.append(p.toString());
+                ps.append("\n--------------------\n");
+            } catch (Exception e){
+                LOG.info("Evaulate", "A problem was encountered trying to publish the passed expectations: " + e.getMessage(), e);
+            }
+        }
+        LOG.debug("passed:\n" + ps.toString());
+        StringBuilder fs = new StringBuilder();
+        for(Goate p:ev.fails()){
+            try {
+                fs.append(p.toString());
+                fs.append("\n--------------------\n");
+            } catch (Exception e){
+                LOG.info("Evaulate", "A problem was encountered trying to publish the failed expectations: " + e.getMessage(), e);
+            }
+        }
+        LOG.debug("failed:\n" + fs.toString());
     }
 
     @Override

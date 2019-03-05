@@ -78,6 +78,15 @@ public class UnknownUtilType implements Utility {
         return buildUtil(obj, util, obj, id, identifier);
     }
 
+    /**
+     * Attempts to find and build the correct implementation of the utility.
+     * @param obj
+     * @param util
+     * @param val
+     * @param id
+     * @param identifier
+     * @return
+     */
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier) {
         Object utility = null;
         Class def = null;
@@ -91,15 +100,19 @@ public class UnknownUtilType implements Utility {
                 Class c = Object.class;
                 try {
                     c = utils.get(key);
-                    Annotation d = c.getAnnotation(IsDefault.class);
-                    if(d!=null){
+                    IsDefault d = (IsDefault)c.getAnnotation(IsDefault.class);
+                    if(d!=null&&!d.forType()){
                         def = c;
                     }else {
                         Class[] types = {Object.class};
                         Method check = c.getMethod("isType", types);
                         Object u = af.constructor(null).build(c);
                         if (check != null && Boolean.parseBoolean(""+check.invoke(u, checkArgs))) {
-                            utility = u;
+                            if(d!=null&&d.forType()){
+                                def = c;
+                            } else {
+                                utility = u;
+                            }
                         }
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |InstantiationException e) {

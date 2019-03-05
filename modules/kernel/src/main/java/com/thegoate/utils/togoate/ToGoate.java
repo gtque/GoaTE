@@ -38,7 +38,7 @@ import com.thegoate.utils.UnknownUtilType;
 public class ToGoate extends UnknownUtilType implements ToGoateUtility{
     boolean autoIncrement = true;
     ToGoateUtility tool = null;
-    Object original = null;
+    protected Object original = null;
 
     public ToGoate(Object o){
         this.original = o;

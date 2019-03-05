@@ -43,6 +43,7 @@ import java.util.Set;
 /**
  * Created by Eric Angeli on 4/18/2018.
  */
+@ToJsonUtil
 public class GoateToJSON extends GoateUtility implements ToJsonUtility{
 
     public GoateToJSON(Object val) {

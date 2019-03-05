@@ -24,31 +24,16 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.expect.test;
+package com.thegoate.expect.extras;
 
-import com.thegoate.staff.Employee;
-import com.thegoate.staff.GoateJob;
+import com.thegoate.expect.Expectation;
 
 /**
- * Simple employee that checks if the parameter in CheckEven##.value is even or not.
- * Created by Eric Angeli on 5/10/2017.
+ * Created by Eric Angeli on 2/28/2019.
  */
-@GoateJob(jobs = {"check json","check paul"})
-public class CheckJson extends Employee {
-    String value = "{}";
+public class ZeroOrMore implements Extra {
     @Override
-    public Employee init() {
-        value = ""+data.get(getName()+".value");
-        return this;
-    }
-
-    @Override
-    protected Object doWork() {
-        return value;
-    }
-
-    @Override
-    public String[] detailedScrub(){
-        return null;
+    public void processExtra(Expectation expectation, Object value) {
+        expectation.zeroOrMore();
     }
 }

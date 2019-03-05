@@ -59,12 +59,15 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     @Override
     public boolean evaluate() {
         if(tool==null){
-            buildTool();
+            buildTool();//step into here if the tool is still null for some reason.
         }
+        //if tool is still null, this indicates a problem trying to find the
+        //right comparator. Either nothing was found or there was no default.
+        // if tool is null, re-run debug and step into buildtool above.
         boolean result = false;
         try {
             tool.to(expected).using(operator);
-            result = tool.evaluate();
+            result = tool.evaluate();//step into evaluate here to debug the comparator implementation
         }catch (Exception e){
             LOG.debug("Compare", "Failed to compare: " + e.getMessage(), e);
         }
