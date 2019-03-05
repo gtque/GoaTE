@@ -139,6 +139,7 @@ public class SimpleTimings extends TestNGEngineAnnotatedDL {
         data.put("path1", "a.+.[*0,1].b");
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("check json>o::path1,>,int::41");
+        etb.expect("check json>a.0.0.b,!=,int::42");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         logStatuses(ev);
