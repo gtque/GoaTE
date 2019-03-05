@@ -315,7 +315,7 @@ public class Expectation {
                     source = from;
                 }
             } catch (Throwable e) {
-                LOG.error("Expectation", "Problem get the source for comparison: " + e.getMessage(), e);
+                LOG.error("Expectation", "Problem getting the source for comparison: " + e.getMessage(), e);
                 logFail(e);
                 source = null;
             }
@@ -605,8 +605,10 @@ public class Expectation {
                 }
                 if (!check) {
                     result = false;
-                    failed.append(fm);
-                    fails.add(exp);
+                    if (key.contains("*")) {
+                        failed.append(fm);
+                        fails.add(exp);
+                    }
                 }
             } catch (Throwable t) {
                 if (key.contains("*")) {
@@ -618,7 +620,7 @@ public class Expectation {
                 } else {
                     result = false;
                     failed.append(fm);
-                    fails.add(exp);
+//                    fails.add(exp);
                 }
                 LOG.debug("Evaluating", "This may or may not be an acutal problem: " + t.getMessage(), t);
             } finally {
