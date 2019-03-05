@@ -1,0 +1,3 @@
+{
+  "spreadsheet": "data/${eut::sut.db}/csv/foo.csv"
+}

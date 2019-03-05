@@ -34,15 +34,9 @@ import com.thegoate.spreadsheets.utils.SpreadSheetUtil;
 import com.thegoate.utils.fill.serialize.DeSerializer;
 import com.thegoate.utils.fill.serialize.DefaultSource;
 import com.thegoate.utils.fill.serialize.Serializer;
-import com.thegoate.utils.togoate.ToGoate;
 import com.thegoate.utils.togoate.ToGoateUtil;
 import com.thegoate.utils.togoate.ToGoateUtility;
-import com.thegoate.json.utils.togoate.JSONToGoate;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -101,7 +95,9 @@ public class SpreadSheetToGoate extends SpreadSheetUtil implements ToGoateUtilit
 
     @Override
     public Goate convert() {
-        JSONArray ja = new JSONArray("[]");
+        //JSONArray ja = new JSONArray("[]");
+        Goate goate = new Goate();
+
         SheetUtils sheet = (SheetUtils) takeActionOn;
         for (int rowIndex = 0; rowIndex < sheet.rowCount(); rowIndex++) {
             Goate row = sheet.getRow(rowIndex);
@@ -111,15 +107,17 @@ public class SpreadSheetToGoate extends SpreadSheetUtil implements ToGoateUtilit
                     row = new Serializer<>(rPojo,csvDestination).toGoate();
                 }
             }
-            JSONObject rjo = new JSONObject("{}");
+            //JSONObject rjo = new JSONObject("{}");
+            Goate rjo = new Goate();
             for (String key : row.keys()) {
                 String colId = generateKey(key, theEnum, theMap);
                 rjo.put(colId, checkPrimitive(row.get(key)));
+                goate.put(""+rowIndex+"."+colId,rjo.getStrict(colId));
             }
-            ja.put(rjo);
-
+            goate.put(""+rowIndex,rjo);
+//            goate.merge(rjo,false);
         }
-        return new ToGoate(ja).convert();
+        return goate;
     }
 
     private Object checkPrimitive(Object check) {
