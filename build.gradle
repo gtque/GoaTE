@@ -131,9 +131,9 @@ subprojects {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
     dependencies {
-        testCompile 'ch.qos.logback:logback-classic:1.1.7'
-        testCompile 'ch.qos.logback:logback-access:1.1.7'
-        testCompile 'ch.qos.logback:logback-core:1.1.7'
+        testCompile 'ch.qos.logback:logback-classic:+'
+        testCompile 'ch.qos.logback:logback-access:+'
+        testCompile 'ch.qos.logback:logback-core:+'
         testCompile 'org.codehaus.janino:janino:2.7.8'
         annotationProcessor "org.atteo.classindex:classindex:3.3"
     }
