@@ -45,8 +45,8 @@ import com.thegoate.utils.togoate.ToGoate;
                 "work = the definition of the job to execute",
                 "return last = true/false to always return the last result, if false returns null, defaults to false",
                 "expect = the array, [], of conditions/expectations that should be met to consider the job completed.",
-                "expect.timeout = the timeout in milliseconds for the expected conditions to be checked, defaults to 50mS, optional and not usually needed",
-                "expect.period = the period in milliseconds at which to check the expected condtions, defaults to 50mS, optional and not usually needed"})
+                "timeout_expect = the timeout in milliseconds for the expected conditions to be checked, defaults to 50mS, optional and not usually needed",
+                "period_expect = the period in milliseconds at which to check the expected condtions, defaults to 50mS, optional and not usually needed"})
 public class WorkUntilConditionMet extends Employee {
 
     private Employee actualJob;
@@ -81,12 +81,12 @@ public class WorkUntilConditionMet extends Employee {
     }
 
     public WorkUntilConditionMet expectTimeout(long timeoutMS){
-        definition.put("expect.timeout", timeoutMS);
+        definition.put("timeout_expect", timeoutMS);
         return this;
     }
 
     public WorkUntilConditionMet expectPeriod(long periodMS){
-        definition.put("expect.period", periodMS);
+        definition.put("period_expect", periodMS);
         return this;
     }
 
@@ -165,8 +165,8 @@ public class WorkUntilConditionMet extends Employee {
     protected boolean evaluate(Goate conditions) {
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(new Goate().put("parent", definition).merge(data, false).put("_goate_result", conditions.get("_goate_result")));
         etb.expect(conditions)
-                .timeout(Long.parseLong("" + definition.get("expect.timeout", 50L)))
-                .period(Long.parseLong("" + definition.get("expect.period", 50L)));
+                .timeout(Long.parseLong("" + definition.get("timeout_expect", 50L)))
+                .period(Long.parseLong("" + definition.get("period_expect", 50L)));
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         return ev.evaluate();
     }

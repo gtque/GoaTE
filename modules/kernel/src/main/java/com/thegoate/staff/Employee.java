@@ -131,9 +131,14 @@ public abstract class Employee {
 
     public final Object work() {
         result = null;
+        String lap = ""+System.nanoTime();
         try {
             if(data!=null&&data.get("lap",null)!=null) {
-                Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
+                String lt = data.get("lap", lap, String.class);
+                if(!lt.isEmpty()){
+                    lap = lt;
+                }
+                Stopwatch.global.start(lap);
             }
             result = doWork();
         } catch (Throwable t) {
@@ -150,7 +155,7 @@ public abstract class Employee {
             throw t;
         }finally {
             if(data!=null&&data.get("lap",null)!=null) {
-                Stopwatch.global.split(data.get("lap", Thread.currentThread().getName(), String.class));
+                Stopwatch.global.split(lap);
             }
         }
         return result;

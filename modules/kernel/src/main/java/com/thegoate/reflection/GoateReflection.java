@@ -108,7 +108,8 @@ public class GoateReflection {
                 || c.equals(Double.class) || c.equals(Double.TYPE)
                 || c.equals(Float.class) || c.equals(Float.TYPE)
                 || c.equals(Long.class) || c.equals(Long.TYPE)
-                || c.equals(Character.class) || c.equals(Character.TYPE);
+                || c.equals(Character.class) || c.equals(Character.TYPE)
+                || c.equals(Short.class) || c.equals(Short.TYPE);
     }
 
     public boolean isBoolean(Object c) {
@@ -165,6 +166,18 @@ public class GoateReflection {
         boolean result = false;
         try {
             Long.parseLong(cs);
+            result = true;
+        } catch (Throwable e) {
+//            LOG.debug(""+actual + " is not a float.");
+        }
+        return result;
+    }
+
+    public boolean isShort(Object c) {
+        String cs = "" + c;
+        boolean result = false;
+        try {
+            Short.parseShort(cs);
             result = true;
         } catch (Throwable e) {
 //            LOG.debug(""+actual + " is not a float.");
@@ -242,6 +255,7 @@ public class GoateReflection {
         if (fieldMap != null) {
             for (Field f : theClass.getDeclaredFields()) {
                 if(!f.getName().contains("$jacocoData")) {
+                    //need to specify a list of things to ignore, in a property file perhaps?
                     fieldMap.put(f.getName(), f);
                 }
             }

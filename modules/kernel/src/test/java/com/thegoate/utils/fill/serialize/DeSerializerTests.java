@@ -104,7 +104,7 @@ public class DeSerializerTests {
         data.put("nested.big decimal", "3.14159");
         data.put("nested.double D", "42.42");
         data.put("nested.long l", 42L);
-        ComplexPojo pojo = (ComplexPojo)data.get("complex pojo", "pojo::complex pojo,simple source");//new DeSerializer().data(data).from(SimpleSource.class).build(ComplexPojo.class);
+        ComplexPojo pojo = (ComplexPojo)data.get("complex pojo", "pojo::complex pojo,simple expected");//new DeSerializer().data(data).from(SimpleSource.class).build(ComplexPojo.class);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         assertEquals(pojo.getDate(), LocalDate.parse("2009-11-24", formatter));
         assertEquals(pojo.getNested().getFieldName(),"Hello, world!");
@@ -185,7 +185,7 @@ public class DeSerializerTests {
 
         Map<String,Object> data2 = new Serializer<>(pojo,SimpleSource.class).toMap(HashMap.class);
 
-        assertTrue(d.size()>50);
+        assertTrue(d.size()>=50);
 
         NestedPojos pojo2 = new DeSerializer()
                 .data(data)

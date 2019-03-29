@@ -24,13 +24,25 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.compare.tools.string;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Checks if a string ends with the given string.
+ * Created by Eric Angeli on 2019/03/12.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@CompareUtil(operator = "endsWith", type="String")
+@IsDefault
+public class CompareStringEndsWith extends CompareStringTool {
+    public CompareStringEndsWith(Object actual) {
+        super(actual);
+    }
+
+    @Override
+    public boolean evaluate() {
+        String act = "" + actual;
+        return act.endsWith(""+expected);
+    }
 }

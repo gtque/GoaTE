@@ -54,7 +54,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
 
     @Override
     public Goate healthCheck(){
-        return tool!=null?tool.healthCheck():new Goate();
+        return new Goate().merge(health,false).merge(tool!=null?tool.healthCheck():new Goate(),false);
     }
     @Override
     public boolean evaluate() {
@@ -66,8 +66,12 @@ public class Compare extends UnknownUtilType implements CompareUtility {
         // if tool is null, re-run debug and step into buildtool above.
         boolean result = false;
         try {
-            tool.to(expected).using(operator);
-            result = tool.evaluate();//step into evaluate here to debug the comparator implementation
+            if(tool!=null) {
+                tool.to(expected).using(operator);
+                result = tool.evaluate();//step into evaluate here to debug the comparator implementation
+            } else {
+                health.put("Tool Not Found", "Could not find \"" + operator + "\" for: " + actual);
+            }
         }catch (Exception e){
             LOG.debug("Compare", "Failed to compare: " + e.getMessage(), e);
         }

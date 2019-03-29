@@ -24,13 +24,45 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.compare.tools.date;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.utils.compare.CompareUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Adds check for date type.
+ * Just checks date, ignores time, if time is delimited by T.
+ * Assumes date in the format of yyyy-MM-dd
+ * Probably need some what to specify the format some how.
+ * Created by Eric Angeli on 2019/03/12.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+public abstract class CompareDate extends CompareTool {
+    protected String format = "yyyy-MM-dd";
+    public CompareDate(Object actual) {
+        super(actual);
+    }
+
+    @Override
+    public boolean isType(Object check) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        boolean result = true;
+        try {
+            String d = parse("" + check);
+            sdf.parse(d);
+        }catch (Throwable t){
+            result = false;
+        }
+        return result;
+    }
+
+    protected String parse(String d){
+        int t = d.indexOf("T");
+        if(t<0){
+            t = d.length();
+        }
+        return d.substring(0,t);
+    }
 }

@@ -24,13 +24,16 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.fill.serialize.string;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.utils.Utility;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+public interface StringConverterUtility extends Utility{
+    String convert();
+    StringConverterUtility value(Object value);
 }

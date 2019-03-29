@@ -88,6 +88,8 @@ public class ExpectThreadExecuter extends Thread {
         status = false;
         if (expectation != null) {
             executing = true;
+            timeoutMS = expectation.getRetryTimeout()<0?timeoutMS:expectation.getRetryTimeout();
+            period = expectation.getRetryPeriod()<0?period:expectation.getRetryPeriod();
             startTime = System.currentTimeMillis();
             long current = System.currentTimeMillis();
             while (executing && !status && (current - startTime) <= timeoutMS) {
@@ -95,9 +97,6 @@ public class ExpectThreadExecuter extends Thread {
                 if (!status) {
                     GoateUtils.sleep(period, LOG);
                 }
-//                if(Thread.interrupted()){
-//                    executing = false;
-//                }
                 current = System.currentTimeMillis();
             }
             if (!status) {

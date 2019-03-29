@@ -59,7 +59,7 @@ public class SimplePojo {
 
     private boolean bool = true;
 
-    //    @GoateSource(source = SimpleSource.class, key = "floaty mcfloatface")
+    //    @GoateSource(expected = SimpleSource.class, key = "floaty mcfloatface")
     private float f = 4f;
 
     public String getFieldName() {

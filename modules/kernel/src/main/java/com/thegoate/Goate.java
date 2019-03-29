@@ -24,7 +24,6 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
 package com.thegoate;
 
 import com.thegoate.dsl.Interpreter;
@@ -36,6 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The manager for the collection of test data.
@@ -230,12 +231,30 @@ public class Goate {
      */
     public Goate filterStrict(String pattern) {
         Goate filtered = new Goate();
+        StringBuilder keyList = new StringBuilder();
         if (data != null) {
             for (String key : keys()) {
+//                keyList.append("-!").append(key).append("!-");
                 if (key.matches(pattern)) {
                     filtered.put(key, getStrict(key));
                 }
             }
+//            StringBuilder goatePattern = new StringBuilder();
+//            int countEnding = pattern.endsWith(")")?1:0;
+//            int lastCurlyOpen = pattern.lastIndexOf("{");
+//            int lastCurlyClose = pattern.lastIndexOf("}");
+//            if((countEnding == 1 && lastCurlyClose!=pattern.length()-2)||lastCurlyOpen<0){
+//                lastCurlyOpen = pattern.length();
+//            }
+//
+//            goatePattern.append(pattern).insert(countEnding,"(-!").insert(lastCurlyOpen+3,"!-)");
+//            Pattern p = Pattern.compile(goatePattern.toString());
+//            Matcher m = p.matcher(keyList.toString());
+//            while (m.find()) {
+//                String key = m.group().replace("-!","").replace("!-","");
+//                filtered.put(key, getStrict(key));
+//                //m = p.matcher(pattern);
+//            }
         }
         return filtered;
     }

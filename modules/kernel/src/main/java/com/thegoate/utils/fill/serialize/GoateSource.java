@@ -45,4 +45,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface GoateSource {
     Class source() default DefaultSource.class;
     String key();
+    boolean flatten() default false;
 }

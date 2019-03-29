@@ -60,8 +60,10 @@ public class DeSerializer extends Cereal{
                 for(Map.Entry<String, Field> field:fields.entrySet()){
                     GoateSource gs = findGoateSource(field.getValue(), dataSource);
                     String fieldKey = field.getKey();
+                    boolean flatten = false;
                     if(gs!=null){
                         fieldKey = gs.key();
+                        flatten = gs.flatten();
                     }
                     Object value = data.get(fieldKey);
                     boolean acc = field.getValue().isAccessible();
@@ -71,7 +73,11 @@ public class DeSerializer extends Cereal{
                                 ||data.filter(fieldKey+"\\.").size()>0
                                 ||data.getStrict(fieldKey)!=null
                                 ||field.getValue().getType().getAnnotation(GoatePojo.class)!=null) {
-                            field.getValue().set(o, new Cast(data.filter(fieldKey).scrubKeys(fieldKey+"\\."), dataSource).field(field.getValue()).cast(value,field.getValue().getType()));
+                            Goate d = new Goate().merge(data,false);
+                            if(!flatten){
+                                d = data.filter(fieldKey).scrubKeys(fieldKey+"\\.");
+                            }
+                            field.getValue().set(o, new Cast(d, dataSource).field(field.getValue()).cast(value,field.getValue().getType()));
                         }
                     } catch (Exception e) {
                         LOG.error("Build Pojo", "Failed to set field: " + e.getMessage(), e);

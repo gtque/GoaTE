@@ -29,27 +29,45 @@ package com.thegoate.expect;
 
 import com.thegoate.Goate;
 
+import com.thegoate.expect.conditional.ModelIsPresentOptional;
+import com.thegoate.expect.test.IsNotFound;
+import com.thegoate.expect.validate.Validate;
+import com.thegoate.expect.validate.ValidateAbsence;
+import com.thegoate.expect.validate.ValidateNotGoate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.thegoate.dsl.words.LoadFile.fileAsAString;
 import static com.thegoate.expect.ExpectMatchWildcardIndexPath.matchWildcardIndex;
 import static com.thegoate.expect.ExpectWildcardIndexPath.wildcardIndex;
+import static com.thegoate.locate.Locate.path;
 import static org.testng.Assert.*;
 
 /**
  * Test expect framework.
  * Created by Eric Angeli on 5/10/2017.
  */
-public class ExpectTests {
+public class ExpectTests extends TestNGEngineAnnotatedDL {
     final BleatBox LOG = BleatFactory.getLogger(getClass());
+    String sample = "{\n" +
+            "    \"data\": [\n" +
+            "        {\n" +
+            "            \"a\": null,\n" +
+            "            \"b\": null,\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000e\"\n" +
+            "        },\n" +
+            "        {\n" +
+            "            \"a\": null,\n" +
+            "            \"c\": 42,\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000f\"\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"page\": null\n" +
+            "}";
 
     @Test(groups = {"unit"})
     public void isEven() {
@@ -73,8 +91,9 @@ public class ExpectTests {
         etb.expect("check if even>return,==,boolean::true");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
+        logStatuses(ev);
         assertFalse(result, ev.failed());
-        LOG.debug("failed message:\n" + ev.failed());
+//        LOG.debug("failed message:\n" + ev.failed());
     }
 
 
@@ -139,13 +158,13 @@ public class ExpectTests {
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         StringBuilder ps = new StringBuilder();
-        for(Goate p:ev.passes()){
+        for (Goate p : ev.passes()) {
             ps.append(p.toString());
             ps.append("\n--------------------\n");
         }
         LOG.debug("passed:\n" + ps.toString());
         StringBuilder fs = new StringBuilder();
-        for(Goate p:ev.fails()){
+        for (Goate p : ev.fails()) {
             fs.append(p.toString());
             fs.append("\n--------------------\n");
         }
@@ -161,7 +180,7 @@ public class ExpectTests {
         String[] index = pattern.split("[0-9]+");
         Arrays.stream(index).forEach(i -> System.out.println(i));
         System.out.println(index.length);
-        Expectation e = new Expectation(new Goate());
+        Validate e = new ValidateNotGoate(null, null, null, null, null, 0, new Goate());
         String p = "" + e.calculateKey(pattern2, pattern);
         String p3 = "" + e.calculateKey(pattern3, pattern);
         System.out.println(p);
@@ -348,5 +367,447 @@ public class ExpectTests {
         etb.expect(new Expectation(data).define("o::id,==,42a"));
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         assertTrue(ev.evaluate());
+    }
+
+    @Test(groups = {"unit"})
+    public void isEqualNullFail() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(null)
+                .isEqualTo("hello"));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isEqualNull() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(null)
+                .isEqualTo(null));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isNullNull() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(null)
+                .isNull(true));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isNullNullFalse() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(null)
+                .isNull(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isNullValue() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(42)
+                .isNull(true));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isNullValueFalse() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("cheese")
+                .isNull(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isPresent() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.+.id").from(sample)
+                .isPresent(true));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isPresentFalse() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.*.vitaliy").from(sample)
+                .isPresent(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isPresentFalseButIsPresent() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.*.id").from(sample)
+                .isPresent(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isJsonNullTrueOneOrMore() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.+.a").from(sample)
+                .isNull(true));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isPresentZeroOrMoreNotPresentButShouldBe() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.+.z").from(sample)
+                .isNull(true));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isJsonNullZeroOrMore() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.*.b").from(sample)
+                .isNull(true));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isJsonNullFalse() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.+.id").from(sample)
+                .isNull(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isJsonNullFalseOneOrMoreFail() {
+        Goate data = new Goate();
+
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.+.c").from(sample)
+                .isNull(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void notExecuted() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(null)
+                .is("throwNullPointer").expected(42));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void notExecutedNotFound() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("42")
+                .is("tricky_bits_are_tricky").expected(42));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void notExecutedFrom() {
+        Goate data = new Goate();
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual("data.*.id").from(sample)
+                .is("throwNullPointer").expected(42));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    String response = "{\n" +
+            "    \"data\": [\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000e\",\n" +
+            "            \"b\": true" +
+            "        },\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000f\"\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"page\": null\n" +
+            "}";
+
+    @Test(groups = {"unit"})
+    public void validatePresenceNotFoundFalseOneOrMoreFails() {
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(path().match("data").dot().matchOneOrMore("[0-9]").dot().match("b")).from(response)
+                .validate(ValidateAbsence.using(IsNotFound.class)).expected(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void validatePresenceNotFoundFalseZeroOrMorePasses() {
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(path().match("data").dot().matchZeroOrMore("[0-9]").dot().match("b")).from(response)
+                .validate(ValidateAbsence.using(IsNotFound.class)).expected(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void validatePresenceNotFoundFalseOneOrMoreNoneFails() {
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(path().match("data").dot().matchOneOrMore("[0-9]").dot().match("c")).from(response)
+                .validate(ValidateAbsence.using(IsNotFound.class)).expected(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void validatePresenceNotFoundTrueOneOrMoreFails() {
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(path().match("data").dot().anyNumberOneOrMore().dot().match("b")).from(response)
+                .validate(ValidateAbsence.using(IsNotFound.class)).expected(true));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void validatePresenceNotFoundFalseOneOrMorePasses() {
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(path().match("data").dot().matchOneOrMore("[0-9]").dot().match("id")).from(response)
+                .validate(ValidateAbsence.using(IsNotFound.class)).expected(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void validatePresenceNotFoundTrueOneOrMorePasses() {
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(path().match("data").dot().anyNumberOneOrMore().dot().match("c")).from(response)
+                .validate(ValidateAbsence.using(IsNotFound.class)).expected(true));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void validatePresenceNotFoundFalseZeroOrMoreStillPasses() {
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect(Expectation.build()
+                .actual(path().match("data").dot().anyNumberZeroOrMore().dot().match("c"))
+                .from(response)
+                .validate(ValidateAbsence.using(IsNotFound.class))
+                .expected(false));
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        logStatuses(ev);
+        assertTrue(result);
+    }
+
+    String fullModel = "{\n" +
+            "    \"data\": [\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000e\",\n" +
+            "            \"b\": true," +
+            "            \"c\": {" +
+            "               \"z\":42" +
+            "            }" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"page\": null\n" +
+            "}";
+    String requiredModel = "{\n" +
+            "    \"data\": [\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000e\"\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"page\": null\n" +
+            "}";
+    String optionalModel = "{\n" +
+            "    \"data\": [\n" +
+            "        {\n" +
+            "            \"b\": true" +
+            "        }\n" +
+            "    ]\n" +
+            "}";
+
+    @Test(groups = {"unit"})
+    public void conditionalModelIsPresent() {
+        expect(new ModelIsPresentOptional()
+                .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("b"))
+                .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("c"))
+                .setActual(response)
+                .setExpected(fullModel));
+    }
+
+    String responseWithC = "{\n" +
+            "    \"data\": [\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000e\",\n" +
+            "            \"b\": true" +
+            "        },\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000f\",\n" +
+            "            \"c\": {\"z\": 3.1459}\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"page\": null\n" +
+            "}";
+
+    @Test(groups = {"unit"})
+    public void conditionalModelIsPresentCIsPresent() {
+        expect(new ModelIsPresentOptional()
+                .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("b"))
+                .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("c"))
+                .setActual(responseWithC)
+                .setExpected(fullModel));
+    }
+
+    String responseShouldFailOnMissingZ = "{\n" +
+            "    \"data\": [\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000e\",\n" +
+            "            \"b\": true," +
+            "            \"c\": {}" +
+            "        },\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000f\"\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"page\": null\n" +
+            "}";
+
+    @Test(groups = {"unit"})
+    public void conditionalModelIsPresentZFail() {
+        expect(new ModelIsPresentOptional()
+                .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("b"))
+                .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("c"))
+                .setActual(responseShouldFailOnMissingZ)
+                .setExpected(fullModel));
+        boolean failed = true;
+        try{
+            evaluate();
+            failed = false;
+        } catch(Throwable t){
+            LOG.debug("Test", "Failed as expected.");
+        }
+        assertTrue(failed);
+    }
+
+    String responseShouldFailOnMissingId = "{\n" +
+            "    \"data\": [\n" +
+            "        {\n" +
+            "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000e\",\n" +
+            "            \"b\": true" +
+            "        },\n" +
+            "        {\n" +
+            "            \"b\": \"8ac2a3d05d37576c015d3c4b3135000f\"\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"page\": null\n" +
+            "}";
+
+    @Test(groups = {"unit"})
+    public void conditionalModelIsPresentRequiredFieldMissing() {
+        expect(new ModelIsPresentOptional()
+                .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("b"))
+                .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("c"))
+                .setActual(responseShouldFailOnMissingId)
+                .setExpected(fullModel));
+        boolean failed = true;
+        try{
+            evaluate();
+            failed = false;
+        } catch(Throwable t){
+            LOG.debug("Test", "Failed as expected.");
+        }
+        assertTrue(failed);
     }
 }

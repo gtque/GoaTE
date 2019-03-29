@@ -26,11 +26,16 @@
  */
 package com.thegoate.utils.fill.serialize.pojos;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.collections.ListType;
+
+import java.util.List;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Created by Eric Angeli on 3/28/2019.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@GoatePojo(id = "list pojo")
+public class ListOfSimplePojo {
+    @ListType( type = SimplePojo.class)
+    List<SimplePojo> simplePojos;
 }

@@ -24,13 +24,21 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.fill.serialize.string;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Used to identify string converter implementations.")
+@Info
+@IndexAnnotated
+public @interface StringConverterUtil {
 }

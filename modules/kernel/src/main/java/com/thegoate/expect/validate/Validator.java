@@ -24,13 +24,22 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.expect.validate;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Created by Eric Angeli on 3/20/2019.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Used to identify a new validator.")
+@Info()
+@IndexAnnotated
+public @interface Validator {
+    String[] operators();
 }

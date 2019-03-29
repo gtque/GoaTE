@@ -31,6 +31,7 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.fill.serialize.string.StringConverter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -63,7 +64,13 @@ public class Cast extends UnknownUtilType {
                 object = serializer.build(type);
             } else {
                 if(type.equals(String.class)){
-                    object = "" + value;
+                    if(value instanceof String) {
+                        object = value;
+                    } else if(value == null){
+                        object = null;
+                    } else {
+                        object = new StringConverter().value(value).convert();
+                    }
                 } else {
                     Constructor constructor = findConstructor(type, value);
                     try {

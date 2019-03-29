@@ -24,13 +24,33 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.expect.test;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Throws a null pointer exception when called.
+ * Created by Eric Angeli on 5/10/2017.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@CompareUtil(operator = "throwNullPointer", type = "object")
+public class ThrowNullPointer extends CompareTool {
+    int value = 0;
+    boolean fail = true;
+    public ThrowNullPointer(Object actual) {
+        super(actual);
+    }
+
+    @Override
+    public boolean evaluate() {
+        if(fail) {
+            throw new NullPointerException("Because I can");
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isType(Object check) {
+        return true;
+    }
 }

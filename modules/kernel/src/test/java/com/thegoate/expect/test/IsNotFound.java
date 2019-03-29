@@ -24,13 +24,33 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.expect.test;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.get.NotFound;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Created by Eric Angeli on 3/19/2019.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@CompareUtil(operator = "notFound", type="Object")
+@IsDefault
+public class IsNotFound extends CompareTool {
+
+    public IsNotFound(Object actual) {
+        super(actual);
+    }
+
+    @Override
+    public boolean evaluate() {
+        boolean result = actual instanceof NotFound;
+        boolean exp = Boolean.parseBoolean(""+expected);
+        return exp?result:!result;
+    }
+
+    @Override
+    public boolean isType(Object check) {
+        return true;
+    }
 }

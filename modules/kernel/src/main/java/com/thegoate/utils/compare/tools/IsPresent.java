@@ -24,13 +24,33 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.compare.tools;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.get.NotFound;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Checks if present (even if null).
+ * Created by Eric Angeli on 5/9/2017.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@CompareUtil(operator = "isPresent", type = "object")
+@IsDefault
+public class IsPresent extends CompareTool {
+
+    public IsPresent(Object actual) {
+        super(actual);
+    }
+
+    @Override
+    public boolean isType(Object check) {
+        return false;
+    }
+
+    @Override
+    public boolean evaluate() {
+        Boolean check = Boolean.parseBoolean(""+expected);
+        return check ? !(actual instanceof NotFound) : (actual instanceof NotFound);
+    }
 }

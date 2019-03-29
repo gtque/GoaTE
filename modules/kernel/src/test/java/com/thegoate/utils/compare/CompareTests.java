@@ -344,4 +344,9 @@ public class CompareTests {
     public void isNullFalseTrue(){
         assertTrue(new Compare("mustard").to(false).using("isNull").evaluate(),"They where not null?");
     }
+
+    @Test(groups = {"unit"})
+    public void simpleDateLessThan(){
+        assertTrue(new Compare("2017-06-11T04:00:00.000+0000").using("<").to("2017-06-30").evaluate(), "The date was not less than apparently.");
+    }
 }

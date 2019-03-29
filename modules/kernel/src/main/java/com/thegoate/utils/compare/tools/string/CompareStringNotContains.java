@@ -24,13 +24,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.compare.tools.string;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.compare.CompareUtil;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Checks if a string not contains the given string.
+ * Created by Eric Angeli on 2019/03/12.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@CompareUtil(operator = "notContains", type="String")
+@IsDefault
+public class CompareStringNotContains extends CompareStringTool {
+    public CompareStringNotContains(Object actual) {
+        super(actual);
+    }
+
+    @Override
+    public boolean evaluate() {
+        String check = ""+expected;
+        String act = "" + actual;
+        return !act.contains(check);
+    }
 }

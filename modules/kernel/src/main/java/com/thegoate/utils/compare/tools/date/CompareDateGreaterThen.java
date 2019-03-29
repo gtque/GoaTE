@@ -24,13 +24,36 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.compare.tools.date;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.utils.compare.CompareUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Checks if a date is greater then expected date.
+ * Created by Eric Angeli on 7/7/2017.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@CompareUtil(operator = ">", type = "date")
+public class CompareDateGreaterThen extends CompareDate {
+    public CompareDateGreaterThen(Object actual) {
+        super(actual);
+    }
+
+    @Override
+    public boolean evaluate() {
+        String exp = "" + expected;
+        String act = "" + actual;
+        boolean result = true;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            Date da = sdf.parse(parse(act));
+            Date de = sdf.parse(parse(exp));
+            result = da.after(de);
+        }catch (Throwable t){
+            result = false;
+        }
+        return result;
+    }
 }

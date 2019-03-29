@@ -24,13 +24,58 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.fill.serialize.string;
 
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+import com.thegoate.Goate;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.Utility;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Created by Eric Angeli on 3/28/2019.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+@StringConverterUtil
+@IsDefault
+public class StringConverterDefault implements StringConverterUtility {
+    Goate health = new Goate();
+    Goate data;
+    Object value;
+
+    public StringConverterDefault(){
+
+    }
+
+    public StringConverterDefault(Object value){
+        this.value = value;
+    }
+
+    @Override
+    public String convert() {
+        String result = null;
+        if(value != null){
+            result = value.toString();
+        }
+        return result;
+    }
+
+    @Override
+    public StringConverterUtility value(Object value) {
+        this.value = value;
+        return this;
+    }
+
+    @Override
+    public Utility setData(Goate data) {
+        this.data = data;
+        return this;
+    }
+
+    @Override
+    public boolean isType(Object check) {
+        return false;
+    }
+
+    @Override
+    public Goate healthCheck() {
+        return health;
+    }
 }

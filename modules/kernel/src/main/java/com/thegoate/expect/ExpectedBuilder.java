@@ -24,13 +24,12 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.pojos;
-
-import com.thegoate.utils.fill.serialize.GoateSourceDef;
+package com.thegoate.expect;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Created by Eric Angeli on 3/26/2019.
  */
-@GoateSourceDef(id = "simple expected")
-public @interface SimpleSource {
+public interface ExpectedBuilder {
+    Object generateExpected();
+    Object fromExpected();
 }

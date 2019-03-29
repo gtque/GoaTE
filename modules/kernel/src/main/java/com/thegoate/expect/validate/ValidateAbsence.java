@@ -24,31 +24,42 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools;
+package com.thegoate.expect.validate;
 
-import com.thegoate.annotations.IsDefault;
-import com.thegoate.utils.compare.CompareTool;
+import com.thegoate.Goate;
 import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.compare.CompareUtility;
 
 /**
- * Compares two booleans for equality.
- * Created by Eric Angeli on 5/9/2017.
+ * Validators don't care about type.
+ * There must be at least one comparator for each operator the Validator supports.
+ * Created by Eric Angeli on 3/20/2019.
  */
-@CompareUtil(operator = "==", type = "object")
-@IsDefault
-public class CompareObjectEqualTo extends CompareTool {
+@Validator(operators = {"isPresent"})
+public class ValidateAbsence extends ValidatePresence{
 
-    public CompareObjectEqualTo(Object actual) {
-        super(actual);
+    public ValidateAbsence(){super();}
+    public ValidateAbsence(Goate exp, String key, Object from, Object fromExpected, Object rtrn, long cachePeriod, Goate data) {
+        super(exp, key, from, fromExpected, rtrn, cachePeriod, data);
     }
 
-    @Override
-    public boolean isType(Object check) {
-        return false;
+    public static Validate using(String operator){
+        Validate vlad = new ValidateAbsence();
+        return vlad.setOperator(operator);
     }
 
-    @Override
-    public boolean evaluate() {
-        return actual!=null?actual.equals(expected):(expected==null||expected.equals("null::"));
+    public static Validate using(CompareUtility compare){
+        return using(compare.getClass());
+    }
+
+    public static Validate using(Class compare){
+        CompareUtil op = getOp(compare);
+        return using(op.operator());
+    }
+
+    protected boolean check(Goate exp, String key, Goate fromData){
+        invert = ("" + exp.get("actual")).contains("+");//only care if one or more.
+        boolean r = super.check(exp, key, fromData);
+        return r;
     }
 }

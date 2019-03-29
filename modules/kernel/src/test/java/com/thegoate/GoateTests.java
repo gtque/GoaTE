@@ -37,7 +37,10 @@ import com.thegoate.utils.togoate.ToGoate;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static com.thegoate.locate.Locate.path;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -112,5 +115,36 @@ public class GoateTests {
         System.out.println("goate data: \n" + data.toString());
         assertEquals(data.size(), 5);
         assertEquals(data.get("test3"),"d");
+    }
+
+
+    @Test(groups = {"unit"})
+    public void filterGoate(){
+        String d = "{\n" +
+                "        \"a\": [\n" +
+                "                {\"b\":true,\"f\":false},\n" +
+                "                {\"b\":true,\"f\":false},\n" +
+                "                {\"b\":true,\"f\":false},\n" +
+                "                {\"b\":true}\n" +
+                "            ],\n" +
+                "        \"c\": 42\n" +
+                "    }";
+        Goate data = new ToGoate(d).convert();
+        Goate f1 = data.filterStrict(path().match("a").dot().anyNumberOneOrMore().toPath());
+        Goate f2 = data.filterStrict(path().match("a").dot().anyNumberOneOrMore().dot().matchOneOrMore("f").toPath());
+        Goate f3 = data.filterStrict(path().match("a").dot().anyNumberOneOrMore().dot().match("f").nTimes(3).toPath());
+        assertEquals(f1.size(),4);
+    }
+
+    @Test(groups = {"unit"})
+    public void regeX(){
+        String d = "-!a!--!a.0!--!a.0.b!--!a.0.f!--!a.1!--!a.1.b!--!a.1.f!--!a.2!--!a.2.b!--!a.2.f!--!a.3!--!a.3.b!--!c!-";
+        String pattern = "(-!a\\.[0-9]+\\.f!-){3}";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(d);
+        while (m.find()) {
+            String key = m.group().replace("-!","").replace("!-","");
+            System.out.println(key);
+        }
     }
 }
