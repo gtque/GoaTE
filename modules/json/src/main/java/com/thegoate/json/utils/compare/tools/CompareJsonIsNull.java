@@ -31,15 +31,15 @@ import com.thegoate.utils.compare.CompareUtility;
 import org.json.JSONObject;
 
 /**
- * Compares two json objects for equality.
+ * Checks if json is null.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "==", type = "json")
-public class CompareJsonEqualTo extends CompareJson {
+@CompareUtil(operator = "isNull", type = "json")
+public class CompareJsonIsNull extends CompareJson {
 
     Object expected = null;
 
-    public CompareJsonEqualTo(Object actual) {
+    public CompareJsonIsNull(Object actual) {
         super(actual);
     }
 
@@ -50,14 +50,12 @@ public class CompareJsonEqualTo extends CompareJson {
 
     @Override
     public boolean evaluate() {
-        if(expected == null){
-            expected = JSONObject.NULL;
+        boolean check = Boolean.parseBoolean(""+expected);
+        boolean result = false;
+        if(takeActionOn == JSONObject.NULL){
+            result = true;
         }
-        boolean result = true;
-        if(takeActionOn != expected){
-            result = comparison(""+takeActionOn,""+expected)==0;
-        }
-        return result;//takeActionOn!=null?takeActionOn.equals(expected):expected==null;
+        return check?result:!result;
     }
 
     @Override

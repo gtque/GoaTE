@@ -133,7 +133,7 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
                 } catch (Exception e){
                     LOG.debug("Compare Json", "Field not found in expected: " + key);
                 }
-                if (o != null && o2 != null) {
+                if ((o != null && o2 != null)&&(o != JSONObject.NULL && o2 != JSONObject.NULL)) {
                     if (o instanceof JSONObject) {
                         if (o2 instanceof JSONObject) {
                             result += compare((JSONObject) o, (JSONObject) o2, baseKey + key + ".", checkingArray);
@@ -163,9 +163,9 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
                         result++;
 //                        }
                     }
-                } else if (o == null && o2 == null) {
+                } else if ((o == null && o2 == null)||(o == JSONObject.NULL && o2 == JSONObject.NULL)) {
                     LOG.debug(key + ": both objects were null");
-                } else if (o != null) {
+                } else if (o != null || o != JSONObject.NULL) {
                     if(!checkingArray&&!secondCheck) {
                         health.put("mismatched##", baseKey + key + ": " + o + " != " + o2);
                     }
@@ -208,7 +208,7 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
             for (int i2 = 0; i2 < j2.length(); i2++) {
                 int r2 = 0;
                 Object o2 = j2.get(i2);
-                if (o != null && o2 != null) {
+                if ((o != null && o2 != null)&&(o != JSONObject.NULL && o2 != JSONObject.NULL)) {
                     if (o instanceof JSONObject) {
                         if (o2 instanceof JSONObject) {
                             r2 = compare((JSONObject) o, (JSONObject) o2, baseKey + i + ".", true);
@@ -229,10 +229,10 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
                         r2++;
 //                        }
                     }
-                } else if (o != null) {
+                } else if (o != null || o != JSONObject.NULL) {
                     LOG.debug(i2 + ": the second object was null.");
                     r2++;
-                } else if (o2 != null) {
+                } else if (o2 != null || o2 != JSONObject.NULL) {
                     LOG.debug(i2 + ": the object was null.");
                     r2++;
                 }

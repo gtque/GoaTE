@@ -78,9 +78,11 @@ public abstract class JsonUtil implements Utility {
     public boolean isType(Object check) {
         boolean istype = true;
         try{
-            if(!(check instanceof JSONObject)) {
-                if (new JSONObject(""+check) == null) {
-                    istype = false;
+            if(check != JSONObject.NULL) {
+                if (!(check instanceof JSONObject)) {
+                    if (new JSONObject("" + check) == null) {
+                        istype = false;
+                    }
                 }
             }
         }catch(JSONException je){

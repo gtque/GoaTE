@@ -24,56 +24,58 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.json.utils.compare.tools;
+package com.thegoate.json.utils.fill.serialize.string;
 
-import com.thegoate.utils.compare.CompareUtil;
-import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.Goate;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.json.JsonUtil;
+import com.thegoate.utils.Utility;
+import com.thegoate.utils.fill.serialize.string.StringConverterUtil;
+import com.thegoate.utils.fill.serialize.string.StringConverterUtility;
 import org.json.JSONObject;
 
 /**
- * Compares two json objects for equality.
- * Created by Eric Angeli on 5/9/2017.
+ * Created by Eric Angeli on 3/28/2019.
  */
-@CompareUtil(operator = "==", type = "json")
-public class CompareJsonEqualTo extends CompareJson {
+@StringConverterUtil
+public class JsonStringConverter extends JsonUtil implements StringConverterUtility {
 
-    Object expected = null;
+    public JsonStringConverter(){
+        super(null);
+    }
 
-    public CompareJsonEqualTo(Object actual) {
-        super(actual);
+    public JsonStringConverter(Object val) {
+        super(val);
+    }
+
+    @Override
+    public String convert() {
+        String result = null;
+        if(takeActionOn != null && takeActionOn != JSONObject.NULL){
+            result = takeActionOn.toString();
+        }
+        return result;
+    }
+
+    @Override
+    public StringConverterUtility value(Object value) {
+        this.takeActionOn = value;
+        return this;
+    }
+
+    @Override
+    public JsonUtil setData(Goate data) {
+        this.data = data;
+        return this;
+    }
+
+    @Override
+    public Goate healthCheck() {
+        return health;
     }
 
     @Override
     protected Object processNested(Object subContainer) {
         return null;
-    }
-
-    @Override
-    public boolean evaluate() {
-        if(expected == null){
-            expected = JSONObject.NULL;
-        }
-        boolean result = true;
-        if(takeActionOn != expected){
-            result = comparison(""+takeActionOn,""+expected)==0;
-        }
-        return result;//takeActionOn!=null?takeActionOn.equals(expected):expected==null;
-    }
-
-    @Override
-    public CompareUtility actual(Object actual) {
-        this.takeActionOn = actual;
-        return this;
-    }
-
-    @Override
-    public CompareUtility to(Object expected) {
-        this.expected = expected;
-        return this;
-    }
-
-    @Override
-    public CompareUtility using(Object operator) {
-        return this;
     }
 }

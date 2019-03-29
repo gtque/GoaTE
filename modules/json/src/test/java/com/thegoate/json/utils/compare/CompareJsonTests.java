@@ -55,11 +55,12 @@ public class CompareJsonTests extends TestNGEngineMethodDL {
 
     @Override
     public void defineDataLoaders() {
-        runData.put("dl##", new StaticDL().add("Scenario", "equals returns true when equal")
-                .add("json1", "{\"e\":\"y\",\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"c\",\"g\":\"h\"},{\"a\":\"b\"},[\"a\"]]}")
-                .add("json2", "{\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"b\"},{\"a\":\"c\",\"g\":\"h\"},[\"a\"]],\"e\":\"y\"}")
-                .add("operator", "==")
-                .add("expected", true))
+        runData
+                .put("dl##", new StaticDL().add("Scenario", "equals returns true when equal")
+                        .add("json1", "{\"e\":\"y\",\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"c\",\"g\":\"h\"},{\"a\":\"b\"},[\"a\"]]}")
+                        .add("json2", "{\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"b\"},{\"a\":\"c\",\"g\":\"h\"},[\"a\"]],\"e\":\"y\"}")
+                        .add("operator", "==")
+                        .add("expected", true))
                 .put("dl##", new StaticDL().add("Scenario", "equals returns false when not equal")
                         .add("json1", "{\"e\":\"y\",\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"c\"},{\"a\":\"b\"},[\"a\"]]}")
                         .add("json2", "{\"frickle\":\"frackle\",\"c\":\"x\",\"d\":\"hello\",\"r\":[{\"a\":\"b\"},{\"a\":\"b\"},[\"a\"]],\"e\":\"y\"}")
@@ -79,13 +80,14 @@ public class CompareJsonTests extends TestNGEngineMethodDL {
         etb.expect(check);
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
+        logStatuses(ev);
         assertEquals(result, get("expected"), ev.failed());
 //        assertTrue(result, ev.failed());
-        if(!result){
-            for (Goate f : ev.fails()) {
-                LOG.fail(getTestName(), "FAILED: " + f.toString());
-            }
-        }
+//        if (!result) {
+//            for (Goate f : ev.fails()) {
+//                LOG.fail(getTestName(), "FAILED: " + f.toString());
+//            }
+//        }
         //LOG.debug("failed message:\n" + ev.failed());
 //        assertEquals(new Compare(get("json1")).to(get("json2")).using("" + get("operator")).evaluate(), get("expected"));
     }

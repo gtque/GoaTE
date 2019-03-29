@@ -89,9 +89,9 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                     }
                     if (exists) {
                         if(!strict) {
-                            json = new FillJson(json).with(new Goate().put(key, takeActionOn.get(dKey)));
+                            json = new FillJson(json).with(new Goate().put(dKey, takeActionOn.get(dKey)));
                         } else {
-                            json = new FillJson(json).with(new Goate().put(key, takeActionOn.getStrict(dKey)));
+                            json = new FillJson(json).with(new Goate().put(dKey, takeActionOn.getStrict(dKey)));
                         }
                     } else {
                         if(!strict) {
