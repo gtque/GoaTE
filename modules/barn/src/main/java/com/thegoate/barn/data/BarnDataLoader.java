@@ -55,94 +55,105 @@ public class BarnDataLoader extends DataLoader {
 
     @Override
     public List<Goate> load() {
-        cleanTempRoot("" + parameters.get("dir",""));
-        String testGroups = parameters.get("testGroups","", String.class);
+        cleanTempRoot("" + parameters.get("dir", ""));
+        String testGroups = parameters.get("testGroups", "", String.class);
         String excludeGroups = parameters.get("excludeGroups", "", String.class);
-        if(!testGroups.trim().isEmpty()) {
+        if (!testGroups.trim().isEmpty()) {
             groups = testGroups.split(",");
         }
-        if(!excludeGroups.trim().isEmpty()) {
+        if (!excludeGroups.trim().isEmpty()) {
             excluded = excludeGroups.split(",");
         }
         List<Goate> data = new ArrayList<>();
         Object fo = new GetFileListFromDir(parameters.get("dir")).from("filedir::");
-        List<File> files = (List<File>)fo ;
+        List<File> files = (List<File>) fo;
         for (File file : files) {
             Object barn = new Get(file).from("file::");
             Goate rd = loadBarn(barn, file.getName());
-            if(rd != null && checkGroups(rd)) {
+            if (rd != null && checkGroups(rd)) {
                 data.add(modelData(rd.scrub("extends")));//scrub(rd));
             }
         }
         return data;
     }
 
-    private void cleanTempRoot(String theRoot){
-        if(!theRoot.isEmpty()){
-            if(theRoot.endsWith("/")){
+    private void cleanTempRoot(String theRoot) {
+        if (!theRoot.isEmpty()) {
+            if (theRoot.endsWith("/")) {
                 theRoot += "..";
             } else {
                 theRoot += "/..";
             }
-            new Delete().rm(GoateUtils.getFilePath("temp/"+theRoot));
+            new Delete().rm(GoateUtils.getFilePath("temp/" + theRoot));
         }
     }
 
-    public Goate loadBarn(Object barn, String fileName){
+    public Goate loadBarn(Object barn, String fileName) {
         Goate rd = new ToGoate(barn).convert();
-        if(rd!=null) {
-            if (fileName!=null&&(check_abstract&&("" + rd.get("abstract")).equals("true"))) {
-                LOG.debug("Barn DataLoader","skipping: " + fileName);
+        if (rd != null) {
+            if (fileName != null && (check_abstract && ("" + rd.get("abstract")).equals("true"))) {
+                LOG.debug("Barn DataLoader", "skipping: " + fileName);
                 rd = null;
             } else {
-                rd = extend(rd, new Goate(),"" + parameters.get("dir",""));
+                rd = extend(rd, new Goate(), "" + parameters.get("dir", ""));
                 rd.drop("abstract");
-                rd.put("Scenario", (fileName!=null?fileName + ":":"") + rd.get("Scenario", ""));
+                rd.put("Scenario", (fileName != null ? fileName + ":" : "") + rd.get("Scenario", ""));
             }
-        }else{
-            LOG.error("Barn DataLoader","Problem loading barn: " + fileName);
+        } else {
+            LOG.error("Barn DataLoader", "Problem loading barn: " + fileName);
         }
         return rd;
     }
 
     protected Goate extend(Goate rd, Goate extension, String root) {
+        String groups = rd.get("groups", "", String.class);
+        String groupsE = "";
         if (extension != null && rd != null) {
             String[] extensions = getExtensions(rd);
             String theRoot = rd.get("_root", root, String.class);
-            if(extensions!=null){
-                for(String ext:extensions) {
+            if (extensions != null) {
+                for (String ext : extensions) {
                     ext = ext.trim();
-                    if (ext.startsWith("/")||ext.startsWith("\\")) {
+                    if (ext.startsWith("/") || ext.startsWith("\\")) {
 //                        ext = ext.substring(1);
                         theRoot = "";
                     } else {
-                        if(!theRoot.endsWith("/")) {
+                        if (!theRoot.endsWith("/")) {
                             theRoot += "/";
                         }
                     }
-                    if(ext.contains("${")){
-                        ext = ""+new Fill(ext).with(parameters);
+                    if (ext.contains("${")) {
+                        ext = "" + new Fill(ext).with(parameters);
                     }
                     extension.merge(extend(new ToGoate(new GetFileAsString(theRoot + ext).explode().from("file::")).autoIncrement(false).convert(), new Goate(), theRoot), false);
                 }
             }
-            if(rd.get("expect")!=null){
-                extension.scrub("expect.");
+            if (rd.get("expect") != null) {
+                extension.scrub(".+_expect");
             }
             rd.merge(extension, false);
+            groupsE = extension.get("groups", "", String.class);
         }
+        if(!groups.isEmpty()){
+            if(!groupsE.isEmpty()){
+                groups += ","+groupsE;
+            }
+        } else {
+            groups = groupsE;
+        }
+        rd.put("groups", groups);
         return rd;
     }
 
-    private String[] getExtensions(Goate rd){
-        String[] result=null;
+    private String[] getExtensions(Goate rd) {
+        String[] result = null;
         if (rd.get("extends") != null) {
             String extensions = "" + rd.get("extends");
             if (new GetJsonField("").isType(extensions)) {
                 Goate exts = new ToGoate(extensions).convert();
                 result = new String[exts.size()];
                 int index = 0;
-                for(String ext:exts.keys()){
+                for (String ext : exts.keys()) {
                     result[index] = "" + exts.get(ext);
                     index++;
                 }
@@ -153,52 +164,59 @@ public class BarnDataLoader extends DataLoader {
         return result;
     }
 
-    protected boolean checkGroups(Goate tc){
+    protected boolean checkGroups(Goate tc) {
         boolean result = false;
-        String group = tc.get("groups", "", String.class)+","+parameters.get("groups",defaultGroup);
-        if(groups.length==0){
+        String group = tc.get("groups", "", String.class) + "," + parameters.get("groups", defaultGroup);
+        if (groups.length == 0) {
             result = true;
         } else {
             result = Arrays.stream(groups).parallel().anyMatch(group::contains);
         }
-        if(excluded.length!=0){
+        if (excluded.length != 0) {
             result = result && !(Arrays.stream(excluded).parallel().anyMatch(group::contains));
         }
         return result;
     }
+
     public BarnDataLoader testCaseDirectory(String dir) {
         setParameter("dir", dir);
         return this;
     }
+
     public BarnDataLoader groups(String label) {
         setParameter("testGroups", label);
         return this;
     }
+
     public BarnDataLoader excludes(String label) {
         setParameter("excludeGroups", label);
         return this;
     }
-    public BarnDataLoader defaultGroup(String label){
+
+    public BarnDataLoader defaultGroup(String label) {
         this.defaultGroup = label;
         return this;
     }
-    public BarnDataLoader ignoreAbstract(){
+
+    public BarnDataLoader ignoreAbstract() {
         this.check_abstract = false;
         return this;
     }
-    public BarnDataLoader checkAbstract(){
+
+    public BarnDataLoader checkAbstract() {
         this.check_abstract = true;
         return this;
     }
-    protected Goate modelData(Goate rd){
-        Goate dl = new ToGoate(rd.get("data modeler",rd.get("data modelers","[]"))).convert();
+
+    protected Goate modelData(Goate rd) {
+        Goate dl = new ToGoate(rd.get("data modeler", rd.get("data modelers", "[]"))).convert();
         rd = rd.scrub("data modelers").scrub("data modeler");
-        if(dl.size()>0){
+        if (dl.size() > 0) {
             int index = 0;
-            while(dl.get(""+index)!=null){
-                Goate data = new ToGoate(dl.get(""+index,"{}")).convert();
-                String dlp = data.get("name",null,String.class);
-                if(dlp!=null&&!dlp.isEmpty()){
+            while (dl.get("" + index) != null) {
+                Goate data = new ToGoate(dl.get("" + index, "{}")).convert();
+                String dlp = data.get("name", null, String.class);
+                if (dlp != null && !dlp.isEmpty()) {
                     rd.merge(new DataModeler(dlp, data).load().get(0), false);
                 }
                 index++;

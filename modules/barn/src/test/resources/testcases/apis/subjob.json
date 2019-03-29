@@ -1,0 +1,13 @@
+{
+  "setup": [
+    {
+      "job": "set sold date",
+      "sold date": "",
+      "loanId":"o::loan id",
+      "import":[
+        "loan id",
+        "loan effective date"
+      ]
+    }
+  ]
+}

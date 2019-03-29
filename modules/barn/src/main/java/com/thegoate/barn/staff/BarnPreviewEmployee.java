@@ -51,7 +51,7 @@ public class BarnPreviewEmployee extends Employee {
 
     @Override
     public Employee init() {
-        barnSource = definition.get("barn source", "{}");
+        barnSource = definition.get("barn expected", "{}");
         barnRoot = definition.get("barn root","", String.class);
         return this;
     }
