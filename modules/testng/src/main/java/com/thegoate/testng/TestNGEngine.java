@@ -31,6 +31,7 @@ import com.thegoate.Goate;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationThreadBuilder;
+import com.thegoate.expect.conditional.ConditionalBuilder;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.metrics.Stopwatch;
@@ -45,6 +46,7 @@ import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -68,6 +70,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     ITestContext testContext = null;
     XmlTest xt = null;
     protected ExpectationThreadBuilder etb;
+    protected ExpectEvaluator ev;
 
     public static int number = 0;
 
@@ -239,6 +242,17 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
+    public TestNGEngine expect(ConditionalBuilder conditionalBuilder){
+        return expect(conditionalBuilder.build());
+    }
+
+    @Override
+    public TestNGEngine expect(List<Expectation> expectationList){
+        expectationList.forEach(this::expect);
+        return this;
+    }
+
+    @Override
     public TestNGEngine evalPeriod(long periodMS){
         if(etb!=null){
             etb.period(periodMS);
@@ -254,12 +268,16 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return this;
     }
 
+    public ExpectEvaluator getEv(){
+        return ev;
+    }
+
     @Override
     public void evaluate(){
         if(etb.isBuilt()) {
             LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
         } else {
-            ExpectEvaluator ev = new ExpectEvaluator(etb);
+            ev = new ExpectEvaluator(etb);
             boolean result = ev.evaluate();
             logStatuses(ev);
             assertTrue(result, ev.failed());

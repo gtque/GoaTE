@@ -29,7 +29,10 @@ package com.thegoate.testng;
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.expect.Expectation;
+import com.thegoate.expect.conditional.ConditionalBuilder;
 import org.testng.ITestContext;
+
+import java.util.List;
 
 /**
  * The interface for TestNG based test classes.
@@ -53,6 +56,8 @@ public interface TestNG {
     <T>T get(String key, Object def, Class<T> type);
     TestNG put(String key, Object val);
     TestNG expect(Expectation expectation);
+    TestNG expect(ConditionalBuilder conditionalBuilder);
+    TestNG expect(List<Expectation> expectation);
     TestNG evalPeriod(long periodMS);
     TestNG evalTimeout(long periodMS);
     void evaluate();

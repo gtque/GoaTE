@@ -166,6 +166,8 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
     public void initDataMethod(Object[] d, Method m) {
         if (d != null&&d.length>0) {
             init((Goate)d[0]);
+        } else {
+            init(data!=null?data:new Goate());
         }
         startUp(m);
     }
