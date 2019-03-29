@@ -24,37 +24,24 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.rest;
+package com.thegoate.simpleserver;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.context.ApplicationContext;
 
 /**
- * Created by Eric Angeli on 11/26/2018.
+ * Created by Eric Angeli on 11/30/2018.
  */
-public class RestResult {
-    public static final String statusCode = "status code";
-    public static final String bodyAsAString = "body as a string";
-    public static final String body = "body";
-    public static final String responseTime = "response time";
-    public static final String sessionId = "session id";
-    public static final String statusLine = "status line";
-    public static final String json = "json";
-    public static final String xml = "xml";
-    public static final String html = "html";
+@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
+public class SimpleServer {
 
-    public static final String header(String header) {
-        return "header " + header;
-    }
-
-    public static final String cookie(String cookie) {
-        return "cookie " + cookie;
-    }
-
-    public static final String detailedCookie(String cookie) {
-        return "detailedCookie " + cookie;
-    }
-
-    public static final String inputStream = "input stream";
-
-    public static final String getField(String field){
-        return field;
+    public static void main(String[] args) {
+        System.out.println("******************************************");
+        System.out.println("          STARTING UP                     ");
+        System.out.println("******************************************");
+        ApplicationContext ctx = SpringApplication.run(SimpleServer.class, args);
     }
 }

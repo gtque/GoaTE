@@ -34,11 +34,18 @@ import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestCall;
 import com.thegoate.rest.RestResult;
 import com.thegoate.rest.staff.ApiGet;
+import com.thegoate.simpleserver.SimpleServer;
+import com.thegoate.spring.SpringTestEngine;
 import com.thegoate.staff.Employee;
-import com.thegoate.testng.TestNGEngineAnnotatedDL;
+import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.Response;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.testng.annotations.Test;
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -48,12 +55,16 @@ import static org.testng.Assert.assertTrue;
  * or a mock server.
  * Created by Eric Angeli on 5/16/2017.
  */
-public class RATests extends TestNGEngineAnnotatedDL {
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = SimpleServer.class)
+@TestExecutionListeners(inheritListeners = false, listeners = {
+        DependencyInjectionTestExecutionListener.class,
+        DirtiesContextTestExecutionListener.class})
+public class RATests extends SpringTestEngine {
 
     @Test(groups = {"unit"})
-    public void getGoogle() {
+    public void getURL() {
         Rest rest = new RABasicAuthHeader();
-        Response response = (Response) rest.baseURL("https://www.google.com").get("");
+        Response response = (Response) rest.baseURL(baseURL()).get("bump/count");
         data.put("response", response);
         assertEquals(response.statusCode(), 200);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
@@ -64,16 +75,16 @@ public class RATests extends TestNGEngineAnnotatedDL {
     }
 
     @Test(groups = {"unit"})
-    public void getGoogleRest() {
+    public void getURLRestWithExpectedWorker() {
         Response response = (Response) new RestCall()
-                .baseURL("https://www.google.com")
+                .baseURL(baseURL())
 //                .get("/".concat(eut("endpoint.base","api")).concat("/payment-advice/{paymentAdviceId}"));
-                .get("");
+                .get("hello/world");
         data.put("response", response);
 
 //        assertEquals(response.statusCode(), 200);
 //        etb.expect("api response>status code,==,200");
-        Employee callYahoo = new CallYahoo();
+        Employee callAnotherURL = new CallAnotherURL().baseURL(baseURL());
         expect(new Expectation(data).actual(response.statusCode()).is("==").expected(200));
         expect(Expectation.build()
                 .actual(RestResult.statusCode)
@@ -86,23 +97,23 @@ public class RATests extends TestNGEngineAnnotatedDL {
                 .fromExpected("{\"status code\": 201}"));
         expect(Expectation.build()
                 .actual(RestResult.bodyAsAString)
-                .from(response)
+                .fromClone(response.body().prettyPrint())
                 .isNotEqualTo(RestResult.bodyAsAString)
-                .fromExpected(callYahoo));
+                .fromExpected(callAnotherURL));
         expect(Expectation.build()
                 .actual(RestResult.statusCode)
                 .from(response)
                 .isEqualTo(RestResult.statusCode)
-                .fromExpected(callYahoo));
+                .fromExpected(callAnotherURL));
         expect(Expectation.build()
                 .actual(200)
                 .isEqualTo(RestResult.statusCode)
-                .fromExpected(callYahoo));
+                .fromExpected(callAnotherURL));
     }
 
     @Test(groups = {"unit"})
-    public void getGoogleByEmployee() {
-        Goate d = new Goate().put("base url", "https://www.google.com");
+    public void getURLByEmployee() {
+        Goate d = new Goate().put("base url", baseURL()).put("end point", "hello/world");
         Employee e = new ApiGet().init(d);
         Response response = (Response) e.work();
         assertEquals(response.statusCode(), 200);
@@ -111,5 +122,22 @@ public class RATests extends TestNGEngineAnnotatedDL {
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void testRestResultBodyAsAString() {
+        String expected = "{\"greeting\":\"hello\"}";
+        Object result = new RestCall().baseURL(baseURL())
+                .get("hello/world");
+        expect(Expectation.build()
+                .actual(RestResult.statusCode)
+                .from(result)
+                .isEqualTo(200));
+        expect(Expectation.build()
+                .actual(RestResult.bodyAsAString)
+                .from(result)
+                .isEqualTo(expected));
+        evaluate();
+        assertEquals(getEv().passes().size(),2);
     }
 }

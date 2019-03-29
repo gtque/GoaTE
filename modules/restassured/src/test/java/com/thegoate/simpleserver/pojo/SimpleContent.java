@@ -24,37 +24,39 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.rest;
+package com.thegoate.simpleserver.pojo;
+
+import java.time.LocalDate;
 
 /**
- * Created by Eric Angeli on 11/26/2018.
+ * Created by Eric Angeli on 11/30/2018.
  */
-public class RestResult {
-    public static final String statusCode = "status code";
-    public static final String bodyAsAString = "body as a string";
-    public static final String body = "body";
-    public static final String responseTime = "response time";
-    public static final String sessionId = "session id";
-    public static final String statusLine = "status line";
-    public static final String json = "json";
-    public static final String xml = "xml";
-    public static final String html = "html";
+public class SimpleContent extends Message{
+    private String id;
+    private LocalDate date;
+    private String message;
 
-    public static final String header(String header) {
-        return "header " + header;
+    public String getId() {
+        return id;
     }
 
-    public static final String cookie(String cookie) {
-        return "cookie " + cookie;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public static final String detailedCookie(String cookie) {
-        return "detailedCookie " + cookie;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public static final String inputStream = "input stream";
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
 
-    public static final String getField(String field){
-        return field;
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

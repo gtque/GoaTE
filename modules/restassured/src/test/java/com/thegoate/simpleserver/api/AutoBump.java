@@ -24,37 +24,44 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.rest;
+package com.thegoate.simpleserver.api;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * Created by Eric Angeli on 11/26/2018.
+ * Created by Eric Angeli on 11/30/2018.
  */
-public class RestResult {
-    public static final String statusCode = "status code";
-    public static final String bodyAsAString = "body as a string";
-    public static final String body = "body";
-    public static final String responseTime = "response time";
-    public static final String sessionId = "session id";
-    public static final String statusLine = "status line";
-    public static final String json = "json";
-    public static final String xml = "xml";
-    public static final String html = "html";
+@RestController
+@RequestMapping("/bump")
+public class AutoBump {
 
-    public static final String header(String header) {
-        return "header " + header;
+    volatile long count;
+
+    @GetMapping("/count")
+    public String getCount(){
+        return "{\"count\":"+count+"}";
     }
 
-    public static final String cookie(String cookie) {
-        return "cookie " + cookie;
+    @PatchMapping("")
+    public void bumpCount(HttpServletResponse response){
+        if(count+1L == Long.MAX_VALUE){
+            count = 0L;
+        }else {
+            count++;
+        }
+        response.setStatus(200);
     }
 
-    public static final String detailedCookie(String cookie) {
-        return "detailedCookie " + cookie;
-    }
-
-    public static final String inputStream = "input stream";
-
-    public static final String getField(String field){
-        return field;
+    @DeleteMapping("")
+    public String deleteCount(HttpServletResponse response){
+        count = 0L;
+        response.setStatus(204);
+        return "";
     }
 }
