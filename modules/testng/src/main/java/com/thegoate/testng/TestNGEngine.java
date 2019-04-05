@@ -27,7 +27,6 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
-
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationThreadBuilder;
@@ -38,7 +37,6 @@ import com.thegoate.metrics.Stopwatch;
 import com.thegoate.statics.StaticScrubber;
 import org.testng.ITest;
 import org.testng.ITestContext;
-import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -47,8 +45,6 @@ import org.testng.xml.XmlTest;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.testng.Assert.assertTrue;
 
