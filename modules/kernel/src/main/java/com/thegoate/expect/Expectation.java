@@ -395,15 +395,25 @@ public class Expectation {
                 if (rtrn == null) {
                     rtrn = new Goate().get("source", source);
                 }
-                for (String key : expect.keys()) {
-                    Goate exp = (Goate) expect.get(key);
-                    if(forceFrom) {
-                        exp.put("actual", "actual");
-                        exp.put("from", from);
+                if(expect.size()==0){
+                    logFail(new Exception("Expection not defined properly."), new Goate()
+                            .put("actual", getActual())
+                    .put("from", getFrom())
+                    .put("operator", getOperator())
+                    .put("expected", getExpected())
+                    .put("fromExpected", getFromExpected()));
+                    result = false;
+                }else {
+                    for (String key : expect.keys()) {
+                        Goate exp = (Goate) expect.get(key);
+                        if (forceFrom) {
+                            exp.put("actual", "actual");
+                            exp.put("from", from);
+                        }
+                        Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);
+                        checker.start();
+                        checkers.add(checker);
                     }
-                    Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);
-                    checker.start();
-                    checkers.add(checker);
                 }
                 boolean notFinished = true;
                 while (notFinished) {

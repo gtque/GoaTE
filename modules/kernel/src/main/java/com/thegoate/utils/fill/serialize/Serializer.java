@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.fill.serialize.to.SerializeTo;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -82,6 +83,10 @@ public class Serializer<T, S> extends Cereal {
         return !(reflection.isPrimitive(type) || (type.equals(String.class)));
     }
 
+    public Object to(SerializeTo serializer){
+        return serializer.serialize(pojo);
+    }
+
     public Map<String, Object> toMap(Class mapType) {
         Map<String, Object> data = null;
         try {
@@ -112,40 +117,6 @@ public class Serializer<T, S> extends Cereal {
                                     if(!type.equals(pojo.getClass())) {
                                         addMap(data, o, fieldKey);
                                     }
-//                            if (field.getValue().getType().getAnnotation(GoatePojo.class) != null) {
-//                                addMap(data, o, fieldKey + ".");
-//                            } else if (o instanceof List) {
-//                                for (int i = 0; i < ((List) o).size(); i++) {
-//                                    Object io = ((List) o).get(i);
-//                                    if (io.getClass().getAnnotation(GoatePojo.class) != null) {
-//                                        addMap(data, io, fieldKey + "." + i + ".");
-//                                    } else {
-//                                        data.put(fieldKey + "." + i, io);
-//                                    }
-//                                }
-//                            } else if (o.getClass().isArray()) {
-//                                for(int i = 0; i< Array.getLength(o); i++){
-//                                    Object io = Array.get(o,i);
-//                                    if (io.getClass().getAnnotation(GoatePojo.class) != null) {
-//                                        addMap(data, io, fieldKey + "." + i + ".");
-//                                    } else {
-//                                        data.put(fieldKey + "." + i, io);
-//                                    }
-//                                }
-//                            } else if (o instanceof Map) {
-//                                int i = 0;
-//                                Iterator keys = ((Map)o).keySet().iterator();
-//                                while(keys.hasNext()) {
-//                                    Object keyValue = keys.next();
-//                                    Object io = ((Map)o).get(keyValue);
-//                                    if (io.getClass().getAnnotation(GoatePojo.class) != null) {
-//                                        addMap(data, io, fieldKey + "." + i + ".value.");
-//                                    } else {
-//                                        data.put(fieldKey + "." + i + ".value", io);
-//                                    }
-//                                    data.put(fieldKey + "." + i + ".key", keyValue);
-//                                    data.put(fieldKey + "." + i + ".class", io.getClass().getName());
-//                                }
                                 } else {
                                     data.put(fieldKey, o);
                                 }

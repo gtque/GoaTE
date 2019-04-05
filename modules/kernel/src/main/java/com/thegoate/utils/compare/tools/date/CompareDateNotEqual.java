@@ -45,12 +45,12 @@ public class CompareDateNotEqual extends CompareDate {
     public boolean evaluate() {
         String exp = "" + expected;
         String act = "" + actual;
-        boolean result = true;
+        boolean result;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(format);
             Date da = sdf.parse(parse(act));
-            Date de = sdf.parse(parse(exp));
-            result = da.compareTo(de)!=0;
+            Date de = expected!=null?sdf.parse(parse(exp)):null;
+            result = de==null?da!=null:da.compareTo(de)!=0;
         }catch (Throwable t){
             result = false;
         }

@@ -810,4 +810,19 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
         }
         assertTrue(failed);
     }
+
+    @Test(groups = {"unit"})
+    public void NotNullToNull(){
+        expect(Expectation.build()
+        .actual("3229.55")
+        .isEqualTo(null));
+        boolean failed = true;
+        try{
+            evaluate();
+            failed = false;
+        } catch(Throwable t){
+            LOG.debug("Test", "Failed as expected.");
+        }
+        assertTrue(failed);
+    }
 }

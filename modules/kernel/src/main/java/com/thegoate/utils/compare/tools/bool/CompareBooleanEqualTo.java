@@ -41,6 +41,12 @@ public class CompareBooleanEqualTo extends CompareBooleanTool {
 
     @Override
     public boolean evaluate() {
-        return Boolean.parseBoolean(""+actual)==Boolean.parseBoolean(""+expected);
+        String exp = ""+expected;
+        String act = ""+actual;
+        boolean result = false;
+        if((exp.equalsIgnoreCase("true")||exp.equalsIgnoreCase("false"))&&(act.equalsIgnoreCase("true")||act.equalsIgnoreCase("false"))) {
+            result = Boolean.parseBoolean("" + actual) == Boolean.parseBoolean("" + expected);
+        }
+        return result;
     }
 }

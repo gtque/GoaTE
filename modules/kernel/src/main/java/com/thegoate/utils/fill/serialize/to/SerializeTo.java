@@ -24,25 +24,11 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.compare.tools.bool;
-
-import com.thegoate.utils.compare.CompareUtil;
+package com.thegoate.utils.fill.serialize.to;
 
 /**
- * Compares two booleans for equality.
- * Created by Eric Angeli on 5/9/2017.
+ * Created by Eric Angeli on 4/2/2019.
  */
-@CompareUtil(operator = "!=", type = "boolean")
-public class CompareBooleanNotEqualTo extends CompareBooleanTool {
-
-    public CompareBooleanNotEqualTo(Object actual) {
-        super(actual);
-    }
-
-    @Override
-    public boolean evaluate() {
-        String exp = ""+expected;
-        String act = ""+actual;
-        return !act.equals(exp);
-    }
+public abstract class SerializeTo {
+    public abstract Object serialize(Object pojo);
 }

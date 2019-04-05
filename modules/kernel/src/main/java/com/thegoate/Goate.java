@@ -345,7 +345,25 @@ public class Goate {
 
     @Override
     public boolean equals(Object check) {
-        boolean result = false;
+        return compare(check)==0;
+    }
+
+    private Object health = null;
+    private Object keySet = null;
+    private Goate keySet(){return (Goate)keySet;}
+    public Goate healthCheck(){
+        return (Goate) health;
+    }
+
+    public int compare(Object check){
+        boolean resetSet = true;
+//        if(keySet == null){
+            health = new Goate();
+            keySet = new Goate();
+//            resetSet = true;
+//        }
+
+        int result = size();
         if(!(check instanceof Goate)){
             Goate castCheck = new ToGoate(check).convert();
             if(castCheck!=null){
@@ -354,14 +372,32 @@ public class Goate {
         }
         if (check instanceof Goate) {
             Goate gCheck = (Goate) check;
-            result = true;
+            result = 0;
             for (String key : keys()) {
-                result = new Compare(get(key)).to(gCheck.get(key)).using("==").evaluate();
-                if (!result) {
-                    break;
+                boolean found = false;
+                Object o = get(key);
+                String keyPattern = key.replaceAll("[0-9]+","[0-9]+").replace(".","\\.");
+                Set<String> keySet = keySet().get(keyPattern, null, Set.class);
+                if(keySet == null){
+                    keySet = gCheck.filterStrict(keyPattern).keys();
+                    keySet().put(keyPattern, keySet);
+                }
+                for(String checkKey:keySet) {
+                    if(new Compare(o).to(gCheck.get(checkKey)).using("==").evaluate()){
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found){
+                    result++;
+                    healthCheck().put("not found##", key+": "+o);
                 }
             }
         }
+        if(resetSet){
+            keySet = null;
+        }
+
         return result;
     }
 }

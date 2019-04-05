@@ -27,6 +27,8 @@
 package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.Goate;
+import com.thegoate.json.utils.fill.serialize.string.JsonStringConverter;
+import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.utils.fill.serialize.pojos.ComplexPojo;
 import com.thegoate.utils.fill.serialize.pojos.NestedPojos;
@@ -191,7 +193,7 @@ public class DeSerializerTests {
                 .data(data)
                 .from(SimpleSource.class)
                 .build(NestedPojos.class);
-
+        System.out.println(new Serializer<>(pojo2,SimpleSource.class).to(new JsonString()));
         assertEquals(pojo.getNumbers(), pojo2.getNumbers());
         assertEquals(pojo.getNumbers2(), pojo2.getNumbers2());
         assertEquals(pojo.getList().get(0), pojo2.getList().get(0));

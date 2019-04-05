@@ -43,7 +43,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     Object operator = null;
     Object expected = null;
 
-    public Compare(Object actual){
+    public Compare(Object actual) {
         this.actual = actual;
     }
 
@@ -53,47 +53,58 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     }
 
     @Override
-    public Goate healthCheck(){
-        return new Goate().merge(health,false).merge(tool!=null?tool.healthCheck():new Goate(),false);
+    public Goate healthCheck() {
+        return new Goate().merge(health, false).merge(tool != null ? tool.healthCheck() : new Goate(), false);
     }
+
     @Override
     public boolean evaluate() {
-        if(tool==null){
-            buildTool();//step into here if the tool is still null for some reason.
-        }
-        //if tool is still null, this indicates a problem trying to find the
-        //right comparator. Either nothing was found or there was no default.
-        // if tool is null, re-run debug and step into buildtool above.
         boolean result = false;
         try {
-            if(tool!=null) {
-                tool.to(expected).using(operator);
+            if (lookupTool()) {
                 result = tool.evaluate();//step into evaluate here to debug the comparator implementation
-            } else {
-                health.put("Tool Not Found", "Could not find \"" + operator + "\" for: " + actual);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.debug("Compare", "Failed to compare: " + e.getMessage(), e);
         }
         return result;
     }
 
-    protected void buildTool(){
+    protected boolean lookupTool() {
+        if (tool == null) {
+            buildTool();//step into here if the tool is still null for some reason.
+        }
+        //if tool is still null, this indicates a problem trying to find the
+        //right comparator. Either nothing was found or there was no default.
+        // if tool is null, re-run debug and step into buildtool above.
+        boolean result = true;
+        if (tool == null) {
+            result = false;
+            health.put("Tool Not Found", "Could not find \"" + operator + "\" for: " + actual);
+        } else {
+            tool.actual(actual).to(expected).using(operator);
+        }
+        return result;
+    }
+
+
+    protected void buildTool() {
         try {
-            tool = (CompareUtility) buildUtil(actual, CompareUtil.class, ""+operator, CompareUtil.class.getMethod("operator"));
+            tool = (CompareUtility) buildUtil(actual, CompareUtil.class, "" + operator, CompareUtil.class.getMethod("operator"));
         } catch (NoSuchMethodException e) {
             LOG.error("Problem finding the compare utility: " + e.getMessage(), e);
         }
     }
-    public CompareUtility getTool(){
-        if(tool==null){
+
+    public CompareUtility getTool() {
+        if (tool == null) {
             buildTool();
         }
         return tool;
     }
 
     @Override
-    public CompareUtility actual(Object actual){
+    public CompareUtility actual(Object actual) {
         this.actual = actual;
         return this;
     }
