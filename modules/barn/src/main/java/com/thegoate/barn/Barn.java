@@ -33,8 +33,6 @@ import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.testng.TestNGEngine;
 import org.testng.SkipException;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 
 import static org.testng.Assert.assertTrue;
 
@@ -147,7 +145,7 @@ public class Barn extends TestNGEngine {
 
     protected void evaluate(String stage) {
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(new Goate().put("parent",data).merge(data,false));
-        etb.expect(data.filter(stage + "."))
+        etb.expect(data.filter(stage + "\\."))
                 .timeout(Long.parseLong("" + data.get(stage + "_timeout", data.get("timeout_expect", 500L))))
                 .period(Long.parseLong("" + data.get(stage + "_period", data.get("period_expect", 50L))));
         ev = new ExpectEvaluator(etb);
