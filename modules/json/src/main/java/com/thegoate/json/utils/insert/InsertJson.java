@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.insert.InsertUtil;
 import com.thegoate.utils.insert.InsertUtility;
 import com.thegoate.utils.togoate.ToGoate;
 import org.json.JSONArray;
@@ -39,6 +40,7 @@ import org.json.JSONObject;
 /**
  * Created by Eric Angeli on 4/18/2018.
  */
+@InsertUtil
 public class InsertJson implements InsertUtility {
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     String key = null;

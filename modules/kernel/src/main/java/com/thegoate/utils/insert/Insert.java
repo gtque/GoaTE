@@ -31,8 +31,8 @@ import com.thegoate.Goate;
 import com.thegoate.utils.UnknownUtilType;
 
 /**
- * The generic get class.
- * This will attempt to look up the specific get utility for the type detected.
+ * The generic insert class.
+ * This will attempt to look up the specific insert utility for the type detected.
  * Created by Eric Angeli on 5/5/2017.
  */
 public class Insert extends UnknownUtilType implements InsertUtility {
@@ -101,7 +101,7 @@ public class Insert extends UnknownUtilType implements InsertUtility {
 
     @Override
     public Object insert() throws Exception {
-        return null;
+        return insert(new Goate());
     }
 
     @Override
