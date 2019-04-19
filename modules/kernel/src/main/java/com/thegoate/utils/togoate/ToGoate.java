@@ -67,6 +67,7 @@ public class ToGoate extends UnknownUtilType implements ToGoateUtility{
             }
             if (result == null) {
                 LOG.info("Failed to convert: " + original);
+                result = new Goate().put("_original_", original);
             }
         }
         return result;
