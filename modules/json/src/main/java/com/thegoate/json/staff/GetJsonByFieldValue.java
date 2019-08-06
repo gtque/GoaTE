@@ -29,10 +29,12 @@ package com.thegoate.json.staff;
 import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.json.utils.togoate.JSONToGoate;
+import com.thegoate.locate.Locate;
 import com.thegoate.staff.Employee;
 import com.thegoate.staff.GoateJob;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.NotFound;
 import com.thegoate.utils.togoate.ToGoate;
 
 import java.util.ArrayList;
@@ -52,8 +54,24 @@ import java.util.regex.Pattern;
                 "json: the json to look in, required if not from result",})
 public class GetJsonByFieldValue extends Employee {
 
+    protected boolean notFound = false;//return original by default.
+
     public static GetJsonByFieldValue value(Object value) {
         return new GetJsonByFieldValue().valueToFind(value);
+    }
+
+    public GetJsonByFieldValue returnNotFound() {
+        notFound = true;
+        return this;
+    }
+
+    public GetJsonByFieldValue returnOriginal() {
+        notFound = false;
+        return this;
+    }
+
+    public GetJsonByFieldValue root(Locate path){
+        return root(path.toPath());
     }
 
     public GetJsonByFieldValue root(String rootPattern) {
@@ -64,6 +82,10 @@ public class GetJsonByFieldValue extends Employee {
     public GetJsonByFieldValue valueToFind(Object value) {
         definition.put("value", value);
         return this;
+    }
+
+    public GetJsonByFieldValue pathPattern(Locate path){
+        return pathPattern(path.toPath());
     }
 
     public GetJsonByFieldValue pathPattern(String pattern) {
@@ -91,11 +113,21 @@ public class GetJsonByFieldValue extends Employee {
         return this;
     }
 
-    public GetJsonByFieldValue secondaryCondition(String secondBase, String pathPattern, Object value){
+    public GetJsonByFieldValue secondaryCondition(String secondBase, Locate pathPattern, Object value) {
+        return secondaryCondition(secondBase, pathPattern.toPath(), value);
+    }
+    public GetJsonByFieldValue secondaryCondition(Locate secondBase, String pathPattern, Object value) {
+        return secondaryCondition(secondBase.toPath(), pathPattern, value);
+    }
+    public GetJsonByFieldValue secondaryCondition(Locate secondBase, Locate pathPattern, Object value) {
+        return secondaryCondition(secondBase.toPath(), pathPattern.toPath(), value);
+    }
+    public GetJsonByFieldValue secondaryCondition(String secondBase, String pathPattern, Object value) {
         List<Condition> secondary = definition.get("secondary", new ArrayList<Condition>(), List.class);
         secondary.add(new Condition(secondBase, pathPattern, value));
         return this;
     }
+
     @Override
     public Employee init() {
         return this;
@@ -128,8 +160,8 @@ public class GetJsonByFieldValue extends Employee {
             Goate jt = new ToGoate(oj).convert();
             Goate filtered = jt.filterStrict(field);
             for (String key : filtered.keys()) {
-                if (new Compare(filtered.get(key)).to(value).using("==").evaluate()){//filtered.get(key) != null && filtered.get(key).equals(value)) {
-                    if(checkSeond(jt, key, secondary)) {
+                if (new Compare(filtered.get(key)).to(value).using("==").evaluate()) {
+                    if (checkSecond(jt, key, secondary)) {
                         foundKey = key;
                         break;
                     }
@@ -141,27 +173,34 @@ public class GetJsonByFieldValue extends Employee {
                     foundKey = "";
                 }
                 break;
+            } else if(notFound){
+                theJson = new NotFound(field + "("+ value + "): not found in the json");
             }
         }
         return foundKey.isEmpty() ? theJson : findValidParent(foundKey, json);
     }
 
-    private boolean checkSeond(Goate jt, String key, List<Condition> secondary){
-        boolean result;
-        if(secondary==null||secondary.size()==0){
-            result = true;
-        } else {
-            result = true;
-            for(Condition second:secondary){
+    private boolean checkSecond(Goate jt, String key, List<Condition> secondary) {
+        boolean result = true;
+        if (secondary != null && secondary.size() > 0) {
+            for (Condition second : secondary) {
                 Pattern p = Pattern.compile(second.getBase());
                 Matcher m = p.matcher(key);
                 if (m.find()) {
                     String keyBase = m.group();
-                    String secondKey = keyBase + "." + second.getPathPattern();
-                    if (!(new Compare(jt.get(secondKey)).to(second.getValue()).using("==").evaluate())){
-                        result = false;
-                        break;
+                    String secondKey = keyBase + (keyBase.isEmpty() ? "" : ".") + second.getPathPattern();
+                    Goate filtered = jt.filterStrict(secondKey);
+                    result = false;
+                    for (String key2 : filtered.keys()) {
+                        if (new Compare(filtered.get(key2)).to(second.getValue()).using("==").evaluate()) {
+                            result = true;
+                            break;
+                        }
                     }
+//                    if (!(new Compare(jt.get(secondKey)).to(second.getValue()).using("==").evaluate())){
+//                        result = false;
+//                        break;
+//                    }
                 }
             }
         }
@@ -190,11 +229,12 @@ public class GetJsonByFieldValue extends Employee {
         return scrub;
     }
 
-    private class Condition{
+    private class Condition {
         protected String base;
         protected String pathPattern;
         protected Object value;
-        Condition(String base, String pathPattern, Object value){
+
+        Condition(String base, String pathPattern, Object value) {
             this.base = base;
             this.pathPattern = pathPattern;
             this.value = value;

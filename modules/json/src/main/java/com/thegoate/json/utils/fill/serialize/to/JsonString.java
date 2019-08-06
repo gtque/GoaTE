@@ -26,15 +26,40 @@
  */
 package com.thegoate.json.utils.fill.serialize.to;
 
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.to.SerializeTo;
 import org.json.JSONObject;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * Created by Eric Angeli on 4/2/2019.
  */
 public class JsonString extends SerializeTo {
+
     @Override
     public Object serialize(Object pojo) {
-        return (new JSONObject(pojo).toString(4));
+        return (mapFields("", cereal, new JSONObject(pojo).toString(4)));
+    }
+
+    @Override
+    public Object mapFields(String base, Class cereal, Object so){
+        String value = ""+ so;
+        GoateReflection gr = new GoateReflection();
+        Map<String, Field> fields = gr.findFields(cereal);
+        for (Map.Entry<String, Field> field : fields.entrySet()) {
+            GoateSource gs = findGoateSource(field.getValue(), source);
+            String fieldKey = field.getKey();
+            String altKey = fieldKey;
+            if (gs != null) {
+                altKey = gs.key();
+            }
+            if(!fieldKey.equals(altKey)) {
+                value = value.replace("\""+fieldKey+"\"","\""+altKey+"\"");
+            }
+        }
+        return value;
     }
 }

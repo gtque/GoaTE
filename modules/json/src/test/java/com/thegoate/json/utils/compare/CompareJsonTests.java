@@ -76,7 +76,7 @@ public class CompareJsonTests extends TestNGEngineMethodDL {
     @Test(groups = {"unit"})
     public void compareJson() {
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        String check = new FillString("json1>json1,${operator},o::json2").with(data).toString();
+        String check = new FillString("o::json1,${operator},o::json2").with(data).toString();
         etb.expect(check);
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
