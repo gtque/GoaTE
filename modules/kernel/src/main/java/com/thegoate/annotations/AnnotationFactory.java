@@ -190,8 +190,15 @@ public class AnnotationFactory {
         }
         Map<String, Class> listing = directory.get(annotation.getCanonicalName());
         if (listing.size() == 0) {
-            for (Class<?> klass : ClassIndex.getAnnotated(annotation)) {
+            if(LOG!=null) {
+                LOG.debug("Building Directory "+annotation.getCanonicalName(), "the listing was empty, trying to build it.");
+            }
+            Iterable<Class<?>> klasses = ClassIndex.getAnnotated(annotation);
+            for (Class<?> klass : klasses) {
                 String theClass = klass.getCanonicalName();
+                if(LOG!=null) {
+                    LOG.debug("Adding to directory", theClass);
+                }
                 try {
                     Class temp = Class.forName(theClass);
                     Annotation service = temp.getAnnotation(annotation);
@@ -237,34 +244,45 @@ public class AnnotationFactory {
                     constructor = new GoateReflection().findConstructor(klass.getConstructors(), constructorArgs);
                 }
                 if (constructor != null) {
-                    o = constructor.newInstance(constructorArgs);
+                    try {
+                        o = constructor.newInstance(constructorArgs);
+                    }catch(IllegalAccessException | InstantiationException | InvocationTargetException e){
+                        LOG.debug("Building Class", "Problem instantiating a new instances: " + e.getMessage(), e);
+                        throw e;
+                    }
+                } else {
+                    LOG.info("Building Class", "Could not find the constructor");
                 }
             } else {
                 o = klass.newInstance();
             }
+        } else {
+            LOG.debug("Building Class", "The class was not specified, definitely could not build it.");
         }
         return o;
     }
 
     public Class lookUpByAnnotatedMethod() {
         buildDirectory();
+        LOG.debug("Look Up Annotated Method", "Trying to look up an annotated method: " + methodId);
         Class klass = null;
         Map<String, Class> listings = directory.get(annotation.getCanonicalName());
         for (String theClass : listings.keySet()) {
+            LOG.debug("Checking Class", theClass);
             List<Method> methods = new GoateReflection().getDeclaredMethods(listings.get(theClass));
+            LOG.debug("Methods to check ("+methods.size()+")", methods.toString());
             for (Method m : methods) {
                 if (m.isAnnotationPresent(methodAnnotation)) {
                     for (Method am : methodAnnotation.getDeclaredMethods()) {
                         Annotation dam = m.getAnnotation(methodAnnotation);
                         try {
+                            LOG.debug("Checking Method", am.getName());
                             if (methodId.equals(am.invoke(dam))) {
                                 klass = listings.get(theClass);
                                 break;
                             }
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            LOG.debug("Look Up Annotated Method", "Problem accessing method: " + e.getMessage(), e);
                         }
                     }
                     if (klass != null) {

@@ -27,6 +27,7 @@
 package com.thegoate;
 
 import com.thegoate.dsl.Interpreter;
+import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.togoate.ToGoate;
 
@@ -176,6 +177,29 @@ public class Goate {
         if (value != null && dsl) {
             value = processDSL(key, value);
         }
+
+        return new GoateReflection().isPrimitive(type) ? doCastPrimitive(value, type) : type.cast(value);
+    }
+
+    public <T> T doCastPrimitive(Object value, Class<T> type) {
+        GoateReflection gr = new GoateReflection();
+        if (gr.isBooleanType(type)&&gr.isBoolean(value)) {
+            value = new Boolean("" + value);
+        } else if (gr.isByteType(type)&&gr.isByte(value)) {
+            value = new Byte("" + value);
+        } else if (gr.isIntegerType(type)&&gr.isInteger(value)) {
+            value = new Integer("" + value);
+        } else if (gr.isDoubleType(type)&&gr.isDouble(value)) {
+            value = new Double("" + value);
+        } else if (gr.isFloatType(type)&&gr.isFloat(value)) {
+            value = new Float("" + value);
+        } else if (gr.isLongType(type)&&gr.isLong(value)) {
+            value = new Long("" + value);
+        } else if (gr.isCharacterType(type)&&gr.isCharacter(value)) {
+            value = new Character(("" + value).charAt(0));
+        } else if (gr.isShortType(type)&&gr.isShort(value)) {
+            value = new Short("" + value);
+        }
         return type.cast(value);
     }
 
@@ -220,7 +244,7 @@ public class Goate {
      * @return A Goate collection containing matching elements.
      */
     public Goate filter(String pattern) {
-        return filterStrict(pattern+".*");
+        return filterStrict(pattern + ".*");
     }
 
     /**
@@ -258,6 +282,7 @@ public class Goate {
         }
         return filtered;
     }
+
     /**
      * Simple filter, matches if key does start with the given pattern; ie excludes anything matching the pattern
      *
@@ -345,28 +370,32 @@ public class Goate {
 
     @Override
     public boolean equals(Object check) {
-        return compare(check)==0;
+        return compare(check) == 0;
     }
 
     private Object health = null;
     private Object keySet = null;
-    private Goate keySet(){return (Goate)keySet;}
-    public Goate healthCheck(){
+
+    private Goate keySet() {
+        return (Goate) keySet;
+    }
+
+    public Goate healthCheck() {
         return (Goate) health;
     }
 
-    public int compare(Object check){
+    public int compare(Object check) {
         boolean resetSet = true;
 //        if(keySet == null){
-            health = new Goate();
-            keySet = new Goate();
+        health = new Goate();
+        keySet = new Goate();
 //            resetSet = true;
 //        }
 
         int result = size();
-        if(!(check instanceof Goate)){
+        if (!(check instanceof Goate)) {
             Goate castCheck = new ToGoate(check).convert();
-            if(castCheck!=null){
+            if (castCheck != null) {
                 check = castCheck;
             }
         }
@@ -376,25 +405,25 @@ public class Goate {
             for (String key : keys()) {
                 boolean found = false;
                 Object o = get(key);
-                String keyPattern = key.replaceAll("[0-9]+","[0-9]+").replace(".","\\.");
+                String keyPattern = key.replaceAll("[0-9]+", "[0-9]+").replace(".", "\\.");
                 Set<String> keySet = keySet().get(keyPattern, null, Set.class);
-                if(keySet == null){
+                if (keySet == null) {
                     keySet = gCheck.filterStrict(keyPattern).keys();
                     keySet().put(keyPattern, keySet);
                 }
-                for(String checkKey:keySet) {
-                    if(new Compare(o).to(gCheck.get(checkKey)).using("==").evaluate()){
+                for (String checkKey : keySet) {
+                    if (new Compare(o).to(gCheck.get(checkKey)).using("==").evaluate()) {
                         found = true;
                         break;
                     }
                 }
-                if(!found){
+                if (!found) {
                     result++;
-                    healthCheck().put("not found##", key+": "+o);
+                    healthCheck().put("not found##", key + ": " + o);
                 }
             }
         }
-        if(resetSet){
+        if (resetSet) {
             keySet = null;
         }
 

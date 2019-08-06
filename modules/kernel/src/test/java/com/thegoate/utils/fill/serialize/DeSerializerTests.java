@@ -30,17 +30,20 @@ import com.thegoate.Goate;
 import com.thegoate.json.utils.fill.serialize.string.JsonStringConverter;
 import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.json.utils.tojson.GoateToJSON;
-import com.thegoate.utils.fill.serialize.pojos.ComplexPojo;
-import com.thegoate.utils.fill.serialize.pojos.NestedPojos;
-import com.thegoate.utils.fill.serialize.pojos.SimplePojo;
-import com.thegoate.utils.fill.serialize.pojos.SimpleSource;
+import com.thegoate.utils.fill.serialize.pojos.*;
 import com.thegoate.utils.fill.serialize.primitives.CastBoolean;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.togoate.ToGoate;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
@@ -51,6 +54,22 @@ import static org.testng.Assert.assertTrue;
  * Created by Eric Angeli on 6/26/2018.
  */
 public class DeSerializerTests {
+
+    @Test(groups = {"unit"})
+    public void testListPojo(){
+        String ja = "[\"premal\",\"jonathan\",\"anthony\"]";
+        JSONObject jo = new JSONObject();
+        jo.put("theList", new JSONArray(ja));
+        Goate g = new ToGoate(jo).convert();
+        SimpleList data = new DeSerializer().data(g).build(SimpleList.class);
+        data.toString();
+        List<String> expected = new ArrayList<>();
+        expected.add("premal");
+        expected.add("jonathan");
+        expected.add("anthony");
+
+        assertEquals(data.getTheList(), expected);
+    }
 
     @Test(groups = {"unit", "deserialize"})
     public void simpleDeserializeStringObjectTest(){
@@ -193,7 +212,8 @@ public class DeSerializerTests {
                 .data(data)
                 .from(SimpleSource.class)
                 .build(NestedPojos.class);
-        System.out.println(new Serializer<>(pojo2,SimpleSource.class).to(new JsonString()));
+        String jstring = ""+new Serializer<>(pojo2, Cheese.class).to(new JsonString());
+        System.out.println(jstring);
         assertEquals(pojo.getNumbers(), pojo2.getNumbers());
         assertEquals(pojo.getNumbers2(), pojo2.getNumbers2());
         assertEquals(pojo.getList().get(0), pojo2.getList().get(0));
@@ -214,5 +234,24 @@ public class DeSerializerTests {
         assertEquals(pojo2.getCp()[1].getMap().get("Peter"),"Parker");
         assertEquals(pojo2.getCp()[1].getMap().get("Tony"),"Stark");
         assertTrue(pojo2.getCp()[0].getNested().isBool());
+    }
+
+    @Test(groups = {"unit"})
+    public void nestedMapped(){
+        SimpleNested pojo2 = new SimpleNested();
+        SimpleInt si = new SimpleInt();
+        si.setValue(42);
+        pojo2.setInnerField(si);
+        String jstring = ""+new Serializer<>(pojo2, Cheese.class).to(new JsonString());
+        System.out.println(jstring);
+        assertEquals(new Get("chuck.value").from(jstring), 42);
+    }
+
+    @Test(groups = {"unit"})
+    public void skipSerializingNested(){
+        String jstring = "{\"ld\":\"04-22-2019\", \"innerField\":{\"value\":42}}";
+        SimpleNested pojo2 = new DeSerializer().data(new ToGoate(jstring).convert()).build(SimpleNested.class);
+        Goate data = new Serializer<>(pojo2, Cheese.class).skipSerializingObjects().skipSerializingGoatePojos().toGoate();
+        assertTrue(data.get("ld") instanceof LocalDate);
     }
 }

@@ -30,74 +30,122 @@ package com.thegoate.locate;
  * Created by Eric Angeli on 3/20/2019.
  */
 public class Locate {
-    StringBuilder path = new StringBuilder();
+    protected StringBuilder path = new StringBuilder();
+    private String oneOrMoreNumber = "([0-9])+";
+    private String zeroOrMoreNumber = "([0-9])*";
 
-    public static Locate path(){
+    public static Locate start(String start) {
+        return path().match(start);
+    }
+
+    public static Locate path() {
         return new Locate();
     }
 
-    public Locate dot(){
+    public Locate wildcardIndex() {
+        return anyNumberZeroOrMore();
+    }
+
+    public Locate wildcardIndex(int expectedSize) {
+        return matchNTimes(zeroOrMoreNumber, expectedSize);
+    }
+
+    public Locate wildcardIndex(int expectedSize, int startingIndex) {
+        return matchNTimesStartingAt(zeroOrMoreNumber, expectedSize, startingIndex);
+    }
+
+    public Locate wildcardIndexOneOrMore() {
+        return anyNumberOneOrMore();
+    }
+
+    public Locate matchIndex() {
+        return wildcardIndex();
+    }
+
+    /**
+     * At the locate level this is mostly just syntactic sugar.
+     * Extensions of Locate may implement more explicit use of matchIndex(int matchIndex)
+     *
+     * @param matchIndex the index to match, ignored in this implementation.
+     * @return self
+     */
+    public Locate matchIndex(int matchIndex) {
+        return wildcardIndex();
+    }
+
+    public Locate dot() {
         path.append("\\.");
         return this;
     }
 
-    public Locate anyNumberOneOrMore(){
-        path.append("([0-9])+");
+    public Locate anyNumberOneOrMore() {
+        path.append(oneOrMoreNumber);
         return this;
     }
 
-    public Locate anyNumberZeroOrMore(){
-        path.append("([0-9])*");
+    public Locate anyNumberZeroOrMore() {
+        path.append(zeroOrMoreNumber);
         return this;
     }
 
-    public Locate anyLetterOneOrMore(){
+    public Locate anyLetterOneOrMore() {
         path.append("([a-zA-Z])+");
         return this;
     }
 
-    public Locate anyLetterZeroOrMore(){
+    public Locate anyLetterZeroOrMore() {
         path.append("([a-zA-Z])*");
         return this;
     }
 
-    public Locate match(String pattern){
+    public Locate match(String pattern) {
         path.append(pattern);
         return this;
     }
 
-    public Locate matchZeroOrMore(String pattern){
+    public Locate matchZeroOrMore(String pattern) {
         path.append("(").append(pattern).append(")*");
         return this;
     }
 
-    public Locate matchOneOrMore(String pattern){
+    public Locate matchOneOrMore(String pattern) {
         path.append("(").append(pattern).append(")+");
         return this;
     }
 
-    public Locate matchNTimes(String pattern, int numberOfTimesToMatch){
+    public Locate matchNTimes(String pattern, int numberOfTimesToMatch) {
         path.append("{").append(numberOfTimesToMatch).append("}");
         return this;
     }
 
-    public Locate matchNTimesStartingAt(String pattern, int numberOfTimesToMatch, int start){
+    public Locate matchNTimesStartingAt(String pattern, int numberOfTimesToMatch, int start) {
         path.append(pattern).append("{").append(start).append(",").append(numberOfTimesToMatch).append("}");
         return this;
     }
 
-    public Locate nTimes(int numberOfTimesToMatch){
-        path.insert(0,"((").append("){").append(numberOfTimesToMatch).append("})");
+    public Locate nTimes(int numberOfTimesToMatch) {
+        path.insert(0, "((").append("){").append(numberOfTimesToMatch).append("})");
         return this;
     }
 
-    public Locate nTimesStartingAt(int numberOfTimesToMatch, int start){
-        path.insert(0,"((").append("){").append(start).append(",").append(numberOfTimesToMatch).append("})");
+    public Locate nTimesStartingAt(int numberOfTimesToMatch, int start) {
+        path.insert(0, "((").append("){").append(start).append(",").append(numberOfTimesToMatch).append("})");
         return this;
     }
-    public String toPath(){
+
+    public String end() {
+        return toPath();
+    }
+
+    public String end(String match) {
+        path.append(match);
+        return toPath();
+    }
+
+    public String toPath() {
         return path.toString();
     }
+
 //    public Locate find(String find){
 //        this.find = find;
 //        return this;

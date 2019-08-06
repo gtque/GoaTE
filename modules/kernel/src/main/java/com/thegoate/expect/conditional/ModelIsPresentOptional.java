@@ -28,6 +28,7 @@ package com.thegoate.expect.conditional;
 
 import com.thegoate.Goate;
 import com.thegoate.expect.Expectation;
+import com.thegoate.expect.validate.ValidatePresence;
 import com.thegoate.locate.Locate;
 import com.thegoate.utils.togoate.ToGoate;
 
@@ -39,7 +40,7 @@ import java.util.List;
  */
 public class ModelIsPresentOptional extends ConditionalBuilder {
 
-//    protected Object requiredModel;
+    //    protected Object requiredModel;
     protected List<String> optionalModel = new ArrayList<>();
 
     @Override
@@ -51,24 +52,24 @@ public class ModelIsPresentOptional extends ConditionalBuilder {
         return model;
     }
 
-    private boolean someParentIsOptional(String key){
+    private boolean someParentIsOptional(String key) {
         boolean optional = false;
         String parent = key;
-        while(parent.contains(".")){
-            if(isOptional(parent)){
+        while (parent.contains(".")) {
+            if (isOptional(parent)) {
                 optional = true;
             }
-            parent = parent.substring(0,parent.lastIndexOf('.'));
+            parent = parent.substring(0, parent.lastIndexOf('.'));
         }
         return optional;
     }
 
-    private boolean isOptional(String key){
+    private boolean isOptional(String key) {
         return optionalModel.parallelStream().anyMatch(key::matches);
     }
 
-    private Goate findParentsMatchingPattern(String key, Goate results){
-        String pattern = key.substring(0,key.lastIndexOf('.'))
+    private Goate findParentsMatchingPattern(String key, Goate results) {
+        String pattern = key.substring(0, key.lastIndexOf('.'))
                 .replace(".", "\\.")
                 .replaceAll("[0-9]+", "[0-9]*");
         return results.filterStrict(pattern);
@@ -79,10 +80,10 @@ public class ModelIsPresentOptional extends ConditionalBuilder {
         Goate model = new ToGoate(getExpected()).convert();
         Goate results = new ToGoate(getActual()).convert();
         for (String key : model.keys()) {
-            if(!isOptional(key)) {
+            if (!isOptional(key)) {
                 if (someParentIsOptional(key)) {
                     Goate parents = findParentsMatchingPattern(key, results);
-                    for(String pKey:parents.keys()){
+                    for (String pKey : parents.keys()) {
                         addExpect(pKey + key.substring(key.lastIndexOf('.')));
                     }
                 } else {
@@ -93,19 +94,20 @@ public class ModelIsPresentOptional extends ConditionalBuilder {
         return expectations;
     }
 
-    private void addExpect(String key){
+    private void addExpect(String key) {
         expect(Expectation.build()
                 .actual(key)
                 .from(getActual())
-                .isPresent(true));
+                .isPresent(true)
+                .validate(new ValidatePresence()));
     }
 
-    public ModelIsPresentOptional addOptionalField(String field){
+    public ModelIsPresentOptional addOptionalField(String field) {
         optionalModel.add(field);
         return this;
     }
 
-    public ModelIsPresentOptional addOptionalField(Locate path){
+    public ModelIsPresentOptional addOptionalField(Locate path) {
         return addOptionalField(path.toPath());
     }
 }

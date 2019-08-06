@@ -25,49 +25,60 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.utils.togoate;
+package com.thegoate.utils.get;
 
-import com.thegoate.Goate;
-import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.GoateUtils;
+
+import java.io.File;
+import java.nio.file.Paths;
 
 /**
- * The generic get class.
- * This will attempt to look up the specific get utility for the type detected.
+ * Loads the file specified in from into a file and returns it.
  * Created by Eric Angeli on 5/5/2017.
  */
-public class ToGoate extends UnknownUtilType implements ToGoateUtility{
-    boolean autoIncrement = true;
-    ToGoateUtility tool = null;
-    protected Object original = null;
+@GetUtil
+public class GetFile extends GetTool{
+    boolean explode = false;
+    boolean overwrite = false;
 
-    public ToGoate(Object o){
-        this.original = o;
+    public GetFile(){
+        super("fileIO::");
+    }
+
+    public GetFile(Object selector) {
+        super(selector);
     }
 
     @Override
     public boolean isType(Object check) {
-        return false;
+        return (""+check).equalsIgnoreCase("fileIO::");
     }
 
-    @Override
-    public ToGoateUtility autoIncrement(boolean increment) {
-        this.autoIncrement = increment;
+    public GetFile explode(){
+        this.explode = true;
         return this;
     }
 
+    public GetFile overwrite(){
+        this.overwrite = true;
+        return this;
+    }
     @Override
-    public Goate convert() {
-        Goate result = null;
-        if(original instanceof Goate){
-            result = (Goate)original;
-        } else {
-            tool = (ToGoateUtility) buildUtil(original, ToGoateUtil.class);
-            if (tool != null) {
-                result = tool.autoIncrement(autoIncrement).convert();
-            }
-            if (result == null) {
-                LOG.debug("Failed to convert: " + original);
-                result = new Goate().put("_original_", original);
+    public Object from(Object container) {
+        Object result = null;
+        String file = "" + selector;
+
+        if (!file.equals("") && !file.equalsIgnoreCase("null")) {
+            String fullPath = GoateUtils.getFilePath(file, !explode, overwrite);
+            try {
+                if (fullPath.contains(":")) {
+                    if (fullPath.indexOf("/") == 0) {
+                        fullPath = fullPath.substring(1);
+                    }
+                }
+                result = new File(Paths.get(fullPath).toUri());
+            } catch (Exception e) {
+                LOG.error("Problem loading file into a string: " + e.getMessage(), e);
             }
         }
         return result;

@@ -37,11 +37,13 @@ import com.thegoate.expect.validate.ValidateNotGoate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
+import com.thegoate.utils.get.Get;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
 import static com.thegoate.dsl.words.LoadFile.fileAsAString;
+import static com.thegoate.expect.ExpectLocator.start;
 import static com.thegoate.expect.ExpectMatchWildcardIndexPath.matchWildcardIndex;
 import static com.thegoate.expect.ExpectWildcardIndexPath.wildcardIndex;
 import static com.thegoate.locate.Locate.path;
@@ -66,6 +68,13 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
             "            \"id\": \"8ac2a3d05d37576c015d3c4b3135000f\"\n" +
             "        }\n" +
             "    ],\n" +
+            "    \"mi\": [\n" +
+            "        [\n" +
+            "            {\n" +
+            "                \"scooby\":\"doo\"\n" +
+            "            }\n" +
+            "        ]" +
+            "    ],\n" +
             "    \"page\": null\n" +
             "}";
 
@@ -80,6 +89,7 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
                 .expect("check if even>return,!=,boolean::false");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
+        logStatuses(ev);
         assertTrue(result, ev.failed());
     }
 
@@ -205,6 +215,21 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
         LOG.debug("failed message:\n" + ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void checkJsonFromFileNestedExpectLocator() {
+        Goate data = new Goate();
+        String json = fileAsAString("data/simpleNested.json");
+        data.put("check json.value", json);
+        expect(
+                Expectation.build()
+                        //      "a.".concat(wildcardIndex()).concat(".").concat(wildcardIndex()).concat(".").concat(wildcardIndex()).concat(".x")
+                        .actual(start("a").dot().wildcardIndex().dot().wildcardIndex().dot().wildcardIndex().dot().end("x"))
+                        .from(json)
+                        //         "b.".concat(matchWildcardIndex()).concat(".").concat(matchWildcardIndex(1)).concat(".").concat(matchWildcardIndex(2)).concat(".y")
+                        .isEqualTo(start("b").dot().matchIndex().dot().matchIndex(1).dot().matchIndex(2).dot().match("y"))
+                        .fromExpected(json));
     }
 
     @Test(groups = {"unit"})
@@ -772,10 +797,10 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
                 .setActual(responseShouldFailOnMissingZ)
                 .setExpected(fullModel));
         boolean failed = true;
-        try{
+        try {
             evaluate();
             failed = false;
-        } catch(Throwable t){
+        } catch (Throwable t) {
             LOG.debug("Test", "Failed as expected.");
         }
         assertTrue(failed);
@@ -802,27 +827,118 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
                 .setActual(responseShouldFailOnMissingId)
                 .setExpected(fullModel));
         boolean failed = true;
-        try{
+        try {
             evaluate();
             failed = false;
-        } catch(Throwable t){
+        } catch (Throwable t) {
             LOG.debug("Test", "Failed as expected.");
         }
         assertTrue(failed);
     }
 
     @Test(groups = {"unit"})
-    public void NotNullToNull(){
+    public void NotNullToNull() {
         expect(Expectation.build()
-        .actual("3229.55")
-        .isEqualTo(null));
+                .actual("3229.55")
+                .isEqualTo(null));
         boolean failed = true;
-        try{
+        try {
             evaluate();
             failed = false;
-        } catch(Throwable t){
+        } catch (Throwable t) {
             LOG.debug("Test", "Failed as expected.");
         }
         assertTrue(failed);
+    }
+
+    @Test(groups = {"unit"})
+    public void evalSkipAndFail() {
+        boolean skipped = true;
+        try {
+            expect(Expectation.build()
+                    .actual("tracy.*.athan")
+                    .from(sample)
+                    .isEqualTo(42));
+            expect(Expectation.build()
+                    .actual("data.+.c")
+                    .from(sample)
+                    .isEqualTo(42));
+            expect(Expectation.build()
+                    .actual("tracy")
+                    .from(sample)
+                    .isEqualTo(42));
+            evaluate();
+            skipped = false;
+        } catch (Throwable shouldBeThrown) {
+            LOG.info("Skip And Fail", "Success!!!");
+        }
+        assertEquals(ev.fails().size(), 2);
+        assertTrue(skipped, "Should have failed and thrown an error.");
+    }
+
+    @Test(groups = {"unit"})
+    public void evalSkipAndPass() {
+        boolean skipped = false;
+        try {
+            expect(Expectation.build()
+                    .actual("tracy.*.athan")
+                    .from(sample)
+                    .isEqualTo(42));
+            evaluate();
+            skipped = true;
+        } catch (Throwable shouldBeThrown) {
+            LOG.info("Skip And Fail", "FAIL!!!");
+        }
+        assertTrue(skipped, "Should have passed and not thrown an error.");
+    }
+
+    @Test(groups = {"unit"})
+    public void evalNoSkipZeroOrMoreAndPass() {
+        boolean skipped = false;
+        try {
+            expect(Expectation.build()
+                    .actual("data.*.c")
+                    .from(sample)
+                    .isEqualTo(42));
+            evaluate();
+            skipped = true;
+        } catch (Throwable shouldBeThrown) {
+            LOG.info("No Skip And Fail", "FAIL!!!");
+        }
+        assertTrue(skipped, "Should have passed and not thrown an error.");
+    }
+
+    @Test(groups = {"unit"})
+    public void evalNoSkipOneOrMoreAndPass() {
+        boolean skipped = false;
+        try {
+            expect(Expectation.build()
+                    .actual("data.+.a")
+                    .from(sample)
+                    .isEqualTo(null));
+            evaluate();
+            skipped = true;
+        } catch (Throwable shouldBeThrown) {
+            LOG.info("No Skip And Fail", "FAIL!!!");
+        }
+        assertTrue(skipped, "Should have passed and not thrown an error.");
+    }
+
+    @Test(groups = {"unit"})
+    public void evalMatchIndexNotFound() {
+        boolean skipped = false;
+        try {
+            String val = ""+ new Get("mi.0.0.scooby").from(sample);
+            expect(Expectation.build()
+                    .actual("mi.*.*.scooby")
+                    .from(sample)
+                    .isEqualTo("mi.%.\\%.scooby")
+                    .fromExpected(sample));
+            evaluate();
+            skipped = true;
+        } catch (Throwable shouldBeThrown) {
+            LOG.info("Match Index", "FAIL!!!");
+        }
+        assertTrue(skipped, "Should have passed and not thrown an error.");
     }
 }

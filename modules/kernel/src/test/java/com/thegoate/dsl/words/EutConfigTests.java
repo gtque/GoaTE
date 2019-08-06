@@ -69,6 +69,14 @@ public class EutConfigTests extends TestNGEngineAnnotatedDL {
     }
 
     @Test(groups = {"unit"})
+    public void fillWithEut(){
+        Goate d = new Goate().put("test", "fill::howdy: ${eut::hello}");
+        String actual = ""+ d.get("test", "foobar");
+        assertEquals(actual, "howdy: world!");
+        assertEquals(d.get("test", "foobar"), "howdy: world!");
+    }
+
+    @Test(groups = {"unit"})
     public void loadLocalOverride(){
         Goate d = new Goate().put("eut", "local").put("test", "eut::hello").put("hello","chocolate");
         String actual = ""+ d.get("test", "foobar");

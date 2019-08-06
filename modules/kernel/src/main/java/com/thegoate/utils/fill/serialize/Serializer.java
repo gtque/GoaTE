@@ -48,6 +48,8 @@ public class Serializer<T, S> extends Cereal {
     private BleatBox LOG = BleatFactory.getLogger(getClass());
     private T pojo;
     private S source;
+    private boolean serializeNested = true;
+    private boolean alwaysSerializeGoatePojo = false;
 
     public Serializer(T pojo, S source) {
         this.pojo = pojo;
@@ -70,6 +72,25 @@ public class Serializer<T, S> extends Cereal {
         return source;
     }
 
+    public Serializer doSerializeNested(){
+        this.serializeNested = true;
+        return this;
+    }
+
+    public Serializer skipSerializingObjects(){
+        this.serializeNested = false;
+        return this;
+    }
+
+    public Serializer alwaysSerializeGoatePojos(){
+        this.alwaysSerializeGoatePojo = true;
+        return this;
+    }
+
+    public Serializer skipSerializingGoatePojos(){
+        this.alwaysSerializeGoatePojo = false;
+        return this;
+    }
     public Goate toGoate() {
         Goate data = new Goate();
         for (Map.Entry<String, Object> entry : toMap(HashMap.class).entrySet()) {
@@ -78,13 +99,8 @@ public class Serializer<T, S> extends Cereal {
         return data;
     }
 
-    private boolean checkNotPrimitive(Class type){
-        GoateReflection reflection = new GoateReflection();
-        return !(reflection.isPrimitive(type) || (type.equals(String.class)));
-    }
-
     public Object to(SerializeTo serializer){
-        return serializer.serialize(pojo);
+        return serializer.source((Class)source).cereal(pojo.getClass()).serialize(pojo);
     }
 
     public Map<String, Object> toMap(Class mapType) {
@@ -113,7 +129,7 @@ public class Serializer<T, S> extends Cereal {
                         if (o != null) {
                             Class type = field.getValue().getType();
                             if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {
-                                if (checkNotPrimitive(type)) {
+                                if (checkNotPrimitive(type)&&doSerialize(pojo.getClass())) {
                                     if(!type.equals(pojo.getClass())) {
                                         addMap(data, o, fieldKey);
                                     }
@@ -134,9 +150,23 @@ public class Serializer<T, S> extends Cereal {
         return data;
     }
 
+    private boolean doSerialize(Class pojoType){
+        boolean serialize = true;
+        if(!serializeNested){
+            if(alwaysSerializeGoatePojo){
+                if(pojoType.getAnnotation(GoatePojo.class)==null){
+                    serialize = false;
+                }
+            } else {
+                serialize = false;
+            }
+        }
+        return serialize;
+    }
+
     private void addMap(Map<String, Object> data, Object o, String baseKey) {
         if (o instanceof List) {
-            data.put(baseKey, o);
+            data.put(baseKey, o);//ToDo: figure out how to put the correct thing here...
             for (int i = 0; i < ((List) o).size(); i++) {
                 Object io = ((List) o).get(i);
                 process(data,io,baseKey + "." + i );

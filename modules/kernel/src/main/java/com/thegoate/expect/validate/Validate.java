@@ -60,11 +60,11 @@ public abstract class Validate extends Thread {
     protected boolean result = false;
     protected long period;
     private volatile boolean running = true;
-    //    StringBuilder evalBuffer = new StringBuilder();
     int patternIndex = 0;
     int checkIndex = 1;
-    volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
-    volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
+    volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());
+    volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());
+    volatile List<Goate> notExecuted = Collections.synchronizedList(new ArrayList<>());
 
     public String operator() {
         return this.operator;

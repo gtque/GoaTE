@@ -45,6 +45,7 @@ import com.thegoate.utils.togoate.ToGoate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Contains the information about what is expected.
@@ -297,13 +298,6 @@ public class Expectation {
     }
 
     public Expectation isPresent(Object expected) {
-//        boolean isPresent = true;
-//        try {
-//            isPresent = Boolean.parseBoolean("" + expected);
-//        } catch (Exception e) {
-//            LOG.debug("Expectation isPresent", "Failed to detect state of expected isPresent, defaulting to true.");
-//        }
-//        return isPresent ? is("isPresent").expected(expected) : is("isPresent").expected("false");
         return is("isPresent").expected(expected);
     }
 
@@ -336,6 +330,9 @@ public class Expectation {
     }
 
     public Expectation expected(Object expected) {
+        if (expected instanceof Locate) {
+            expected = ((Locate) expected).toPath();
+        }
         this.expected = expected;
         simpleState += "c";
         checkState(false);
@@ -375,17 +372,17 @@ public class Expectation {
             forceFrom = true;
             from = new Goate().put("actual", source);
         }
-            try {
-                if (from instanceof Employee) {
-                    source = ((Employee) from).defaultPeriod(cachePeriod).syncWork();
-                } else {
-                    source = from;
-                }
-            } catch (Throwable e) {
-                LOG.error("Expectation", "Problem getting the source for comparison: " + e.getMessage(), e);
-                logFail(e);
-                source = null;
+        try {
+            if (from instanceof Employee) {
+                source = ((Employee) from).defaultPeriod(cachePeriod).syncWork();
+            } else {
+                source = from;
             }
+        } catch (Throwable e) {
+            LOG.error("Expectation", "Problem getting the source for comparison: " + e.getMessage(), e);
+            logFail(e);
+            source = null;
+        }
 
         if (source != null) {
             List<Validate> checkers = new ArrayList<>();
@@ -395,15 +392,21 @@ public class Expectation {
                 if (rtrn == null) {
                     rtrn = new Goate().get("source", source);
                 }
-                if(expect.size()==0){
+                if (rtrn instanceof Goate) {
+                    Set<String> keys = ((Goate) rtrn).keys();
+                    if (keys.size() == 1 && keys.contains("_original_")) {
+                        rtrn = source;
+                    }
+                }
+                if (expect.size() == 0) {
                     logFail(new Exception("Expection not defined properly."), new Goate()
                             .put("actual", getActual())
-                    .put("from", getFrom())
-                    .put("operator", getOperator())
-                    .put("expected", getExpected())
-                    .put("fromExpected", getFromExpected()));
+                            .put("from", getFrom())
+                            .put("operator", getOperator())
+                            .put("expected", getExpected())
+                            .put("fromExpected", getFromExpected()));
                     result = false;
-                }else {
+                } else {
                     for (String key : expect.keys()) {
                         Goate exp = (Goate) expect.get(key);
                         if (forceFrom) {

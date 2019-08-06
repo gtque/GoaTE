@@ -78,6 +78,10 @@ public class ExpectEvaluator {
         return result;
     }
 
+    public List<ExpectThreadExecuter> expectations(){
+        return expectations;
+    }
+
     public List<Goate> fails(){
         return fails;
     }

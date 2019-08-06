@@ -24,27 +24,24 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.to;
+package com.thegoate.utils.fill.serialize.pojos;
 
-import com.thegoate.utils.fill.serialize.Cereal;
+import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
 
 /**
- * Created by Eric Angeli on 4/2/2019.
+ * Created by Eric Angeli on 4/22/2019.
  */
-public abstract class SerializeTo extends Cereal {
-    protected Class cereal;
-    protected Class source;
+@GoatePojo
+public class SimpleInt {
+    @GoateSource(source=Cheese.class, key="bartowski")
+    private int value = 1;
 
-    public SerializeTo source(Class source){
-        this.source = source;
-        return this;
+    public int getValue() {
+        return value;
     }
 
-    public SerializeTo cereal(Class pojoType){
-        this.cereal = pojoType;
-        return this;
+    public void setValue(int value) {
+        this.value = value;
     }
-
-    public abstract Object mapFields(String base, Class cereal, Object so);
-    public abstract Object serialize(Object pojo);
 }

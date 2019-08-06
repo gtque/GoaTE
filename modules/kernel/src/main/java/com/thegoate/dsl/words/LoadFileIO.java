@@ -24,27 +24,40 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize.to;
+package com.thegoate.dsl.words;
 
-import com.thegoate.utils.fill.serialize.Cereal;
+import com.thegoate.Goate;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+import com.thegoate.utils.get.GetFile;
+
+import java.io.File;
 
 /**
- * Created by Eric Angeli on 4/2/2019.
+ * Created by Eric Angeli on 7/5/2017.
  */
-public abstract class SerializeTo extends Cereal {
-    protected Class cereal;
-    protected Class source;
+@GoateDSL(word = "fileIO")
+public class LoadFileIO extends DSL {
 
-    public SerializeTo source(Class source){
-        this.source = source;
-        return this;
+    public LoadFileIO(Object value){
+        super(value);
     }
 
-    public SerializeTo cereal(Class pojoType){
-        this.cereal = pojoType;
-        return this;
+    public static String file(String filePath){
+        return file(filePath, new Goate());
     }
 
-    public abstract Object mapFields(String base, Class cereal, Object so);
-    public abstract Object serialize(Object pojo);
+    public static String file(File file){
+        return file(file.getPath(), new Goate());
+    }
+
+    public static String file(Object file, Goate data){
+        return ""+new LoadFileIO("fileIO::"+file).evaluate(data);
+    }
+
+    @Override
+    public Object evaluate(Goate data) {
+        String filePath = ""+get(1,data);
+        return new GetFile(filePath).explode().from("fileIO::");
+    }
 }

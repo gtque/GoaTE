@@ -28,6 +28,7 @@ package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.GoateReflection;
 
 import java.lang.reflect.Field;
 
@@ -55,5 +56,10 @@ public class Cereal {
             }
         }
         return gs;
+    }
+
+    protected boolean checkNotPrimitive(Class type){
+        GoateReflection reflection = new GoateReflection();
+        return !(reflection.isPrimitive(type) || (type.equals(String.class)));
     }
 }

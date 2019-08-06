@@ -42,11 +42,19 @@ import java.util.regex.Pattern;
 
 import static com.thegoate.locate.Locate.path;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by gtque on 4/21/2017.
  */
 public class GoateTests {
+
+    @Test(groups = {"unit"})
+    public void testUrlEncodedPath(){
+        String path = "nonexistant%402/sample.json";
+        path = GoateUtils.getFilePath(path);
+        assertEquals(path, "\\\\nonexistant@2\\sample.json");
+    }
 
     @Test(groups = {"unit"})
     public void testEnumMapping(){
@@ -146,5 +154,57 @@ public class GoateTests {
             String key = m.group().replace("-!","").replace("!-","");
             System.out.println(key);
         }
+    }
+
+    @Test(groups = {"unit"})
+    public void testBoolean(){
+        Goate g = new Goate().put("actual", true);
+        assertTrue(g.get("actual", false, Boolean.class));
+    }
+
+    @Test(groups = {"unit"})
+    public void testShort(){
+        Goate g = new Goate().put("actual", "42");
+        short actual = g.get("actual", 84, Short.class);
+        assertEquals(actual, 42);
+    }
+
+    @Test(groups = {"unit"})
+    public void testInteger(){
+        Goate g = new Goate().put("actual", "42");
+        int actual = g.get("actual", 84, Integer.class);
+        assertEquals(actual, 42);
+    }
+
+    @Test(groups = {"unit"})
+    public void testDouble(){
+        Goate g = new Goate().put("actual", "42");
+        double actual = g.get("actual", 84, Double.class);
+        assertEquals(actual, 42D);
+    }
+    @Test(groups = {"unit"})
+    public void testFloat(){
+        Goate g = new Goate().put("actual", "42.4");
+        float actual = g.get("actual", 84.8, Float.class);
+        assertEquals(actual, 42.4F);
+    }
+    @Test(groups = {"unit"})
+    public void testLong(){
+        Goate g = new Goate().put("actual", "42");
+        long actual = g.get("actual", 84L, Long.class);
+        assertEquals(actual, 42L);
+    }
+    @Test(groups = {"unit"})
+    public void testByte(){
+        Goate g = new Goate().put("actual", 1);
+        byte actual = g.get("actual", 2, Byte.class);
+        byte expected = 1;
+        assertEquals(actual, 1);
+    }
+    @Test(groups = {"unit"})
+    public void testCharacter(){
+        Goate g = new Goate().put("actual", "a");
+        char actual = g.get("actual", 'b', Character.class);
+        assertEquals(actual, 'a');
     }
 }

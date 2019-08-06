@@ -112,6 +112,38 @@ public class GoateReflection {
                 || c.equals(Short.class) || c.equals(Short.TYPE);
     }
 
+    public boolean isBooleanType(Class c) {
+        return c.equals(Boolean.class) || c.equals(Boolean.TYPE);
+    }
+
+    public boolean isByteType(Class c) {
+        return c.equals(Byte.class) || c.equals(Byte.TYPE);
+    }
+
+    public boolean isIntegerType(Class c) {
+        return c.equals(Integer.class) || c.equals(Integer.TYPE);
+    }
+
+    public boolean isDoubleType(Class c) {
+        return c.equals(Double.class) || c.equals(Double.TYPE);
+    }
+
+    public boolean isFloatType(Class c) {
+        return c.equals(Float.class) || c.equals(Float.TYPE);
+    }
+
+    public boolean isLongType(Class c) {
+        return c.equals(Long.class) || c.equals(Long.TYPE);
+    }
+
+    public boolean isCharacterType(Class c) {
+        return c.equals(Character.class) || c.equals(Character.TYPE);
+    }
+
+    public boolean isShortType(Class c) {
+        return c.equals(Short.class) || c.equals(Short.TYPE);
+    }
+
     public boolean isBoolean(Object c) {
         String cs = "" + c;
         return (c instanceof Boolean) || cs.equalsIgnoreCase("true") || cs.equalsIgnoreCase("false");
@@ -128,6 +160,7 @@ public class GoateReflection {
         }
         return result;
     }
+
     public boolean isInteger(Object c) {
         String cs = "" + c;
         boolean result = false;
@@ -139,6 +172,7 @@ public class GoateReflection {
         }
         return result;
     }
+
     public boolean isDouble(Object c) {
         String cs = "" + c;
         boolean result = false;
@@ -150,6 +184,7 @@ public class GoateReflection {
         }
         return result;
     }
+
     public boolean isFloat(Object c) {
         String cs = "" + c;
         boolean result = false;
@@ -161,6 +196,7 @@ public class GoateReflection {
         }
         return result;
     }
+
     public boolean isLong(Object c) {
         String cs = "" + c;
         boolean result = false;
@@ -169,6 +205,15 @@ public class GoateReflection {
             result = true;
         } catch (Throwable e) {
 //            LOG.debug(""+actual + " is not a float.");
+        }
+        return result;
+    }
+
+    public boolean isCharacter(Object c) {
+        String cs = "" + c;
+        boolean result = false;
+        if (cs.length() == 1) {
+            result = true;
         }
         return result;
     }
@@ -254,7 +299,7 @@ public class GoateReflection {
     public void findFields(Class theClass, Map<String, Field> fieldMap) {
         if (fieldMap != null) {
             for (Field f : theClass.getDeclaredFields()) {
-                if(!f.getName().contains("$jacocoData")) {
+                if (!f.getName().contains("$jacocoData")) {
                     //need to specify a list of things to ignore, in a property file perhaps?
                     fieldMap.put(f.getName(), f);
                 }
