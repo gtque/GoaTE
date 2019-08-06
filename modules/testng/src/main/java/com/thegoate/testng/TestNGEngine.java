@@ -28,6 +28,7 @@ package com.thegoate.testng;
 
 import com.thegoate.Goate;
 import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.ExpectThreadExecuter;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.expect.conditional.ConditionalBuilder;
@@ -46,6 +47,7 @@ import org.testng.xml.XmlTest;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
 import static org.testng.Assert.assertTrue;
 
 
@@ -55,6 +57,7 @@ import static org.testng.Assert.assertTrue;
  */
 @Listeners({TestNGEvaluateListener.class})
 public abstract class TestNGEngine implements ITest, TestNG {
+    private final String expectSeparator = "\n--------------------\n";
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
@@ -62,6 +65,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     protected int runNumber = 0;
     protected String scenario = "";
     protected String methodName = "";
+    protected boolean muteFrom = false;
     protected boolean includeClassMethodInName = true;
     ITestContext testContext = null;
     XmlTest xt = null;
@@ -78,14 +82,14 @@ public abstract class TestNGEngine implements ITest, TestNG {
         init(data);
     }
 
-    public void setLOG(BleatBox box){
+    public void setLOG(BleatBox box) {
         LOG = box;
     }
 
     @BeforeMethod(alwaysRun = true)
     public void startUp(Method method) {
         methodName = method.getName();
-        if(data!=null&&data.get("lap",null)!=null) {
+        if (data != null && data.get("lap", null) != null) {
             Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
         }
         etb = new ExpectationThreadBuilder(data);
@@ -101,7 +105,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         StaticScrubber scrubber = new StaticScrubber();
-        if(data!=null&&data.get("lap",null)!=null) {
+        if (data != null && data.get("lap", null) != null) {
             Stopwatch.global.stop(data.get("lap", Thread.currentThread().getName(), String.class));
         }
         scrubber.scrub();
@@ -140,14 +144,14 @@ public abstract class TestNGEngine implements ITest, TestNG {
         }
         initDataLoaders();
 
-        return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true,testContext.getIncludedGroups(),testContext.getExcludedGroups());
+        return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
     }
 
     public void initDataLoaders() {
-        if(runData==null) {
+        if (runData == null) {
             runData = new Goate();
         }
-        if(constantData==null) {
+        if (constantData == null) {
             constantData = new Goate();
         }
         defineDataLoaders();
@@ -230,81 +234,160 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public TestNGEngine expect(Expectation expectation){
-        if(etb!=null){
+    public TestNGEngine expect(Expectation expectation) {
+        if (etb != null) {
             etb.expect(expectation);
         }
         return this;
     }
 
     @Override
-    public TestNGEngine expect(ConditionalBuilder conditionalBuilder){
+    public TestNGEngine expect(ConditionalBuilder conditionalBuilder) {
         return expect(conditionalBuilder.build());
     }
 
     @Override
-    public TestNGEngine expect(List<Expectation> expectationList){
+    public TestNGEngine expect(List<Expectation> expectationList) {
         expectationList.forEach(this::expect);
         return this;
     }
 
     @Override
-    public TestNGEngine evalPeriod(long periodMS){
-        if(etb!=null){
+    public TestNGEngine evalPeriod(long periodMS) {
+        if (etb != null) {
             etb.period(periodMS);
         }
         return this;
     }
 
     @Override
-    public TestNGEngine evalTimeout(long periodMS){
-        if(etb!=null){
-            etb.period(periodMS);
+    public TestNGEngine evalTimeout(long timeoutMS) {
+        if (etb != null) {
+            etb.timeout(timeoutMS);
         }
         return this;
     }
 
-    public ExpectEvaluator getEv(){
+    public ExpectEvaluator getEv() {
         return ev;
     }
 
     @Override
-    public void evaluate(){
-        if(etb.isBuilt()) {
+    public void evaluate() {
+        if (etb.isBuilt()) {
             LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
         } else {
             ev = new ExpectEvaluator(etb);
             boolean result = ev.evaluate();
-            logStatuses(ev);
+            result = logStatuses(ev, result);
             assertTrue(result, ev.failed());
         }
     }
 
-    protected void logStatuses(ExpectEvaluator ev){
+    protected boolean logStatuses(ExpectEvaluator ev) {
+        return logStatuses(ev, true);
+    }
+
+    protected boolean logStatuses(ExpectEvaluator ev, boolean currentStatus) {
         StringBuilder ps = new StringBuilder();
-        for(Goate p:ev.passes()){
+        boolean passes = false;
+        for (Goate p : ev.passes()) {
+            passes = true;
+            ps.append(expectSeparator);
             try {
-                ps.append(p.toString());
-                ps.append("\n--------------------\n");
-            } catch (Exception e){
-                LOG.info("Evaulate", "A problem was encountered trying to publish the passed expectations: " + e.getMessage(), e);
+                if (eut("expect.mute", muteFrom, Boolean.class)) {
+                    p.drop("from");
+                    p.drop("fromExpected");
+                }
+                ps.append(p.toString("\t", ""));
+            } catch (Exception e) {
+                LOG.debug("Evaulate", "A problem was encountered trying to publish the passed expectations: " + e.getMessage(), e);
             }
         }
-        LOG.debug("passed:\n" + ps.toString());
+        if (passes) {
+            ps.append(expectSeparator);
+            LOG.info("\npassed:" + ps.toString());
+        }
         StringBuilder fs = new StringBuilder();
-        for(Goate p:ev.fails()){
+        boolean fails = false;
+        for (Goate p : ev.fails()) {
+            fails = true;
+            fs.append(expectSeparator);
             try {
-                fs.append(p.toString());
-                fs.append("\n--------------------\n");
-            } catch (Exception e){
+                if (eut("expect.mute", muteFrom, Boolean.class)) {
+                    p.drop("from");
+                    p.drop("fromExpected");
+                }
+                fs.append(p.toString("\t", ""));
+            } catch (Exception e) {
                 LOG.info("Evaulate", "A problem was encountered trying to publish the failed expectations: " + e.getMessage(), e);
             }
         }
-        LOG.debug("failed:\n" + fs.toString());
+        if (fails) {
+            fs.append(expectSeparator);
+            LOG.error("\nfailed:" + fs.toString());
+        }
+        StringBuilder ss = new StringBuilder();
+        boolean skipped = false;
+        StringBuilder zs = new StringBuilder();
+        boolean zero = false;
+        for (ExpectThreadExecuter expectation : ev.expectations()) {
+            Expectation ex = expectation.getExpectation();
+            Goate eval = ex.getExpectations();
+            for (String key : eval.keys()) {
+                Goate exp = eval.get(key, null, Goate.class);
+                if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), ev.passes())) {
+                    if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), ev.fails())) {
+                        if (!("" + exp.get("actual")).contains("*")&&!("" + exp.get("actual")).contains("+")) {
+                            if (eut("expect.mute", muteFrom, Boolean.class)) {
+                                exp.drop("from");
+                                exp.drop("fromExpected");
+                            }
+                            skipped = true;
+                            ss.append(expectSeparator);
+                            ss.append(exp.toString("\t", ""));
+                            currentStatus = false;
+                            ev.fails().add(exp);
+                        } else {
+                            if(!("" + exp.get("actual")).contains("+")) {
+                                exp.drop("from");
+                                exp.drop("fromExpected");
+                                zs.append(expectSeparator);
+                                zs.append(exp.toString("\t", ""));
+                                zero = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (skipped) {
+            ss.append(expectSeparator);
+            LOG.error("\nfailed (skipped):" + ss.toString());
+        }
+        if (zero) {
+            zs.append(expectSeparator);
+            LOG.info("\nzero or more:" + zs.toString());
+        }
+        return currentStatus;
+    }
+
+    protected boolean checkInExpectationList(Object actual, String operator, List<Goate> list) {
+        String act = "" + actual;
+        boolean result = false;
+        for (Goate expectation : list) {
+            if (act.equals("" + expectation.get("actual", null))) {
+                if (operator.equals("" + expectation.get("operator", null, String.class))) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     @Override
-    public TestNGEngine clearExpectations(){
+    public TestNGEngine clearExpectations() {
         etb = new ExpectationThreadBuilder(data);
         return this;
     }
