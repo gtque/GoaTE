@@ -120,6 +120,13 @@ public class ExcelSheet extends SheetUtils {
             }
             data.put(sheetName, sheetData);
         }
+        if(in != null){
+            try {
+                in.close();
+            }catch(Exception e){
+                LOG.info("Excel Sheet", "Problem closing input stream: " + e.getMessage(), e);
+            }
+        }
         return data;
     }
 

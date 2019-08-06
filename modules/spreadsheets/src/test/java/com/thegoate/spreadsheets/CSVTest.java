@@ -40,6 +40,7 @@ import com.thegoate.json.utils.togoate.JSONToGoate;
 
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.file.Delete;
 import com.thegoate.utils.get.Get;
 import org.testng.annotations.Test;
 
@@ -67,7 +68,37 @@ public class CSVTest extends TestNGEngineMethodDL {
         assertEquals(sheet.get("a", 1), "false");
         assertEquals(sheet.get(0, 0), "b");
         assertEquals(sheet.get("c", 0, "e"), "e");
-        assertEquals(sheet.get(2, 0, 3), 3);
+        assertEquals(sheet.get(2, 1, 3), 3);
+    }
+
+    @Test(groups = {"unit"})
+    public void writeSimpleCsv() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
+        sheet.load();
+        int row = sheet.rowCount();
+        assertEquals(sheet.get("a", 0), "b");
+        assertEquals(sheet.get("a", 1), "false");
+        assertEquals(sheet.get(0, 0), "b");
+        assertEquals(sheet.get("c", 0, "e"), "e");
+        assertEquals(sheet.get(2, 1, 3), 3);
+        sheet.set("a", row, 42)
+                .set("c", row, 42)
+                .set("a", row+2, 42)
+                .set(3, row+1, true);
+        sheet.newFile("temp/sample2.csv").writeToFile();
+        SheetUtils sheet2 = SheetUtils.build("temp/sample2.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
+        sheet2.load();
+        new Delete().rm("temp/sample2.csv");
+        assertEquals(sheet2.get("c", 0), "e");
+        assertEquals(sheet2.get("a", 0), "b");
+        assertEquals(sheet2.get("a", 1), "false");
+        assertEquals(sheet2.get(0, 0), "b");
+        assertEquals(sheet2.get(2, 1), "3");
+        assertEquals(sheet2.get("a", 2), "42");
+        assertEquals(sheet2.get("c", 2), "42");
+        assertEquals(sheet2.get(3, 3), "true");
+        assertEquals(sheet2.get(3, 0), "");
+        assertEquals(sheet2.get("c", 3), "");
     }
 
     @Test(groups = {"unit"})
@@ -111,7 +142,7 @@ public class CSVTest extends TestNGEngineMethodDL {
         assertEquals(sheet.get("a",1),"false");
         assertEquals(sheet.get(0,0),"b");
         assertEquals(sheet.get("c",0,"e"),"e");
-        assertEquals(sheet.get(2,0,3),3);
+        assertEquals(sheet.get(2,0,3),"e");
     }
 
     @Test(groups = {"unit"})

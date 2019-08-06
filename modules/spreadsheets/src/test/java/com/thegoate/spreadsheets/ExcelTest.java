@@ -64,7 +64,7 @@ public class ExcelTest extends TestNGEngineMethodDL {
         assertEquals(Integer.parseInt("" + sheet.get("z", 0)), 42);
         assertEquals(sheet.get("z", 1), "42.01");
         assertEquals(sheet.get("c", 0, "e"), "e");
-        assertEquals(sheet.get(2, 0, 3), 3);
+        assertEquals(sheet.get(2, 0, 3), "e");
     }
 
     @Test(groups = {"unit"})
@@ -77,7 +77,7 @@ public class ExcelTest extends TestNGEngineMethodDL {
         assertEquals(Integer.parseInt("" + sheet.get("z", 0)), 42);
         assertEquals(sheet.get("z", 1), "42.01");
         assertEquals(sheet.get("c", 0, "e"), "e");
-        assertEquals(sheet.get(2, 0, 3), 3);
+        assertEquals(sheet.get(2, 0, 3), "e");
         assertEquals(sheet.get("a", 3), "howdy");
     }
 
@@ -153,7 +153,7 @@ public class ExcelTest extends TestNGEngineMethodDL {
         assertEquals(Integer.parseInt(""+sheet.get("z",0)),42);
         assertEquals(sheet.get("z",1),"42.01");
         assertEquals(sheet.get("c",0,"e"),"e");
-        assertEquals(sheet.get(2,0,3),3);
+        assertEquals(sheet.get(2,0,3),"e");
     }
 
     @Test(groups = {"unit"})

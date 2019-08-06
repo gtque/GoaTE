@@ -141,8 +141,19 @@ public abstract class SheetUtils {
         return get(col, row, null);
     }
 
+    protected String getColId(int col){
+        String colId = "" + col;
+        if (firstRowIsHeader) {
+            if (col < headers.get(sheetName).size()) {
+                colId = headers.get(sheetName).get(col);
+            }
+        }
+        return colId;
+    }
+
     public Object get(int col, int row, Object def) {
-        return get((headers(sheetName).size() > col ? headers(sheetName).get(col) : ("" + col)), row, def);
+        String colId = getColId(col);
+        return get(colId, row, def);
     }
 
     public Object get(String col, int row) {
@@ -150,7 +161,15 @@ public abstract class SheetUtils {
     }
 
     public Object get(String col, int row, Object def) {
+        setHeaderIfNotSet(col);
         return currentSheet().get("" + row, new Goate(), Goate.class).get(col, def);
+    }
+
+    public SheetUtils setHeaderIfNotSet(String header){
+        if(!headers().stream().anyMatch(h -> h.equals(header))){
+            setHeader(headers().size(), header);
+        }
+        return this;
     }
 
     public SheetUtils setHeader(int col, String header) {
@@ -173,16 +192,12 @@ public abstract class SheetUtils {
     }
 
     public SheetUtils set(int col, int row, Object value) {
-        String colId = "" + col;
-        if (firstRowIsHeader) {
-            if (col < headers.get(sheetName).size()) {
-                colId = headers.get(sheetName).get(col);
-            }
-        }
+        String colId = getColId(col);
         return set(colId, row, value);
     }
 
     public SheetUtils set(String col, int row, Object value) {
+        setHeaderIfNotSet(col);
         Goate page = currentSheet();
         Goate rowData = page.get("" + row, new Goate(), Goate.class);
         rowData.put(col, value);

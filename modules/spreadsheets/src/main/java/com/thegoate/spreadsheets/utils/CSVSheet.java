@@ -30,13 +30,12 @@ import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.GoateUtils;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +48,8 @@ import java.util.List;
 @IsDefault
 @GoateSheet(fileTypes = {"csv"})
 public class CSVSheet extends SheetUtils {
+
+    int maxColumnCount = 0;
 
     @Override
     public SheetUtils sheet(String sheetName) {
@@ -111,8 +112,12 @@ public class CSVSheet extends SheetUtils {
                         headers.put(sheetName, headerList);
                     }
                     headersFound = true;
+                    if(count>maxColumnCount){
+                        maxColumnCount=count;
+                    }
                 }
                 data.put(sheetName, sheetData);
+                in.close();
             } catch (Exception e) {
                 LOG.warn("problem loading csv file (" + fileName + "):" + e.getMessage(), e);
             }
@@ -120,6 +125,13 @@ public class CSVSheet extends SheetUtils {
         return data;
     }
 
+    @Override
+    public SheetUtils set(int col, int row, Object value) {
+        if(col+1>maxColumnCount){
+            maxColumnCount = col+1;
+        }
+        return super.set(col, row, value);
+    }
     @Override
     public int rowCount() {
         return data.get(sheetName, new Goate(), Goate.class).size();
@@ -132,9 +144,38 @@ public class CSVSheet extends SheetUtils {
 
     @Override
     public SheetUtils writeToFile() {
-        return null;
+        try{
+            BufferedWriter writer = Files.newBufferedWriter(Paths.get(this.fileName));
+            CSVFormat format = CSVFormat.DEFAULT;
+            if(firstRowIsHeader){
+                String[] head = headers().toArray(new String[headers.size()]);
+                format = format.withHeader(head);
+            }
+            CSVPrinter printer = new CSVPrinter(writer, format);
+            for(int i=0; i<rowCount(); i++){
+                printer.printRecord(rowAsList(i));
+            }
+            printer.flush();
+            printer.close();
+        } catch (Exception e){
+            LOG.info("CSV Sheet", "Problem writing file: " + e.getMessage(), e);
+        }
+        return this;
     }
 
+    private List<Object> rowAsList(int rowNumber){
+        Goate row = getRow(rowNumber);
+        List<Object> rowData = new ArrayList<>();
+        if(firstRowIsHeader){
+            headers().stream().forEach(header -> rowData.add(row.get(header)==null?"":row.get(header)));
+        } else {
+            for(int i=0; i<maxColumnCount; i++){
+                Object value = get(i, rowNumber);
+                rowData.add(value==null?"":value);
+            }
+        }
+        return rowData;
+    }
     @Override
     public SheetUtils close() {
         return this;
