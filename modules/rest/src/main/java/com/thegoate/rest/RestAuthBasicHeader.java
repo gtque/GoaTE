@@ -33,14 +33,6 @@ import java.util.Base64;
  * Created by Eric Angeli on 5/16/2017.
  */
 public abstract class RestAuthBasicHeader extends RestAuthBasicUserPW {
-    public enum Settings{
-        user,password
-    }
-
-    @Override
-    public RestSpec processCustomData(Enum key, Object value){
-        return processCustomData(key.name(), value);
-    }
 
     @Override
     public RestSpec processCustomData(String key, Object value){

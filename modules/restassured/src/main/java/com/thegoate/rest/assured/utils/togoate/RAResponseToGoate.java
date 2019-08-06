@@ -55,7 +55,7 @@ public class RAResponseToGoate extends ToGoate implements ToGoateUtility {
         Response r = (Response) original;
         result.put("status code", r.statusCode());
         result.put("body", r.body());
-        result.put("body as a string", r.body().prettyPrint());
+        result.put("body as a string", r.body().asString());
         result.put("response time", r.time());
         result.put("session id", r.sessionId());
         result.put("status line", r.statusLine());
@@ -67,7 +67,7 @@ public class RAResponseToGoate extends ToGoate implements ToGoateUtility {
         result.put("detailedCookies", r.detailedCookies());//selector.toString().substring("detailedCookie".length()).trim());
         try {
             Goate g = null;
-            g = new ToGoate(r.body().prettyPrint()).convert();
+            g = new ToGoate(r.body().asString()).convert();
             result.merge(g, true);
         } catch (Exception e){
             LOG.warn("Response ToGoate", "Failed to convert the body, there may not be a proper ToGoate Utility in the class path. "+e.getMessage(), e);

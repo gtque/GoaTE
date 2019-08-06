@@ -38,6 +38,8 @@ import com.thegoate.logging.BleatFactory;
 public abstract class Rest implements RestSpec {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
 
+    public static final String typeSeparator = "<type>";
+
     protected Goate headers = new Goate();
     protected Goate queryParams = new Goate();
     protected Goate urlParams = new Goate();
@@ -232,7 +234,16 @@ public abstract class Rest implements RestSpec {
 
     @Override
     public RestSpec multipartFormData(String key, Object value) {
+        return multipartFormData(key, value, null);
+    }
+
+    @Override
+    public RestSpec multipartFormData(String key, Object value, String contentType){
         bodyFormat = BODY.multipart;
+        //>=contentType
+        if(contentType!=null){
+            key = typeSeparator+contentType;
+        }
         return body(bodyFormat, key, value);
     }
 

@@ -42,6 +42,12 @@ import java.lang.reflect.InvocationTargetException;
 public abstract class ApiEmployee extends Employee {
     RestSpec rest = null;
 
+    public void logRequest(){
+        if(rest!=null){
+            rest.logSpec();
+        }
+    }
+
     @Override
     public Employee init() {
         String security = "" + definition.get("security", "none");

@@ -62,6 +62,30 @@ import static org.testng.Assert.assertTrue;
 public class RATests extends SpringTestEngine {
 
     @Test(groups = {"unit"})
+    public void putURL() {
+        Rest rest = new RABasicAuthHeader();
+        Response response = (Response) rest.baseURL(baseURL()).put("hello/world");
+        data.put("response", response);
+        assertEquals(response.statusCode(), 200);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("api response>status code,==,200");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+    }
+    @Test(groups = {"unit"})
+    public void deleteURL() {
+        Rest rest = new RABasicAuthHeader();
+        Response response = (Response) rest.baseURL(baseURL()).delete("hello/world");
+        data.put("response", response);
+        assertEquals(response.statusCode(), 200);
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("api response>status code,==,200");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+    }
+    @Test(groups = {"unit"})
     public void getURL() {
         Rest rest = new RABasicAuthHeader();
         Response response = (Response) rest.baseURL(baseURL()).get("bump/count");
@@ -73,6 +97,25 @@ public class RATests extends SpringTestEngine {
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
     }
+
+    @Test(groups = {"unit"})
+    public void debugExtraLines() {
+        Response response = (Response) new RestCall()
+                .baseURL(baseURL())
+//                .get("/".concat(eut("endpoint.base","api")).concat("/payment-advice/{paymentAdviceId}"));
+                .get("hello/world");
+        data.put("response", response);
+
+//        assertEquals(response.statusCode(), 200);
+//        etb.expect("api response>status code,==,200");
+//        Employee callAnotherURL = new CallAnotherURL().baseURL(baseURL());
+//        expect(new Expectation(data).actual(response.statusCode()).is("==").expected(200));
+        expect(Expectation.build()
+                .actual(RestResult.statusCode)
+                .from(response)
+                .isEqualTo(200));
+    }
+
 
     @Test(groups = {"unit"})
     public void getURLRestWithExpectedWorker() {
@@ -97,7 +140,7 @@ public class RATests extends SpringTestEngine {
                 .fromExpected("{\"status code\": 201}"));
         expect(Expectation.build()
                 .actual(RestResult.bodyAsAString)
-                .fromClone(response.body().prettyPrint())
+                .from(response)
                 .isNotEqualTo(RestResult.bodyAsAString)
                 .fromExpected(callAnotherURL));
         expect(Expectation.build()
@@ -138,6 +181,48 @@ public class RATests extends SpringTestEngine {
                 .from(result)
                 .isEqualTo(expected));
         evaluate();
-        assertEquals(getEv().passes().size(),2);
+        assertEquals(getEv().passes().size(), 2);
+    }
+
+    @Test(groups = {"unit"})
+    public void testGetRestBasicAuthHeader() {
+        Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
+                .get("hello/auth");
+        expect(Expectation.build()
+                .actual("user")
+                .from(result)
+                .isEqualTo("fred"));
+        expect(Expectation.build()
+                .actual("password")
+                .from(result)
+                .isEqualTo("rogers"));
+    }
+
+    @Test(groups = {"unit"})
+    public void testDeleteRestBasicAuthHeader() {
+        Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
+                .delete("hello/auth");
+        expect(Expectation.build()
+                .actual("user")
+                .from(result)
+                .isEqualTo("fred"));
+        expect(Expectation.build()
+                .actual("password")
+                .from(result)
+                .isEqualTo("rogers"));
+    }
+
+    @Test(groups = {"unit"})
+    public void testPutRestBasicAuthHeader() {
+        Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
+                .put("hello/auth");
+        expect(Expectation.build()
+                .actual("user")
+                .from(result)
+                .isEqualTo("fred"));
+        expect(Expectation.build()
+                .actual("password")
+                .from(result)
+                .isEqualTo("rogers"));
     }
 }

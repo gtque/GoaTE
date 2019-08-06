@@ -83,6 +83,8 @@ public interface RestSpec {
 
     RestSpec multipartFormData(String key, Object value);
 
+    RestSpec multipartFormData(String key, Object value, String contentType);
+
     RestSpec customData(Goate data);
 
     RestSpec customData(Enum key, Object value);
@@ -100,6 +102,8 @@ public interface RestSpec {
     RestSpec baseUri(String uri);
 
     RestSpec baseURL(String url);
+
+    RestSpec logSpec();
 
     Goate getHeaders();
 
@@ -130,4 +134,6 @@ public interface RestSpec {
     Object delete(String endpoint);
 
     Object patch(String endpoint);
+
+    Object head(String endpoint);
 }

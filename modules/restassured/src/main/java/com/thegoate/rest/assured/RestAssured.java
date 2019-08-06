@@ -155,7 +155,6 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setHeaders(RequestSpecification spec, Goate headers) {
         if (headers != null && spec != null) {
-//            spec.headers(headers.data());
             for (String key : headers.keys()) {
                 spec.header(key, headers.get(key));
             }
@@ -195,13 +194,37 @@ public class RestAssured extends Rest implements RASpec {
                 Goate b = (Goate) body.get(key);
                 if (b != null) {
                     for (String id : b.keys()) {
+                        String[] keyParts = key.split(typeSeparator);
+                        String type = null;
+                        String idkey = keyParts[0];
+                        if(keyParts.length>1){
+                            type = keyParts[1];
+                        }
                         if (key.equals(BODY.urlencoded.name()) || key.equals(BODY.form.name())) {
                             spec.formParam(id, b.get(id));
-                        } else if (key.equals(BODY.multipart.name())) {
-                            if (id.startsWith(MP_ID_NOT_SET)) {
+                        } else if (key.startsWith(BODY.multipart.name())) {
+                            if (idkey.equals(MP_ID_NOT_SET)) {
                                 spec.multiPart((File) b.get(id));
                             } else {
-                                spec.multiPart(id, b.get(id));
+                                if (b.get(id) instanceof File) {
+                                    if(type!=null) {
+                                        spec.multiPart(idkey, (File) b.get(id), type);
+                                    } else {
+                                        spec.multiPart(idkey, (File) b.get(id));
+                                    }
+                                } else if (b.get(id) instanceof String) {
+                                    if(type!=null) {
+                                        spec.multiPart(idkey, "" + b.get(id), type);
+                                    } else {
+                                        spec.multiPart(idkey, "" + b.get(id));
+                                    }
+                                } else {
+                                    if(type!=null){
+                                        spec.multiPart(idkey, b.get(id), type);
+                                    } else {
+                                        spec.multiPart(idkey, b.get(id));
+                                    }
+                                }
                             }
                         } else {
                             spec.body(b.get(id));
@@ -219,6 +242,14 @@ public class RestAssured extends Rest implements RASpec {
 
     @Override
     public RestSpec processCustomData(String key, Object value) {
+        return this;
+    }
+
+    @Override
+    public RestSpec logSpec() {
+        if (specification != null) {
+            specification.log().all();
+        }
         return this;
     }
 
@@ -266,6 +297,14 @@ public class RestAssured extends Rest implements RASpec {
     public Object patch(String endpoint) {
         specification = RestAssured.build(this);
         response = specification.patch(endpoint);
+        log(response);
+        return response;
+    }
+
+    @Override
+    public Object head(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.head(endpoint);
         log(response);
         return response;
     }

@@ -35,6 +35,8 @@ import com.thegoate.staff.GoateJob;
 
 import java.lang.reflect.InvocationTargetException;
 
+import static com.thegoate.rest.Rest.typeSeparator;
+
 /**
  * Wrapper for programmatically using the REST framework in GoaTE.
  * Created by Eric Angeli on 11/8/2018.
@@ -44,82 +46,104 @@ public class RestCall {
 
     protected Goate definition = new Goate();
 
-    public RestCall baseURL(String url){
+    public RestCall clear(){
+        definition = new Goate();
+        return this;
+    }
+
+    public RestCall baseURL(String url) {
         definition.put("base url", url);
         return this;
     }
 
-    public RestCall security(String security){
+    public RestCall security(String security) {
         definition.put("security", security);
         return this;
     }
 
-    public RestCall timeout(int timeout){
+    public RestCall timeout(int timeout) {
         definition.put("rest.timeout", timeout);
         return this;
     }
 
-    public RestCall customParam(String key, String param){
-        definition.put("custom params.##", key+":="+param);
+    public RestCall customParam(String key, String param) {
+        definition.put("custom params.##", key + ":=" + param);
         return this;
     }
 
-    public RestCall multipart(String key, String param){
-        definition.put("multipart##", key+":="+param);
+    public RestCall multipart(String key, String param, String contentType){
+        if(contentType!=null){
+            key = typeSeparator + contentType;
+        }
+        return multipart(key, param);
+    }
+
+    public RestCall multipart(String key, String param) {
+        definition.put("multipart##", key + ":=" + param);
         return this;
     }
 
-    public RestCall formParam(String key, String param){
-        definition.put("form params.##", key+":="+param);
+    public RestCall formParam(String key, String param) {
+        definition.put("form params.##", key + ":=" + param);
         return this;
     }
 
-    public RestCall pathParam(String key, String param){
-        definition.put("path params.##", key+":="+param);
+    public RestCall pathParam(String key, String param) {
+        definition.put("path params.##", key + ":=" + param);
         return this;
     }
 
-    public RestCall queryParam(String key, String param){
-        definition.put("query params.##", key+":="+param);
+    public RestCall queryParam(String key, String param) {
+        definition.put("query params.##", key + ":=" + param);
         return this;
     }
 
-    public RestCall urlParam(String key, String param){
-        definition.put("url params.##", key+":="+param);
+    public RestCall urlParam(String key, String param) {
+        definition.put("url params.##", key + ":=" + param);
         return this;
     }
 
-    public RestCall header(String key, String param){
-        definition.put("headers.##", key+":="+param);
+    public RestCall header(String key, String param) {
+        definition.put("headers.##", key + ":=" + param);
         return this;
     }
 
-    public RestCall body(Object body){
+    public RestCall body(Object body) {
         definition.put("body", body);
         return this;
     }
 
-    public Object get(String endpoint){
+    public Object get(String endpoint) {
         definition.put("end point", endpoint);
         return execute("get");
     }
-    public Object put(String endpoint){
+
+    public Object put(String endpoint) {
         definition.put("end point", endpoint);
         return execute("put");
     }
-    public Object post(String endpoint){
+
+    public Object post(String endpoint) {
         definition.put("end point", endpoint);
         return execute("post");
     }
-    public Object patch(String endpoint){
+
+    public Object patch(String endpoint) {
         definition.put("end point", endpoint);
         return execute("patch");
     }
-    public Object delete(String endpoint){
+
+    public Object delete(String endpoint) {
         definition.put("end point", endpoint);
         return execute("delete");
     }
-    private Object execute(String method){
+
+    public Object head(String endpoint) {
+        definition.put("end point", endpoint);
+        return execute("head");
+    }
+
+    private Object execute(String method) {
         definition.put("method", method);
         AnnotationFactory af = new AnnotationFactory();
         Object result = null;
@@ -128,7 +152,7 @@ public class RestCall {
             worker.init(definition);
             result = worker.work();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            LOG.error("Barn API Init", "problem finding something to execute a " + method +"\nmake sure you have an implementation library included.", e);
+            LOG.error("Barn API Init", "problem finding something to execute a " + method + "\nmake sure you have an implementation library included.", e);
         }
         return result;
     }

@@ -29,6 +29,8 @@ package com.thegoate.simpleserver.api;
 import com.thegoate.simpleserver.pojo.SimpleName;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
+
 /**
  * Created by Eric Angeli on 11/30/2018.
  */
@@ -36,9 +38,43 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/hello")
 public class HelloWorld {
 
+    @PutMapping("/world")
+    public String putWorld(){
+        return getWorld();
+    }
+    @DeleteMapping("/world")
+    public String deleteWorld(){
+        return getWorld();
+    }
     @GetMapping("/world")
     public String getWorld(){
         return "{\"greeting\":\"hello\"}";
+    }
+
+    @PutMapping("/auth")
+    public String putWorld(@RequestHeader("Authorization") String auth) {
+        return getWorld(auth);
+    }
+
+    @DeleteMapping("/auth")
+    public String deleteWorld(@RequestHeader("Authorization") String auth) {
+        return getWorld(auth);
+    }
+
+    @GetMapping("/auth")
+    public String getWorld(@RequestHeader("Authorization") String auth){
+        String response = "{\"greeting\":\"hello\"}";
+        if(auth.contains("Basic")){
+            String decoded = new String(Base64.getDecoder().decode(auth.replace("Basic ", "").getBytes()));
+            try {
+                String[] value = decoded.split(":");
+                response = "{\"user\":\"" + value[0] + "\", \"password\":\"" + value[1] + "\"}";
+            } catch (Exception e){
+                e.printStackTrace();
+                response = "{\"error\":\""+e.getMessage()+"\",\"content\":\""+decoded+"\"}";
+            }
+        }
+        return response;
     }
 
     @PostMapping("/world")
