@@ -35,6 +35,7 @@ import com.thegoate.testng.TestNGEngineMethodDL;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.ITest;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -63,10 +64,10 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
 
     @Override
     @DataProvider(name = "dataLoader")
-    public Object[][] dataLoader(ITestContext context) throws Exception {
+    public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();
-        return engine.dataLoader(context);
+        return engine.dataLoader(method, context);
     }
 
     @DataProvider(name = "methodLoader")

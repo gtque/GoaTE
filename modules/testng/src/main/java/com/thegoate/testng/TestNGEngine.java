@@ -38,6 +38,7 @@ import com.thegoate.metrics.Stopwatch;
 import com.thegoate.statics.StaticScrubber;
 import org.testng.ITest;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -97,7 +98,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 "***************************Starting Up***************************\n" +
                 "*\t" + getTestName() + "\t*\n";
         startMessage += data.toString("*\t", "\t*");
-        startMessage += "*****************************************************************";
+        startMessage += "\n*****************************************************************";
         TestMap.tests.put(getTestName(), this);
         LOG.info("Start Up", startMessage);
     }
@@ -113,7 +114,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 "*****************************************************************\n" +
                 "*\t" + getTestName() + "\t*\n";
         endMessage += data.toString("*\t", "\t*");
-        endMessage += "***************************Finished Up***************************";
+        endMessage += "\n***************************Finished Up***************************";
         LOG.info("Shut Down", endMessage);
     }
 
@@ -134,16 +135,16 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return name.toString();
     }
 
+
     @Override
     @DataProvider(name = "dataLoader")
-    public Object[][] dataLoader(ITestContext context) throws Exception {
-        number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+    public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
+        number = 0;//resets the count, assumes TestNG loads all the runs before processing the next class.
         this.testContext = context;
         if (context != null) {
             xt = context.getCurrentXmlTest();
         }
         initDataLoaders();
-        xt.getXmlClasses().get(0).getName();
         return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
     }
 

@@ -55,7 +55,7 @@ public class TestNGEngineTest extends TestNGEngine {
     @Test(groups = {"unit"})
     public void runNumberCheck() throws Exception {
         SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
+        Object[][] runs = test.dataLoader(null,null);
         assertEquals(runs.length, 4);
     }
 
@@ -63,7 +63,7 @@ public class TestNGEngineTest extends TestNGEngine {
     public void filtered() throws Exception {
         GoateUtils.setEnvironment("run", "1,fourth");
         SampleTestNGEngineTest test = new SampleTestNGEngineTest();
-        Object[][] runs = test.dataLoader(null);
+        Object[][] runs = test.dataLoader(null,null);
         GoateUtils.removeEnvironment("run");
         assertEquals(runs.length, 2);
     }

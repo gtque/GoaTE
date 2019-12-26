@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.conditional.ConditionalBuilder;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ import java.util.List;
  * Created by Eric Angeli on 5/11/2017.
  */
 public interface TestNG {
-    Object[][] dataLoader(ITestContext context) throws Exception;
+    Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception;
     void defineDataLoaders();
     void defineDataLoaders(Goate runData, Goate constantData);
     Goate getRunDataLoader();
