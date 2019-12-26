@@ -51,5 +51,5 @@ dependencies{
     testCompile "com.fasterxml.jackson.core:jackson-databind:2.9.7"
     testCompile "com.fasterxml.jackson.core:jackson-core:2.9.7"
     testCompile "com.fasterxml.jackson.core:jackson-annotations:2.9.7"
-    testCompile "com.oracle.jdbc:ojdbc8:12.2.0.1"
+//    testCompile "com.oracle.jdbc:ojdbc8:12.2.0.1"
 }

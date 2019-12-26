@@ -143,7 +143,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
             xt = context.getCurrentXmlTest();
         }
         initDataLoaders();
-
+        xt.getXmlClasses().get(0).getName();
         return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
     }
 

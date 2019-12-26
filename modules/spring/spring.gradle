@@ -47,5 +47,5 @@ dependencies{
     testCompile "org.springframework.boot:spring-boot:2.1.1.RELEASE"
     testCompile "org.springframework.boot:spring-boot-starter:2.1.1.RELEASE"
     testCompile "org.springframework.boot:spring-boot-starter-tomcat:2.1.1.RELEASE"
-    testCompile "com.oracle.jdbc:ojdbc8:12.2.0.1"
+//    testCompile "com.oracle.jdbc:ojdbc8:12.2.0.1"
 }
