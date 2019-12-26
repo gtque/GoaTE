@@ -40,6 +40,12 @@ public class JsonToJSON extends JsonUtil implements ToJsonUtility{
         super(val);
     }
 
+    @Override
+    protected void init(Object val){
+        processNested = false;
+        super.init(val);
+    }
+
     boolean strict = false;
     @Override
     protected Object processNested(Object subContainer) {

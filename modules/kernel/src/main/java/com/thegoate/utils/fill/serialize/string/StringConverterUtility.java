@@ -28,8 +28,6 @@ package com.thegoate.utils.fill.serialize.string;
 
 import com.thegoate.utils.Utility;
 
-import java.lang.reflect.Field;
-
 /**
  * Created by Eric Angeli on 6/26/2018.
  */

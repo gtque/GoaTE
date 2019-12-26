@@ -29,9 +29,6 @@ package com.thegoate.expect.validate;
 import com.thegoate.Goate;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
-import com.thegoate.utils.get.NotFound;
-
-import java.util.List;
 
 /**
  * Validators don't care about type.

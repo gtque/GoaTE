@@ -30,8 +30,6 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.RestSpec;
 import io.restassured.specification.RequestSpecification;
 
-import java.io.PrintStream;
-
 /**
  * Used for defining the rest assured interface needed for building a Rest Assured based Rest class.
  * Created by Eric Angeli on 5/16/2017.

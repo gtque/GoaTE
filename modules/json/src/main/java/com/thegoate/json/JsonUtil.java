@@ -29,7 +29,6 @@ package com.thegoate.json;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.Utility;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,7 +79,7 @@ public abstract class JsonUtil implements Utility {
         try{
             if(check != JSONObject.NULL) {
                 if (!(check instanceof JSONObject)) {
-                    if (new JSONObject("" + check) == null) {
+                    if (!((check instanceof String && new JSONObject("" + check) != null) || (check instanceof JSONArray))) {
                         istype = false;
                     }
                 }
@@ -88,7 +87,7 @@ public abstract class JsonUtil implements Utility {
         }catch(JSONException je){
             try{
                 if(!(check instanceof JSONArray)) {
-                    if (new JSONArray(""+check) == null) {
+                    if (!(check instanceof String && new JSONArray(""+check) != null)) {
                         istype = false;
                     }
                 }

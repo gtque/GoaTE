@@ -41,6 +41,12 @@ public class CompareCSVRowsEqual extends CompareCsvRecord {
     }
 
     @Override
+    protected void init(Object val){
+        processNested = false;
+        super.init(val);
+    }
+
+    @Override
     protected Object processNested(Object subContainer) {
         return null;
     }

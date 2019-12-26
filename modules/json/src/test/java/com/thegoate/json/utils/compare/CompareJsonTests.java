@@ -31,13 +31,11 @@ import com.thegoate.data.StaticDL;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.testng.TestNGEngineMethodDL;
-import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.fill.FillString;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Tests against CompareJson utilities.

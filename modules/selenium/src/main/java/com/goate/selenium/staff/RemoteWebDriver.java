@@ -31,8 +31,6 @@ import com.goate.selenium.annotations.Driver;
 import com.thegoate.Goate;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;

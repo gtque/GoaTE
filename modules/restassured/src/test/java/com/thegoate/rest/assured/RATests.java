@@ -37,7 +37,6 @@ import com.thegoate.rest.staff.ApiGet;
 import com.thegoate.simpleserver.SimpleServer;
 import com.thegoate.spring.SpringTestEngine;
 import com.thegoate.staff.Employee;
-import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.Response;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
@@ -93,6 +92,30 @@ public class RATests extends SpringTestEngine {
         assertEquals(response.statusCode(), 200);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("api response>status code,==,200");
+        ExpectEvaluator ev = new ExpectEvaluator(etb);
+        boolean result = ev.evaluate();
+        assertTrue(result, ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void premal(){
+        Rest rest = new RestAssured();
+        Response response = (Response) rest.baseURL(baseURL()).get("breakingthings");
+        data.put("response", response);
+        data.put("expected", "{\n" +
+                "    \"title\": \"Unprocessable Entity\",\n" +
+                "    \"status\": 422,\n" +
+                "    \"detail\": \"Input data was invalid. See exceptions for details.\",\n" +
+                "    \"exceptions\": [\n" +
+                "        {\n" +
+                "            \"code\": \"API_VALIDATION_ERROR\",\n" +
+                "            \"message\": \"numeric value out of bounds (<18 digits>.<2 digits> expected)\",\n" +
+                "            \"field\": \"amount\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}");
+        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+        etb.expect("api response>body as a string,isEqualIgnoreFields,o::expected");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());

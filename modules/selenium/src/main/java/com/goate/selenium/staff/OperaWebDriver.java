@@ -31,7 +31,6 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.opera.OperaOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
  * Returns a new opera web driver.

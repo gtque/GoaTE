@@ -33,7 +33,6 @@ import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.reflection.GoateReflection;
 import org.testng.ITestContext;
-import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;

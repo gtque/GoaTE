@@ -29,7 +29,6 @@ package com.goate.selenium.staff;
 import com.goate.selenium.annotations.Driver;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 

@@ -28,7 +28,6 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.dsl.PrimitiveDSL;
 

@@ -27,10 +27,8 @@
 package com.thegoate.barn.staff;
 
 import com.thegoate.Goate;
-import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.barn.data.BarnDataLoader;
 import com.thegoate.json.utils.tojson.GoateToJSON;
-import com.thegoate.rest.staff.ApiEmployee;
 import com.thegoate.staff.Employee;
 import com.thegoate.staff.GoateJob;
 import com.thegoate.utils.get.GetFileAsString;
@@ -38,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Generates a preview of the evaluated barn json.

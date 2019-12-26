@@ -32,7 +32,6 @@ import com.thegoate.data.PropertyFileDL;
 import com.thegoate.data.StaticDL;
 import com.thegoate.map.EnumMap;
 import com.thegoate.utils.GoateUtils;
-import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
 import org.testng.annotations.Test;
 

@@ -28,9 +28,8 @@ package com.thegoate.spreadsheets;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
-import com.thegoate.spreadsheets.data.SpreadSheetAbstractedDL;
 import com.thegoate.expect.Expectation;
-import com.thegoate.map.EnumMap;
+import com.thegoate.spreadsheets.data.SpreadSheetAbstractedDL;
 import com.thegoate.spreadsheets.data.SpreadSheetDL;
 import com.thegoate.spreadsheets.dsl.words.LoadExcel;
 import com.thegoate.spreadsheets.utils.SheetUtils;
@@ -40,7 +39,6 @@ import com.thegoate.utils.file.Delete;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.thegoate.expect.ExpectMatchWildcardIndexPath.matchWildcardIndex;

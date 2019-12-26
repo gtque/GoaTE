@@ -33,8 +33,6 @@ import com.thegoate.annotations.IsDefault;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 
-
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;

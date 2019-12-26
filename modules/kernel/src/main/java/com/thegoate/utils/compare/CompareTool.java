@@ -30,7 +30,6 @@ package com.thegoate.utils.compare;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.UnknownUtilType;
 
 /**
  * Base class for Compare Utilities. Adds logger, and class level variables.

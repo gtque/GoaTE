@@ -29,7 +29,6 @@ package com.thegoate.utils.fill.serialize.collections;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.fill.serialize.CastUtil;
 import com.thegoate.utils.fill.serialize.GoateCastUtility;
 
 import java.lang.reflect.InvocationTargetException;

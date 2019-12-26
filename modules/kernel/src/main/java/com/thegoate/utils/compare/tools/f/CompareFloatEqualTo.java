@@ -27,7 +27,6 @@
 package com.thegoate.utils.compare.tools.f;
 
 import com.thegoate.utils.compare.CompareUtil;
-import com.thegoate.utils.compare.tools.integer.CompareIntTool;
 
 /**
  * Compares two floats for equality.

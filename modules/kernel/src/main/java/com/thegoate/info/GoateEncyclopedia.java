@@ -29,13 +29,6 @@ package com.thegoate.info;
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.annotations.GoateDescription;
-import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.Interpreter;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Simple app for reading the dictionary.

@@ -28,7 +28,6 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import org.testng.Assert;

@@ -27,7 +27,6 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
-import com.thegoate.data.DataLoader;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.conditional.ConditionalBuilder;
 import org.testng.ITestContext;

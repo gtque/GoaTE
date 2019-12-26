@@ -27,7 +27,6 @@
 package com.thegoate.testng;
 
 import org.testng.*;
-import org.testng.annotations.Test;
 
 /**
  * Created by Eric Angeli on 11/28/2017.

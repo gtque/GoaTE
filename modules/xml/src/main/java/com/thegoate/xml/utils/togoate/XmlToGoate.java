@@ -34,9 +34,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import static com.thegoate.xml.XmlHelper.buildNodeListInformation;
-import static com.thegoate.xml.XmlHelper.generateDocument;
-import static com.thegoate.xml.XmlHelper.generatePreLable;
+import static com.thegoate.xml.XmlHelper.*;
 
 /**
  * Converts from json to goate.

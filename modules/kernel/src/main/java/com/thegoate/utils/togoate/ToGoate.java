@@ -31,8 +31,8 @@ import com.thegoate.Goate;
 import com.thegoate.utils.UnknownUtilType;
 
 /**
- * The generic get class.
- * This will attempt to look up the specific get utility for the type detected.
+ * The generic togoate class.
+ * This will attempt to look up the specific to goate utility for the type detected.
  * Created by Eric Angeli on 5/5/2017.
  */
 public class ToGoate extends UnknownUtilType implements ToGoateUtility{

@@ -129,6 +129,16 @@ public abstract class Employee {
         return result;
     }
 
+    /**
+     * Always called immediately before doWork().<br>
+     * Override this method to define any common setup/configuration/initialization that needs
+     * to be done just prior to working after the definition and other parameters have been set.
+     * @return
+     */
+    public Employee clockIn(){
+        return this;
+    }
+
     public final Object work() {
         result = null;
         String lap = ""+System.nanoTime();
@@ -140,7 +150,7 @@ public abstract class Employee {
                 }
                 Stopwatch.global.start(lap);
             }
-            result = doWork();
+            result = clockIn().doWork();
         } catch (Throwable t) {
             try {
                 //Creates a report in HR. Most reports are going to be exceptions.

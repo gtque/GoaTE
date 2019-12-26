@@ -74,13 +74,16 @@ public class SumFieldsDSL extends DSL {
 
         String filter = "" + get(1,data);
         Goate filtered = data;
+
         if(!filter.equalsIgnoreCase("null")&&!filter.isEmpty()){
             filtered = filtered.filter(filter);
         }
         sumFields.merge(filtered,false);
         for(String key:sumFields.keys()){
             try {
-                sum = sum.add(new BigDecimal("" + sumFields.get(key)));
+                if(!key.equals(this.key)) {
+                    sum = sum.add(new BigDecimal("" + sumFields.get(key)));
+                }
             }catch(Exception e){
                 LOG.debug("Sum","Problem adding: " + sumFields.get(key), e);
             }

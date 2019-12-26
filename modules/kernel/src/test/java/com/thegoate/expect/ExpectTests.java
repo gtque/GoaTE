@@ -28,7 +28,6 @@
 package com.thegoate.expect;
 
 import com.thegoate.Goate;
-
 import com.thegoate.expect.conditional.ModelIsPresentOptional;
 import com.thegoate.expect.test.IsNotFound;
 import com.thegoate.expect.validate.Validate;
@@ -38,9 +37,12 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import com.thegoate.utils.get.Get;
+import com.thegoate.utils.togoate.ToGoate;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.thegoate.dsl.words.LoadFile.fileAsAString;
 import static com.thegoate.expect.ExpectLocator.start;
@@ -928,7 +930,7 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
     public void evalMatchIndexNotFound() {
         boolean skipped = false;
         try {
-            String val = ""+ new Get("mi.0.0.scooby").from(sample);
+            String val = "" + new Get("mi.0.0.scooby").from(sample);
             expect(Expectation.build()
                     .actual("mi.*.*.scooby")
                     .from(sample)
@@ -940,5 +942,190 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
             LOG.info("Match Index", "FAIL!!!");
         }
         assertTrue(skipped, "Should have passed and not thrown an error.");
+    }
+
+    @Test(groups = {"unit"})
+    public void wildCardInExpectedValue() {
+        String value = "hello%world";
+        expect(Expectation.build()
+                .actual(value)
+                .isEqualTo(value));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardListIndex() {
+        List<Goate> list = new ArrayList<>();
+        Goate one = new Goate().put("a", true);
+        Goate two = new Goate().put("a", true);
+        list.add(one);
+        list.add(two);
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("*.a")
+                .from(list)
+                .isEqualTo(true));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardListIndexExpected() {
+        List<Goate> list = new ArrayList<>();
+        Goate one = new Goate().put("a", true);
+        Goate two = new Goate().put("a", true);
+        list.add(one);
+        list.add(two);
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("*.a")
+                .from(list)
+                .isEqualTo("%.a")
+                .fromExpected(list));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardPercentCharacterInValue() {
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("%.a")
+                .isEqualTo("%.a"));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardZeroOrMoreCharacterInValue() {
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("*.a")
+                .isEqualTo("*.a"));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardOneOrMoreCharacterInValue() {
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("+.a")
+                .isEqualTo("+.a"));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardNestedListIndex() {
+        List<List> list = new ArrayList<>();
+        Goate one = new Goate().put("a", true);
+        Goate two = new Goate().put("a", true);
+        List<Goate> oneL = new ArrayList<>();
+        oneL.add(one);
+        oneL.add(two);
+        List<Goate> twoL = new ArrayList<>();
+        twoL.add(one);
+        list.add(oneL);
+        list.add(twoL);
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("*.*.a")
+                .from(list)
+                .isEqualTo(true));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardNestedNestedListIndex() {
+        List<List> list = new ArrayList<>();
+        List<List> l1 = new ArrayList<>();
+        List<List> l2 = new ArrayList<>();
+        Goate one = new Goate().put("a", true);
+        Goate two = new Goate().put("a", true);
+        List<Goate> oneL = new ArrayList<>();
+        oneL.add(one);
+        oneL.add(two);
+        List<Goate> twoL = new ArrayList<>();
+        twoL.add(one);
+        l1.add(oneL);
+        l1.add(twoL);
+        l2.add(oneL);
+        list.add(l1);
+        list.add(l2);
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("*.*.*.a")
+                .from(list)
+                .isEqualTo(true));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardOneOrMoreNestedNestedListIndex() {
+        List<List> list = new ArrayList<>();
+        List<List> l1 = new ArrayList<>();
+        List<List> l2 = new ArrayList<>();
+        Goate one = new Goate().put("a", true);
+        Goate two = new Goate().put("a", true);
+        List<Goate> oneL = new ArrayList<>();
+        oneL.add(one);
+        oneL.add(two);
+        List<Goate> twoL = new ArrayList<>();
+        twoL.add(one);
+        l1.add(oneL);
+        l1.add(twoL);
+        l2.add(oneL);
+        list.add(l1);
+        list.add(l2);
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("+.+.+.a")
+                .from(list)
+                .isEqualTo(true));
+    }
+
+    @Test(groups = {"unit"})
+    public void wildcardExpectFailureListIndex() {
+        List<List> list = new ArrayList<>();
+        List<List> l1 = new ArrayList<>();
+        List<List> l2 = new ArrayList<>();
+        Goate one = new Goate().put("a", true);
+        Goate two = new Goate().put("b", true);
+        List<Goate> oneL = new ArrayList<>();
+        oneL.add(one);
+        oneL.add(two);
+        List<Goate> twoL = new ArrayList<>();
+        twoL.add(one);
+        l1.add(oneL);
+        l1.add(twoL);
+        l2.add(oneL);
+        list.add(l1);
+        list.add(l2);
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual("+.+.+.a")
+                .from(list)
+                .isEqualTo(true));
+        boolean fail = true;
+        try {
+            evaluate();
+            fail = false;
+        } catch (Throwable t) {
+            LOG.info("nested more than one expected failed as expected.");
+        }
+        assertTrue(fail);
+    }
+
+    @Test(groups = {"unit"})
+    public void listToGoate() {
+        List<String> fred = new ArrayList<>();
+        fred.add("rogers");
+        fred.add("astaire");
+        fred.add("kruger");
+//        list.stream().forEach(goate ->
+//        Goate gl = new ToGoate(list).convert();
+        Goate fredGoate = new ToGoate(fred).convert();
+        LOG.info("Goate Conversion", fredGoate.toString());
+        expect(Expectation.build()
+                .actual("+")
+                .from(fred)
+                .isEmpty(false));
     }
 }

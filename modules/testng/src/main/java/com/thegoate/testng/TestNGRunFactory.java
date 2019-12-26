@@ -32,7 +32,6 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +65,6 @@ public class TestNGRunFactory {
             runs.add(null);
         }
         runs = filter(runs);
-//        runs = filterGroups(runs, include, exclude);
         if (constants.size() > 0) {
             for (Goate data : runs) {
                 int i = -42;
@@ -108,7 +106,7 @@ public class TestNGRunFactory {
         List<Goate> filtered = new ArrayList<>();
         String runId = "" + GoateUtils.getProperty("run", "empty::");
         if (!runId.equals("null") && !runId.isEmpty()) {
-            String[] runIds = runId.split(",");
+            String[] runIds = runId.split(""+GoateUtils.getProperty("runDelimiter", ","));
             for (String run : runIds) {
                 int runNum = -42;
                 try {
@@ -120,22 +118,35 @@ public class TestNGRunFactory {
                 int count = 0;
                 for (Goate rd : runs) {
                     count++;
-                    if(rd!=null) {
-                        if (runNum >= 0) {
-                            if (runNum == count) {
-                                filtered.add(rd);
-                            }
-                        } else {
-                            String scene = "" + rd.get("Scenario");
-                            if (scene.equals(run)) {
-                                filtered.add(rd);
+                    boolean runEnabled = Boolean.parseBoolean(""+rd.get("runEnabled", "true"));
+                    if(runEnabled) {
+                        if (rd != null) {
+                            if (runNum >= 0) {
+                                if (runNum == count) {
+                                    filtered.add(rd.drop("runEnabled"));
+                                }
+                            } else {
+                                String scene = "" + rd.get("Scenario");
+                                if (scene.equals(run)) {
+                                    filtered.add(rd.drop("runEnabled"));
+                                }
                             }
                         }
                     }
                 }
             }
         } else {
-            filtered = runs;
+            for (Goate rd : runs) {
+                Object b = "true";
+                if(rd!=null){
+                    b = rd.get("runEnabled", "true");
+                    rd.drop("runEnabled");
+                }
+                boolean runEnabled = Boolean.parseBoolean("" + b);
+                if (runEnabled) {
+                    filtered.add(rd);
+                }
+            }
         }
         return filtered;
     }

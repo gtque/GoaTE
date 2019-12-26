@@ -51,6 +51,13 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
     }
 
     boolean strict = false;
+
+    @Override
+    protected void init(Object val){
+        processNested = false;
+        super.init(val);
+    }
+
     @Override
     protected Object processNested(Object subContainer) {
         return null;

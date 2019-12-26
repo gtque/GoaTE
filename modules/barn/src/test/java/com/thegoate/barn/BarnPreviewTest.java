@@ -28,7 +28,6 @@ package com.thegoate.barn;
 
 import com.thegoate.Goate;
 import com.thegoate.barn.staff.BarnPreviewEmployee;
-import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
 import org.testng.annotations.Test;

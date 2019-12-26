@@ -27,10 +27,8 @@
 package com.thegoate.utils.compare.tools.date;
 
 import com.thegoate.utils.compare.CompareTool;
-import com.thegoate.utils.compare.CompareUtil;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Adds check for date type.

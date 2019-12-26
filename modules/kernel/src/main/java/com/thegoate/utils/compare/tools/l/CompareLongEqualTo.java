@@ -27,7 +27,6 @@
 package com.thegoate.utils.compare.tools.l;
 
 import com.thegoate.utils.compare.CompareUtil;
-import com.thegoate.utils.compare.tools.f.CompareFloatTool;
 
 /**
  * Compares two longs for equality.

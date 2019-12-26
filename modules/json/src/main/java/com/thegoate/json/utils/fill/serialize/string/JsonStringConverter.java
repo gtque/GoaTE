@@ -27,9 +27,7 @@
 package com.thegoate.json.utils.fill.serialize.string;
 
 import com.thegoate.Goate;
-import com.thegoate.annotations.IsDefault;
 import com.thegoate.json.JsonUtil;
-import com.thegoate.utils.Utility;
 import com.thegoate.utils.fill.serialize.string.StringConverterUtil;
 import com.thegoate.utils.fill.serialize.string.StringConverterUtility;
 import org.json.JSONObject;
@@ -72,6 +70,12 @@ public class JsonStringConverter extends JsonUtil implements StringConverterUtil
     @Override
     public Goate healthCheck() {
         return health;
+    }
+
+    @Override
+    protected void init(Object val){
+        processNested = false;
+        super.init(val);
     }
 
     @Override

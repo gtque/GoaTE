@@ -31,7 +31,6 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
 
-
 import java.io.*;
 import java.net.URL;
 

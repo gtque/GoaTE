@@ -32,9 +32,7 @@ import com.thegoate.metrics.Stopwatch;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.*;
 
 /**
  * Created by gtque on 4/25/2017.

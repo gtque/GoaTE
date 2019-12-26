@@ -44,6 +44,12 @@ public class CompareJsonEqualTo extends CompareJson {
     }
 
     @Override
+    protected void init(Object val){
+        processNested = false;
+        super.init(val);
+    }
+
+    @Override
     protected Object processNested(Object subContainer) {
         return null;
     }
@@ -75,5 +81,9 @@ public class CompareJsonEqualTo extends CompareJson {
     @Override
     public CompareUtility using(Object operator) {
         return this;
+    }
+
+    public boolean isType(Object comp){
+        return super.isType(comp);
     }
 }

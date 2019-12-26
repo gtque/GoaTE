@@ -59,6 +59,12 @@ public class EqualIgnoreFields extends CompareJson implements ExpectedBuilder {
     }
 
     @Override
+    public void init(Object val){
+        processNested = false;
+        super.init(val);
+    }
+
+    @Override
     protected Object processNested(Object o) {
         return null;
     }

@@ -31,7 +31,6 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.test.TestChild;
 import com.thegoate.reflection.test.TestConstructors;
-
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;

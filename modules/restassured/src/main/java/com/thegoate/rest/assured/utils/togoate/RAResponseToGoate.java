@@ -28,13 +28,10 @@ package com.thegoate.rest.assured.utils.togoate;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
-import com.thegoate.utils.get.NotFound;
 import com.thegoate.utils.togoate.ToGoate;
 import com.thegoate.utils.togoate.ToGoateUtil;
 import com.thegoate.utils.togoate.ToGoateUtility;
 import io.restassured.response.Response;
-
-import java.io.InputStreamReader;
 
 /**
  * Converts from restassured response to goate.

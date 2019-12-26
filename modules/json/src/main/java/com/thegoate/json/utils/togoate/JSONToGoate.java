@@ -50,6 +50,12 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
     }
 
     @Override
+    protected void init(Object val){
+        processNested = false;
+        super.init(val);
+    }
+
+    @Override
     protected Object processNested(Object subContainer) {
         return subContainer;
     }
@@ -86,27 +92,26 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
         return result;
     }
 
+    protected void put(Object o, String currentPath, String key){
+        String id = currentPath+(currentPath.length()>0?".":"")+key;
+        result.put(id,o);
+        if(o instanceof JSONObject){
+            find((JSONObject) o, id);
+        }else if(o instanceof JSONArray){
+            find((JSONArray) o, id);
+        }
+    }
     protected void find(JSONObject json, String currentPath){
         for(String key:json.keySet()){
             Object o = json.get(key);
-            result.put(currentPath+(currentPath.length()>0?".":"")+key,o);
-            if(o instanceof JSONObject){
-                find((JSONObject) o, currentPath+(currentPath.length()>0?".":"")+key);
-            }else if(o instanceof JSONArray){
-                find((JSONArray) o, currentPath+(currentPath.length()>0?".":"")+key);
-            }
+            put(o, currentPath, key);
         }
     }
 
     protected void find(JSONArray json, String currentPath){
         for(int key = 0; key<json.length(); key++){
             Object o = json.get(key);
-            result.put(currentPath+(currentPath.length()>0?".":"")+key,o);
-            if(o instanceof JSONObject){
-                find((JSONObject) o, currentPath+(currentPath.length()>0?".":"")+key);
-            }else if(o instanceof JSONArray){
-                find((JSONArray) o, currentPath+(currentPath.length()>0?".":"")+key);
-            }
+            put(o, currentPath, ""+key);
         }
     }
 }

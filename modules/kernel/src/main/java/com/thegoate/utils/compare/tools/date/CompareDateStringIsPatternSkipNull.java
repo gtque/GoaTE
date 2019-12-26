@@ -30,8 +30,6 @@ import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
 
-import java.text.SimpleDateFormat;
-
 /**
  * Checks if a string is empty or not.
  * Returns true only if actual is not null and is empty and if expected is true.

@@ -28,7 +28,6 @@ package com.thegoate.testng;
 
 import com.thegoate.Goate;
 import com.thegoate.data.GoateProvider;
-import com.thegoate.data.StaticDL;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 

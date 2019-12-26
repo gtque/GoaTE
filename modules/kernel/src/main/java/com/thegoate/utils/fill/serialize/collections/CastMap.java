@@ -29,9 +29,7 @@ package com.thegoate.utils.fill.serialize.collections;
 import com.thegoate.utils.fill.serialize.Cast;
 import com.thegoate.utils.fill.serialize.CastUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

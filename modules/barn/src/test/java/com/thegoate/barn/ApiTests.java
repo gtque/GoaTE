@@ -29,7 +29,6 @@ package com.thegoate.barn;
 import com.thegoate.Goate;
 import com.thegoate.utils.GoateUtils;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 

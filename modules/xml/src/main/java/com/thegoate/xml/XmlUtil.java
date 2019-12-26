@@ -29,7 +29,6 @@ package com.thegoate.xml;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.Utility;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;

@@ -31,7 +31,6 @@ import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
-import com.thegoate.utils.insert.Insert;
 
 /**
  * NOT YET SUPPORTED!!!

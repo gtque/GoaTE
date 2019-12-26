@@ -30,7 +30,6 @@ package com.thegoate.rest.assured.utils.get;
 import com.thegoate.Goate;
 import com.thegoate.statics.ResetStatic;
 import com.thegoate.statics.ResetStatics;
-import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetTool;
 import com.thegoate.utils.get.GetUtil;
 import com.thegoate.utils.get.NotFound;

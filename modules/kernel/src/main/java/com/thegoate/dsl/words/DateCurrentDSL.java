@@ -32,7 +32,6 @@ import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -41,7 +40,7 @@ import java.time.format.DateTimeFormatter;
  * Created by gtque on 3/10/2018.
  */
 @GoateDSL(word = "date")
-@GoateDescription(description = "returns current (local) date time in the given format.",
+@GoateDescription(description = "returns current (local) date time in the given format as a string.",
         parameters = {"the format for the date"})
 public class DateCurrentDSL extends DSL {
     public DateCurrentDSL(Object value) {

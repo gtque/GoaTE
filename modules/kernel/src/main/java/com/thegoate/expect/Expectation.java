@@ -277,6 +277,10 @@ public class Expectation {
         return is("==").expected(expected);
     }
 
+    public Expectation isEqualToIgnoreCase(Object expected) {
+        return is("~=").expected(expected);
+    }
+
     public Expectation isNotEqualTo(Object expected) {
         return is("!=").expected(expected);
     }
@@ -307,6 +311,10 @@ public class Expectation {
 
     public Expectation isNull(Object expected) {
         return is("isNull").expected(expected);
+    }
+
+    public Expectation isIn(Object expected) {
+        return is("contains").expected(expected);
     }
 
     public Expectation is(String operator) {

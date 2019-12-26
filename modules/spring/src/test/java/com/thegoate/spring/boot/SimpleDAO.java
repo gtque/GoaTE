@@ -4,11 +4,9 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import oracle.jdbc.pool.OracleDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

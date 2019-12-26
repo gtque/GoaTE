@@ -38,41 +38,45 @@ import com.thegoate.utils.get.NotFound;
  * Created by Eric Angeli on 3/20/2019.
  */
 @Validator(operators = {""})
-public class ValidateNotGoate extends Validate{
+public class ValidateNotGoate extends Validate {
 
     boolean resultC = true;
-    public ValidateNotGoate(){super();}
+
+    public ValidateNotGoate() {
+        super();
+    }
+
     public ValidateNotGoate(Goate exp, String key, Object from, Object fromExpected, Object rtrn, long cachePeriod, Goate data) {
         super(exp, key, from, fromExpected, rtrn, cachePeriod, data);
     }
 
-    public static Validate using(String operator){
+    public static Validate using(String operator) {
         Validate vlad = new ValidateNotGoate();
         return vlad.setOperator(operator);
     }
 
-    public static Validate using(CompareUtility compare){
+    public static Validate using(CompareUtility compare) {
         return using(compare.getClass());
     }
 
-    public static Validate using(Class compare){
+    public static Validate using(Class compare) {
         CompareUtil op = getOp(compare);
         return using(op.operator());
     }
 
     public Object getRtrn() {
-        return new Goate().put("return",rtrn);
+        return new Goate().put("return", rtrn);
     }
 
     protected boolean check(Goate exp, String key, Goate rtrn) {
         boolean result = true;
-        try{
-            if(!check2(exp, key, rtrn.get("return"))){
+        try {
+            if (!check2(exp, key, rtrn.get("return"), 0)) {
                 result = false;
                 resultC = false;
             }
-        }catch(Throwable t){
-            if (key.contains("*")) {
+        } catch (Throwable t) {
+            if (key.contains("*")||key.contains("+")) {
                 if (!resultC) {
                     result = false;
                     fails.add(exp);
@@ -84,7 +88,8 @@ public class ValidateNotGoate extends Validate{
         return result;
     }
 
-    private boolean check2(Goate exp, String key, Object rtrn){
+    private boolean check2(Goate exp, String key, Object rtrn, int indexLevel) {
+        exp = new Goate().merge(exp, true);
         boolean result = true;
         Object val = null;
         String act = "" + exp.get("actual");
@@ -121,16 +126,17 @@ public class ValidateNotGoate extends Validate{
             }
             String act1 = size > 0 || index > 0 ? act.replaceFirst("\\[", "").replaceFirst("" + actP + "]", "") : act;
             Goate expt = new Goate().merge(exp, true);
+            String act2 = "fiddly bit";
             try {
                 boolean running = true;
                 while (running) {
-                    String act2 = act1.replaceFirst("\\*", "" + index);//act.substring(0, star) + index + act.substring(star + 1);
+                    act2 = act1.replaceFirst("\\*", "" + index);//act.substring(0, star) + index + act.substring(star + 1);
                     String keyt = key.replace(act, act2);
                     expt.put("actual", act2);
                     if (expt.get("expected") instanceof String) {
                         expt.put("expected", expt.get("expected", "", String.class).replaceAll("\\\\%", "_mwi_").replaceAll("\\%", "" + index).replaceAll("_mwi_", "%"));
                     }
-                    boolean check = check2(expt, keyt, rtrn);
+                    boolean check = check2(expt, keyt, rtrn, indexLevel+1);
                     if (!check) {
                         resultC = false;
                         result = false;
@@ -151,7 +157,7 @@ public class ValidateNotGoate extends Validate{
                     result = false;
                 }
                 if (!moreThanZero) {
-                    if (index == 0) {
+                    if (indexLevel == 0) {
                         if (!checkEvaluated(passes, act1, index)) {
                             resultC = false;
                             result = false;
@@ -166,7 +172,11 @@ public class ValidateNotGoate extends Validate{
                 //because a field should be present you will have to check for that some other way other than
                 //using the wild card, otherwise you could end up in an infinite recursive loop.
                 //you could, if checking elements inside an array, check that the size of the array is greater than 0.
-                throw t;
+//                if(!parentFound) {
+                if(indexLevel>0&&index==0) {
+                    throw t;
+                }
+//                }
 //                    }
 
             }

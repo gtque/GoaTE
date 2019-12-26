@@ -83,6 +83,12 @@ public class SpreadSheetToGoate extends SpreadSheetUtil implements ToGoateUtilit
     }
 
     @Override
+    protected void init(Object val){
+        processNested = false;
+        super.init(val);
+    }
+
+    @Override
     protected Object processNested(Object subContainer) {
         return subContainer;
     }

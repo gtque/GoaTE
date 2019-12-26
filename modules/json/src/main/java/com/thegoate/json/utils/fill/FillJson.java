@@ -59,6 +59,7 @@ public class FillJson extends JsonUtil implements FillUtility {
         processNested = false;
         super.init(val);
     }
+
     @Override
     protected Object processNested(Object subContainer) {
         return null;

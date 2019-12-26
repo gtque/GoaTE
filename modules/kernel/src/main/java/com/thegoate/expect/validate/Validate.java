@@ -358,7 +358,7 @@ public abstract class Validate extends Thread {
     }
 
     protected Object getExpectedValue(Object exp, String act1) {
-        if (("" + exp).contains("%")) {
+        if (("" + exp).contains("%")&&getFromExpected()!=null) {
             exp = calculateKey(exp, act1);
         }
         Object result = exp;

@@ -30,12 +30,8 @@ import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
 import com.thegoate.expect.Expectation;
 import com.thegoate.testng.TestNGEngineMethodDL;
-import com.thegoate.utils.compare.Compare;
-import org.json.JSONArray;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Tests against CompareJson utilities.

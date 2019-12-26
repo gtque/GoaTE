@@ -30,6 +30,8 @@ import com.thegoate.expect.Expectation;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertTrue;
+
 /**
  * Created by Eric Angeli on 4/3/2019.
  */
@@ -84,6 +86,7 @@ public class GetJsonByMoreThanOneFieldValue extends TestNGEngineAnnotatedDL {
             "                \"value\": \"4\"\n" +
             "            }\n" +
             "        ]";
+
     @Test(groups = {"unit"})
     public void twoFieldValues() {
         Object found = new GetJsonByFieldValue()
@@ -100,4 +103,43 @@ public class GetJsonByMoreThanOneFieldValue extends TestNGEngineAnnotatedDL {
                 .isEqualTo(expected));
 
     }
+
+    @Test(groups = {"unit"})
+    public void compareJsonArrays() {
+        String j1 = "[{'a':true,'b':3.14159'}]";
+        String j2 = "[{'b':3.14159','a':true}]";
+
+        expect(Expectation.build()
+                .actual(j1)
+                .isEqualTo(j2));
+    }
+
+    @Test(groups = {"unit"})
+    public void compareJsonArrayContains() {
+        String j1 = "[{'a':true,'b':3.14159'}]";
+        String j2 = "[{'b':1.159','a':false, 'c':42}, {'b':3.14159','a':true, 'c':42}]";
+
+        expect(Expectation.build()
+                .actual(j1)
+                .isIn(j2));
+    }
+
+    @Test(groups = {"unit"})
+    public void compareJsonArrayDoesNotContains() {
+        String j1 = "[{'a':false,'b':3.14159'}]";
+        String j2 = "[{'b':1.159','a':false, 'c':42}, {'b':3.14159','a':true, 'c':42}]";
+
+        expect(Expectation.build()
+                .actual(j1)
+                .isIn(j2));
+        boolean passed = true;
+        try{
+            evaluate();
+            passed = false;
+        } catch (Throwable t){
+            LOG.info("Failed as expected.");
+        }
+        assertTrue(passed);
+    }
+
 }
