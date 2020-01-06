@@ -59,6 +59,7 @@ import static org.testng.Assert.assertTrue;
 @Listeners({TestNGEvaluateListener.class})
 public abstract class TestNGEngine implements ITest, TestNG {
     private final String expectSeparator = "\n--------------------\n";
+    private Class testClass = null;
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
@@ -128,7 +129,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     public String getTestName() {
         StringBuilder name = new StringBuilder("");
         if (includeClassMethodInName) {
-            name.append(getClass().getCanonicalName() + ":" + methodName + ":");
+            name.append((testClass==null?getClass().getCanonicalName():testClass.getCanonicalName())+ ":" + methodName + ":");
         }
         name.append(scenario);
         name.append("(" + runNumber + ")");
@@ -285,11 +286,11 @@ public abstract class TestNGEngine implements ITest, TestNG {
         }
     }
 
-    protected boolean logStatuses(ExpectEvaluator ev) {
+    public boolean logStatuses(ExpectEvaluator ev) {
         return logStatuses(ev, true);
     }
 
-    protected boolean logStatuses(ExpectEvaluator ev, boolean currentStatus) {
+    public boolean logStatuses(ExpectEvaluator ev, boolean currentStatus) {
         StringBuilder ps = new StringBuilder();
         boolean passes = false;
         for (Goate p : ev.passes()) {
@@ -391,5 +392,13 @@ public abstract class TestNGEngine implements ITest, TestNG {
     public TestNGEngine clearExpectations() {
         etb = new ExpectationThreadBuilder(data);
         return this;
+    }
+
+    public void setTestClass(Class testClass){
+        this.testClass = testClass;
+    }
+
+    public Class getTestClass(){
+        return this.testClass;
     }
 }

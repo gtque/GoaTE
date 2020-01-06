@@ -67,6 +67,7 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
 
     public SpringTestEngine() {
         engine = new TestNGEngineMethodDL();
+        engine.setTestClass(getClass());
         engine.setLOG(BleatFactory.getLogger(getClass()));
     }
 
@@ -204,6 +205,14 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     @Override
     public void evaluate() {
         engine.evaluate();
+    }
+
+    public boolean logStatuses(ExpectEvaluator ev) {
+        return logStatuses(ev, true);
+    }
+
+    public boolean logStatuses(ExpectEvaluator ev, boolean currentStatus) {
+        return engine.logStatuses(ev, currentStatus);
     }
 
     protected String baseURL() {

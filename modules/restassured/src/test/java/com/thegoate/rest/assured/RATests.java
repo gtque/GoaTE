@@ -72,18 +72,24 @@ public class RATests extends SpringTestEngine {
         boolean result = ev.evaluate();
         assertTrue(result, ev.failed());
     }
+
     @Test(groups = {"unit"})
     public void deleteURL() {
         Rest rest = new RABasicAuthHeader();
+//        LOG.debug("Start", "Calling delete end point");
         Response response = (Response) rest.baseURL(baseURL()).delete("hello/world");
         data.put("response", response);
+//        LOG.debug("Called", "Endpoint returned: " + response.getStatusCode());
         assertEquals(response.statusCode(), 200);
+//        response.getBody().prettyPrint();
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect("api response>status code,==,200");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
+        logStatuses(ev, result);
         assertTrue(result, ev.failed());
     }
+
     @Test(groups = {"unit"})
     public void getURL() {
         Rest rest = new RABasicAuthHeader();
