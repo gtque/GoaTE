@@ -15,6 +15,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
+modules/selenium/temp
 
 # External tool builders
 .externalToolBuilders/
