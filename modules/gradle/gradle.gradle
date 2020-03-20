@@ -29,10 +29,11 @@ apply plugin: 'com.github.johnrengelman.shadow'
 dependencies{
     compile gradleApi()
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile d.depends(":kernel", project.internalVersion);
+//    compile d.depends(":kernel", project.internalVersion);
     //compile d.depends(":ssh", project.internalVersion);
     //compile d.depends(":xml", project.internalVersion);
-    compile 'org.eclipse.jgit:org.eclipse.jgit:5.3.1.201904271842-r'
+//    compile 'org.eclipse.jgit:org.eclipse.jgit:5.3.1.201904271842-r'
+    testCompile d.depends(":kernel", project.internalVersion);
     testCompile d.depends(":testng", project.internalVersion);
     testCompile 'com.google.inject:guice:4.1.0'
     testCompile 'org.mockito:mockito-all:1.10.19'
