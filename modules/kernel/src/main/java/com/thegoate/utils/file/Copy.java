@@ -45,6 +45,10 @@ public class Copy {
     private File file = null;
     private InputStream fileInputStream = null;
 
+    public static Copy copy(File copy){
+        return new Copy(copy);
+    }
+
     public Copy() {
     }
 

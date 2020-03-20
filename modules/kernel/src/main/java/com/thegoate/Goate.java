@@ -33,6 +33,7 @@ import com.thegoate.utils.togoate.ToGoate;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -233,6 +234,15 @@ public class Goate {
             }
         }
         return this;
+    }
+
+    public String findKeyIgnoreCase(String find){
+        String key = find;
+        Optional<String> found = keys().parallelStream().filter(k -> k.equalsIgnoreCase(find)).findFirst();
+        if(found.isPresent()){
+            key = found.get();
+        }
+        return key;
     }
 
     /**

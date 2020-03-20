@@ -41,7 +41,7 @@ import java.net.URLDecoder;
 import java.util.*;
 
 /**
- * Some basic utily helpers.
+ * Some basic utility helpers.
  * Created by gtque on 5/3/2017.
  */
 public class GoateUtils {
