@@ -121,7 +121,8 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     public void init(Goate data) {
         setData(data);
-        setScenario(get("Scenario", "empty::", String.class));
+        String sKey = getData().findKeyIgnoreCase("Scenario");
+        setScenario(get(sKey, "empty::", String.class));
         bumpRunNumber();
     }
 
@@ -290,6 +291,16 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return logStatuses(ev, true);
     }
 
+    private void logVolume(Goate p){
+        if (eut("expect.scenario", false, Boolean.class)) {
+            p.put("_scenario", getTestName());
+        }
+        if (eut("expect.mute", muteFrom, Boolean.class)) {
+            p.drop("from");
+            p.drop("fromExpected");
+        }
+    }
+
     public boolean logStatuses(ExpectEvaluator ev, boolean currentStatus) {
         StringBuilder ps = new StringBuilder();
         boolean passes = false;
@@ -297,10 +308,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
             passes = true;
             ps.append(expectSeparator);
             try {
-                if (eut("expect.mute", muteFrom, Boolean.class)) {
-                    p.drop("from");
-                    p.drop("fromExpected");
-                }
+                logVolume(p);
                 ps.append(p.toString("\t", ""));
             } catch (Exception e) {
                 LOG.debug("Evaulate", "A problem was encountered trying to publish the passed expectations: " + e.getMessage(), e);
@@ -316,10 +324,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
             fails = true;
             fs.append(expectSeparator);
             try {
-                if (eut("expect.mute", muteFrom, Boolean.class)) {
-                    p.drop("from");
-                    p.drop("fromExpected");
-                }
+                logVolume(p);
                 fs.append(p.toString("\t", ""));
             } catch (Exception e) {
                 LOG.info("Evaulate", "A problem was encountered trying to publish the failed expectations: " + e.getMessage(), e);
@@ -341,10 +346,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), ev.passes())) {
                     if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), ev.fails())) {
                         if (!("" + exp.get("actual")).contains("*")&&!("" + exp.get("actual")).contains("+")) {
-                            if (eut("expect.mute", muteFrom, Boolean.class)) {
-                                exp.drop("from");
-                                exp.drop("fromExpected");
-                            }
+                            logVolume(exp);
                             skipped = true;
                             ss.append(expectSeparator);
                             ss.append(exp.toString("\t", ""));

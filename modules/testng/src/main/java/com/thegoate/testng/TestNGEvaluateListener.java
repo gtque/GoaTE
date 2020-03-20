@@ -26,12 +26,21 @@
  */
 package com.thegoate.testng;
 
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
+
+import java.util.Arrays;
+
 import org.testng.*;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 
 /**
  * Created by Eric Angeli on 11/28/2017.
  */
 public class TestNGEvaluateListener implements IInvokedMethodListener, ITestListener {
+
+    BleatBox LOG = BleatFactory.getLogger(getClass());
 
     @Override
     public void onTestStart(ITestResult arg0) {
@@ -81,8 +90,12 @@ public class TestNGEvaluateListener implements IInvokedMethodListener, ITestList
                     }
                 } catch (Throwable t) {
                     result.setStatus(ITestResult.FAILURE);
-                    result.setThrowable(t);
-                    t.printStackTrace();
+                    if(eut("assert.printStackTrace",true, Boolean.class)) {
+                        result.setThrowable(t);
+//                        StringBuilder stack = new StringBuilder();
+//                        Arrays.stream(t.getStackTrace()).forEach(trace -> stack.append(trace).append("\n"));
+//                        LOG.error("result.getTestName()", stack.toString());
+                    }
                 } finally {
                     TestMap.tests.remove(result.getTestName());//clearing map for garbage collection
                 }

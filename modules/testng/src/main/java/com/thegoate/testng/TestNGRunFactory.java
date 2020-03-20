@@ -95,7 +95,10 @@ public class TestNGRunFactory {
         List<Goate> filtered = new ArrayList<>();
         if(include!=null&&include.length>0){
             for(Goate run:runs){
-                Object groups = run.get("groups", include);
+                String groups = run.get("groups", "", String.class);
+                if(!groups.isEmpty()){
+
+                }
             }
         }
 
@@ -126,7 +129,8 @@ public class TestNGRunFactory {
                                     filtered.add(rd.drop("runEnabled"));
                                 }
                             } else {
-                                String scene = "" + rd.get("Scenario");
+                                String sKey = rd.findKeyIgnoreCase("Scenario");
+                                String scene = "" + rd.get(sKey);
                                 if (scene.equals(run)) {
                                     filtered.add(rd.drop("runEnabled"));
                                 }
