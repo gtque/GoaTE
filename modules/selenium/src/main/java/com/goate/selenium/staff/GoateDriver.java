@@ -54,13 +54,19 @@ import org.openqa.selenium.WebDriver;
 public abstract class GoateDriver {
     BleatBox LOG = BleatFactory.getLogger(getClass());
     enum OS{
-        WIN32("windows/32"),WIN64("windows/64"),LIN32("linux/32"),LIN64("linux/64"),ANDROID("android/64"),IOS("ios/64"),MACOS("macos/64");
-        String path = "";
-        OS(String path){
+        WIN32("windows/32", true),WIN64("windows/64", true),LIN32("linux/32", false),LIN64("linux/64", false),ANDROID("android/64", false),IOS("ios/64", false),MACOS("macos/64", false);
+        String path;
+        boolean exe;
+
+        OS(String path, boolean exe){
             this.path = path;
+            this.exe = exe;
         }
         public String path(){
             return path;
+        }
+        public String ext(String extension){
+            return exe?extension:extension.replace(".exe","");
         }
     }
     OS os;
@@ -144,7 +150,7 @@ public abstract class GoateDriver {
             if(driverPath.isEmpty()){
                 driverPath = "webdrivers/"+browser;
             }
-            path = driverPath +"/"+os.path() + "/" + browser + extension;
+            path = driverPath +"/"+os.path() + "/" + browser + os.ext(extension);
             path = GoateUtils.getFilePath(path);
             if (!browser.isEmpty()) {
                 System.setProperty("webdriver." + browser + ".driver", path);

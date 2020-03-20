@@ -45,6 +45,20 @@ public class ChromeWebDriver extends GoateDriver {
     }
 
     @Override
+    public GoateDriver addCapability(String name, Object value){
+        if(dc!=null){
+            if(name.startsWith("args")){
+                ((ChromeOptions)dc).addArguments(""+value);
+            } else {
+                super.addCapability(name, value);
+            }
+        }else{
+            LOG.warn("Capabilities have not been loaded for the driver.");
+        }
+        return this;
+    }
+
+    @Override
     public WebDriver build() {
         return new ChromeDriver((ChromeOptions)dc);
     }

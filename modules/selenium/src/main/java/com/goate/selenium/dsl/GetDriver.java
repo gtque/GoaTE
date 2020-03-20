@@ -49,7 +49,12 @@ public class GetDriver extends DSL {
     @Override
     public Object evaluate(Goate data) {
         String browser = ""+get(1,data);
-        WebDriver driver = new WebDriverBuilder(browser).build();
+        WebDriverBuilder builder = new WebDriverBuilder(browser);
+        for(int i = 2; get(i, data)!=null; i++){
+            String[] capability = (""+get(i, data)).split("==");
+            builder.addCapability(capability[0], capability[1]);
+        }
+        WebDriver driver = builder.build();
         if(!key.isEmpty()){
             data.put(key,driver);
         }
