@@ -28,6 +28,7 @@
 package com.thegoate.rest.assured.utils.get;
 
 import com.thegoate.Goate;
+import com.thegoate.rest.RestResult;
 import com.thegoate.statics.ResetStatic;
 import com.thegoate.statics.ResetStatics;
 import com.thegoate.utils.get.GetTool;
@@ -80,7 +81,7 @@ public class GetRAResponse extends GetTool implements ResetStatic {
             Response r = (Response) container;
             if (selector.equals("status code")) {
                 result = r.statusCode();
-            } else if (selector.equals("body")) {
+            } else if (selector.equals(RestResult.body)) {
                 result = r.body();
             } else if (selector.equals("body as a string")) {
                 result = r.body().asString();
@@ -104,9 +105,9 @@ public class GetRAResponse extends GetTool implements ResetStatic {
                 result = r.detailedCookie(selector.toString().substring("detailedCookie".length()).trim());
             } else if (selector.toString().startsWith("body as input stream") || selector.toString().startsWith("input stream")) {
                 result = new InputStreamReader(r.asInputStream());
-            } else if (selector.toString().startsWith("content") || selector.toString().startsWith("input stream")) {
+            } else if (selector.toString().startsWith(RestResult.content)) {
                 result = ((RestAssuredResponseImpl) r).getContent();
-            } else if (selector.toString().startsWith("byteArray") || selector.toString().startsWith("input stream")) {
+            } else if (selector.toString().startsWith(RestResult.byteArray)) {
                 result = r.asByteArray();
             } else {
                 Goate g = null;
