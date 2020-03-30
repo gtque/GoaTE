@@ -75,6 +75,10 @@ public abstract class JsonUtil implements Utility {
 
     @Override
     public boolean isType(Object check) {
+        return isJSONObject(check) || isJSONArray(check);
+    }
+
+    public boolean isJSONObject(Object check){
         boolean istype = true;
         try{
             if(check != JSONObject.NULL) {
@@ -85,15 +89,21 @@ public abstract class JsonUtil implements Utility {
                 }
             }
         }catch(JSONException je){
-            try{
-                if(!(check instanceof JSONArray)) {
-                    if (!(check instanceof String && new JSONArray(""+check) != null)) {
-                        istype = false;
-                    }
+            istype = false;
+        }
+        return istype;
+    }
+
+    public boolean isJSONArray(Object check){
+        boolean istype = true;
+        try{
+            if(!(check instanceof JSONArray)) {
+                if (!(check instanceof String && new JSONArray(""+check) != null)) {
+                    istype = false;
                 }
-            }catch (Exception e){
-                istype = false;
             }
+        }catch (Exception e){
+            istype = false;
         }
         return istype;
     }

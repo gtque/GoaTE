@@ -28,6 +28,8 @@ package com.thegoate.json.utils.compare.tools;
 
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -63,6 +65,8 @@ public class CompareJsonIsEmpty extends CompareJson {
             result = true;
         } else if(act.isEmpty()){
             result = true;
+        } else if(isJSONArray(takeActionOn)){
+            result = new JSONArray(act).length()==0;
         }
         return check?result:!result;
     }
