@@ -27,30 +27,31 @@
 
 package com.thegoate.expect;
 
+import static com.thegoate.dsl.words.LoadFile.fileAsAString;
+import static com.thegoate.expect.ExpectLocator.start;
+import static com.thegoate.expect.ExpectMatchWildcardIndexPath.matchWildcardIndex;
+import static com.thegoate.expect.ExpectWildcardIndexPath.wildcardIndex;
+import static com.thegoate.locate.Locate.path;
+import static java.util.Optional.ofNullable;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.testng.annotations.Test;
+
 import com.thegoate.Goate;
 import com.thegoate.expect.conditional.ModelIsPresentOptional;
 import com.thegoate.expect.test.IsNotFound;
 import com.thegoate.expect.validate.Validate;
 import com.thegoate.expect.validate.ValidateAbsence;
 import com.thegoate.expect.validate.ValidateNotGoate;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
-
-import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.thegoate.dsl.words.LoadFile.fileAsAString;
-import static com.thegoate.expect.ExpectLocator.start;
-import static com.thegoate.expect.ExpectMatchWildcardIndexPath.matchWildcardIndex;
-import static com.thegoate.expect.ExpectWildcardIndexPath.wildcardIndex;
-import static com.thegoate.locate.Locate.path;
-import static org.testng.Assert.*;
 
 /**
  * Test expect framework.
@@ -58,8 +59,12 @@ import static org.testng.Assert.*;
  */
 public class ExpectTests extends TestNGEngineAnnotatedDL {
 
-	final BleatBox LOG = BleatFactory.getLogger(getClass());
+//	final BleatBox LOG = BleatFactory.getLogger(getClass());
 	String sample = "{\n" +
+		"	\"empty\":[],\n" +
+		"	\"there_but_missing\":[[{\"cheese\":\"burger\"}]],\n" +
+		"	\"there_but_empty2\":[[{\"field\":\"cheezeburger\"}],[]],\n" +
+		"	\"there_and_filled\":[[{\"field\":\"cheezeburger\"}],[{\"field\":\"cheezeburger\"}]],\n" +
 		"    \"data\": [\n" +
 		"        {\n" +
 		"            \"a\": null,\n" +
@@ -243,7 +248,7 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
 		List<String> expected = new ArrayList<String>();
 		expected.add("hello");
 		expected.add("hello");
-//		Goate from = new Goate().put("1", true).put("2", false).put("3", true);
+		//		Goate from = new Goate().put("1", true).put("2", false).put("3", true);
 		expect(Expectation.build()
 			.actual(from)
 			.isEqualTo(expected));
@@ -542,6 +547,35 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
 	}
 
 	@Test(groups = {"unit"})
+	public void goateNullIsPresentTrueOneOrMore() {
+		Goate data = new Goate();
+		data.get("data.0.a", null);
+		data.get("data.1.a", null);
+		data.get("data.2.a", null);
+		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+		etb.expect(Expectation.build()
+			.actual("data.+.a").from(data)
+			.isPresent(true));
+		ExpectEvaluator ev = new ExpectEvaluator(etb);
+		boolean result = ev.evaluate();
+		logStatuses(ev);
+		assertTrue(result);
+	}
+
+	@Test(groups = {"unit"})
+	public void isJsonNullPresentTrueOneOrMore() {
+		Goate data = new Goate();
+		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+		etb.expect(Expectation.build()
+			.actual("data.+.a").from(sample)
+			.isPresent(true));
+		ExpectEvaluator ev = new ExpectEvaluator(etb);
+		boolean result = ev.evaluate();
+		logStatuses(ev);
+		assertTrue(result);
+	}
+
+	@Test(groups = {"unit"})
 	public void isPresentZeroOrMoreNotPresentButShouldBe() {
 		Goate data = new Goate();
 		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
@@ -769,6 +803,58 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
 			.setExpected(fullModel));
 	}
 
+	String jaoSample = "{\"list\":["
+		+ "{\"field1\":\"a\"},"
+		+ "{\"field1\":\"a\"},"
+		+ "{\"field1\":\"a\"},"
+		+ "{\"field1\":\"a\"}"
+		+ "]}";
+	String jaoFullModel = "{\"list\":["
+		+ "{\"field1\":\"a\"}"
+		+ "]}";
+	String jaoPartialModel = "{\"field1\":\"a\"}";
+
+	@Test(groups = {"unit"})
+	public void jsonArrayOfObjects() {
+		//I am using the one or more wild card operator, +,
+		//this expects at least one element in the json array.
+		//You can use the zero or more operator, *,
+		//but this will still pass if there is nothing in the json array, so use as appropriate.
+
+		//check if the json array has something in it, regardless of what that something is.
+		expect(Expectation.build()
+			.actual("list.+")
+			.from(jaoSample)
+			.isPresent(true));
+
+		//check if a field is in an object in a json array, regardless of value
+		expect(Expectation.build()
+			.actual("list.+.field1")
+			.from(jaoSample)
+			.isPresent(true));
+
+		//check if value of a field in an object in the json array equals the expecte value.
+		expect(Expectation.build()
+			.actual("list.+.field1")
+			.from(jaoSample)
+			.isEqualTo("a"));
+
+		//using a Conditional builder, this is not covered by tutorials, at least not yet.
+		//it allows you to define a base model for the expected json and then check that the response matches the model.
+		//checking the entire expected json response
+		expect(new ModelIsPresentOptional()
+			.setActual(jaoSample)
+			.setExpected(jaoFullModel));
+
+		//using a Conditional builder, this is not covered by tutorials, at least not yet.
+		//it allows you to define a base model for the expected json and then check that the response matches the model.
+		//checking just the expected json object(s) in the json array in the response
+		expect(new ModelIsPresentOptional()
+			.setActual("list.+")
+			.setFrom(jaoSample)
+			.setExpected(jaoPartialModel));
+	}
+
 	String responseWithC = "{\n" +
 		"    \"data\": [\n" +
 		"        {\n" +
@@ -845,6 +931,7 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
 			.setExpected(fullModel));
 		boolean failed = true;
 		try {
+			muteFrom = true;
 			evaluate();
 			failed = false;
 		} catch (Throwable t) {
@@ -939,6 +1026,86 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
 			LOG.info("No Skip And Fail", "FAIL!!!");
 		}
 		assertTrue(skipped, "Should have passed and not thrown an error.");
+	}
+
+	@Test(groups = {"unit"})
+	public void oneOrMoreButActuallyEmpty() {
+		boolean skipped = true;
+		try {
+			expect(Expectation.build()
+				.actual("empty.+.field")
+				.from(sample)
+				.isEqualTo("cheezeburger"));
+			evaluate();
+			skipped = false;
+		} catch (Throwable shouldBeThrown) {
+			LOG.info("One Or More Wildcard Index", "Failed, like it should have.");
+		}
+		assertTrue(skipped, "Should have failed and thrown an error.");
+	}
+
+	@Test(groups = {"unit"})
+	public void zeroOrMoreThenOneOrMoreButActuallyEmpty() {
+		boolean skipped = false;
+		try {
+			expect(Expectation.build()
+				.actual("empty.*.+.field")
+				.from(sample)
+				.isEqualTo("cheezeburger"));
+			evaluate();
+			skipped = true;
+		} catch (Throwable shouldBeThrown) {
+			LOG.info("One Or More Wildcard Index", "Failed, but it shouldn't have.");
+		}
+		assertTrue(skipped, "Should have passed.");
+	}
+
+	@Test(groups = {"unit"})
+	public void checkForOneOrMoreIfAnyPresent() {
+		boolean skipped = true;
+		try {
+			expect(Expectation.build()
+				.actual("there_but_missing.*.+.field")
+				.from(sample)
+				.isEqualTo("cheezeburger"));
+			evaluate();
+			skipped = false;
+		} catch (Throwable shouldBeThrown) {
+			LOG.info("One Or More Wildcard Index", "Failed, like it should have.");
+		}
+		assertTrue(skipped, "Should have failed and thrown an error.");
+	}
+
+	@Test(groups = {"unit"})
+	public void checkForOneOrMoreNestedNotPresent() {
+		boolean skipped = true;
+		try {
+			expect(Expectation.build()
+				.actual("there_but_empty2.+.+.field")
+				.from(sample)
+				.isEqualTo("cheezeburger"));
+			evaluate();
+			skipped = false;
+		} catch (Throwable shouldBeThrown) {
+			LOG.info("One Or More Wildcard Index", "Failed, like it should have.");
+		}
+		assertTrue(skipped, "Should have failed and thrown an error.");
+	}
+
+	@Test(groups = {"unit"})
+	public void checkForOneOrMoreNestedIsPresent() {
+		boolean skipped = false;
+		try {
+			expect(Expectation.build()
+				.actual("there_and_filled.+.+.field")
+				.from(sample)
+				.isEqualTo("cheezeburger"));
+			evaluate();
+			skipped = true;
+		} catch (Throwable shouldBeThrown) {
+			LOG.info("One Or More Wildcard Index", "Failed, but it shouldn't have.");
+		}
+		assertTrue(skipped, "Should have passed.");
 	}
 
 	@Test(groups = {"unit"})

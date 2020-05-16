@@ -41,7 +41,8 @@ public class SimpleInt {
         return value;
     }
 
-    public void setValue(int value) {
+    public SimpleInt setValue(int value) {
         this.value = value;
+        return this;
     }
 }

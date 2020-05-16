@@ -75,7 +75,9 @@ public class DeSerializer extends Cereal{
                                 ||field.getValue().getType().getAnnotation(GoatePojo.class)!=null) {
                             Goate d = new Goate().merge(data,false);
                             if(!flatten){
-                                d = data.filter(fieldKey).scrubKeys(fieldKey+"\\.");
+                                d = data.filter(fieldKey.replace("##", "[0-9]*")).scrubKeys(fieldKey+"\\.");
+                            } else {
+                                d = data.filterStrict(fieldKey.replace("##","[0-9]*"));
                             }
                             field.getValue().set(o, new Cast(d, dataSource).field(field.getValue()).cast(value,field.getValue().getType()));
                         }

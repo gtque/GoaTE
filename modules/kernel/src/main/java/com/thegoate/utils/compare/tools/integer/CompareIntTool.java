@@ -26,12 +26,14 @@
  */
 package com.thegoate.utils.compare.tools.integer;
 
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.ParseDetector;
 import com.thegoate.utils.compare.CompareTool;
 
 /**
  * Created by Eric Angeli on 5/9/2017.
  */
-public abstract class CompareIntTool extends CompareTool {
+public abstract class CompareIntTool extends CompareTool implements ParseDetector {
     public CompareIntTool(Object actual) {
         super(actual);
     }
@@ -40,11 +42,32 @@ public abstract class CompareIntTool extends CompareTool {
     public boolean isType(Object check) {
         boolean istype = false;
         try{
-            Integer.parseInt(""+actual);
-            istype = true;
+            GoateReflection gr = new GoateReflection();
+            if (gr.isIntegerType(check.getClass())) {
+                LOG.debug("Check Type", "detected primitive int");
+                istype = true;
+            } else {
+                LOG.debug("Check Type", "not a primitive int.");
+            }
         }catch(Throwable e){
 //            LOG.debug(""+actual + " is not an int.");
         }
         return istype;
+    }
+
+    @Override
+    public boolean parseDetector(Object object){
+        boolean result = false;
+        try{
+            parseInt(object);
+            result = true;
+        } catch (Exception e){
+            LOG.debug("Parse Detector", "Not a parsable int.");
+        }
+        return result;
+    }
+
+    protected int parseInt(Object value){
+        return Integer.parseInt((""+value).replaceAll("[,$]",""));
     }
 }

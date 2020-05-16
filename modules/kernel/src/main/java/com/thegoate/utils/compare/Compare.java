@@ -29,11 +29,14 @@ package com.thegoate.utils.compare;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.ParseDetector;
 import com.thegoate.utils.UnknownUtilType;
-
+import com.thegoate.utils.compare.tools.CompareObject;
+import com.thegoate.utils.compare.tools.CompareObjectEqualTo;
 
 /**
- * Generic sompare service.
+ * Generic compare service.
  * Created by Eric Angeli on 5/9/2017.
  */
 public class Compare extends UnknownUtilType implements CompareUtility {
@@ -42,10 +45,17 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     Object actual = null;
     Object operator = null;
     Object expected = null;
+    boolean compareNumeric = false;
+    boolean triedOnce = false;
 
     public Compare(Object actual) {
         this.actual = actual;
     }
+
+    public Compare triedOnce(boolean triedOnce){
+    	this.triedOnce = triedOnce;
+    	return this;
+	}
 
     @Override
     public boolean isType(Object check) {
@@ -72,7 +82,20 @@ public class Compare extends UnknownUtilType implements CompareUtility {
 
     protected boolean lookupTool() {
         if (tool == null) {
-            buildTool();//step into here if the tool is still null for some reason.
+            tool = buildTool(actual);//step into here if the tool is still null for some reason.
+        }
+		GoateReflection gr = new GoateReflection();
+        if ((expected !=null && tool instanceof CompareObject && gr.isPrimitiveOrNumerical(expected))|| tool == null) {
+            CompareUtility altTool = buildTool(expected);
+            if(altTool != null){
+                tool = altTool;
+            }
+        }
+        if(tool == null || tool instanceof CompareObject){
+            CompareUtility altTool = buildTool(actual, ParseDetector.isType);
+            if(altTool != null){
+                tool = altTool;
+            }
         }
         //if tool is still null, this indicates a problem trying to find the
         //right comparator. Either nothing was found or there was no default.
@@ -82,23 +105,37 @@ public class Compare extends UnknownUtilType implements CompareUtility {
             result = false;
             health.put("Tool Not Found", "Could not find \"" + operator + "\" for: " + actual);
         } else {
-            tool.actual(actual).to(expected).using(operator);
+            if(compareNumeric&&tool instanceof CompareObject){
+                result = false;
+                health.put("Tool Not Found", "Expecting to compare a numeric, but did not find an implementation for the numeric type: \"" + operator + "\" for: " + actual.getClass());
+            } else {
+                LOG.debug("Compare", "Found comparator: " + tool.getClass());
+                if(tool instanceof CompareTool){
+					((CompareTool)tool).triedOnce(triedOnce);
+				}
+                tool.actual(actual).to(expected).using(operator);
+            }
         }
         return result;
     }
 
+    protected CompareUtility buildTool(Object checkFor) {
+        return buildTool(checkFor, "isType");
+    }
 
-    protected void buildTool() {
+    protected CompareUtility buildTool(Object checkFor, String isType){
+        CompareUtility foundTool = null;
         try {
-            tool = (CompareUtility) buildUtil(actual, CompareUtil.class, "" + operator, CompareUtil.class.getMethod("operator"));
+            foundTool = (CompareUtility) buildUtil(checkFor, CompareUtil.class, "" + operator, CompareUtil.class.getMethod("operator"), isType);
         } catch (NoSuchMethodException e) {
             LOG.error("Problem finding the compare utility: " + e.getMessage(), e);
         }
+        return foundTool;
     }
 
     public CompareUtility getTool() {
         if (tool == null) {
-            buildTool();
+            tool = buildTool(actual);
         }
         return tool;
     }
@@ -118,6 +155,11 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     @Override
     public CompareUtility using(Object operator) {
         this.operator = operator;
+        return this;
+    }
+
+    public Compare compareNumeric(boolean compareNumeric){
+        this.compareNumeric = compareNumeric;
         return this;
     }
 }

@@ -49,6 +49,7 @@ public abstract class Validate extends Thread {
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected static BleatBox sLOG = BleatFactory.getLogger(Validate.class);
     protected String starReplacement = "_s#T$a%R_";
+    protected String plusReplacement = "_p#L$u%S_";
     protected String operator = "";
     protected Goate exp;
     protected Object from;
@@ -191,6 +192,17 @@ public abstract class Validate extends Thread {
         return checks;
     }
 
+    protected boolean starBefore(String check){
+        int firstIndexStar = check.indexOf("*");
+        int firstIndexPlus = check.lastIndexOf("+");
+        //return firstIndexPlus <= -1 || (firstIndexStar <= -1 || (firstIndexStar < firstIndexPlus));
+        boolean result = firstIndexStar <= firstIndexPlus;
+        if(firstIndexStar<0&&firstIndexPlus>-1){
+            result = false;
+        }
+        return result;
+    }
+
     private String[] calculateIndexCheck(String act1) {
         String[] ic = {null, null};
         int pattern = 0;
@@ -202,7 +214,7 @@ public abstract class Validate extends Thread {
         } else {
             if (firstIndexPlus > -1) {
                 String base = act1.substring(0, firstIndexPlus);
-                ic[pattern] = base + starReplacement + act1.substring(firstIndexPlus + 1);
+                ic[pattern] = base + plusReplacement + act1.substring(firstIndexPlus + 1);
                 ic[check] = base + "[0-9]+" + act1.substring(firstIndexPlus + 1).replaceAll("\\[*\\*[0-9]*,*[0-9]*\\]*", "*").replaceAll("\\+", "*") + ",>=,1";
             } else if (firstIndexStar > -1) {
                 ic = calculateStarCheck(act1, firstIndexStar);

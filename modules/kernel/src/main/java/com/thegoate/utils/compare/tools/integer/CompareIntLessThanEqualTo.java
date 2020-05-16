@@ -41,10 +41,10 @@ public class CompareIntLessThanEqualTo extends CompareIntTool {
 
     @Override
     public boolean evaluate() {
-//        return Integer.parseInt(""+actual)<=Integer.parseInt(""+expected);
+//        return parseInt(actual)<=parseInt(expected);
         boolean result = false;
         try{
-            result = Integer.parseInt(""+actual)<=Integer.parseInt(""+expected);
+            result = parseInt(actual)<=parseInt(expected);
         }catch(Exception e){
             result = tryExpectedType("<=");
         }

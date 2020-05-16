@@ -43,7 +43,7 @@ public class CompareLongGreaterThan extends CompareLongTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = Long.parseLong(""+actual)>Long.parseLong(""+expected);
+            result = parseLong(actual)>parseLong(expected);
         }catch(Exception e){
             result = tryExpectedType(">");
         }

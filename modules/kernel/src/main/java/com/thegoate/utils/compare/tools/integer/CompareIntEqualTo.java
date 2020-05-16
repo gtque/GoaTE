@@ -43,7 +43,7 @@ public class CompareIntEqualTo extends CompareIntTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = Integer.parseInt(""+actual)==Integer.parseInt(""+expected);
+            result = parseInt(actual)==parseInt(expected);
         }catch(Exception e){
             result = tryExpectedType("==");
         }

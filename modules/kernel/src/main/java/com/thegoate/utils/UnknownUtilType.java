@@ -76,6 +76,10 @@ public class UnknownUtilType implements Utility {
         return buildUtil(obj, util, obj, id, identifier);
     }
 
+    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, String id, Method identifier, String isType) {
+        return buildUtil(obj, util, obj, id, identifier, isType);
+    }
+
     /**
      * Attempts to find and build the correct implementation of the utility.
      * @param obj
@@ -86,6 +90,20 @@ public class UnknownUtilType implements Utility {
      * @return
      */
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier) {
+        return buildUtil(obj, util, val, id, identifier,"isType");
+    }
+
+    /**
+     * Attempts to find and build the correct implementation of the utility.
+     * @param obj
+     * @param util
+     * @param val
+     * @param id
+     * @param identifier
+     * @param isType
+     * @return
+     */
+    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier, String isType) {
         Object utility = null;
         Class def = null;
         Object[] args = {val};
@@ -103,13 +121,14 @@ public class UnknownUtilType implements Utility {
                         def = c;
                     }else {
                         Class[] types = {Object.class};
-                        Method check = c.getMethod("isType", types);
+                        Method check = c.getMethod(isType, types);
                         Object u = af.constructor(null).build(c);
                         if (check != null && Boolean.parseBoolean(""+check.invoke(u, checkArgs))) {
                             if(d!=null&&d.forType()){
                                 def = c;
                             } else {
                                 utility = u;
+                                break;
                             }
                         }
                     }

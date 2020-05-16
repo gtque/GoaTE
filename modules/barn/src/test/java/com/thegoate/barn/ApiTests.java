@@ -53,7 +53,7 @@ public class ApiTests extends ApiBarn {
     }
 
     @Override
-    @Test(groups = {"api"})
+    @Test(groups = {"unit"})
     public void apiTest() {
         execute();
     }

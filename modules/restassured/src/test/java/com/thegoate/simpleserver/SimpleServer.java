@@ -43,5 +43,6 @@ public class SimpleServer {
         System.out.println("          STARTING UP                     ");
         System.out.println("******************************************");
         ApplicationContext ctx = SpringApplication.run(SimpleServer.class, args);
+
     }
 }

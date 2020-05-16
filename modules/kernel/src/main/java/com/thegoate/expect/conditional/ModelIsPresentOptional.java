@@ -87,7 +87,7 @@ public class ModelIsPresentOptional extends ConditionalBuilder {
                         addExpect(pKey + key.substring(key.lastIndexOf('.')));
                     }
                 } else {
-                    addExpect(key.replaceAll("[0-9]+", "+"));
+                    addExpect(key.replaceAll("\\.[0-9]+", ".+"));
                 }
             }
         }
@@ -95,8 +95,14 @@ public class ModelIsPresentOptional extends ConditionalBuilder {
     }
 
     private void addExpect(String key) {
+        String actualKey = key;
+        if(from!=null){
+            if((""+actual).contains("*")||(""+actual).contains("+")) {
+                actualKey = ""+actual + "." + actualKey;
+            }
+        }
         expect(Expectation.build()
-                .actual(key)
+                .actual(actualKey)
                 .from(getActual())
                 .isPresent(true)
                 .validate(new ValidatePresence()));

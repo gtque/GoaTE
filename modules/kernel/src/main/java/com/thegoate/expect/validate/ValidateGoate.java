@@ -118,7 +118,8 @@ public class ValidateGoate extends Validate{
         for (String checks : indexChecks) {
             String[] check = checks.split(",");
             Goate cev = new Goate();
-            check[0] = check[0].replace(starReplacement, "*").replace(".", "\\.");
+            String og_check = check[0].replace(starReplacement, "*").replace(".", "\\.").replace(plusReplacement, "+");
+            check[0] = check[0].replace(starReplacement, "*").replace(".", "\\.").replace(plusReplacement, "*");
             cev.put("actual", check[0] + ".size()");
             cev.put("operator", check[1]);
             cev.put("expected", check[2]);
@@ -149,14 +150,31 @@ public class ValidateGoate extends Validate{
                 //find how many are present
                 Goate plusFirstFilter = fromData.filterStrict((plusCheck[0] + "[0-9]+" + (plusCheck.length > 1 ? "\\." + pnc[0] : "")).replace("*", "[0-9]*").replace("\\\\","\\").replace("([0-9])[0-9]","([0-9])"));
                 //find how many should be present
-                Goate plusSecondFilter = fromData.filterStrict((plusCheck[0] + "[0-9]+").replace("*", "[0-9]*").replace("\\\\","\\").replace("([0-9])[0-9]","([0-9])"));
+                int plusSecondFilterSize = calculatedMinimumSize(fromData, plusCheck, og_check);//plusSecondFilter.size()==0?1:plusSecondFilter.size();
                 cev.put("actual_value", plusFirstFilter.size())
-                        .put("expected_value", plusSecondFilter.size());
-                if (!compare(plusFirstFilter.size(), plusSecondFilter.size(), cev)) {//fromData.filterStrict(check[0].replace("*", "[0-9]*")).size(), i, cev)) {
+                        .put("expected_value", plusSecondFilterSize);
+                if (!compare(plusFirstFilter.size(), plusSecondFilterSize, cev)) {//fromData.filterStrict(check[0].replace("*", "[0-9]*")).size(), i, cev)) {
                     result = false;
                 }
             }
         }
         return result;
     }
+
+    protected int calculatedMinimumSize(Goate fromData, String[] plusCheck, String check){
+        int minSize = 1;
+        Goate plusSecondFilter = fromData.filterStrict((plusCheck[0] + "[0-9]+").replace("*", "[0-9]*").replace("\\\\","\\").replace("([0-9])[0-9]","([0-9])"));
+        if(starBefore(check)){
+            minSize = plusSecondFilter.size();//fromData.filterStrict((plusCheck[0].substring(0,plusCheck[0].length()-2)).replace("*", "[0-9]*").replace("\\\\","\\").replace("([0-9])[0-9]","([0-9])")).size();
+        } else {
+            if (plusSecondFilter.size() == 0) {
+                minSize = check.split("\\+").length;
+            } else {
+                minSize = plusSecondFilter.size();
+            }
+        }
+        return minSize;
+    }
+
+
 }

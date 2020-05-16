@@ -46,6 +46,7 @@ public abstract class Rest implements RestSpec {
     protected Goate pathParams = new Goate();
     protected Goate body = new Goate();
     protected Goate custom = new Goate();
+    protected Object config = null;
     protected String baseURL = "";//this should include the port if different from default.
     protected int timeout = 15;
     protected boolean logAll = true;
@@ -311,6 +312,18 @@ public abstract class Rest implements RestSpec {
     public RestSpec timeout(int timeoutSeconds){
         this.timeout = timeoutSeconds;
         return this;
+    }
+
+
+    @Override
+    public RestSpec configure(Object config) {
+        this.config = config;
+        return this;
+    }
+
+    @Override
+    public Object getConfig(){
+        return this.config;
     }
 
     @Override

@@ -51,6 +51,12 @@ public class HelloWorld {
         return "{\"greeting\":\"hello\"}";
     }
 
+    @GetMapping("/null")
+    public String getNull(){
+        return "{\"field\":null}";
+    }
+
+
     @PutMapping("/auth")
     public String putWorld(@RequestHeader("Authorization") String auth) {
         return getWorld(auth);

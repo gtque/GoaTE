@@ -43,7 +43,7 @@ public class CompareFloatLessThan extends CompareFloatTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = Float.parseFloat(""+actual)<Float.parseFloat(""+expected);
+            result = parseFloat(actual)<parseFloat(expected);
         }catch(Exception e){
             result = tryExpectedType("<");
         }

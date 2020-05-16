@@ -24,9 +24,13 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+
 package com.thegoate.utils.compare.tools;
 
+import com.thegoate.HealthMonitor;
 import com.thegoate.annotations.IsDefault;
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
 
@@ -36,19 +40,36 @@ import com.thegoate.utils.compare.CompareUtil;
  */
 @CompareUtil(operator = "==", type = "object")
 @IsDefault
-public class CompareObjectEqualTo extends CompareTool {
+public class CompareObjectEqualTo extends CompareObject {
 
-    public CompareObjectEqualTo(Object actual) {
-        super(actual);
-    }
+	public CompareObjectEqualTo(Object actual) {
+		super(actual);
+	}
 
-    @Override
-    public boolean isType(Object check) {
-        return false;
-    }
+	@Override
+	public boolean isType(Object check) {
+		return false;
+	}
 
-    @Override
-    public boolean evaluate() {
-        return actual!=null?actual.equals(expected):(expected==null||expected.equals("null::"));
-    }
+	@Override
+	public boolean evaluate() {
+		boolean result = false;
+//		GoateReflection gr = new GoateReflection();
+//		if (expected != null && (gr.isPrimitive(expected.getClass()) || expected instanceof Number)) {
+//			LOG.debug("isEqualTo", "Detected a primitive, comparing as a formatted string.");
+//			Compare comp = new Compare(expected);
+//			result = comp.compareNumeric(expected instanceof Number).to(actual).using("==").evaluate();
+//			health = comp.healthCheck();
+//		} else {
+			result = actual != null ? actual.equals(expected) : (expected == null || expected.equals("null::"));
+//		}
+		if (actual instanceof HealthMonitor) {
+			health = (((HealthMonitor) actual).healthCheck());
+		} else {
+			if (!result) {
+				health.put("not equal", "" + actual + "!=" + expected);
+			}
+		}
+		return result;
+	}
 }

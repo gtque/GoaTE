@@ -123,6 +123,10 @@ public interface RestSpec {
 
     String getBaseURL();
 
+    RestSpec configure(Object config);
+
+    Object getConfig();
+
     RestSpec config();
 
     Object get(String endpoint);

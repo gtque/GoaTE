@@ -62,7 +62,7 @@ public class TestDriver2 extends TestNGEngine {
         super(data);
     }
 
-    @Test(groups = {"webui"})
+    @Test(groups = {"webui2"})
     public void webdriver() {
         for(int i = 0; i<20; i++) {
             WebDriver driver = (WebDriver) get("browser", "webdriver::chrome,args.1==--incognito");

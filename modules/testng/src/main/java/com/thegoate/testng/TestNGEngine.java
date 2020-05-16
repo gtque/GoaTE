@@ -39,6 +39,7 @@ import com.thegoate.statics.StaticScrubber;
 import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -238,6 +239,9 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     @Override
     public TestNGEngine expect(Expectation expectation) {
+        if(etb.isBuilt()){
+            clearExpectations();
+        }
         if (etb != null) {
             etb.expect(expectation);
         }
@@ -277,6 +281,11 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     @Override
     public void evaluate() {
+        evaluate(null);
+    }
+
+    @Override
+    public void evaluate(ITestResult testResult){
         if (etb.isBuilt()) {
             LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
         } else {

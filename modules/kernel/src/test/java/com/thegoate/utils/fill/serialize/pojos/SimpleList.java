@@ -24,22 +24,27 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+
 package com.thegoate.utils.fill.serialize.pojos;
 
 import java.util.List;
+
+import com.thegoate.utils.fill.serialize.GoateSource;
 
 /**
  * Created by Eric Angeli on 8/1/2019.
  */
 public class SimpleList {
-//    @ListType( type = String.class)
-private List<Object> theList;
 
-    public List<Object> getTheList() {
-        return theList;
-    }
+	//    @ListType( type = String.class)
+	@GoateSource(source = RootSource.class, key = "##")
+	private List<Object> theList;
 
-    public void setTheList(List<Object> theList) {
-        this.theList = theList;
-    }
+	public List<Object> getTheList() {
+		return theList;
+	}
+
+	public void setTheList(List<Object> theList) {
+		this.theList = theList;
+	}
 }

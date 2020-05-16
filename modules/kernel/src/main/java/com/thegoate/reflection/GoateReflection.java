@@ -101,6 +101,9 @@ public class GoateReflection {
         return p;
     }
 
+    public boolean isPrimitiveOrNumerical(Object o){
+        return o!=null && (isPrimitive(o.getClass()) || o instanceof Number);
+    }
     public boolean isPrimitive(Class c) {
         return c.equals(Boolean.class) || c.equals(Boolean.TYPE)
                 || c.equals(Byte.class) || c.equals(Byte.TYPE)

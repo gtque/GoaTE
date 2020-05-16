@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * The manager for the collection of test data.
  * Created by gtque on 4/19/2017.
  */
-public class Goate {
+public class Goate implements HealthMonitor{
     Map<String, Object> data = new ConcurrentHashMap<>();
     Interpreter dictionary;
     boolean increment = true;
@@ -108,6 +108,10 @@ public class Goate {
         return this;
     }
 
+    public boolean filterOnKey(String key){
+        return key.contains("##");
+    }
+
     public String buildKey(String key) {
         String fullKey = key;
         if (increment) {
@@ -153,30 +157,33 @@ public class Goate {
 
     public <T> T get(String key, Object def, boolean dsl, Class<T> type) {
         Object value = System.getProperty(key);
-        if (value == null) {
-            if (key.equals("username")) {//username is a special key name, in most cases we want to use the one set in the collection
-                //so it is checked first, and then if it is null it, check using the normal flow.
-                value = data.get(key);
-            }
+        if(filterOnKey(key)){
+            value = filter(key.replace("##","[0-9]*"));
+        } else {
             if (value == null) {
-                value = System.getenv(key);
+                if (key.equals("username")) {//username is a special key name, in most cases we want to use the one set in the collection
+                    //so it is checked first, and then if it is null it, check using the normal flow.
+                    value = data.get(key);
+                }
                 if (value == null) {
-                    if (data.containsKey(key)) {
-                        value = data.get(key);
-                    } else if (def != null) {
-                        data.put(key, def);
-                        value = def;
+                    value = System.getenv(key);
+                    if (value == null) {
+                        if (data.containsKey(key)) {
+                            value = data.get(key);
+                        } else if (def != null) {
+                            data.put(key, def);
+                            value = def;
+                        }
                     }
                 }
             }
+            if (value == null && !data.containsKey(key)) {
+                value = def;
+            }
+            if (value != null && dsl) {
+                value = processDSL(key, value);
+            }
         }
-        if (value == null && !data.containsKey(key)) {
-            value = def;
-        }
-        if (value != null && dsl) {
-            value = processDSL(key, value);
-        }
-
         return new GoateReflection().isPrimitive(type) ? doCastPrimitive(value, type) : type.cast(value);
     }
 
@@ -423,6 +430,8 @@ public class Goate {
                     if (new Compare(o).to(gCheck.get(checkKey)).using("==").evaluate()) {
                         found = true;
                         break;
+                    } else {
+                        healthCheck().put("not equal##", checkKey + ": " + o + "!=" + gCheck.get(checkKey));
                     }
                 }
                 if (!found) {

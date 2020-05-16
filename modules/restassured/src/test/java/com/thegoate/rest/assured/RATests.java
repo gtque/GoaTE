@@ -24,6 +24,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
+
 package com.thegoate.rest.assured;
 
 import com.thegoate.Goate;
@@ -37,7 +38,9 @@ import com.thegoate.rest.staff.ApiGet;
 import com.thegoate.simpleserver.SimpleServer;
 import com.thegoate.spring.SpringTestEngine;
 import com.thegoate.staff.Employee;
+
 import io.restassured.response.Response;
+
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -56,202 +59,201 @@ import static org.testng.Assert.assertTrue;
  */
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = SimpleServer.class)
 @TestExecutionListeners(inheritListeners = false, listeners = {
-        DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class})
+	DependencyInjectionTestExecutionListener.class,
+	DirtiesContextTestExecutionListener.class})
 public class RATests extends SpringTestEngine {
 
-    @Test(groups = {"unit"})
-    public void putURL() {
-        Rest rest = new RABasicAuthHeader();
-        Response response = (Response) rest.baseURL(baseURL()).put("hello/world");
-        data.put("response", response);
-        assertEquals(response.statusCode(), 200);
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect("api response>status code,==,200");
-        ExpectEvaluator ev = new ExpectEvaluator(etb);
-        boolean result = ev.evaluate();
-        assertTrue(result, ev.failed());
-    }
+	@Test(groups = {"unit"})
+	public void putURL() {
+		Rest rest = new RABasicAuthHeader();
+		Response response = (Response) rest.baseURL(baseURL()).put("hello/world");
+		data.put("response", response);
+		assertEquals(response.statusCode(), 200);
+		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+		etb.expect("api response>status code,==,200");
+		ExpectEvaluator ev = new ExpectEvaluator(etb);
+		boolean result = ev.evaluate();
+		assertTrue(result, ev.failed());
+	}
 
-    @Test(groups = {"unit"})
-    public void deleteURL() {
-        Rest rest = new RABasicAuthHeader();
-//        LOG.debug("Start", "Calling delete end point");
-        Response response = (Response) rest.baseURL(baseURL()).delete("hello/world");
-        data.put("response", response);
-//        LOG.debug("Called", "Endpoint returned: " + response.getStatusCode());
-        assertEquals(response.statusCode(), 200);
-//        response.getBody().prettyPrint();
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect("api response>status code,==,200");
-        ExpectEvaluator ev = new ExpectEvaluator(etb);
-        boolean result = ev.evaluate();
-        logStatuses(ev, result);
-        assertTrue(result, ev.failed());
-    }
+	@Test(groups = {"unit"})
+	public void deleteURL() {
+		Rest rest = new RABasicAuthHeader();
+		//        LOG.debug("Start", "Calling delete end point");
+		Response response = (Response) rest.baseURL(baseURL()).delete("hello/world");
+		data.put("response", response);
+		//        LOG.debug("Called", "Endpoint returned: " + response.getStatusCode());
+		assertEquals(response.statusCode(), 200);
+		//        response.getBody().prettyPrint();
+		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+		etb.expect("api response>status code,==,200");
+		ExpectEvaluator ev = new ExpectEvaluator(etb);
+		boolean result = ev.evaluate();
+		logStatuses(ev, result);
+		assertTrue(result, ev.failed());
+	}
 
-    @Test(groups = {"unit"})
-    public void getURL() {
-        Rest rest = new RABasicAuthHeader();
-        Response response = (Response) rest.baseURL(baseURL()).get("bump/count");
-        data.put("response", response);
-        assertEquals(response.statusCode(), 200);
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect("api response>status code,==,200");
-        ExpectEvaluator ev = new ExpectEvaluator(etb);
-        boolean result = ev.evaluate();
-        assertTrue(result, ev.failed());
-    }
+	@Test(groups = {"unit"})
+	public void getURL() {
+		Rest rest = new RABasicAuthHeader();
+		Response response = (Response) rest.baseURL(baseURL()).get("bump/count");
+		data.put("response", response);
+		assertEquals(response.statusCode(), 200);
+		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+		etb.expect("api response>status code,==,200");
+		ExpectEvaluator ev = new ExpectEvaluator(etb);
+		boolean result = ev.evaluate();
+		assertTrue(result, ev.failed());
+	}
 
-    @Test(groups = {"unit"})
-    public void premal(){
-        Rest rest = new RestAssured();
-        Response response = (Response) rest.baseURL(baseURL()).get("breakingthings");
-        data.put("response", response);
-        data.put("expected", "{\n" +
-                "    \"title\": \"Unprocessable Entity\",\n" +
-                "    \"status\": 422,\n" +
-                "    \"detail\": \"Input data was invalid. See exceptions for details.\",\n" +
-                "    \"exceptions\": [\n" +
-                "        {\n" +
-                "            \"code\": \"API_VALIDATION_ERROR\",\n" +
-                "            \"message\": \"numeric value out of bounds (<18 digits>.<2 digits> expected)\",\n" +
-                "            \"field\": \"amount\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}");
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        etb.expect("api response>body as a string,isEqualIgnoreFields,o::expected");
-        ExpectEvaluator ev = new ExpectEvaluator(etb);
-        boolean result = ev.evaluate();
-        assertTrue(result, ev.failed());
-    }
+	@Test(groups = {"unit"})
+	public void premal() {
+		Rest rest = new RestAssured();
+		Response response = (Response) rest.baseURL(baseURL()).get("breakingthings");
+		data.put("response", response);
+		data.put("expected", "{\n" +
+			"    \"title\": \"Unprocessable Entity\",\n" +
+			"    \"status\": 422,\n" +
+			"    \"detail\": \"Input data was invalid. See exceptions for details.\",\n" +
+			"    \"exceptions\": [\n" +
+			"        {\n" +
+			"            \"code\": \"API_VALIDATION_ERROR\",\n" +
+			"            \"message\": \"numeric value out of bounds (<18 digits>.<2 digits> expected)\",\n" +
+			"            \"field\": \"amount\"\n" +
+			"        }\n" +
+			"    ]\n" +
+			"}");
+		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+		etb.expect("api response>body as a string,isEqualIgnoreFields,o::expected");
+		ExpectEvaluator ev = new ExpectEvaluator(etb);
+		boolean result = ev.evaluate();
+		assertTrue(result, ev.failed());
+	}
 
-    @Test(groups = {"unit"})
-    public void debugExtraLines() {
-        Response response = (Response) new RestCall()
-                .baseURL(baseURL())
-//                .get("/".concat(eut("endpoint.base","api")).concat("/payment-advice/{paymentAdviceId}"));
-                .get("hello/world");
-        data.put("response", response);
+	@Test(groups = {"unit"})
+	public void debugExtraLines() {
+		Response response = (Response) new RestCall()
+			.baseURL(baseURL())
+			//                .get("/".concat(eut("endpoint.base","api")).concat("/payment-advice/{paymentAdviceId}"));
+			.get("hello/world");
+		data.put("response", response);
 
-//        assertEquals(response.statusCode(), 200);
-//        etb.expect("api response>status code,==,200");
-//        Employee callAnotherURL = new CallAnotherURL().baseURL(baseURL());
-//        expect(new Expectation(data).actual(response.statusCode()).is("==").expected(200));
-        expect(Expectation.build()
-                .actual(RestResult.statusCode)
-                .from(response)
-                .isEqualTo(200));
-    }
+		//        assertEquals(response.statusCode(), 200);
+		//        etb.expect("api response>status code,==,200");
+		//        Employee callAnotherURL = new CallAnotherURL().baseURL(baseURL());
+		//        expect(new Expectation(data).actual(response.statusCode()).is("==").expected(200));
+		expect(Expectation.build()
+			.actual(RestResult.statusCode)
+			.from(response)
+			.isEqualTo(200));
+	}
 
+	@Test(groups = {"unit"})
+	public void getURLRestWithExpectedWorker() {
+		Response response = (Response) new RestCall()
+			.baseURL(baseURL())
+			//                .get("/".concat(eut("endpoint.base","api")).concat("/payment-advice/{paymentAdviceId}"));
+			.get("hello/world");
+		data.put("response", response);
 
-    @Test(groups = {"unit"})
-    public void getURLRestWithExpectedWorker() {
-        Response response = (Response) new RestCall()
-                .baseURL(baseURL())
-//                .get("/".concat(eut("endpoint.base","api")).concat("/payment-advice/{paymentAdviceId}"));
-                .get("hello/world");
-        data.put("response", response);
+		//        assertEquals(response.statusCode(), 200);
+		//        etb.expect("api response>status code,==,200");
+		Employee callAnotherURL = new CallAnotherURL().baseURL(baseURL());
+		expect(new Expectation(data).actual(response.statusCode()).is("==").expected(200));
+		expect(Expectation.build()
+			.actual(RestResult.statusCode)
+			.from(response)
+			.isEqualTo(200));
+		expect(Expectation.build()
+			.actual(RestResult.statusCode)
+			.from(response)
+			.isNotEqualTo(RestResult.statusCode)
+			.fromExpected("{\"status code\": 201}"));
+		expect(Expectation.build()
+			.actual(RestResult.bodyAsAString)
+			.from(response)
+			.isNotEqualTo(RestResult.bodyAsAString)
+			.fromExpected(callAnotherURL));
+		expect(Expectation.build()
+			.actual(RestResult.statusCode)
+			.from(response)
+			.isEqualTo(RestResult.statusCode)
+			.fromExpected(callAnotherURL));
+		expect(Expectation.build()
+			.actual(200)
+			.isEqualTo(RestResult.statusCode)
+			.fromExpected(callAnotherURL));
+	}
 
-//        assertEquals(response.statusCode(), 200);
-//        etb.expect("api response>status code,==,200");
-        Employee callAnotherURL = new CallAnotherURL().baseURL(baseURL());
-        expect(new Expectation(data).actual(response.statusCode()).is("==").expected(200));
-        expect(Expectation.build()
-                .actual(RestResult.statusCode)
-                .from(response)
-                .isEqualTo(200));
-        expect(Expectation.build()
-                .actual(RestResult.statusCode)
-                .from(response)
-                .isNotEqualTo(RestResult.statusCode)
-                .fromExpected("{\"status code\": 201}"));
-        expect(Expectation.build()
-                .actual(RestResult.bodyAsAString)
-                .from(response)
-                .isNotEqualTo(RestResult.bodyAsAString)
-                .fromExpected(callAnotherURL));
-        expect(Expectation.build()
-                .actual(RestResult.statusCode)
-                .from(response)
-                .isEqualTo(RestResult.statusCode)
-                .fromExpected(callAnotherURL));
-        expect(Expectation.build()
-                .actual(200)
-                .isEqualTo(RestResult.statusCode)
-                .fromExpected(callAnotherURL));
-    }
+	@Test(groups = {"unit"})
+	public void getURLByEmployee() {
+		Goate d = new Goate().put("base url", baseURL()).put("end point", "hello/world");
+		Employee e = new ApiGet().init(d);
+		Response response = (Response) e.work();
+		assertEquals(response.statusCode(), 200);
+		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(d);
+		etb.expect("api response>status code,==,200");
+		ExpectEvaluator ev = new ExpectEvaluator(etb);
+		boolean result = ev.evaluate();
+		assertTrue(result, ev.failed());
+	}
 
-    @Test(groups = {"unit"})
-    public void getURLByEmployee() {
-        Goate d = new Goate().put("base url", baseURL()).put("end point", "hello/world");
-        Employee e = new ApiGet().init(d);
-        Response response = (Response) e.work();
-        assertEquals(response.statusCode(), 200);
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(d);
-        etb.expect("api response>status code,==,200");
-        ExpectEvaluator ev = new ExpectEvaluator(etb);
-        boolean result = ev.evaluate();
-        assertTrue(result, ev.failed());
-    }
+	@Test(groups = {"unit"})
+	public void testRestResultBodyAsAString() {
+		String expected = "{\"greeting\":\"hello\"}";
+		Object result = new RestCall().baseURL(baseURL())
+			.get("hello/world");
+		expect(Expectation.build()
+			.actual(RestResult.statusCode)
+			.from(result)
+			.isEqualTo(200));
+		expect(Expectation.build()
+			.actual(RestResult.bodyAsAString)
+			.from(result)
+			.isEqualTo(expected));
+		evaluate();
+		assertEquals(getEv().passes().size(), 2);
+	}
 
-    @Test(groups = {"unit"})
-    public void testRestResultBodyAsAString() {
-        String expected = "{\"greeting\":\"hello\"}";
-        Object result = new RestCall().baseURL(baseURL())
-                .get("hello/world");
-        expect(Expectation.build()
-                .actual(RestResult.statusCode)
-                .from(result)
-                .isEqualTo(200));
-        expect(Expectation.build()
-                .actual(RestResult.bodyAsAString)
-                .from(result)
-                .isEqualTo(expected));
-        evaluate();
-        assertEquals(getEv().passes().size(), 2);
-    }
+	@Test(groups = {"unit"})
+	public void testGetRestBasicAuthHeader() {
+		Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
+			.get("hello/auth");
+		expect(Expectation.build()
+			.actual("user")
+			.from(result)
+			.isEqualTo("fred"));
+		expect(Expectation.build()
+			.actual("password")
+			.from(result)
+			.isEqualTo("rogers"));
+	}
 
-    @Test(groups = {"unit"})
-    public void testGetRestBasicAuthHeader() {
-        Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
-                .get("hello/auth");
-        expect(Expectation.build()
-                .actual("user")
-                .from(result)
-                .isEqualTo("fred"));
-        expect(Expectation.build()
-                .actual("password")
-                .from(result)
-                .isEqualTo("rogers"));
-    }
+	@Test(groups = {"unit"})
+	public void testDeleteRestBasicAuthHeader() {
+		Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
+			.delete("hello/auth");
+		expect(Expectation.build()
+			.actual("user")
+			.from(result)
+			.isEqualTo("fred"));
+		expect(Expectation.build()
+			.actual("password")
+			.from(result)
+			.isEqualTo("rogers"));
+	}
 
-    @Test(groups = {"unit"})
-    public void testDeleteRestBasicAuthHeader() {
-        Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
-                .delete("hello/auth");
-        expect(Expectation.build()
-                .actual("user")
-                .from(result)
-                .isEqualTo("fred"));
-        expect(Expectation.build()
-                .actual("password")
-                .from(result)
-                .isEqualTo("rogers"));
-    }
-
-    @Test(groups = {"unit"})
-    public void testPutRestBasicAuthHeader() {
-        Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
-                .put("hello/auth");
-        expect(Expectation.build()
-                .actual("user")
-                .from(result)
-                .isEqualTo("fred"));
-        expect(Expectation.build()
-                .actual("password")
-                .from(result)
-                .isEqualTo("rogers"));
-    }
+	@Test(groups = {"unit"})
+	public void testPutRestBasicAuthHeader() {
+		Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
+			.put("hello/auth");
+		expect(Expectation.build()
+			.actual("user")
+			.from(result)
+			.isEqualTo("fred"));
+		expect(Expectation.build()
+			.actual("password")
+			.from(result)
+			.isEqualTo("rogers"));
+	}
 }

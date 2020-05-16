@@ -31,6 +31,7 @@ import com.thegoate.expect.Expectation;
 import com.thegoate.expect.conditional.ConditionalBuilder;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
 
 import java.util.List;
 
@@ -61,5 +62,6 @@ public interface TestNG {
     TestNG evalPeriod(long periodMS);
     TestNG evalTimeout(long periodMS);
     void evaluate();
+    void evaluate(ITestResult testResult);
     TestNG clearExpectations();
 }

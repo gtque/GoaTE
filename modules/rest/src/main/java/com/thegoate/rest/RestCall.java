@@ -113,6 +113,11 @@ public class RestCall {
         return this;
     }
 
+    public RestCall configure(Object config) {
+        definition.put("config", config);
+        return this;
+    }
+
     public Object get(String endpoint) {
         definition.put("end point", endpoint);
         return execute("get");

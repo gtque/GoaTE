@@ -102,7 +102,8 @@ public class CompareJsonTests extends TestNGEngineMethodDL {
 				.add("json1", JSONObject.NULL)
 				.add("json2", true)
 				.add("operator", "isEmpty")
-				.add("expected", true));
+				.add("expected", true))
+		;
 	}
 
 	@Test(groups = {"unit"})

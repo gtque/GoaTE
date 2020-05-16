@@ -71,7 +71,7 @@ public class RestAssured extends Rest implements RASpec {
 
     public static RequestSpecification init(RequestSpecification specification, RASpec spec) {
         specification = specification == null ? given() : specification;
-        RestAssuredConfig rac = new RestAssuredConfig();
+        RestAssuredConfig rac = spec.getConfig() == null?new RestAssuredConfig():(RestAssuredConfig)spec.getConfig();
         PrintStream streamer = getPrintStream(spec.getLog());
         LogConfig lc = new LogConfig(streamer, true);
         SSLConfig sslc = new SSLConfig().allowAllHostnames().relaxedHTTPSValidation();

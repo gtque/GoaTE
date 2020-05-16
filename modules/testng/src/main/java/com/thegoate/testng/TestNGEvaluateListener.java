@@ -86,7 +86,7 @@ public class TestNGEvaluateListener implements IInvokedMethodListener, ITestList
                 TestNG test = TestMap.tests.get(result.getTestName());
                 try {
                     if (test != null) {
-                        test.evaluate();
+                        test.evaluate(result);
                     }
                 } catch (Throwable t) {
                     result.setStatus(ITestResult.FAILURE);

@@ -77,7 +77,11 @@ public abstract class ConditionalBuilder {
     public Object getActual() {
         Object a = actual;
         if(from!=null){
-            a = new Get(actual).from(from);
+            if(!(""+actual).contains("*")&&!(""+actual).contains("+")) {
+                a = new Get(actual).from(from);
+            } else {
+                a = from;
+            }
         }
         return a;
     }

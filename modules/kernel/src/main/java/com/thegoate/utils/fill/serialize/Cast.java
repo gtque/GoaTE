@@ -95,12 +95,6 @@ public class Cast extends UnknownUtilType {
     }
 
     protected Object buildFromCastUtil(Class type, Object value){
-//        try{
-//            LOGGER.debug("Cast", "is array: " + type.isArray());
-//            return type.cast(value);
-//        }catch (Throwable t){
-//            LOGGER.debug("Cast", "Failed to cast to: "+type.getName()+", trying to lookup cast utility.");
-//        }
         CastUtility caster = (CastUtility)buildUtil(type, CastUtil.class, value);
         if(caster==null){
             LOGGER.error("Cast","Could not build: " + type.getName() +". You may need to implement a CastUtility to support that object type.");

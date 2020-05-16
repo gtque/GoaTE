@@ -32,8 +32,11 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Loads the run data and builds the runs.
@@ -64,7 +67,6 @@ public class TestNGRunFactory {
         if (runs.size() == 0) {
             runs.add(null);
         }
-        runs = filter(runs);
         if (constants.size() > 0) {
             for (Goate data : runs) {
                 int i = -42;
@@ -79,6 +81,7 @@ public class TestNGRunFactory {
                 //a constant can be overloaded by setting it in the run data.
             }
         }
+        runs = filter(runs);
         if(runs.size()==1&&runs.get(0)==null){
             runs = new ArrayList<>();
         }
@@ -105,6 +108,36 @@ public class TestNGRunFactory {
         return filtered;
     }
 
+    protected static boolean checkRunGroups(Object runData, String[] runGroups) {
+        boolean check = true;
+        if(runGroups!=null&&runGroups.length>0) {
+            Object run = runData;
+            if(runData!=null && runData instanceof Goate){
+                run = ((Goate)runData).get("groups");
+            }
+            if(run != null) {
+                if(run instanceof String) {
+                    String runsIn = ("-r-" + run + "-r-").replace(",", "-r-,-r-").replaceAll("\\s*-r-\\s*","-r-");
+                    check = Arrays.stream(runGroups).parallel().anyMatch(runsIn::contains);
+                } else {
+                    check = false;
+                }
+            } else {
+                check = false;
+            }
+        }
+        return check;
+    }
+    protected static List<Goate> filterRunGroups(List<Goate> runs){
+        List<Goate> filtered = runs;
+        String runId = "" + GoateUtils.getProperty("runGroups", "empty::");
+        if (!runId.equals("null") && !runId.isEmpty()) {
+            String[] runIds = ("-r-"+runId.replace(",","-r-,-r-")+"-r-").replaceAll("\\s*-r-\\s*","-r-").split(",");
+            filtered = runs.stream().filter(run -> checkRunGroups(run,runIds)).collect(Collectors.toList());
+        }
+
+        return filtered;
+    }
     protected static List<Goate> filter(List<Goate> runs) {
         List<Goate> filtered = new ArrayList<>();
         String runId = "" + GoateUtils.getProperty("run", "empty::");
@@ -152,6 +185,6 @@ public class TestNGRunFactory {
                 }
             }
         }
-        return filtered;
+        return filterRunGroups(filtered);
     }
 }

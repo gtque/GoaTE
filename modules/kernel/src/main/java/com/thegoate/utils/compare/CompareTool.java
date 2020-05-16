@@ -30,6 +30,7 @@ package com.thegoate.utils.compare;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.fill.serialize.GoateCastUtility;
 
 /**
  * Base class for Compare Utilities. Adds logger, and class level variables.
@@ -45,6 +46,8 @@ public abstract class CompareTool implements CompareUtility{
     protected boolean nested = false;
     protected Goate health = new Goate();
     protected Goate data;
+    protected GoateCastUtility caster = null;
+    protected boolean triedOnce = false;
 
     public CompareTool(Object actual){
         this.actual = actual;
@@ -59,16 +62,21 @@ public abstract class CompareTool implements CompareUtility{
         return nested;
     }
 
+    public CompareTool triedOnce(boolean triedOnce){
+        this.triedOnce = triedOnce;
+        return this;
+    }
+
     protected boolean tryExpectedType(String op){
         boolean result = false;
-        if(!isNested()) {
+        if(!isNested()&&!triedOnce) {
             Compare compare = new Compare(expected);
             compare.using(op).to(actual);
             CompareUtility cu = compare.getTool();
             if (cu instanceof CompareTool) {
                 ((CompareTool) cu).nested();
             }
-            result = compare.actual(actual).to(expected).evaluate();
+            result = compare.triedOnce(true).actual(actual).to(expected).evaluate();
         }
         return result;
     }
