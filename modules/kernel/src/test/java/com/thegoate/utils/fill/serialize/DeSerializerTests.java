@@ -55,6 +55,37 @@ import static org.testng.Assert.*;
 public class DeSerializerTests {
 
 	@Test(groups = {"unit"})
+	public void testListRootPojo() {
+		String ja = "[\"premal\",\"jonathan\",\"anthony\"]";
+		Goate g = new ToGoate(ja).convert();
+		SimpleList data = new DeSerializer().data(g).from(RootSource.class).build(SimpleList.class);
+		data.toString();
+		List<String> expected = new ArrayList<>();
+		expected.add("premal");
+		expected.add("jonathan");
+		expected.add("anthony");
+
+		assertEquals(data.getTheList(), expected);
+	}
+
+	@Test(groups = {"unit"})
+	public void testNestedObjectListRootPojo() {
+		String ja = "[{\"values\":[{\"value\":1},{\"value\":2}]},{\"values\":[{\"value\":3},{\"value\":4}]}]";
+		Goate g = new ToGoate(ja).convert();
+		ComplexList data = new DeSerializer().data(g).from(RootSource.class).build(ComplexList.class);
+		data.toString();
+		List<NestedList> expected = new ArrayList<>();
+		expected.add(new NestedList().addValue(new SimpleInt().setValue(1)).addValue(new SimpleInt().setValue(2)));
+		expected.add(new NestedList().addValue(new SimpleInt().setValue(3)).addValue(new SimpleInt().setValue(4)));
+
+		assertEquals(data.getTheList().get(0).getTheList().get(0).getValue(),1);
+		assertEquals(data.getTheList().get(0).getTheList().get(1).getValue(),2);
+		assertEquals(data.getTheList().get(1).getTheList().get(0).getValue(),3);
+		assertEquals(data.getTheList().get(1).getTheList().get(1).getValue(),4);
+//		assertEquals(data.getTheList(), expected);
+	}
+
+	@Test(groups = {"unit"})
 	public void testListPojo() {
 		String ja = "[\"premal\",\"jonathan\",\"anthony\"]";
 		JSONObject jo = new JSONObject();
@@ -124,7 +155,7 @@ public class DeSerializerTests {
 		data.put("nested.big decimal", "3.14159");
 		data.put("nested.double D", "42.42");
 		data.put("nested.long l", 42L);
-		ComplexPojo pojo = (ComplexPojo) data.get("complex pojo", "pojo::complex pojo,simple expected");//new DeSerializer().data(data).from(SimpleSource.class).build(ComplexPojo.class);
+		ComplexPojo pojo = data.get("complex pojo", "pojo::complex pojo,simple expected", ComplexPojo.class);//new DeSerializer().data(data).from(SimpleSource.class).build(ComplexPojo.class);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		assertEquals(pojo.getDate(), LocalDate.parse("2009-11-24", formatter));
 		assertEquals(pojo.getNested().getFieldName(), "Hello, world!");
@@ -138,6 +169,12 @@ public class DeSerializerTests {
 		assertTrue(pojo.getNested().isBool());
 	}
 
+	String boolean_json = "{\"isField\":true}";
+	@Test(groups = {"unit"})
+	public void testIsInTheName(){
+		Object result = new Serializer<>(new Bojo(true), DefaultSource.class).to(new JsonString());
+		assertEquals(new Get("isField").from(result), true);
+	}
 	@Test(groups = {"unit", "deserialize"})
 	public void nestedDeserializeGoateTest() {
 		Goate data = new Goate();
