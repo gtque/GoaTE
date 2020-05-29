@@ -26,6 +26,8 @@
  */
 package com.thegoate.utils.fill.serialize;
 
+import static com.thegoate.utils.fill.serialize.Cereal.findGoateSource;
+
 import com.thegoate.Goate;
 
 import java.lang.reflect.Field;
@@ -70,5 +72,17 @@ public abstract class GoateCastUtility implements CastUtility {
     public CastUtility field(Field field) {
         this.field = field;
         return this;
+    }
+
+    public String fieldName(){
+        String name = null;
+        if(field!=null){
+            name = field.getName();
+            GoateSource source = findGoateSource(field, dataSource);
+            if(source!=null){
+                name = source.key();
+            }
+        }
+        return name;
     }
 }

@@ -302,8 +302,10 @@ public class GoateReflection {
     public void findFields(Class theClass, Map<String, Field> fieldMap) {
         if (fieldMap != null) {
             for (Field f : theClass.getDeclaredFields()) {
-                if (!f.getName().contains("$jacocoData")) {
+                if (!f.getName().contains("$jacocoData") && f.getType()!=theClass) {
                     //need to specify a list of things to ignore, in a property file perhaps?
+                    //need to ignore nested objects of the same type to avoid recursion issues,
+                    //it may still be possible if the object is not the same type, but some object in the nested one does.
                     fieldMap.put(f.getName(), f);
                 }
             }

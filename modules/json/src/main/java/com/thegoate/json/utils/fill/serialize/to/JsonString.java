@@ -26,9 +26,14 @@
  */
 package com.thegoate.json.utils.fill.serialize.to;
 
+import com.thegoate.Goate;
+import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.to.SerializeTo;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.togoate.ToGoate;
+
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
@@ -46,6 +51,44 @@ public class JsonString extends SerializeTo {
 
     @Override
     public Object mapFields(String base, Class cereal, Object so){
+        Goate value;
+        if(!(so instanceof Goate)){
+            value = new ToGoate(so).convert();
+        } else {
+            value = (Goate) so;
+        }
+        GoateReflection gr = new GoateReflection();
+        Map<String, Field> fields = gr.findFields(cereal);
+        for (Map.Entry<String, Field> field : fields.entrySet()) {
+            GoateSource gs = findGoateSource(field.getValue(), source);
+            String fieldKey = field.getKey();
+            String altKey = fieldKey;
+            if (gs != null) {
+                altKey = gs.key();
+            }
+
+            if(!fieldKey.equals(altKey)) {
+                value.scrubSubKeys(base + "(\\.*[0-9]*\\.*)*"+fieldKey+".*", fieldKey, altKey);
+                fieldKey = altKey;
+//                value = value.replace("\""+fieldKey+"\"","\""+altKey+"\"");
+            }
+            if(!gr.isPrimitive(field.getValue().getType())){
+                //have to drop the high level entry, otherwise nested fields may not be scrubbed properly.
+                dropHighLevelGoateEntry(value, base + "(\\.*[0-9]*\\.*)*"+fieldKey);
+                mapFields(base + "(\\.*[0-9]*\\.*)*"+fieldKey, field.getValue().getType(), value);
+            }
+        }
+        return new GoateToJSON(value).convert();
+    }
+
+    private void dropHighLevelGoateEntry(Goate value, String pattern){
+        Goate filtered = value.filterStrict(pattern);
+        for(String key:filtered.keys()){
+            value.drop(key);
+        }
+    }
+
+    public Object mapFields2(String base, Class cereal, Object so){
         String value = ""+ so;
         GoateReflection gr = new GoateReflection();
         Map<String, Field> fields = gr.findFields(cereal);
@@ -56,8 +99,12 @@ public class JsonString extends SerializeTo {
             if (gs != null) {
                 altKey = gs.key();
             }
+
             if(!fieldKey.equals(altKey)) {
                 value = value.replace("\""+fieldKey+"\"","\""+altKey+"\"");
+            }
+            if(!gr.isPrimitive(field.getValue().getType())){
+                value = ""+mapFields2(base, field.getValue().getType(), value);
             }
         }
         return value;

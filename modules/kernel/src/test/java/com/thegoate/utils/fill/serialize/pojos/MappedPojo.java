@@ -24,42 +24,44 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize;
+package com.thegoate.utils.fill.serialize.pojos;
 
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-import com.thegoate.reflection.GoateReflection;
+import java.util.Map;
 
-import java.lang.reflect.Field;
+import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.collections.MapKeyType;
+import com.thegoate.utils.fill.serialize.collections.MapType;
 
 /**
- * Created by Eric Angeli on 7/10/2018.
+ * Created by Eric Angeli on 6/26/2018.
  */
-public class Cereal {
-    private BleatBox LOG = BleatFactory.getLogger(getClass());
-//    protected Class dataSource;
-//
-//    public Cereal from(Class dataSource){
-//        this.dataSource = dataSource;
-//        return this;
-//    }
+@GoatePojo(id = "mapped pojo")
+public class MappedPojo {
 
-    public static GoateSource findGoateSource(Field field, Class dataSource){
-        GoateSource[] annotations = field.getAnnotationsByType(GoateSource.class);
-        GoateSource gs = null;
-        if(dataSource!=null) {
-            for (GoateSource source : annotations) {
-                if (source.source().equals(dataSource)) {
-                    gs = source;
-                    break;
-                }
-            }
-        }
-        return gs;
+    @MapType(type = NestedMap1.class)
+    @MapKeyType(type = String.class)
+    @GoateSource(source = SimpleSource.class, key = "theMap")
+    private Map<String,NestedMap1> someMap;
+
+    @MapType(type = String.class)
+    @MapKeyType(type = String.class)
+    @GoateSource(source = SimpleSource.class, key = "theStringMap")
+    private Map<String, String> someMapOfStrings;
+
+    public Map<String, NestedMap1> getSomeMap() {
+        return someMap;
     }
 
-    protected boolean checkNotPrimitive(Class type){
-        GoateReflection reflection = new GoateReflection();
-        return !(reflection.isPrimitive(type) || (type.equals(String.class)));
+    public void setSomeMap(Map<String, NestedMap1> someMap) {
+        this.someMap = someMap;
+    }
+
+    public Map<String, String> getSomeMapOfStrings() {
+        return someMapOfStrings;
+    }
+
+    public void setSomeMapOfStrings(Map<String, String> someMapOfStrings) {
+        this.someMapOfStrings = someMapOfStrings;
     }
 }

@@ -31,12 +31,15 @@ import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.togoate.ToGoate;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * The manager for the collection of test data.
@@ -317,13 +320,37 @@ public class Goate implements HealthMonitor{
     }
 
     public Goate scrubKeys(String pattern) {
-        Goate scrubbed = new Goate();
+        return scrubKeys(pattern, "");
+    }
+
+    public Goate scrubKeys(String pattern, String sponge) {
+        return scrubSubKeys(".*", pattern, sponge);
+    }
+
+    public Goate scrubSubKeys(String pattern, String subkey, String sponge){
+//        Goate scrubbed = new Goate();
+        List<String> scrubbed = new ArrayList<>();
+        List<String> not_scrubbed = new ArrayList<>();
         if (data != null) {
             for (Map.Entry<String, Object> entry : data.entrySet()) {
-                scrubbed.put(entry.getKey().replaceFirst(pattern, ""), entry.getValue());
+                if(entry.getKey().matches(pattern)) {
+                    scrubbed.add(entry.getKey());
+                    String soap;
+                    if (subkey == null) {
+                        soap = entry.getKey().replaceFirst(pattern, sponge);
+                    } else {
+                        soap = entry.getKey().replaceFirst(subkey, sponge);
+                    }
+                    this.put(soap, entry.getValue());
+                    not_scrubbed.add(soap);
+                }
             }
+            scrubbed.parallelStream()
+                .filter(scrub -> !not_scrubbed.contains(scrub))
+                .collect(Collectors.toList())
+                .parallelStream().forEach(scrub -> drop(scrub));
         }
-        return scrubbed;
+        return this;
     }
 
     public Goate filterAndSplitKeyValuePairs(String filter) {

@@ -28,8 +28,10 @@
 package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.Goate;
+import com.thegoate.expect.Expectation;
 import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.json.utils.tojson.GoateToJSON;
+import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.fill.serialize.pojos.*;
 import com.thegoate.utils.fill.serialize.primitives.CastBoolean;
 import com.thegoate.utils.get.Get;
@@ -52,7 +54,7 @@ import static org.testng.Assert.*;
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-public class DeSerializerTests {
+public class DeSerializerTests extends TestNGEngineMethodDL {
 
 	@Test(groups = {"unit"})
 	public void testListRootPojo() {
@@ -78,11 +80,11 @@ public class DeSerializerTests {
 		expected.add(new NestedList().addValue(new SimpleInt().setValue(1)).addValue(new SimpleInt().setValue(2)));
 		expected.add(new NestedList().addValue(new SimpleInt().setValue(3)).addValue(new SimpleInt().setValue(4)));
 
-		assertEquals(data.getTheList().get(0).getTheList().get(0).getValue(),1);
-		assertEquals(data.getTheList().get(0).getTheList().get(1).getValue(),2);
-		assertEquals(data.getTheList().get(1).getTheList().get(0).getValue(),3);
-		assertEquals(data.getTheList().get(1).getTheList().get(1).getValue(),4);
-//		assertEquals(data.getTheList(), expected);
+		assertEquals(data.getTheList().get(0).getTheList().get(0).getValue(), 1);
+		assertEquals(data.getTheList().get(0).getTheList().get(1).getValue(), 2);
+		assertEquals(data.getTheList().get(1).getTheList().get(0).getValue(), 3);
+		assertEquals(data.getTheList().get(1).getTheList().get(1).getValue(), 4);
+		//		assertEquals(data.getTheList(), expected);
 	}
 
 	@Test(groups = {"unit"})
@@ -169,12 +171,16 @@ public class DeSerializerTests {
 		assertTrue(pojo.getNested().isBool());
 	}
 
-	String boolean_json = "{\"isField\":true}";
-	@Test(groups = {"unit"})
-	public void testIsInTheName(){
-		Object result = new Serializer<>(new Bojo(true), DefaultSource.class).to(new JsonString());
-		assertEquals(new Get("isField").from(result), true);
-	}
+	//	jackson has an interesting behavior that occurs when the field name starts with "is" and so does the getter/setter.
+	//	there are ways to work around this that do not require changes to the goate framework, but
+	//	if someone finds those workarounds awkward and wants Goate to handle it, this will need to be implemented to test it.
+	//	String boolean_json = "{\"isField\":true}";
+	//	@Test(groups = {"unit"})
+	//	public void testIsInTheName(){
+	//		Object result = new Serializer<>(new Bojo(true), DefaultSource.class).to(new JsonString());
+	//		assertEquals(new Get("isField").from(result), true);
+	//	}
+
 	@Test(groups = {"unit", "deserialize"})
 	public void nestedDeserializeGoateTest() {
 		Goate data = new Goate();
@@ -273,14 +279,66 @@ public class DeSerializerTests {
 	}
 
 	@Test(groups = {"unit"})
-	public void nestedMapped() {
+	public void serializeMapFromJson() {
+		String json = "{\n" +
+			" \"theMap\":{\n" +
+			"  \"entry1\":{\"fieldI\":42,\"fieldB\":false,\"fieldO\":{\"fieldS\":\"Hello\", \"fieldS2\":\"World\", \"fieldS3\":\"!\"}},\n" +
+			"  \"entry2\":{\"fieldI\":84,\"fieldB\":false,\"fieldO\":{\"fieldS\":\"Mr.\"}},\n" +
+			"  \"entry3\":{\"fieldI\":168,\"fieldB\":true,\"fieldO\":{\"fieldS\":\"Pickles\"}}\n" +
+			" },\n" +
+			" \"theStringMap\":{\n" +
+			"  \"name\": \"Mr. Chompers\",\n" +
+			"  \"job\": \"Being Cute\",\n" +
+			"  \"favorite animal\": \"Kittens\"\n" +
+			" }" +
+			"}";
+		Goate data = new ToGoate(json).convert();
+		MappedPojo pojo = new DeSerializer().data(data).from(SimpleSource.class).build(MappedPojo.class);
+		assertEquals(pojo.getSomeMapOfStrings().get("name"), "Mr. Chompers");
+		assertEquals(pojo.getSomeMap().get("entry1").getFieldO().get("fieldS"), "Hello");
+		assertEquals(pojo.getSomeMap().get("entry1").getFieldO().get("fieldS2"), "World");
+		assertEquals(pojo.getSomeMap().get("entry1").getFieldO().get("fieldS3"), "!");
+		assertEquals(pojo.getSomeMap().get("entry1").isFieldB(), false);
+		assertEquals(pojo.getSomeMap().get("entry1").getFieldI(), 42);
+		assertEquals(pojo.getSomeMap().get("entry2").getFieldO().get("fieldS"), "Mr.");
+		assertEquals(pojo.getSomeMap().get("entry2").isFieldB(), false);
+		assertEquals(pojo.getSomeMap().get("entry2").getFieldI(), 84);
+		assertEquals(pojo.getSomeMap().get("entry3").getFieldO().get("fieldS"), "Pickles");
+		assertEquals(pojo.getSomeMap().get("entry3").isFieldB(), true);
+		assertEquals(pojo.getSomeMap().get("entry3").getFieldI(), 168);
+		assertEquals(pojo.getSomeMapOfStrings().get("name"), "Mr. Chompers");
+		assertEquals(pojo.getSomeMapOfStrings().get("favorite animal"), "Kittens");
+		assertEquals(pojo.getSomeMapOfStrings().get("job"), "Being Cute");
+		String jstring = "" + new Serializer<>(pojo, SimpleSource.class).to(new JsonString());
+		expect(Expectation.build()
+			.actual(jstring)
+			.isEqualTo(json));
+	}
+
+	@Test(groups = {"unit"})
+	public void nestedSource() {
 		SimpleNested pojo2 = new SimpleNested();
 		SimpleInt si = new SimpleInt();
 		si.setValue(42);
 		pojo2.setInnerField(si);
 		String jstring = "" + new Serializer<>(pojo2, Cheese.class).to(new JsonString());
 		System.out.println(jstring);
-		assertEquals(new Get("chuck.value").from(jstring), 42);
+		assertEquals(new Get("chuck.bartowski").from(jstring), 42);
+	}
+
+	@Test(groups = {"unit"})
+	public void nestedSourcesSameDefaultNameButDifferentSourceName() {
+		NotSoSimpleNested pojo2 = new NotSoSimpleNested();
+		SimpleInt si = new SimpleInt();
+		si.setValue(42);
+		pojo2.setInnerField(si);
+		SimpleDouble sd = new SimpleDouble();
+		sd.setValue(3.14159D);
+		pojo2.setInnerDoubleField(sd);
+		String jstring = "" + new Serializer<>(pojo2, Cheese.class).to(new JsonString());
+		System.out.println(jstring);
+		assertEquals(new Get("chuck.bartowski").from(jstring), 42);
+		assertEquals(new Get("charles.yeager").from(jstring), 3.14159D);
 	}
 
 	@Test(groups = {"unit"})

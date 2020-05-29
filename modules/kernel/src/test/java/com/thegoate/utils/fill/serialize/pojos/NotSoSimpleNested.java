@@ -24,42 +24,48 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize;
+package com.thegoate.utils.fill.serialize.pojos;
 
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-import com.thegoate.reflection.GoateReflection;
+import java.time.LocalDate;
 
-import java.lang.reflect.Field;
+import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
 
 /**
- * Created by Eric Angeli on 7/10/2018.
+ * Created by Eric Angeli on 4/22/2019.
  */
-public class Cereal {
-    private BleatBox LOG = BleatFactory.getLogger(getClass());
-//    protected Class dataSource;
-//
-//    public Cereal from(Class dataSource){
-//        this.dataSource = dataSource;
-//        return this;
-//    }
+@GoatePojo
+public class NotSoSimpleNested {
+    @GoateSource(source=Cheese.class, key="chuck")
+    private SimpleInt innerField;
 
-    public static GoateSource findGoateSource(Field field, Class dataSource){
-        GoateSource[] annotations = field.getAnnotationsByType(GoateSource.class);
-        GoateSource gs = null;
-        if(dataSource!=null) {
-            for (GoateSource source : annotations) {
-                if (source.source().equals(dataSource)) {
-                    gs = source;
-                    break;
-                }
-            }
-        }
-        return gs;
+    @GoateSource(source=Cheese.class, key="charles")
+    private SimpleDouble innerDoubleField;
+
+    private LocalDate ld;
+
+
+    public SimpleInt getInnerField() {
+        return innerField;
     }
 
-    protected boolean checkNotPrimitive(Class type){
-        GoateReflection reflection = new GoateReflection();
-        return !(reflection.isPrimitive(type) || (type.equals(String.class)));
+    public void setInnerField(SimpleInt innerField) {
+        this.innerField = innerField;
+    }
+
+    public LocalDate getLd() {
+        return ld;
+    }
+
+    public void setLd(LocalDate ld) {
+        this.ld = ld;
+    }
+
+    public SimpleDouble getInnerDoubleField() {
+        return innerDoubleField;
+    }
+
+    public void setInnerDoubleField(SimpleDouble innerDoubleField) {
+        this.innerDoubleField = innerDoubleField;
     }
 }

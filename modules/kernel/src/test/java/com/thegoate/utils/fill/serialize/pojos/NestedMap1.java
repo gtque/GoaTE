@@ -24,42 +24,48 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.utils.fill.serialize;
+package com.thegoate.utils.fill.serialize.pojos;
 
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-import com.thegoate.reflection.GoateReflection;
+import java.util.Map;
 
-import java.lang.reflect.Field;
+import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.collections.MapKeyType;
+import com.thegoate.utils.fill.serialize.collections.MapType;
 
 /**
- * Created by Eric Angeli on 7/10/2018.
+ * Created by Eric Angeli on 6/26/2018.
  */
-public class Cereal {
-    private BleatBox LOG = BleatFactory.getLogger(getClass());
-//    protected Class dataSource;
-//
-//    public Cereal from(Class dataSource){
-//        this.dataSource = dataSource;
-//        return this;
-//    }
+@GoatePojo(id = "NestedMap1")
+public class NestedMap1 {
 
-    public static GoateSource findGoateSource(Field field, Class dataSource){
-        GoateSource[] annotations = field.getAnnotationsByType(GoateSource.class);
-        GoateSource gs = null;
-        if(dataSource!=null) {
-            for (GoateSource source : annotations) {
-                if (source.source().equals(dataSource)) {
-                    gs = source;
-                    break;
-                }
-            }
-        }
-        return gs;
+    private int fieldI = -42;
+    private boolean fieldB = true;
+    @MapType(type = String.class)
+    @MapKeyType(type = String.class)
+    private Map<String,String> fieldO;
+
+    public int getFieldI() {
+        return fieldI;
     }
 
-    protected boolean checkNotPrimitive(Class type){
-        GoateReflection reflection = new GoateReflection();
-        return !(reflection.isPrimitive(type) || (type.equals(String.class)));
+    public void setFieldI(int fieldI) {
+        this.fieldI = fieldI;
+    }
+
+    public boolean isFieldB() {
+        return fieldB;
+    }
+
+    public void setFieldB(boolean fieldB) {
+        this.fieldB = fieldB;
+    }
+
+    public Map<String, String> getFieldO() {
+        return fieldO;
+    }
+
+    public void setFieldO(Map<String, String> fieldO) {
+        this.fieldO = fieldO;
     }
 }
