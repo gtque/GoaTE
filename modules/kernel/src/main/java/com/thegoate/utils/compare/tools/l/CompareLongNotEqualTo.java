@@ -32,7 +32,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Compares two longs for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = "!=", type = "long")
+@CompareUtil(operator = "!=", type = Long.class)
 public class CompareLongNotEqualTo extends CompareLongTool {
 
     public CompareLongNotEqualTo(Object actual) {

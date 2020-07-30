@@ -32,7 +32,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Compares two ints for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = ">", type = "int")
+@CompareUtil(operator = ">", type = Integer.class)
 public class CompareIntGreaterThan extends CompareIntTool {
 
     public CompareIntGreaterThan(Object actual) {

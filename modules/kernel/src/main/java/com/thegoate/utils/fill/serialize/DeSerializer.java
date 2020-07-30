@@ -106,7 +106,7 @@ public class DeSerializer extends Cereal{
         return this;
     }
 
-    public DeSerializer data(Map<String, Object> data){
+    public DeSerializer data(Map<String, ?> data){
         return data(new Goate(data));
     }
 

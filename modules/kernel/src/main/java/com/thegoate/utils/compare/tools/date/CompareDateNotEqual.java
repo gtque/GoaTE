@@ -35,7 +35,7 @@ import java.util.Date;
  * Checks if a date is not equal expected date.
  * Created by Eric Angeli on 7/7/2017.
  */
-@CompareUtil(operator = "!=", type = "date")
+@CompareUtil(operator = "!=", type = Date.class)
 public class CompareDateNotEqual extends CompareDate {
     public CompareDateNotEqual(Object actual) {
         super(actual);

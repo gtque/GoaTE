@@ -55,23 +55,23 @@ public abstract class BleatBoxBase implements BleatBox{
     }
 
     protected void setVolume(boolean debug, boolean error, boolean info, boolean trace, boolean warn) {
-        if (warn) {
-            setVolume(Level.WARNING);
-        } else if (error) {
-            setVolume(Level.SEVERE);
+        if (trace) {
+            setVolume(Level.FINE);
+        } else if (debug) {
+            setVolume(Level.CONFIG);
         } else if (info) {
             setVolume(Level.INFO);
-        } else if (trace) {
-            setVolume(Level.FINE);
-        } else if(debug){
-            setVolume(Level.FINEST);
+        } else if (warn) {
+            setVolume(Level.WARNING);
+        } else if(error){
+            setVolume(Level.SEVERE);
         } else {
             setVolume(Level.INFO);
         }
     }
 
     public BleatBox setVolume(Level volume) {
-        volume = BleatLevel.level(volume, loggingClass.getName());
+        this.volume = BleatLevel.level(volume, loggingClass.getName());
         return this;
     }
 

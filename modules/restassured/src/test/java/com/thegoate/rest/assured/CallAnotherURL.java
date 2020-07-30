@@ -29,10 +29,13 @@ package com.thegoate.rest.assured;
 import com.thegoate.rest.RestCall;
 import com.thegoate.staff.Employee;
 
+import io.restassured.internal.RestAssuredResponseImpl;
+import io.restassured.response.Response;
+
 /**
  * Created by Eric Angeli on 11/26/2018.
  */
-public class CallAnotherURL extends Employee {
+public class CallAnotherURL extends Employee<Response> {
     String baseURL;
 
     @Override
@@ -50,8 +53,8 @@ public class CallAnotherURL extends Employee {
         return this;
     }
     @Override
-    protected Object doWork() {
-        RestCall rest = new RestCall().baseURL(baseURL);
-        return rest.patch("bump");
+    protected Response doWork() {
+//        RestCall<Response> rest = new RestCall();//.baseURL(baseURL);
+        return new RestCall<Response>().baseURL(baseURL).patch("bump");
     }
 }

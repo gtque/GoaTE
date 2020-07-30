@@ -33,7 +33,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Checks if a string not contains the given string.
  * Created by Eric Angeli on 2019/03/12.
  */
-@CompareUtil(operator = "notContains", type="String")
+@CompareUtil(operator = "notContains", type = String.class)
 @IsDefault
 public class CompareStringNotContains extends CompareStringTool {
     public CompareStringNotContains(Object actual) {

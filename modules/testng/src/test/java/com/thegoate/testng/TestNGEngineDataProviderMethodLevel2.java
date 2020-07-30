@@ -30,6 +30,8 @@ import com.thegoate.Goate;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.data.StaticDL;
+import com.thegoate.testng.test.DataContainer;
+
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -67,7 +69,8 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
      */
     public Goate[] sample3(){
         Goate[] d = new Goate[2];
-        d[0] = new Goate().put("dl##", new StaticDL().add("a","x").add("Scenario", "use method provider 3."));
+        d[0] = new Goate().put("dl##", new StaticDL().add("a","x").add("Scenario", "use method provider 3."))
+            .put("dl##", new StaticDL().add("a","x").add("Scenario", "use method provider 3."));
         d[1] = new Goate().put("dl##", new StaticDL().add("b","y"));
         return d;
     }
@@ -94,4 +97,25 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
         assertEquals(data.size(), 5);
     }
 
+    @GoateProvider(name = "sample4", container = DataContainer.class)
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void putRunData4(Goate d) throws Exception {
+        assertEquals(data.size(), 4);
+        assertEquals(get("b"),"y");
+        assertEquals(get("a"),"x");
+        put("c", 3);
+        assertEquals(get("c"),3);
+        assertEquals(data.size(), 5);
+    }
+
+    @GoateProvider(name = "mydata2", container = DataContainer.class)
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void putRunData5(Goate d) throws Exception {
+        assertEquals(data.size(), 4);
+        assertEquals(get("b"),"x");
+        assertEquals(get("a"),"y");
+        put("c", 3);
+        assertEquals(get("c"),3);
+        assertEquals(data.size(), 5);
+    }
 }

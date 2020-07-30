@@ -32,7 +32,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Compares two floats for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = ">", type = "double")
+@CompareUtil(operator = ">", type = Double.class)
 public class CompareDoubleGreaterThan extends CompareDoubleTool {
 
     public CompareDoubleGreaterThan(Object actual) {

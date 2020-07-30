@@ -32,10 +32,10 @@ import com.thegoate.Goate;
 import java.util.List;
 
 /**
- * Loads the file specified in from into a string and returns it.
+ * Gets the item from the list.
  * Created by Eric Angeli on 5/5/2017.
  */
-@GetUtil
+@GetUtil(type = List.class)
 public class GetFromList extends GetTool {
 
     public GetFromList() {

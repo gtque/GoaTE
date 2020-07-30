@@ -69,11 +69,8 @@ public abstract class CompareCharTool extends CompareTool implements ParseDetect
 		return result;
 	}
 
-	protected char parseChar(Object value){
-		String v = ""+value;
-		if(v.length()>1){
-			throw new ClassCastException("Problem: "+value+" is not a valid char.");
-		}
-		return v.charAt(0);
+	protected char parseChar(Object o){
+		return new GoateReflection().parseChar(o);
 	}
+
 }

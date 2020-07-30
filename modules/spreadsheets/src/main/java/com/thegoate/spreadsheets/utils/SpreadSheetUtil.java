@@ -56,7 +56,7 @@ public abstract class SpreadSheetUtil implements Utility {
     }
 
     protected void init(Object val){
-        if(val instanceof String && processNested){
+        if(val!=null && val instanceof String && processNested){
             String select = ""+val;
             if((select).contains(">")){
                 nested = select.substring(select.indexOf(">")+1);

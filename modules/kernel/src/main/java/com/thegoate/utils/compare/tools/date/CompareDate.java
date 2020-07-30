@@ -39,28 +39,17 @@ import java.text.SimpleDateFormat;
  */
 public abstract class CompareDate extends CompareTool {
     protected String format = "yyyy-MM-dd";
+
     public CompareDate(Object actual) {
         super(actual);
     }
 
     @Override
     public boolean isType(Object check) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
-        boolean result = true;
-        try {
-            String d = parse("" + check);
-            sdf.parse(d);
-        }catch (Throwable t){
-            result = false;
-        }
-        return result;
+        return new DateType().isType(check);
     }
 
     protected String parse(String d){
-        int t = d.indexOf("T");
-        if(t<0){
-            t = d.length();
-        }
-        return d.substring(0,t);
+        return new DateType().parse(d);
     }
 }

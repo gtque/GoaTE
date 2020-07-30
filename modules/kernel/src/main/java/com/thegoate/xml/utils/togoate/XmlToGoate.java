@@ -66,7 +66,11 @@ public class XmlToGoate extends XmlUtil implements ToGoateUtility {
     public Goate convert() {
         Goate o = new Goate();
         try {
-            o = processXml(""+takeActionOn);
+            if(takeActionOn instanceof Document){
+                o = processXml((Document) takeActionOn);
+            } else {
+                o = processXml("" + takeActionOn);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

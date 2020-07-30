@@ -33,7 +33,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Checks if a string contains the given string.
  * Created by Eric Angeli on 4/17/2018.
  */
-@CompareUtil(operator = "~=", type="String")
+@CompareUtil(operator = "~=", type = String.class)
 @IsDefault
 public class CompareStringEqualsIgnoreCase extends CompareStringTool {
     public CompareStringEqualsIgnoreCase(Object actual) {

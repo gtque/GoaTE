@@ -24,7 +24,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.expect.conditional;
+package com.thegoate.expect.builder;
 
 import com.thegoate.expect.Expectation;
 import com.thegoate.utils.get.Get;
@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Created by Eric Angeli on 3/26/2019.
  */
-public abstract class ConditionalBuilder {
+public abstract class ExpectationBuilder {
     protected Object from;
     protected Object fromExpected;
     protected Object actual;
@@ -51,7 +51,7 @@ public abstract class ConditionalBuilder {
 
     public abstract List<Expectation> build();
 
-    protected ConditionalBuilder expect(Expectation expectation){
+    protected ExpectationBuilder expect(Expectation expectation){
         expectations.add(expectation);
         return this;
     }
@@ -60,7 +60,7 @@ public abstract class ConditionalBuilder {
         return from;
     }
 
-    public ConditionalBuilder setFrom(Object from) {
+    public ExpectationBuilder setFrom(Object from) {
         this.from = from;
         return this;
     }
@@ -69,7 +69,7 @@ public abstract class ConditionalBuilder {
         return fromExpected;
     }
 
-    public ConditionalBuilder setFromExpected(Object fromExpected) {
+    public ExpectationBuilder setFromExpected(Object fromExpected) {
         this.fromExpected = fromExpected;
         return this;
     }
@@ -86,7 +86,7 @@ public abstract class ConditionalBuilder {
         return a;
     }
 
-    public ConditionalBuilder setActual(Object actual) {
+    public ExpectationBuilder setActual(Object actual) {
         this.actual = actual;
         return this;
     }
@@ -95,7 +95,7 @@ public abstract class ConditionalBuilder {
         return expected;
     }
 
-    public ConditionalBuilder setExpected(Object expected) {
+    public ExpectationBuilder setExpected(Object expected) {
         this.expected = expected;
         return this;
     }

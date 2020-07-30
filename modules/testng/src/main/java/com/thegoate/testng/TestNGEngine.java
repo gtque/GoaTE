@@ -31,11 +31,17 @@ import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.ExpectThreadExecuter;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationThreadBuilder;
-import com.thegoate.expect.conditional.ConditionalBuilder;
+import com.thegoate.expect.amp.FailAmplifier;
+import com.thegoate.expect.amp.PassAmplifier;
+import com.thegoate.expect.amp.SkippedAmplifier;
+import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.metrics.Stopwatch;
 import com.thegoate.statics.StaticScrubber;
+import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.get.Get;
+
 import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
@@ -59,7 +65,7 @@ import static org.testng.Assert.assertTrue;
  */
 @Listeners({TestNGEvaluateListener.class})
 public abstract class TestNGEngine implements ITest, TestNG {
-    private final String expectSeparator = "\n--------------------\n";
+
     private Class testClass = null;
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
@@ -91,6 +97,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     @BeforeMethod(alwaysRun = true)
     public void startUp(Method method) {
+        UnknownUtilType.clearCache(Get.class);
         methodName = method.getName();
         if (data != null && data.get("lap", null) != null) {
             Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
@@ -249,8 +256,8 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public TestNGEngine expect(ConditionalBuilder conditionalBuilder) {
-        return expect(conditionalBuilder.build());
+    public TestNGEngine expect(ExpectationBuilder expectationBuilder) {
+        return expect(expectationBuilder.build());
     }
 
     @Override
@@ -300,103 +307,38 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return logStatuses(ev, true);
     }
 
-    private void logVolume(Goate p){
-        if (eut("expect.scenario", false, Boolean.class)) {
-            p.put("_scenario", getTestName());
-        }
-        if (eut("expect.mute", muteFrom, Boolean.class)) {
-            p.drop("from");
-            p.drop("fromExpected");
-        }
-    }
-
     public boolean logStatuses(ExpectEvaluator ev, boolean currentStatus) {
-        StringBuilder ps = new StringBuilder();
-        boolean passes = false;
-        for (Goate p : ev.passes()) {
-            passes = true;
-            ps.append(expectSeparator);
-            try {
-                logVolume(p);
-                ps.append(p.toString("\t", ""));
-            } catch (Exception e) {
-                LOG.debug("Evaulate", "A problem was encountered trying to publish the passed expectations: " + e.getMessage(), e);
-            }
+        Goate.innerGoate = -1;
+        String passes = new PassAmplifier(null)
+                .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
+                .testName(getTestName())
+                .amplify(ev);
+        if (!passes.isEmpty()) {
+            LOG.info("\npassed:" + passes);
         }
-        if (passes) {
-            ps.append(expectSeparator);
-            LOG.info("\npassed:" + ps.toString());
-        }
-        StringBuilder fs = new StringBuilder();
-        boolean fails = false;
-        for (Goate p : ev.fails()) {
-            fails = true;
-            fs.append(expectSeparator);
-            try {
-                logVolume(p);
-                fs.append(p.toString("\t", ""));
-            } catch (Exception e) {
-                LOG.info("Evaulate", "A problem was encountered trying to publish the failed expectations: " + e.getMessage(), e);
-            }
-        }
-        if (fails) {
-            fs.append(expectSeparator);
-            LOG.error("\nfailed:" + fs.toString());
-        }
-        StringBuilder ss = new StringBuilder();
-        boolean skipped = false;
-        StringBuilder zs = new StringBuilder();
-        boolean zero = false;
-        for (ExpectThreadExecuter expectation : ev.expectations()) {
-            Expectation ex = expectation.getExpectation();
-            Goate eval = ex.getExpectations();
-            for (String key : eval.keys()) {
-                Goate exp = eval.get(key, null, Goate.class);
-                if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), ev.passes())) {
-                    if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), ev.fails())) {
-                        if (!("" + exp.get("actual")).contains("*")&&!("" + exp.get("actual")).contains("+")) {
-                            logVolume(exp);
-                            skipped = true;
-                            ss.append(expectSeparator);
-                            ss.append(exp.toString("\t", ""));
-                            currentStatus = false;
-                            ev.fails().add(exp);
-                        } else {
-                            if(!("" + exp.get("actual")).contains("+")) {
-                                exp.drop("from");
-                                exp.drop("fromExpected");
-                                zs.append(expectSeparator);
-                                zs.append(exp.toString("\t", ""));
-                                zero = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (skipped) {
-            ss.append(expectSeparator);
-            LOG.error("\nfailed (skipped):" + ss.toString());
-        }
-        if (zero) {
-            zs.append(expectSeparator);
-            LOG.info("\nzero or more:" + zs.toString());
-        }
-        return currentStatus;
-    }
 
-    protected boolean checkInExpectationList(Object actual, String operator, List<Goate> list) {
-        String act = "" + actual;
-        boolean result = false;
-        for (Goate expectation : list) {
-            if (act.equals("" + expectation.get("actual", null))) {
-                if (operator.equals("" + expectation.get("operator", null, String.class))) {
-                    result = true;
-                    break;
-                }
+        String fails = new FailAmplifier(null)
+                .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
+                .testName(getTestName())
+                .amplify(ev);
+        if (!fails.isEmpty()) {
+            LOG.info("\nfailed:" + fails);
+        }
+
+        String skips = new SkippedAmplifier(null)
+                .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
+                .testName(getTestName())
+                .amplify(ev);
+        if (!skips.isEmpty()) {
+            LOG.info(skips);
+        }
+        if(currentStatus){
+            if(ev.fails().size()>0){
+                currentStatus = false;
             }
         }
-        return result;
+        Goate.innerGoate = 0;
+        return currentStatus;
     }
 
     @Override

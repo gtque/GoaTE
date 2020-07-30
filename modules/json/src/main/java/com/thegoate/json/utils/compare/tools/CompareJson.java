@@ -26,6 +26,8 @@
  */
 package com.thegoate.json.utils.compare.tools;
 
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
+
 import com.thegoate.json.JsonUtil;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtility;
@@ -46,6 +48,8 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
     String json2;
     boolean checkingContains = true;
     boolean secondCheck = false;
+    boolean onSecondCheck = false;
+
     public CompareJson(Object val) {
         super(val);
     }
@@ -59,8 +63,10 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
     public int comparison(String json1, String json2) {
         checkingContains = false;
         secondCheck = false;
+        onSecondCheck = false;
         int compare1 = compare(json1, json2);
-        secondCheck = true;
+        onSecondCheck = true;
+        secondCheck = !Boolean.parseBoolean(eut("json.compare.strict",""+false));
         int compare2 = compare(json2, json1);
         return compare1 + compare2;
     }
@@ -242,7 +248,7 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
                 }
             }
             if (!found&&!secondCheck) {
-                health.put("not found##", baseKey + i + ":" + o);
+                health.put("not found##", baseKey + i + ":" + o + ">not in " + (onSecondCheck?"actual":"expected"));
                 LOG.debug("the object was not found in the other array.");
                 result++;
             }

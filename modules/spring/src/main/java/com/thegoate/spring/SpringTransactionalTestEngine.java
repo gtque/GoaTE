@@ -28,7 +28,7 @@ package com.thegoate.spring;
 
 import com.thegoate.Goate;
 import com.thegoate.expect.Expectation;
-import com.thegoate.expect.conditional.ConditionalBuilder;
+import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
 import com.thegoate.testng.TestNGEngineMethodDL;
@@ -166,8 +166,8 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
-    public TestNG expect(ConditionalBuilder conditionalBuilder){
-        engine.expect(conditionalBuilder.build());
+    public TestNG expect(ExpectationBuilder expectationBuilder){
+        engine.expect(expectationBuilder.build());
         return this;
     }
 

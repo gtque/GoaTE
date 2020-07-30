@@ -35,6 +35,8 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
+
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.LogConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
@@ -105,6 +107,9 @@ public class RestAssured extends Rest implements RASpec {
                 mySpec.log().all();
                 spec.getLog().flush();
             }
+//            keeping this as a reference in case I need to expose it for some reason.
+//            io.restassured.RestAssured.urlEncodingEnabled = false;
+
         }
         return mySpec;
     }
@@ -194,14 +199,14 @@ public class RestAssured extends Rest implements RASpec {
                 Goate b = (Goate) body.get(key);
                 if (b != null) {
                     for (String id : b.keys()) {
-                        String[] keyParts = key.split(typeSeparator);
+                        String[] keyParts = id.split(typeSeparator);
                         String type = null;
                         String idkey = keyParts[0];
                         if(keyParts.length>1){
                             type = keyParts[1];
                         }
                         if (key.equals(BODY.urlencoded.name()) || key.equals(BODY.form.name())) {
-                            spec.formParam(id, b.get(id));
+                            spec.formParam(idkey, b.get(id));
                         } else if (key.startsWith(BODY.multipart.name())) {
                             if (idkey.equals(MP_ID_NOT_SET)) {
                                 spec.multiPart((File) b.get(id));

@@ -48,6 +48,7 @@ import java.util.regex.Pattern;
 public abstract class Validate extends Thread {
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected static BleatBox sLOG = BleatFactory.getLogger(Validate.class);
+    public final static String HEALTH_CHECK = "est1885drpepper23";
     protected String starReplacement = "_s#T$a%R_";
     protected String plusReplacement = "_p#L$u%S_";
     protected String operator = "";
@@ -271,7 +272,7 @@ public abstract class Validate extends Thread {
         }
         Goate health = compare.healthCheck();
         if (health.size() > 0) {
-            ev.put("health check", health);
+            ev.put(HEALTH_CHECK + "_health check", health);
         }
         return result;
     }

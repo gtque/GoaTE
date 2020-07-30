@@ -69,8 +69,7 @@ public abstract class CompareDoubleTool extends CompareTool implements ParseDete
 		return result;
 	}
 
-
-	protected double parseDouble(Object value){
-		return Double.parseDouble((""+value).replaceAll("[,$]",""));
+	protected double parseDouble(Object o){
+		return new GoateReflection().parseDouble(o);
 	}
 }

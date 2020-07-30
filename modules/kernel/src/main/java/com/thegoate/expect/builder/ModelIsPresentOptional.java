@@ -24,7 +24,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.expect.conditional;
+package com.thegoate.expect.builder;
 
 import com.thegoate.Goate;
 import com.thegoate.expect.Expectation;
@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Created by Eric Angeli on 3/26/2019.
  */
-public class ModelIsPresentOptional extends ConditionalBuilder {
+public class ModelIsPresentOptional extends ExpectationBuilder {
 
     //    protected Object requiredModel;
     protected List<String> optionalModel = new ArrayList<>();

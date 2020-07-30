@@ -51,6 +51,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Simple rest tests.
  * this really should be a spring test that stands up a spring application for testing purposes.
@@ -244,6 +247,36 @@ public class RATests extends SpringTestEngine {
 	}
 
 	@Test(groups = {"unit"})
+	public void testListString() {
+		List<String> simpleList = new ArrayList<>();
+		simpleList.add("a");
+		simpleList.add("b");
+		simpleList.add("c");
+		Object result = new RestCall().queryParam("list", "a,b,c").baseURL(baseURL())
+			.get("hello/list");
+		expect(Expectation.build()
+			.actual("size")
+			.from(result)
+			.isEqualTo(simpleList.size()));
+	}
+
+	@Test(groups = {"unit"})
+	public void testListObject() {
+		List<String> simpleList = new ArrayList<>();
+		simpleList.add("a");
+		simpleList.add("b");
+		simpleList.add("c");
+		RestCall<Response> rest = new RestCall().queryParam("list", simpleList).baseURL(baseURL());
+		Response result = rest
+			.get("hello/list");
+		expect(Expectation.build()
+			.actual("size")
+			.from(result)
+			.isEqualTo(simpleList.size()));
+	}
+
+
+	@Test(groups = {"unit"})
 	public void testPutRestBasicAuthHeader() {
 		Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
 			.put("hello/auth");
@@ -255,5 +288,116 @@ public class RATests extends SpringTestEngine {
 			.actual("password")
 			.from(result)
 			.isEqualTo("rogers"));
+	}
+
+	@Test(groups = {"unit"})
+	public void mpFileUploadTestNoType() {
+		Object rest = new RestCall()
+			.multipart("simpleF", "fileIO::mp_upload.json")
+			.baseURL(baseURL())
+			.post("hello/mpfile");
+		expect(Expectation.build()
+			.actual("field")
+			.from(rest)
+			.isEqualTo("Jeefff"));
+		expect(Expectation.build()
+			.actual("type")
+			.from(rest)
+			.isEqualTo("application/octet-stream"));
+	}
+
+	@Test(groups = {"unit"})
+	public void mpFileUploadTestWithType() {
+		Object rest = new RestCall()
+			.multipart("simpleF", "fileIO::mp_upload.json", "application/json")
+			.baseURL(baseURL())
+			.post("hello/mpfile");
+		expect(Expectation.build()
+			.actual("field")
+			.from(rest)
+			.isEqualTo("Jeefff"));
+		expect(Expectation.build()
+			.actual("type")
+			.from(rest)
+			.isEqualTo("application/json"));
+	}
+
+	@Test(groups = {"unit"})
+	public void isPresentScalabilityTesting() {
+		Object body = new RestCall()
+			.baseURL(baseURL())
+			.get("hello/big");
+		//		int size = Integer.parseInt(""+new Get("content>size()").from(body));
+		//		for(int i = 0; i<size-1; i++) {
+//		muteFrom = true;
+		expect(Expectation.build()
+			.actual("content.*.id")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.a")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.b")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.c")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.d")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.e")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.f")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.g")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.h")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.i")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.j")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.k")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.l")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.m")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.n")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.o")
+			.from(body)
+			.isPresent(true));
+		expect(Expectation.build()
+			.actual("content.*.p")
+			.from(body)
+			.isPresent(true));
+		//	}
 	}
 }

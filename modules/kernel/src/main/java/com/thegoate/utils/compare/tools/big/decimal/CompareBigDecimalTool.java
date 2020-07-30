@@ -59,7 +59,7 @@ public abstract class CompareBigDecimalTool extends CompareTool implements Parse
 		return result;
 	}
 
-	protected BigDecimal parseBigDecimal(Object value){
-		return new BigDecimal((""+value).replaceAll("[,$]",""));
+	protected BigDecimal parseBigDecimal(Object o){
+		return new GoateReflection().parseBigDecimal(o);
 	}
 }

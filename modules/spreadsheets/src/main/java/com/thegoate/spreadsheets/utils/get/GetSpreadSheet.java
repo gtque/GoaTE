@@ -37,7 +37,7 @@ import com.thegoate.utils.get.NotFound;
  * Get from the excel sheet.
  * Created by Eric Angeli on 5/19/2017.
  */
-@GetUtil
+@GetUtil(type = SheetUtils.class)
 public class GetSpreadSheet extends SpreadSheetUtil implements GetUtility {
 
     public GetSpreadSheet(Object val) {

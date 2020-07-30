@@ -26,6 +26,7 @@
  */
 package com.thegoate.spreadsheets.utils.compare;
 
+import com.thegoate.spreadsheets.csv.CSVRecord;
 import com.thegoate.utils.compare.CompareUtil;
 
 /**
@@ -33,7 +34,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * returns true of they are equal, otherwise false.
  * Created by Eric Angeli on 8/10/2018.
  */
-@CompareUtil(operator = "==", type = "csv")
+@CompareUtil(operator = "==", type = CSVRecord.class)
 public class CompareCSVRowsEqual extends CompareCsvRecord {
 
     public CompareCSVRowsEqual(Object val) {

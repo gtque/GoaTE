@@ -61,7 +61,7 @@ public abstract class CompareByteTool extends CompareTool implements ParseDetect
 	public boolean parseDetector(Object object){
 		boolean result = false;
 		try{
-			parseByte(object);
+			new GoateReflection().parseByte(object);
 			result = true;
 		} catch (Exception e){
 			LOG.debug("Parse Detector", "Not a parsable byte.");
@@ -69,7 +69,7 @@ public abstract class CompareByteTool extends CompareTool implements ParseDetect
 		return result;
 	}
 
-	protected byte parseByte(Object value){
-		return Byte.parseByte((""+value).replaceAll("[,$]",""));
+	protected byte parseByte(Object o){
+		return new GoateReflection().parseByte(o);
 	}
 }

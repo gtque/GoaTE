@@ -29,7 +29,7 @@ package com.thegoate.spring;
 import com.thegoate.Goate;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.Expectation;
-import com.thegoate.expect.conditional.ConditionalBuilder;
+import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
@@ -180,8 +180,8 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
-    public TestNG expect(ConditionalBuilder conditionalBuilder){
-        engine.expect(conditionalBuilder.build());
+    public TestNG expect(ExpectationBuilder expectationBuilder){
+        engine.expect(expectationBuilder.build());
         return this;
     }
 

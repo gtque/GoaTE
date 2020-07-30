@@ -70,8 +70,14 @@ public class BarnDataLoader extends DataLoader {
         for (File file : files) {
             Object barn = new Get(file).from("file::");
             Goate rd = loadBarn(barn, file.getName());
-            if (rd != null && checkGroups(rd)) {
-                data.add(modelData(rd.scrub("extends")));//scrub(rd));
+            if (rd != null) {
+                if(checkGroups(rd)) {
+                    data.add(modelData(rd.scrub("extends")));//scrub(rd));
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    Arrays.stream(groups).forEach(s -> sb.append(s).append(";"));
+                    LOG.debug("exclude because of group: " + sb.toString());
+                }
             }
         }
         return data;

@@ -69,7 +69,8 @@ public abstract class CompareShortTool extends CompareTool implements ParseDetec
 		return result;
 	}
 
-	protected short parseShort(Object value){
-		return Short.parseShort((""+value).replaceAll("[,$]",""));
+	protected short parseShort(Object o){
+		return new GoateReflection().parseShort(o);
 	}
+
 }

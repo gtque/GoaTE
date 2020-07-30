@@ -67,7 +67,7 @@ public abstract class CompareIntTool extends CompareTool implements ParseDetecto
         return result;
     }
 
-    protected int parseInt(Object value){
-        return Integer.parseInt((""+value).replaceAll("[,$]",""));
+    protected int parseInt(Object o){
+        return new GoateReflection().parseInt(o);
     }
 }

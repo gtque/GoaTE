@@ -290,9 +290,8 @@ public class SimpleTimings extends TestNGEngineAnnotatedDL {
         etb.expect("check paul>a.*.c,==,true");
         ExpectEvaluator ev = new ExpectEvaluator(etb);
         boolean result = ev.evaluate();
-        assertTrue(result, ev.failed());
-        LOG.debug("failed:\n" + ev.failed());
         logStatuses(ev);
+        assertTrue(result, ev.failed());
     }
 
 //    @Test

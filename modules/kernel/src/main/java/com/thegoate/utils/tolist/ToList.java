@@ -65,4 +65,11 @@ public class ToList extends UnknownUtilType implements ToListUtility{
         }
         return result;
     }
+
+    @Override
+    public boolean checkType(Class tool, Class type) {
+        //        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
+        //        return tu.type()!=null?(tu.type() == type):(type == null);
+        return false;
+    }
 }

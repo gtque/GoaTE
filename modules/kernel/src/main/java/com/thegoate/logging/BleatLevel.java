@@ -2,18 +2,20 @@ package com.thegoate.logging;
 
 import java.util.logging.Level;
 
-import com.thegoate.Goate;
-
 /**
  * Place holder for possible future support of getting/checking enabled log level.
  * Only partially thought out at this time. But still need something that stores the basic log level.
  * Need to revisit this in the future to full flesh out the idea.
+ * Used in by the Amplifier framework for shaping logging messages.
  * Created by Eric Angeli on 6/6/2017.
  */
-public class BleatLevel extends Level{
+public class BleatLevel{
+    String name;
+    int value;
 
     protected BleatLevel(String name, int value) {
-        super(name, value);
+        this.name = name;
+        this.value = value;
     }
 
     public static BleatLevel level(Level level, String name){
@@ -26,7 +28,11 @@ public class BleatLevel extends Level{
     }
 
     public boolean isLoudEnough(Level voice){
-        return voice.intValue() >= intValue();
+        return intValue() >= voice.intValue();
+    }
+
+    public int intValue(){
+        return value;
     }
 
     public BleatLevel tune(String name){

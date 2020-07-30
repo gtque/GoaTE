@@ -83,9 +83,11 @@ public abstract class DSL {
         definition.add(v.substring(0,v.indexOf("::")));
         v = v.substring(v.indexOf("::")+2);
         v = v.replace("\\,","(comma_goate_yall)");
-        String[] def = (v).split(",");
-        for(String d:def){
-            definition.add(d.replace("(comma_goate_yall)",","));
+        if(!v.isEmpty()) {
+            String[] def = (v).split(",");
+            for (String d : def) {
+                definition.add(d.replace("(comma_goate_yall)", ","));
+            }
         }
         return definition;
     }

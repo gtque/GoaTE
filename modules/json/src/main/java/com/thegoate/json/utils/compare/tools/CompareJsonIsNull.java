@@ -34,7 +34,7 @@ import org.json.JSONObject;
  * Checks if json is null.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "isNull", type = "json")
+@CompareUtil(operator = "isNull", type = JSONObject.class)
 public class CompareJsonIsNull extends CompareJson {
 
     Object expected = null;
@@ -58,7 +58,7 @@ public class CompareJsonIsNull extends CompareJson {
     public boolean evaluate() {
         boolean check = Boolean.parseBoolean(""+expected);
         boolean result = false;
-        if(takeActionOn == JSONObject.NULL){
+        if(takeActionOn == JSONObject.NULL || takeActionOn == null){
             result = true;
         }
         return check?result:!result;

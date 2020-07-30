@@ -33,7 +33,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Checks if a string starts with the given string.
  * Created by Eric Angeli on 2019/03/12.
  */
-@CompareUtil(operator = "startsWith", type="String")
+@CompareUtil(operator = "startsWith", type = String.class)
 @IsDefault
 public class CompareStringStartsWith extends CompareStringTool {
     public CompareStringStartsWith(Object actual) {

@@ -67,7 +67,7 @@ public abstract class CompareLongTool extends CompareTool implements ParseDetect
         return result;
     }
 
-    protected long parseLong(Object value){
-        return Long.parseLong((""+value).replaceAll("[,$]",""));
+    protected long parseLong(Object o){
+        return new GoateReflection().parseLong(o);
     }
 }

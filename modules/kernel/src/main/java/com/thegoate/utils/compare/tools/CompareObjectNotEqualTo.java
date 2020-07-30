@@ -35,11 +35,13 @@ import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
 
+import static com.thegoate.logging.volume.VolumeKnob.volume;
+
 /**
  * Compares two booleans for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "!=", type = "object")
+@CompareUtil(operator = "!=")
 @IsDefault
 public class CompareObjectNotEqualTo extends CompareObject {
 
@@ -68,7 +70,7 @@ public class CompareObjectNotEqualTo extends CompareObject {
             health = (((HealthMonitor) actual).healthCheck());
         } else {
             if(!result) {
-                health.put("is equal", "" + actual + "==" + expected);
+                health.put("is equal", "" + volume(actual) + "==" + volume(expected));
             }
         }
         return result;

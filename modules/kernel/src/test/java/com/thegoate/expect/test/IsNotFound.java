@@ -34,7 +34,7 @@ import com.thegoate.utils.get.NotFound;
 /**
  * Created by Eric Angeli on 3/19/2019.
  */
-@CompareUtil(operator = "notFound", type="Object")
+@CompareUtil(operator = "notFound")
 @IsDefault
 public class IsNotFound extends CompareTool {
 

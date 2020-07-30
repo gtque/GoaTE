@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Gets a rest assure
  * Created by Eric Angeli on 5/18/2017.
  */
-@GetUtil
+@GetUtil(type = Response.class)
 @ResetStatics
 public class GetRAResponse extends GetTool implements ResetStatic {
 

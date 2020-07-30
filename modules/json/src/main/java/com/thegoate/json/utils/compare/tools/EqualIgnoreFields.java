@@ -49,7 +49,7 @@ import java.util.List;
  * Created by Eric Angeli on 4/9/2018.
  */
 @IsDefault
-@CompareUtil(operator = "isEqualIgnoreFields", type = "json")
+@CompareUtil(operator = "isEqualIgnoreFields", type = JSONObject.class)
 public class EqualIgnoreFields extends CompareJson implements ExpectedBuilder {
     Object expected = null;
     Object fromExpected = null;

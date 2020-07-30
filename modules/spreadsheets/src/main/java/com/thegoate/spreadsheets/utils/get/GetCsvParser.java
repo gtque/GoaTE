@@ -39,7 +39,7 @@ import java.io.IOException;
  * Get the field from the given json.
  * Created by Eric Angeli on 5/19/2017.
  */
-@GetUtil
+@GetUtil(type = CSVParser.class)
 public class GetCsvParser extends CsvParserUtil implements GetUtility {
 
     public GetCsvParser(Object val) {

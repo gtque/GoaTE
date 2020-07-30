@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Returns a mocked object using Mockito.
  * Created by Eric Angeli on 9/20/2017.
  */
-@Mocker(type = "object")
+@Mocker(type = Object.class)
 public class MockObject extends Mock {
 
     boolean spy = false;

@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.data.DLProvider;
 import com.thegoate.data.GoateDLP;
+import com.thegoate.data.GoateNullClass;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.reflection.GoateReflection;
 import org.testng.ITestContext;
@@ -98,7 +99,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
                     rdl.merge(provider.getRunDataLoaders(), true);
                     cdl.merge(provider.getConstantDataLoaders(), true);
                 } else {
-                    Goate[] providers = buildMethodProviders(gp.name(), method);
+                    Goate[] providers = buildMethodProviders(gp.name(), method, gp.container());
                     if (providers == null) {
                         throw new Exception("Failed to find the DLProvider: " + gp.name());
                     }else{
@@ -120,16 +121,21 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         }
     }
 
-    protected Goate[] buildMethodProviders(String name, Method method) {
+    protected Goate[] buildMethodProviders(String name, Method method, Class container) {
         Goate[] providers = null;
         GoateReflection gr = new GoateReflection();
         List<Method> methods = new ArrayList<>();
-        gr.getAllMethods(method.getDeclaringClass(), methods);//getClass(), methods);
-        for (Method m : methods) {//ToDo:make a way to call DL methods from other classes?
+        Class declaring_class = method.getDeclaringClass();
+        if(!container.equals(GoateNullClass.class)) {
+            declaring_class = container;
+        }
+        gr.getAllMethods(declaring_class, methods);
+
+        for (Method m : methods) {
             GoateDLP dlp = m.getAnnotation(GoateDLP.class);
             if (m.getName().equals(name) || (dlp != null && dlp.name().equals(name))) {
                 try {
-                    providers = (Goate[]) m.invoke(method.getDeclaringClass().newInstance());
+                    providers = (Goate[]) m.invoke(declaring_class.newInstance());
                     break;
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     LOG.error("Problem defining data loaders for a method: " + name + "\n" + e.getMessage(), e);

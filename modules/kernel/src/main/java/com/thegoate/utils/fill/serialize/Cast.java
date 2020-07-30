@@ -123,4 +123,11 @@ public class Cast extends UnknownUtilType {
         }
         return constructor;
     }
+
+    @Override
+    public boolean checkType(Class tool, Class type) {
+//        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
+//        return tu.type()!=null?(tu.type() == type):(type == null);
+        return false;
+    }
 }

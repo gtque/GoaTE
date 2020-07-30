@@ -26,6 +26,7 @@
  */
 package com.thegoate.json.utils.compare.tools;
 
+import com.thegoate.json.utils.type.JsonType;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
 
@@ -36,7 +37,7 @@ import org.json.JSONObject;
  * Checks if json is empty (or null).
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "isEmpty", type = "json")
+@CompareUtil(operator = "isEmpty", type = JSONObject.class)
 public class CompareJsonIsEmpty extends CompareJson {
 
     Object expected = null;
@@ -65,7 +66,7 @@ public class CompareJsonIsEmpty extends CompareJson {
             result = true;
         } else if(act.isEmpty()){
             result = true;
-        } else if(isJSONArray(takeActionOn)){
+        } else if(new JsonType().isJSONArray(takeActionOn)){
             result = new JSONArray(act).length()==0;
         }
         return check?result:!result;

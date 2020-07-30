@@ -33,12 +33,14 @@ import com.thegoate.utils.get.GetUtility;
 import com.thegoate.utils.get.NotFound;
 import com.thegoate.xml.XmlUtil;
 import com.thegoate.xml.utils.togoate.XmlToGoate;
+import org.w3c.dom.Document;
+
 
 /**
  * Get the field from the given json.
  * Created by Eric Angeli on 5/19/2017.
  */
-@GetUtil
+@GetUtil(type = Document.class)
 public class GetXmlField extends XmlUtil implements GetUtility {
 
     Goate xmlData = null;

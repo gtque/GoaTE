@@ -53,7 +53,9 @@ public abstract class CompareCsvRecord extends CsvRecordUtil implements CompareU
 
     @Override
     public CompareUtility actual(Object actual){
-        this.actual = (CSVRecord)actual;
+        if(actual!=null && actual instanceof CSVRecord) {
+            this.actual = (CSVRecord) actual;
+        }
         return this;
     }
 

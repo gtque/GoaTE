@@ -43,4 +43,5 @@ import java.lang.annotation.RetentionPolicy;
 @IndexAnnotated
 public @interface GoateProvider {
     String name();
+    Class container() default GoateNullClass.class;
 }

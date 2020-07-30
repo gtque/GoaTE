@@ -75,8 +75,7 @@ public abstract class CompareFloatTool extends CompareTool implements ParseDetec
 		return result;
 	}
 
-
-	protected float parseFloat(Object value){
-		return Float.parseFloat((""+value).replaceAll("[,$]",""));
+	protected float parseFloat(Object o){
+		return new GoateReflection().parseFloat(o);
 	}
 }

@@ -71,6 +71,10 @@ public class GoateUtils {
         return getFilePath(file, false, false);
     }
 
+    public static boolean fileExists(String file){
+        return new File(getFilePath(file)).exists();
+    }
+
     public static String moveUpDir(String fileName){
         while(fileName.contains("../")){
             String temp = fileName.substring(0,fileName.indexOf("../"));
@@ -140,7 +144,7 @@ public class GoateUtils {
             path = temp.getAbsolutePath();
             LOG.debug("Goate File Util","file path: " + path);
         } catch (Exception e) {
-            LOG.error("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
+            LOG.debug("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
         }
         if(path.contains("%")){
             try {

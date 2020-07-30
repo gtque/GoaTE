@@ -197,10 +197,6 @@ public class GetJsonByFieldValue extends Employee {
                             break;
                         }
                     }
-//                    if (!(new Compare(jt.get(secondKey)).to(second.getValue()).using("==").evaluate())){
-//                        result = false;
-//                        break;
-//                    }
                 }
             }
         }
@@ -210,7 +206,7 @@ public class GetJsonByFieldValue extends Employee {
     private Object findValidParent(String foundKey, Goate json) {
         Object result = null;
         if (foundKey.contains(".")) {
-            foundKey = foundKey.substring(0, foundKey.lastIndexOf("."));
+            foundKey = foundKey.substring(0, foundKey.lastIndexOf('.'));
         } else {
             foundKey = "";
         }

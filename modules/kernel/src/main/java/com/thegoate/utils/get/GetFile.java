@@ -28,6 +28,8 @@
 package com.thegoate.utils.get;
 
 import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.type.IsType;
+import com.thegoate.utils.type.TypeUtility;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -36,8 +38,9 @@ import java.nio.file.Paths;
  * Loads the file specified in from into a file and returns it.
  * Created by Eric Angeli on 5/5/2017.
  */
-@GetUtil
-public class GetFile extends GetTool{
+@IsType
+@GetUtil(type = GetFile.class)
+public class GetFile extends GetTool implements TypeUtility {
     boolean explode = false;
     boolean overwrite = false;
 
@@ -82,5 +85,10 @@ public class GetFile extends GetTool{
             }
         }
         return result;
+    }
+
+    @Override
+    public Class type(Object check) {
+        return getClass();
     }
 }

@@ -40,7 +40,7 @@ import java.text.SimpleDateFormat;
  * example: field1,==,null::
  * Created by Eric Angeli on 7/7/2017.
  */
-@CompareUtil(operator = "dateIsPattern", type = "String")
+@CompareUtil(operator = "dateIsPattern", type = String.class)
 @IsDefault
 public class CompareDateStringIsPattern extends CompareTool {
     public CompareDateStringIsPattern(Object actual) {

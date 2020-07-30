@@ -33,7 +33,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Checks if a string ends with the given string.
  * Created by Eric Angeli on 2019/03/12.
  */
-@CompareUtil(operator = "endsWith", type="String")
+@CompareUtil(operator = "endsWith", type = String.class)
 @IsDefault
 public class CompareStringEndsWith extends CompareStringTool {
     public CompareStringEndsWith(Object actual) {

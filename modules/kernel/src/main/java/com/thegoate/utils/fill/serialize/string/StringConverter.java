@@ -52,4 +52,11 @@ public class StringConverter extends UnknownUtilType implements StringConverterU
         this.value = value;
         return this;
     }
+
+    @Override
+    public boolean checkType(Class tool, Class type) {
+        //		GoateAmplifier tu = (GoateAmplifier) tool.getAnnotation(GoateAmplifier.class);
+        //		return tu.type() != null ? tu.equals(type) : type == null;
+        return false;
+    }
 }

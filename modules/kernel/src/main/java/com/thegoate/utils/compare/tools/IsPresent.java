@@ -35,7 +35,7 @@ import com.thegoate.utils.get.NotFound;
  * Checks if present (even if null).
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "isPresent", type = "object")
+@CompareUtil(operator = "isPresent")
 @IsDefault
 public class IsPresent extends CompareTool {
 

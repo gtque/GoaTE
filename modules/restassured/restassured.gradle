@@ -28,7 +28,9 @@ import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
     compile "io.rest-assured:rest-assured:4.0.0"
-    compile "com.github.dzieciou.testing:curl-logger:1.0.4"
+    compile ("com.github.dzieciou.testing:curl-logger:1.0.5") {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+    }
     compile d.depends(":kernel", project.internalVersion);
     compile d.depends(":rest", project.internalVersion);
     testCompile d.depends(":testng", project.internalVersion);

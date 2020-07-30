@@ -123,6 +123,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
 		assertEquals(pojo.getaByte(), new Byte("1"));
 		assertEquals(pojo.getF(), 4F);
 		assertTrue(pojo.isBool());
+		pojo.reportHealth("test", "hello");
 		Goate d = new Serializer<>(pojo, SimpleSource.class).toGoate();
 		String json = new GoateToJSON(d).convert();
 		System.out.println("serialized: " + json);
@@ -347,5 +348,18 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
 		SimpleNested pojo2 = new DeSerializer().data(new ToGoate(jstring).convert()).build(SimpleNested.class);
 		Goate data = new Serializer<>(pojo2, Cheese.class).skipSerializingObjects().skipSerializingGoatePojos().toGoate();
 		assertTrue(data.get("ld") instanceof LocalDate);
+	}
+
+	@Test(groups = {"unit"})
+	public void flatNest() {
+		Goate g = new Goate().put("row.0.inner_name", "Tarun").put("row.0.inner_job", "Bringer of Pain");
+		FlatNest next = new DeSerializer().data(g.filter("row.0.").scrubKeys("row.0.")).from(FlatNest.class).build(FlatNest.class);
+
+		expect(Expectation.build()
+			.actual(next)
+			.isNull(false));
+		expect(Expectation.build()
+			.actual(next.getInner().getName())
+			.isEqualTo("Tarun"));
 	}
 }

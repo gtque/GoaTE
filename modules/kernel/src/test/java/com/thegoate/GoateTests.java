@@ -40,18 +40,31 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.thegoate.locate.Locate.path;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * Created by gtque on 4/21/2017.
  */
 public class GoateTests extends TestNGEngineMethodDL {
+
+	@Test(groups = {"unit"})
+	public void testPutMap(){
+		Map<String, Object> map = new LinkedHashMap<>();
+		map.put("a", "b");
+		map.put("b", null);
+		map.put("c", "current time::");
+
+		Goate d = new Goate(map);
+		assertEquals(d.size(), map.size());
+		assertEquals(d.get("a"), map.get("a"));
+		assertNull(d.get("b"));
+	}
 
 	@Test(groups = {"unit"})
 	public void testUrlEncodedPath() {

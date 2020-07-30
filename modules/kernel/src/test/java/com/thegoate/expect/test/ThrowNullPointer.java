@@ -33,7 +33,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Throws a null pointer exception when called.
  * Created by Eric Angeli on 5/10/2017.
  */
-@CompareUtil(operator = "throwNullPointer", type = "object")
+@CompareUtil(operator = "throwNullPointer")
 public class ThrowNullPointer extends CompareTool {
     int value = 0;
     boolean fail = true;

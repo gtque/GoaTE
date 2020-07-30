@@ -47,6 +47,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static com.thegoate.logging.volume.VolumeKnob.volume;
+
 /**
  * Contains the information about what is expected.
  * The source should be defined and annotated as an Employee.<br>
@@ -204,7 +206,7 @@ public class Expectation {
             }
         }
         if (name == null || name.isEmpty() || name.equals(actual)) {
-            name = "" + source;
+            name = volume(source);
         }
         return this;
     }
@@ -577,7 +579,7 @@ public class Expectation {
         if (workerId instanceof String) {
             source = "" + workerId;
             String[] sourceInfo = source.split("#");//if the source does not define an id number, assume 0.
-            this.name = sourceInfo[0];
+            this.name = volume(sourceInfo[0]);
             if (sourceInfo.length > 1) {
                 this.id = sourceInfo[1];
             } else {

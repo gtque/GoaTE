@@ -29,6 +29,7 @@ package com.thegoate.reflection;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.test.SampleChild;
 import com.thegoate.reflection.test.TestChild;
 import com.thegoate.reflection.test.TestConstructors;
 import org.testng.annotations.Test;
@@ -39,6 +40,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * Simple tests to validate reflection wrappers and helpers.
@@ -122,5 +124,11 @@ public class ReflectionTests {
         Constructor c = new GoateReflection().findConstructor(TestConstructors.class.getConstructors(), args);
         TestConstructors tc = (TestConstructors)c.newInstance(args);
         assertEquals(tc.c, 'z');
+    }
+
+    @Test(groups = {"unit"})
+    public void findMethod() {
+        Object o = new SampleChild();
+        assertNotNull(new GoateReflection().findMethod(o, "healthCheck"));
     }
 }

@@ -42,7 +42,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class CallDefinitionFromCode {
 
-    @Test(groups = {"api"})
+    @Test(groups = {"api", "unit"})
     public void callDefinition(){
         Employee e = new ApiTester();
         Goate data = new Goate();

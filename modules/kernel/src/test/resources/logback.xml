@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <Target>System.out</Target>
+    <encoder>
+      <pattern>[%p] %d{ISO8601} %c: %m%n</pattern>
+    </encoder>
+  </appender>
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- Tests run on modern PCs show that buffering related property -->
+    <!-- "ImmediateFlush" has negligible impact and will be ignored.  -->
+    <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <Append>true</Append>
+    <File>./Debug/WILogs.out</File>
+    <encoder>
+      <pattern>[%p] %d{ISO8601} %r %m%n</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>debug</level>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <maxIndex>10</maxIndex>
+      <FileNamePattern>./Debug/WILogs.out.%i</FileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>2000KB</maxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <logger name="com.thegoate" level="DEBUG"/>
+  <logger name="com.thegoate.annotations.AnnotationFactory" level="INFO"/>
+  <logger name="com.thegoate.json.logging.volume" level="ERROR"/>
+  <!--<logger name="com.thegoate.json.logging.volume.JsonAmplifier" level="ERROR"/>-->
+  <logger name="curl" level="DEBUG"/>
+  <root level="INFO">
+    <appender-ref ref="stdout"/>
+    <appender-ref ref="FILE"/>
+  </root>
+</configuration>

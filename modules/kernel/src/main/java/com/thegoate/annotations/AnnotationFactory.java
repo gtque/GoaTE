@@ -56,7 +56,7 @@ public class AnnotationFactory {
         }
     }
 
-    String id;
+    Object id;
     String methodId;
     Constructor constructor = null;
     Object[] constructorArgs = new Object[0];
@@ -88,7 +88,7 @@ public class AnnotationFactory {
         return this;
     }
 
-    public AnnotationFactory find(String id) {
+    public AnnotationFactory find(Object id) {
         this.id = id;
         return this;
     }
@@ -164,9 +164,9 @@ public class AnnotationFactory {
         buildDirectory();
         Class c = null;
         LOG.debug("looking for " + annotation.getName());
-        String theClass = id;
+        String theClass = ""+id;
         try {
-            c = directory.get(annotation.getCanonicalName()).get(id);
+            c = directory.get(annotation.getCanonicalName()).get(theClass);
         } catch (NullPointerException e) {
             LOG.error("could not get the class: " + theClass + "; " + e.getMessage(), e);
         }
@@ -240,18 +240,29 @@ public class AnnotationFactory {
         Object o = null;
         if (klass != null) {
             if (constructorArgs != null) {
+                Object[] ca = constructorArgs;
                 if (constructor == null) {
                     constructor = new GoateReflection().findConstructor(klass.getConstructors(), constructorArgs);
+                    if(constructor == null){
+//                        LOG.debug("Build Class", "didn't find specific constructor, checking for default constructor");
+                        constructor = new GoateReflection().findConstructor(klass.getConstructors(), new Object[0]);
+                        ca = new Object[0];
+                    }
                 }
                 if (constructor != null) {
                     try {
-                        o = constructor.newInstance(constructorArgs);
+//                        if(ca!=null) {
+                            o = constructor.newInstance(ca);
+//                        } else {
+//                            o = constructor.newInstance();
+//                        }
                     }catch(IllegalAccessException | InstantiationException | InvocationTargetException e){
                         LOG.debug("Building Class", "Problem instantiating a new instances: " + e.getMessage(), e);
                         throw e;
                     }
                 } else {
-                    LOG.info("Building Class", "Could not find the constructor");
+                    LOG.info("Building Class", "Could not find the constructor, wil check for a default constructor...");
+
                 }
             } else {
                 o = klass.newInstance();

@@ -34,7 +34,7 @@ import org.json.JSONObject;
  * Compares two json objects for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "==", type = "json")
+@CompareUtil(operator = "==", type = JSONObject.class)
 public class CompareJsonEqualTo extends CompareJson {
 
     Object expected = null;
@@ -59,6 +59,10 @@ public class CompareJsonEqualTo extends CompareJson {
         if(expected == null){
             expected = JSONObject.NULL;
         }
+        if(takeActionOn == null){
+            takeActionOn = JSONObject.NULL;
+        }
+
         boolean result = true;
         if(takeActionOn != expected){
             result = comparison(""+takeActionOn,""+expected)==0;

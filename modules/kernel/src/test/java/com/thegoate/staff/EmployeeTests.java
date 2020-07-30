@@ -29,6 +29,8 @@ package com.thegoate.staff;
 
 import com.thegoate.Goate;
 import com.thegoate.metrics.Stopwatch;
+import com.thegoate.staff.test.EventuallyTrue;
+import com.thegoate.staff.test.EventuallyTrueInt;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import org.testng.annotations.Test;
 
@@ -72,6 +74,24 @@ public class EmployeeTests extends TestNGEngineMethodDL {
                 .put("expect", "[\"o::_goate_result,==,4\"]");
         int r = Integer.parseInt("" + Employee.recruit("work until", data).work());
         assertEquals(r, 4);
+    }
+
+    @Test(groups = {"unit"})
+    public void employeeTyped() {
+        Goate data = new Goate();
+        data.put("work", "{\"job\":\"eventually_true\"}")
+            .put("expect", "[\"o::_goate_result,==,4\"]");
+        int r = new EventuallyTrueInt().work();//Integer.parseInt("" + Employee.recruit("work until", data).work());
+        assertEquals(r, 1);
+    }
+
+    @Test(groups = {"unit"})
+    public void employeeTypedRecruited() {
+        Goate data = new Goate();
+        data.put("work", "{\"job\":\"eventually_true\"}")
+            .put("expect", "[\"o::_goate_result,==,4\"]");
+        int r = Employee.recruit("eventually_true_int", data, Integer.class).work();
+        assertEquals(r, 1);
     }
 
     @Test(groups = {"unit"})

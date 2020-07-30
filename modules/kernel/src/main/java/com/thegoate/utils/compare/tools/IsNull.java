@@ -34,7 +34,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Checks if null or not.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "isNull", type = "object")
+@CompareUtil(operator = "isNull")
 @IsDefault
 public class IsNull extends CompareTool {
 

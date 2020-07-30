@@ -26,6 +26,8 @@
  */
 package com.thegoate.utils.compare.tools.big.decimal;
 
+import java.math.BigDecimal;
+
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.tools.d.CompareDoubleTool;
 
@@ -33,7 +35,7 @@ import com.thegoate.utils.compare.tools.d.CompareDoubleTool;
  * Compares two big decimals for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = "==", type = "BigDecimal")
+@CompareUtil(operator = "==", type = BigDecimal.class)
 public class CompareBigDecimalEqualTo extends CompareBigDecimalTool {
 
     public CompareBigDecimalEqualTo(Object actual) {

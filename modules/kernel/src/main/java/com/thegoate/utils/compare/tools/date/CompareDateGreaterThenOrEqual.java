@@ -35,7 +35,7 @@ import java.util.Date;
  * Checks if a date is greater or equal then expected date.
  * Created by Eric Angeli on 7/7/2017.
  */
-@CompareUtil(operator = ">=", type = "date")
+@CompareUtil(operator = ">=", type = Date.class)
 public class CompareDateGreaterThenOrEqual extends CompareDate {
     public CompareDateGreaterThenOrEqual(Object actual) {
         super(actual);

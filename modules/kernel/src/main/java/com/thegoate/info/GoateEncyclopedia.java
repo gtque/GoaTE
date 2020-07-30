@@ -43,6 +43,7 @@ public class GoateEncyclopedia {
      * Looks for anything annotated with Info and adds it to the index.
      * The last instance of a word wins, ie there will only be one version of a word in the dictionary
      * which may produce unexpected results if more than one uses the same word.
+     * @return the compiled encyclopedia describing all of Goate.
      */
     public GoateEncyclopedia buildIndex() {
         try {
