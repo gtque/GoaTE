@@ -27,33 +27,34 @@
 
 package com.thegoate.expect;
 
+import com.thegoate.Goate;
+import com.thegoate.expect.builder.ContainsExpectationBuilder;
+import com.thegoate.expect.builder.ModelIsPresentOptional;
+import com.thegoate.expect.builder.Value;
+import com.thegoate.expect.test.*;
+import com.thegoate.expect.validate.Validate;
+import com.thegoate.expect.validate.ValidateAbsence;
+import com.thegoate.expect.validate.ValidateNotGoate;
+import com.thegoate.json.utils.fill.serialize.to.JsonString;
+import com.thegoate.json.utils.insert.InsertJson;
+import com.thegoate.testng.TestNGEngineAnnotatedDL;
+import com.thegoate.utils.fill.Fill;
+import com.thegoate.utils.fill.serialize.DeSerializer;
+import com.thegoate.utils.fill.serialize.DefaultSource;
+import com.thegoate.utils.fill.serialize.Serializer;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.togoate.ToGoate;
+import org.testng.annotations.Test;
+
+import java.math.BigDecimal;
+import java.util.*;
+
 import static com.thegoate.dsl.words.LoadFile.fileAsAString;
 import static com.thegoate.expect.ExpectLocator.start;
 import static com.thegoate.expect.ExpectMatchWildcardIndexPath.matchWildcardIndex;
 import static com.thegoate.expect.ExpectWildcardIndexPath.wildcardIndex;
 import static com.thegoate.locate.Locate.path;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.testng.annotations.Test;
-
-import com.thegoate.Goate;
-import com.thegoate.expect.builder.ModelIsPresentOptional;
-import com.thegoate.expect.test.IsNotFound;
-import com.thegoate.expect.test.SimpleObject;
-import com.thegoate.expect.validate.Validate;
-import com.thegoate.expect.validate.ValidateAbsence;
-import com.thegoate.expect.validate.ValidateNotGoate;
-import com.thegoate.json.utils.insert.InsertJson;
-import com.thegoate.testng.TestNGEngineAnnotatedDL;
-import com.thegoate.utils.fill.Fill;
-import com.thegoate.utils.get.Get;
-import com.thegoate.utils.togoate.ToGoate;
+import static org.testng.Assert.*;
 
 /**
  * Test expect framework.
@@ -102,6 +103,33 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
         boolean result = ev.evaluate();
         logStatuses(ev);
         assertTrue(result, ev.failed());
+    }
+
+    @Test(groups = {"unit"})
+    public void isEvenEmployee() {
+        expect(Expectation.build()
+                .actual(Expectation.EmployeeWorkResult)
+                .from(new CheckEven().check(84))
+                .isEqualTo(true));
+    }
+
+    @Test(groups = {"unit"})
+    public void isCustomObjectEmployee() {
+        expect(Expectation.build()
+                .actual(Expectation.EmployeeWorkResult)
+                .from(new EmployeeReturnsAnObject().name("floyd").configured(true))
+                .isEqualTo(new CustomObject().setName("floyd").setConfigured(true)));
+    }
+
+    @Test(groups = {"unit"})
+    public void volumeCheck() {
+        expect(Expectation.build()
+                .actual("a")
+                .from(new ToGoate("{'a':42,'b':true,'c':[{'x':'y'}]}").convert())
+                .isGreaterThan("a")
+                .fromExpected(new ToGoate("{'a':40,'b':true,'c':[{'x':'y'}]}").convert()));
+
+        LOG.debug("expecting: " + etb.expectations());
     }
 
     @Test(groups = {"unit"})
@@ -973,12 +1001,12 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
                     .actual("tracy")
                     .from(sample)
                     .isEqualTo(42));
-            evaluate();
+            evaluate(true);
             skipped = false;
         } catch (Throwable shouldBeThrown) {
             LOG.info("Skip And Fail", "Success!!!");
         }
-        assertEquals(ev.fails().size(), 2);
+        assertEquals(ev.fails().size() + ev.skipped().size(), 2);
         assertTrue(skipped, "Should have failed and thrown an error.");
     }
 
@@ -1299,6 +1327,29 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
     }
 
     @Test(groups = {"unit"})
+    public void jsonFail() {
+        String a = "{" +
+                "\"a\":42" +
+                "}";
+        String b = "{" +
+                "\"a\":43" +
+                "}";
+        //        list.stream().forEach(goate ->
+        //        Goate gl = new ToGoate(list).convert();
+        expect(Expectation.build()
+                .actual(a)
+                .isEqualTo(b));
+        boolean fail = true;
+        try {
+            evaluate();
+            fail = false;
+        } catch (Throwable t) {
+            LOG.info("nested more than one expected failed as expected.");
+        }
+        assertTrue(fail);
+    }
+
+    @Test(groups = {"unit"})
     public void listToGoate() {
         List<String> fred = new ArrayList<>();
         fred.add("rogers");
@@ -1360,15 +1411,32 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
     @Test(groups = {"unit"})
     public void isEqualObjectsWithHealthCheckFail() {
         Goate data = new Goate();
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("fred", new Goate().put("field1", true));
+        Map<String, Object> map2 = new HashMap<>();
+        map2.put("fred", new Goate().put("field1", false));
+        List<SimpleObject2> list1 = new ArrayList<>();
+        list1.add(new SimpleObject2().setBd(new BigDecimal(3)));
+        List<SimpleObject2> list2 = new ArrayList<>();
+        list2.add(new SimpleObject2().setBd(new BigDecimal(3)));
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
         etb.expect(Expectation.build()
-                .actual(new SimpleObject().setA("h").setB(true).addC("a").addC("b"))
-                .isEqualTo(new SimpleObject().setA("h").setB(false).addC("c").addC("b")));
+                .actual(new SimpleObject().setSo2(list1).setA("h").setB(true).addC("a").addC("b").setNested(new NestedObject().setNo("hello").setMap(map1)))
+                .isEqualTo(new SimpleObject().setSo2(list2).setA("h").setB(false).addC("c").addC("b").setNested(new NestedObject().setNo("world").setMap(map2))));
         ExpectEvaluator ev = new ExpectEvaluator(etb);
-        assertEquals(42, 42, "these were not equal");
+//        assertEquals(42, 42, "these were not equal");
         boolean result = ev.evaluate();
-        logStatuses(ev);
+        logStatuses(ev, true);
         assertFalse(result);
+    }
+
+    @Test(groups = {"unit"})
+    public void isInString() {
+        String act = "hello World!!!";
+        String exp = "llo Wo";
+        expect(Expectation.build()
+                .actual(exp)
+                .isIn(act));
     }
 
     @Test(groups = {"unit"})
@@ -1393,9 +1461,181 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
     }
 
     @Test(groups = {"unit"})
+    public void containsListInList() {
+        String json = "'content':[" +
+                "{'id':'1st'}," +
+                "{'id':'4th'}," +
+                "{'id':'1st'}," +
+                "{'id':'2nd'}," +
+                "{'id':'3rd'}" +
+                "{'id':'3rd'}" +
+                "]";
+        List<String> expected = new ArrayList<>();
+        expected.add("1st");
+        expected.add("2nd");
+        expected.add("3rd");
+        expected.add("4th");
+
+        expect(new ContainsExpectationBuilder()
+                .lookFor(new Value("+.id").in(json))
+                .lookIn(new Value(expected)));
+    }
+
+
+    @Test(groups = {"unit"})
+    public void compareUnsorted() {
+        String api1 = "{" +
+                "\"content\":[" +
+                "{\"type\":\"foo\", \"some other key\": false}," +
+                "{\"type\":\"bar\", \"some other key\": false}," +
+//                "{\"type\":\"noo\", \"some other key\": false}," +
+                "{\"type\":\"roo\", \"some other key\": true}" +
+                "]" +
+                "}";
+        String api2 = "{" +
+                "\"content\":[" +
+                "{\"udfFieldType\":{\"code\":\"bar\"}}," +
+                "{\"udfFieldType\":{\"code\":\"roo\"}}," +
+                "{\"udfFieldType\":{\"code\":\"foo\"}}" +
+                "]" +
+                "}";
+        ContentPojoT<TypePojo> content = new DeSerializer().data(new ToGoate(api1).convert()).T(TypePojo.class).build(ContentPojoT.class);
+        String api1FormattedPT = "" + new Serializer<>(new DeSerializer().data(new ToGoate(api1).convert()).T(TypePojo.class).build(ContentPojoT.class), DefaultSource.class).to(new JsonString());
+        String api1FormattedP = "" + new Serializer<>(new DeSerializer().data(new ToGoate(api1).convert()).build(ContentPojo.class), DefaultSource.class).to(new JsonString());
+        String api2FormattedP = "" + new Serializer<>(new DeSerializer().data(new ToGoate(api2).convert()).from(UDFSource.class).build(ContentPojo.class), DefaultSource.class).to(new JsonString());
+        expect(Expectation.build()
+                .actual("content")
+                .from(api1FormattedP)
+                .isEqualTo("content")
+                .fromExpected(api2FormattedP));
+        expect(Expectation.build()
+                .actual(api1FormattedPT)
+                .isEqualTo(api2FormattedP));
+    }
+
+    @Test(groups = {"unit"})
+    public void expectWildcardIndex() {
+        String json = "[" +
+                "{'id':'1st'}," +
+                "{'id':'4th'}," +
+                "{'id':'1st'}," +
+                "{'id':'2nd'}," +
+                "{'id':'3rd'}" +
+                "]";
+        List<String> expected = new ArrayList<>();
+        expected.add("1st");
+        expected.add("4th");
+        expected.add("1st");
+        expected.add("2nd");
+        expected.add("3rd");
+
+        expect(Expectation.build()
+                .actual("+.id")
+                .from(json)
+                .isEqualTo("%")
+                .fromExpected(expected));
+    }
+
+    @Test(groups = {"unit"})
+    public void expectWildcardIndexUsingValue() {
+        String json = "[" +
+                "{'id':'1st'}," +
+                "{'id':'4th'}," +
+                "{'id':'1st'}," +
+                "{'id':'2nd'}," +
+                "{'id':'3rd'}" +
+                "]";
+        List<String> expected = new ArrayList<>();
+        expected.add("1st");
+        expected.add("4th");
+        expected.add("1st");
+        expected.add("2nd");
+        expected.add("3rd");
+
+        expect(Expectation.build()
+                .actual(new Value("+.id").in(json))
+                .isEqualTo(new Value("%").in(expected)));
+    }
+
+    @Test(groups = {"unit"})
+    public void containsWildCardActual() {
+        String json = "[" +
+                "{'id':'hello world'}," +
+                "{'id':'hello world'}," +
+                "{'id':'ho wo'}," +
+                "{'id':'halo wants'}," +
+                "{'id':'hello world!'}" +
+                "]";
+
+        expect(new ContainsExpectationBuilder()
+                .lookFor("o w")
+                .lookIn(new Value("+.id").in(json)));
+    }
+
+    @Test(groups = {"unit"})
+    public void containsBuilderString() {
+        expect(new ContainsExpectationBuilder()
+                .lookFor(new Value("o w"))
+                .lookIn(new Value("Hello world!!!")));
+    }
+
+    @Test(groups = {"unit"})
+    public void containsString() {
+        expect(Expectation.build()
+                .actual("o w")
+                .isIn("Hello world!!!"));
+    }
+
+
+    @Test(groups = {"unit"})
     public void nullToJsonNull() {
         expect(Expectation.build().actual(null)
                 .isEqualTo("a")
                 .fromExpected("{\"a\":null}"));
+    }
+
+    @Test(groups = {"unit"})
+    public void skippedTestsFail() {
+        expect(Expectation.build().actual("b")
+                .isEqualTo("a")
+                .from("{\"a\":null}"));
+        boolean failed = true;
+//        try {
+//            evaluate();
+//            failed = false;
+//        } catch (Throwable t) {
+//            LOG.info("I threw the error I was expecting.");
+//        }
+        expect(Expectation.build().actual(false).isEqualTo(true));
+        try {
+            evaluate(true);
+            failed = false;
+        } catch (Throwable t) {
+            LOG.info("nuthin");
+        }
+        expect(Expectation.build().actual(failed).isEqualTo(true));
+        expect(Expectation.build().actual("b.*.a")
+                .isEqualTo("a")
+                .from("{\"a\":null}"));
+    }
+
+    @Test(groups = {"unit"})
+    public void skippedTestsPassZeroOrMore() {
+        expect(Expectation.build().actual("b.*.a")
+                .isEqualTo("a")
+                .from("{\"a\":null}"));
+        boolean failed = false;
+        try {
+            evaluate();
+            failed = true;
+        } catch (Throwable t) {
+            LOG.info("I threw the error I was NOT expecting.");
+        }
+        expect(Expectation.build().actual(failed).isEqualTo(true));
+    }
+
+    @Test
+    public void errorLog() {
+        LOG.error("error", new Exception("something witty and inspirational."));
     }
 }

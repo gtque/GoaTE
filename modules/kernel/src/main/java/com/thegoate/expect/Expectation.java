@@ -28,6 +28,7 @@ package com.thegoate.expect;
 
 import com.thegoate.Goate;
 import com.thegoate.dsl.Interpreter;
+import com.thegoate.expect.builder.Value;
 import com.thegoate.expect.extras.Extra;
 import com.thegoate.expect.extras.OneOrMore;
 import com.thegoate.expect.extras.ZeroOrMore;
@@ -47,6 +48,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static com.thegoate.Goate.GOATE_VARIABLE_PREFIX;
 import static com.thegoate.logging.volume.VolumeKnob.volume;
 
 /**
@@ -55,6 +57,8 @@ import static com.thegoate.logging.volume.VolumeKnob.volume;
  * Created by Eric Angeli on 5/8/2017.
  */
 public class Expectation {
+
+    public final static String EmployeeWorkResult = GOATE_VARIABLE_PREFIX+"Employee Work Result";
 
     public Validate getValidator() {
         return validator;
@@ -133,7 +137,9 @@ public class Expectation {
     Object fromExpected = null;
     Object source = null;
     boolean zeroOrMore = true;
+    String clearedState = null;
     StringBuilder failed = new StringBuilder("");
+    String failureMessage = null;
     volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
     volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
     boolean includeExtras = false;
@@ -206,7 +212,9 @@ public class Expectation {
             }
         }
         if (name == null || name.isEmpty() || name.equals(actual)) {
-            name = volume(source);
+            if(source!=null) {
+                name = "" + source.hashCode();
+            }
         }
         return this;
     }
@@ -231,6 +239,9 @@ public class Expectation {
         return this.fromExpected;
     }
 
+    public String getFailureMessage(){
+        return this.failureMessage;
+    }
     /**
      * When adding a new expectation to an existing one you must set actual, is, and expected, (even if expected is null)
      * Except for the last one added.
@@ -254,12 +265,25 @@ public class Expectation {
         Goate ex = expectation.getExpectations();
         for (String key : ex.keys()) {
             Goate exp = (Goate) ex.get(key);
-            actual(exp.getStrict("actual")).is("" + exp.getStrict("operator")).expected(exp.getStrict("expected"));
+            actual(exp.getStrict("actual")).is("" + exp.getStrict("operator")).expected(exp.getStrict("expected")).failureMessage(""+exp.getStrict("failure message"));
+        }
+        return this;
+    }
+
+    public Expectation actualValue(Value value){
+        if(value!=null) {
+            actual(value.getLocator());
+            if (value.getContainer() != null) {
+                from(value.getContainer());
+            }
         }
         return this;
     }
 
     public Expectation actual(Object actual) {
+        if(actual instanceof Value){
+            return actualValue((Value)actual);
+        }
         if (actual instanceof Locate) {
             actual = ((Locate) actual).toPath();
         }
@@ -319,6 +343,10 @@ public class Expectation {
         return is("contains").expected(expected);
     }
 
+    public Expectation contains(Object expected) {
+        return is("contains").expected(expected);
+    }
+
     public Expectation is(String operator) {
         this.operator = operator;
         this.validator = null;
@@ -339,7 +367,21 @@ public class Expectation {
         return this;
     }
 
+    public Expectation expectedValue(Value value){
+        if(value!=null) {
+            expected(value.getLocator());
+            if (value.getContainer() != null) {
+                fromExpected(value.getContainer());
+            }
+        }
+        return this;
+    }
+
     public Expectation expected(Object expected) {
+        if(expected instanceof Value){
+            return expectedValue((Value)expected);
+        }
+
         if (expected instanceof Locate) {
             expected = ((Locate) expected).toPath();
         }
@@ -358,6 +400,7 @@ public class Expectation {
                 exp.put("operator", operator);
                 exp.put("expected", expected);
                 exp.put("from", fullName());
+                exp.put("failure message", failureMessage);
                 if (includeExtras) {
                     Goate extras = new Goate();
                     extras.put("zeroOrMore", zeroOrMore);
@@ -368,7 +411,11 @@ public class Expectation {
                 operator = "";
                 expected = null;
                 simpleState = "";
+                failureMessage = null;
+                clearedState = key;
             }
+        }else{
+            clearedState = null;
         }
     }
 
@@ -384,7 +431,7 @@ public class Expectation {
         }
         try {
             if (from instanceof Employee) {
-                source = ((Employee) from).defaultPeriod(cachePeriod).syncWork();
+                source = ((Employee) from).expectation(this).defaultPeriod(cachePeriod).syncWork();
             } else {
                 source = from;
             }
@@ -414,7 +461,8 @@ public class Expectation {
                             .put("from", getFrom())
                             .put("operator", getOperator())
                             .put("expected", getExpected())
-                            .put("fromExpected", getFromExpected()));
+                            .put("fromExpected", getFromExpected())
+                            .put("failure message", getFailureMessage()));
                     result = false;
                 } else {
                     for (String key : expect.keys()) {
@@ -423,6 +471,11 @@ public class Expectation {
                             exp.put("actual", "actual");
                             exp.put("from", from);
                         }
+//                        String act = exp.get("actual", null, String.class);
+//                        if(act != null && act.equals(EmployeeWorkResult)){
+//                            exp.put("actual", "actual");
+//                            exp.put("from", source);
+//                        }
                         Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);
                         checker.start();
                         checkers.add(checker);
@@ -532,6 +585,9 @@ public class Expectation {
             if (parts.length > 3) {
                 processExtras(parts[3].split("&"));
             }
+            if (parts.length > 4) {
+                failureMessage(parts[4]);
+            }
         }
         return this;
     }
@@ -547,6 +603,15 @@ public class Expectation {
             }
             EXTRAS.lookUp(extraKey).process(this, extraValue);
         }
+    }
+
+    public Expectation failureMessage(String failureMessage){
+        if(clearedState != null){
+            ((Goate)expect.get(clearedState)).put("failure message", failureMessage);
+        } else {
+            this.failureMessage = failureMessage;
+        }
+        return this;
     }
 
     public Expectation fromExpected(Object from) {
