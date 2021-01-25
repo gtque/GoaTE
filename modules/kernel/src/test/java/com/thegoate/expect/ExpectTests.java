@@ -123,11 +123,28 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
 
     @Test(groups = {"unit"})
     public void volumeCheck() {
-        expect(Expectation.build()
-                .actual("a")
-                .from(new ToGoate("{'a':42,'b':true,'c':[{'x':'y'}]}").convert())
-                .isGreaterThan("a")
-                .fromExpected(new ToGoate("{'a':40,'b':true,'c':[{'x':'y'}]}").convert()));
+
+        LOG.debug("volumeCheck", "checking the size of the first page.");
+        Goate expected = new ToGoate("{'a':123,'b':true,'c':[{'x':'y'}]}").convert();
+        String cheeseData = fileAsAString("data/big.json");
+        Object firstPage = new Get("content").from(cheeseData);
+        Goate cheese = new ToGoate(firstPage).convert();
+        LOG.debug("volumeCheck", "checking the size of the first page.");
+        int size = Integer.parseInt("" + new Get("size()").from(firstPage));//loans.filterStrict("[0-9]*").size();
+        LOG.debug("volumeCheck", "size of the first page:" + size);
+        for (int i = 0; i < size - 1; i++) {
+            LOG.debug("volumeCheck", "adding new page:" + i);
+//            expect(Expectation.build()
+//                    .actual("" + i + ".loanNumber")
+//                    .from(loans)
+//                    .isLessThan("" + (i+1) + ".loanNumber")
+//                    .fromExpected(loans));
+            expect(Expectation.build()
+                    .actual("cheeseNumber")
+                    .from(cheese.get(""+i))
+                    .isLessThan("cheeseNumber")
+                    .fromExpected(cheese.get(""+(i+1))));
+        }
 
         LOG.debug("expecting: " + etb.expectations());
     }

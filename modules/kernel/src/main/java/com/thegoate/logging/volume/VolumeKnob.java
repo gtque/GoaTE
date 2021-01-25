@@ -14,15 +14,23 @@ import com.thegoate.utils.type.FindType;
 public class VolumeKnob extends UnknownUtilType {
 
 	public static String volume(Object message) {
-		Class type = new FindType().type(message);
+		return volume(message, true);
+	}
+	public static String volume(Object message, boolean checkDiary){
 		String output = null;
-		Amplifier tool = (Amplifier) new VolumeKnob().buildUtil(message, GoateAmplifier.class, message, null, null, type);
-		Object result = new NotFound("Get tool not found, make sure a proper get util is implemented or on the class path.");
-		if (tool != null) {
-			output = tool.amplify(message);
-		} else {
-			if (message != null) {
-				output = message.toString();
+		if(checkDiary && message instanceof Diary){
+			output = ((Diary)message).mostRecentEntry();
+		}
+		else {
+			Class type = new FindType().type(message);
+			Amplifier tool = (Amplifier) new VolumeKnob().buildUtil(message, GoateAmplifier.class, message, null, null, type);
+			Object result = new NotFound("Get tool not found, make sure a proper get util is implemented or on the class path.");
+			if (tool != null) {
+				output = tool.amplify(message);
+			} else {
+				if (message != null) {
+					output = message.toString();
+				}
 			}
 		}
 		return output;

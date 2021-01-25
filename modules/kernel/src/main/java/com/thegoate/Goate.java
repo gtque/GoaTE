@@ -31,6 +31,7 @@ import static com.thegoate.expect.validate.Validate.HEALTH_CHECK;
 import static com.thegoate.logging.volume.VolumeKnob.volume;
 
 import com.thegoate.dsl.Interpreter;
+import com.thegoate.logging.volume.Diary;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.togoate.ToGoate;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
  * The manager for the collection of test data.
  * Created by gtque on 4/19/2017.
  */
-public class Goate implements HealthMonitor {
+public class Goate implements HealthMonitor, Diary {
 
 	public static final String GOATE_VARIABLE_PREFIX = "_goate_(%$#)_";
 	Map<String, Object> data = new ConcurrentHashMap<>();
@@ -81,6 +82,7 @@ public class Goate implements HealthMonitor {
 		for (String key : keys()) {
 			mapped.put(key, get(key));
 		}
+		stale = true;
 		return mapped;
 	}
 
@@ -115,6 +117,7 @@ public class Goate implements HealthMonitor {
 		}
 		data.put(key, value == null ? "null::" : value);//can't put null in a map, so wrap in the null dsl.
 		//        }
+		stale = true;
 		return this;
 	}
 
@@ -185,6 +188,7 @@ public class Goate implements HealthMonitor {
 							value = data.get(key);
 						} else if (def != null) {
 							data.put(key, def);
+							stale = true;
 							value = def;
 						}
 					}
@@ -243,6 +247,7 @@ public class Goate implements HealthMonitor {
 
 	public Goate drop(String key) {
 		data.remove(key);
+		stale = true;
 		return this;
 	}
 
@@ -253,6 +258,7 @@ public class Goate implements HealthMonitor {
 				drop(key);
 			}
 		}
+		stale = true;
 		return this;
 	}
 
@@ -397,6 +403,7 @@ public class Goate implements HealthMonitor {
 				.collect(Collectors.toList())
 				.parallelStream().forEach(scrub -> drop(scrub));
 		}
+		stale = true;
 		return this;
 	}
 
@@ -437,6 +444,7 @@ public class Goate implements HealthMonitor {
 				}
 			}
 		}
+		stale = true;
 		return this;
 	}
 
@@ -519,7 +527,7 @@ public class Goate implements HealthMonitor {
 		int result = size();
 		if (!(check instanceof Goate)) {
 			Goate castCheck = new ToGoate(check).convert();
-			if (castCheck != null) {
+			if (castCheck != null && !(castCheck.size()==1&&castCheck.keys().contains("_original_"))) {
 				check = castCheck;
 			}
 		}
@@ -556,4 +564,21 @@ public class Goate implements HealthMonitor {
 		return result;
 	}
 
+	private volatile String entry = "";
+	private volatile boolean stale;
+
+	@Override
+	public String mostRecentEntry() {
+		if(stale){
+			writeEntry(volume(this, false));
+		}
+		return entry;
+	}
+
+	@Override
+	public void writeEntry(String entry) {
+		this.entry = entry;
+		stale = false;
+
+	}
 }

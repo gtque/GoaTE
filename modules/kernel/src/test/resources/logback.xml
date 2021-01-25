@@ -37,7 +37,8 @@
 
   <logger name="com.thegoate" level="DEBUG"/>
   <logger name="com.thegoate.annotations.AnnotationFactory" level="INFO"/>
-  <logger name="com.thegoate.json.logging.volume" level="ERROR"/>
+  <logger name="com.thegoate.json.logging.volume" level="DEBUG"/>
+  <logger name="com.thegoate.reflection.GoateReflection" level="INFO"/>
   <!--<logger name="com.thegoate.json.logging.volume.JsonAmplifier" level="ERROR"/>-->
   <logger name="curl" level="DEBUG"/>
   <root level="INFO">

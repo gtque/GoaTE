@@ -261,7 +261,7 @@ public abstract class UnknownUtilType implements Utility {
                     LOG.debug("Problem instantiating the default utility ("+def.getName()+"): " + e.getMessage(), e);
                 }
             } else {
-                LOG.info("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier!=null?identifier.getName():null));
+                LOG.debug("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier!=null?identifier.getName():null));
             }
         }
         return utility;

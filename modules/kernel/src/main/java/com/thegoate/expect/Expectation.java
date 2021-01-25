@@ -213,7 +213,7 @@ public class Expectation {
         }
         if (name == null || name.isEmpty() || name.equals(actual)) {
             if(source!=null) {
-                name = "" + source.hashCode();
+                name = volume(source);
             }
         }
         return this;
@@ -399,7 +399,7 @@ public class Expectation {
                 exp.put("actual", actual);
                 exp.put("operator", operator);
                 exp.put("expected", expected);
-                exp.put("from", fullName());
+                exp.put("from", from);
                 exp.put("failure message", failureMessage);
                 if (includeExtras) {
                     Goate extras = new Goate();

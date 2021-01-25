@@ -22,7 +22,8 @@ public class XmlType extends FindType {
     public boolean parseXml(Object check){
         boolean result = false;
         try {
-            if((""+check).startsWith("<")) {
+            String co = (""+check).trim();
+            if(co.startsWith("<")&&co.endsWith(">")) {
                 Document document = null;
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 dbf.setNamespaceAware(true);
