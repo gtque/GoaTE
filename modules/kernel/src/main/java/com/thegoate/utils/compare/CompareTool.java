@@ -48,6 +48,7 @@ public abstract class CompareTool implements CompareUtility{
     protected Goate data;
     protected GoateCastUtility caster = null;
     protected boolean triedOnce = false;
+    protected boolean triedExpected = false;
 
     public CompareTool(Object actual){
         this.actual = actual;
@@ -67,6 +68,11 @@ public abstract class CompareTool implements CompareUtility{
         return this;
     }
 
+    public CompareTool alreadyTriedExpected(boolean triedExpected){
+        this.triedExpected = triedExpected;
+        return this;
+    }
+
     protected boolean tryExpectedType(String op){
         boolean result = false;
         if(!isNested()&&!triedOnce) {
@@ -76,7 +82,7 @@ public abstract class CompareTool implements CompareUtility{
             if (cu instanceof CompareTool) {
                 ((CompareTool) cu).nested();
             }
-            result = compare.triedOnce(true).actual(actual).to(expected).evaluate();
+            result = compare.triedOnce(true).alreadyTriedExpected(triedExpected).actual(actual).to(expected).evaluate();
         }
         return result;
     }

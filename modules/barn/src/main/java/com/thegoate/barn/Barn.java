@@ -122,9 +122,6 @@ public class Barn extends TestNGEngine {
             } catch (Throwable t) {
                 throw t;
             } finally {
-                if (ev != null) {
-                    logStatuses(ev);
-                }
                 LOG.debug(getTestName(), "----finished expectations----");
                 cleanup();
             }
@@ -132,24 +129,22 @@ public class Barn extends TestNGEngine {
     }
 
     protected void evaluateExpectations() {
-        evaluate("expect");
+        evaluate("expect", false);
     }
 
     protected void evaluatePreconditions() {
-        evaluate("preconditions");
+        evaluate("preconditions", true);
     }
 
     protected void evaluatePostconditions() {
-        evaluate("postconditions");
+        evaluate("postconditions", false);
     }
 
-    protected void evaluate(String stage) {
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(new Goate().put("parent",data).merge(data,false));
-        etb.expect(data.filter(stage + "\\."))
-                .timeout(Long.parseLong("" + data.get(stage + "_timeout", data.get("timeout_expect", 500L))))
-                .period(Long.parseLong("" + data.get(stage + "_period", data.get("period_expect", 50L))));
-        ev = new ExpectEvaluator(etb);
-        boolean result = ev.evaluate();
-        assertTrue(result, stage.toUpperCase()+": " + ev.failed());
+    protected void evaluate(String stage, boolean clearAfterRunning) {
+        etb = new ExpectationThreadBuilder(new Goate().put("parent", data).merge(data, false));
+        etb.expect(data.filter(stage + "\\."));
+        evalTimeout(Long.parseLong("" + data.get(stage + "_timeout", data.get("timeout_expect", 500L))));
+        evalPeriod(Long.parseLong("" + data.get(stage + "_period", data.get("period_expect", 50L))));
+        evaluate(clearAfterRunning);
     }
 }

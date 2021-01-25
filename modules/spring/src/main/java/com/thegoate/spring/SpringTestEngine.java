@@ -213,12 +213,12 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
         engine.evaluate(testResult);
     }
 
-    public boolean logStatuses(ExpectEvaluator ev) {
-        return logStatuses(ev, true);
+    public void logStatuses(ExpectEvaluator ev) {
+        logStatuses(ev, false);
     }
 
-    public boolean logStatuses(ExpectEvaluator ev, boolean currentStatus) {
-        return engine.logStatuses(ev, currentStatus);
+    public void logStatuses(ExpectEvaluator ev, boolean logFailuresDefault) {
+        engine.logStatuses(ev, logFailuresDefault);
     }
 
     protected String baseURL() {
@@ -252,7 +252,7 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
         startUp(m);
     }
 
-    @AfterMethod(alwaysRun = true)
+//    @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         engine.finishUp(method);
     }

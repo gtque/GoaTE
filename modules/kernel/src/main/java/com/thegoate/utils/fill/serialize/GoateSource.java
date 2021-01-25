@@ -46,4 +46,5 @@ public @interface GoateSource {
     Class source() default DefaultSource.class;
     String key();
     boolean flatten() default false;
+    Class serializeTo() default GoateSource.class;
 }

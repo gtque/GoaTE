@@ -35,13 +35,7 @@ import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.togoate.ToGoate;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -51,6 +45,7 @@ import java.util.stream.Collectors;
  */
 public class Goate implements HealthMonitor {
 
+	public static final String GOATE_VARIABLE_PREFIX = "_goate_(%$#)_";
 	Map<String, Object> data = new ConcurrentHashMap<>();
 	Interpreter dictionary;
 	boolean increment = true;
@@ -144,6 +139,9 @@ public class Goate implements HealthMonitor {
 		return get(key, null, false);
 	}
 
+	public Object getStrict(String key, Object def) {
+		return get(key, def, false);
+	}
 	public Object get(int index) {
 		Iterator<String> keys = data.keySet().iterator();
 		String key = "";
@@ -331,6 +329,30 @@ public class Goate implements HealthMonitor {
 		return filtered;
 	}
 
+	public Goate filterByValue(Object value){
+		Goate filtered = new Goate();
+		if(data != null){
+			for (String key : keys()) {
+				if (new Compare(get(key)).using("==").to(value).evaluate()) {
+					filtered.put(key, get(key));
+				}
+			}
+		}
+		return filtered;
+	}
+
+	public Goate filterExcludeByValue(Object value){
+		Goate filtered = new Goate();
+		if(data != null){
+			for (String key : keys()) {
+				if (new Compare(get(key)).using("!=").to(value).evaluate()) {
+					filtered.put(key, get(key));
+				}
+			}
+		}
+		return filtered;
+	}
+
 	public Goate scrubKeys(String pattern) {
 		return scrubKeys(pattern, "");
 	}
@@ -424,17 +446,26 @@ public class Goate implements HealthMonitor {
 
 	public static volatile int innerGoate = 0;
 
-	public String toString(String prepadding, String postpadding) {
+	public String toString(String prepadding, String postpadding){
+		return toString(prepadding, postpadding, true);
+	}
+
+	public String toString(String prepadding, String postpadding, boolean newLine) {
 		StringBuilder sb = new StringBuilder();
 		if(innerGoate>0){
-			sb.append("Goate[\n");
+			sb.append("Goate[");
+			if(newLine){
+				sb.append("\n");
+			}
 		}
 		// parentInner = innerGoate;
 		innerGoate++;
 		boolean appendNewLine = false;
 		for (String key : keys()) {
-			if (appendNewLine) {
+			if (appendNewLine && newLine) {
 				sb.append("\n");
+			} else if(appendNewLine && !newLine){
+				sb.append("; ");
 			}
 			appendNewLine = true;
 			Object message = data.get(key);
@@ -446,7 +477,10 @@ public class Goate implements HealthMonitor {
 		}
 		innerGoate--;
 		if(innerGoate>0){
-			sb.append("\n]");
+			if(newLine){
+				sb.append("\n");
+			}
+			sb.append("]");
 		}
 		return sb.toString();
 	}
@@ -465,6 +499,13 @@ public class Goate implements HealthMonitor {
 
 	public Goate healthCheck() {
 		return (Goate) health;
+	}
+
+	public String pad(String text, String pad){
+		StringBuilder sb = new StringBuilder();
+		sb.append("%_goate_start%");
+		Arrays.stream(text.split("\n")).forEach(line -> sb.append(pad).append(line).append("\n"));
+		return sb.toString().trim().replace("%_goate_start%", "");
 	}
 
 	public int compare(Object check) {
@@ -515,7 +556,4 @@ public class Goate implements HealthMonitor {
 		return result;
 	}
 
-	public abstract class Sponge{
-		public abstract String soap(String dirty);
-	}
 }

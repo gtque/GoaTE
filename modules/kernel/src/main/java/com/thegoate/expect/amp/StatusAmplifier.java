@@ -10,6 +10,7 @@ import com.thegoate.logging.volume.amp.BasicAmplifier;
 import java.util.List;
 import java.util.logging.Level;
 
+import static com.thegoate.Goate.GOATE_VARIABLE_PREFIX;
 import static com.thegoate.dsl.words.EutConfigDSL.eut;
 
 public abstract class StatusAmplifier extends BasicAmplifier {
@@ -49,6 +50,12 @@ public abstract class StatusAmplifier extends BasicAmplifier {
         if (level.isLoudEnough(Level.SEVERE)){
             p.drop("actual");
             p.drop("expected");
+        }
+        if(p.get("actual")!=null && p.get("actual") instanceof String){
+            if(p.get("actual", "", String.class).equals(p.get("from"))){
+                p.drop("from");
+            }
+            p.put("actual", p.get("actual","", String.class).replace(GOATE_VARIABLE_PREFIX, ""));
         }
     }
 

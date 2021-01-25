@@ -26,14 +26,9 @@
  */
 package com.thegoate.testng;
 
-import static com.thegoate.dsl.words.EutConfigDSL.eut;
-
-import java.util.Arrays;
-
-import org.testng.*;
-
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import org.testng.*;
 
 /**
  * Created by Eric Angeli on 11/28/2017.
@@ -76,13 +71,13 @@ public class TestNGEvaluateListener implements IInvokedMethodListener, ITestList
     }
 
     @Override
-    public void beforeInvocation(IInvokedMethod method, ITestResult iTestResult) {
+    public void beforeInvocation(IInvokedMethod method, ITestResult result) {
     }
 
     @Override
     public void afterInvocation(IInvokedMethod method, ITestResult result) {
-        if(method.isTestMethod()) {
-            if(result.getTestName()!=null) {
+        if (method.isTestMethod()) {
+            if (result.getTestName() != null) {
                 TestNG test = TestMap.tests.get(result.getTestName());
                 try {
                     if (test != null) {
@@ -90,14 +85,14 @@ public class TestNGEvaluateListener implements IInvokedMethodListener, ITestList
                     }
                 } catch (Throwable t) {
                     result.setStatus(ITestResult.FAILURE);
-                    if(eut("assert.printStackTrace",true, Boolean.class)) {
+//                    if (eut("assert.printStackTrace", true, Boolean.class)) {
                         result.setThrowable(t);
-//                        StringBuilder stack = new StringBuilder();
-//                        Arrays.stream(t.getStackTrace()).forEach(trace -> stack.append(trace).append("\n"));
-//                        LOG.error("result.getTestName()", stack.toString());
-                    }
+//                    }
                 } finally {
                     TestMap.tests.remove(result.getTestName());//clearing map for garbage collection
+                    if(test != null) {
+                        test.finishUp(method.getTestMethod().getConstructorOrMethod().getMethod());
+                    }
                 }
             }
         }

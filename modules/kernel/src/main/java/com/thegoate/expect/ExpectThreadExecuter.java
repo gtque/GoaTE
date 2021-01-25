@@ -100,7 +100,7 @@ public class ExpectThreadExecuter extends Thread {
                 current = System.currentTimeMillis();
             }
             if (!status) {
-                failed.append("The expectation failed or timed out.\n");
+                failed.append("The expectation(s) failed or timed out.\n");
                 failed.append(expectation.failed());
             }
             executing = false;

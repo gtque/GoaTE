@@ -16,6 +16,12 @@ public class PassAmplifier extends StatusAmplifier {
 	}
 
 	@Override
+	protected void logVolume(Goate p){
+		super.logVolume(p);
+		p.drop("failure message");
+	}
+
+	@Override
 	protected void setStatus() {
 		status = ev.passes();
 	}

@@ -1,11 +1,13 @@
 package com.thegoate.staff;
 
 import com.thegoate.Goate;
+import com.thegoate.expect.Expectation;
 
 /**
  * Created by Eric Angeli on 6/26/2020.
  */
 public interface Worker<T, S> {
+	Worker<T, S> expectation(Expectation expectation);
 	S work();
 	HealthRecord getHrReport();
 	T setName(String name);

@@ -1,5 +1,6 @@
 package com.thegoate.expect.amp;
 
+import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.logging.volume.amp.GoateAmplifier;
 
@@ -12,6 +13,14 @@ public class FailAmplifier extends StatusAmplifier {
 
 	public FailAmplifier(Object message) {
 		super(message);
+	}
+
+	@Override
+	protected void logVolume(Goate p){
+		super.logVolume(p);
+		if(p.get("failure message", null) == null) {
+			p.drop("failure message");
+		}
 	}
 
 	@Override

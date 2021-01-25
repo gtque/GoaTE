@@ -47,8 +47,9 @@ public class SpreadSheetDL extends DataLoader {
         String fileName = ""+parameters.get("fileName");
         String sheetName = ""+parameters.get("sheetName","Sheet1");
         boolean firstRow = Boolean.parseBoolean(""+parameters.get("firstRowIsHeader",true));
+        boolean trim = Boolean.parseBoolean(""+parameters.get("trim",false));
         try {
-            SheetUtils sheet = SheetUtils.build(fileName, sheetName).firstRowIsHeader(firstRow);
+            SheetUtils sheet = SheetUtils.build(fileName, sheetName).trim(trim).firstRowIsHeader(firstRow);
             Goate info = sheet.load();
             for(String key:info.keys()){
                 Goate page = (Goate)info.get(key);
@@ -74,6 +75,11 @@ public class SpreadSheetDL extends DataLoader {
 
     public SpreadSheetDL firstRowIsHeader(boolean headerRow){
         setParameter("firstRowIsHeader", headerRow);
+        return this;
+    }
+
+    public SpreadSheetDL trim(boolean trim){
+        setParameter("trim", trim);
         return this;
     }
 }

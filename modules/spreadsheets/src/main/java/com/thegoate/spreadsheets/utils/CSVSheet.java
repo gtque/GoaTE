@@ -84,7 +84,7 @@ public class CSVSheet extends SheetUtils {
         }
         if (in != null) {
             try {
-                Iterable<CSVRecord> records = CSVFormat.RFC4180.parse(in);
+                Iterable<CSVRecord> records = CSVFormat.RFC4180.withTrim(trimWhiteSpace).parse(in);
                 boolean headersFound = false;
                 int row = 0;
                 for (CSVRecord record : records) {

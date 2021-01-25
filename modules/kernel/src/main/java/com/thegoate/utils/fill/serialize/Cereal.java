@@ -29,6 +29,7 @@ package com.thegoate.utils.fill.serialize;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.togoate.ToGoate;
 
 import java.lang.reflect.Field;
 
@@ -36,13 +37,17 @@ import java.lang.reflect.Field;
  * Created by Eric Angeli on 7/10/2018.
  */
 public class Cereal {
-    private BleatBox LOG = BleatFactory.getLogger(getClass());
+    protected BleatBox LOG = BleatFactory.getLogger(getClass());
 //    protected Class dataSource;
 //
 //    public Cereal from(Class dataSource){
 //        this.dataSource = dataSource;
 //        return this;
 //    }
+
+    protected Object doCast(Object o, Class castTo) throws InstantiationException, IllegalAccessException {
+        return new Cast(new ToGoate(o).convert(), o.getClass()).cast(o, castTo);
+    }
 
     public static GoateSource findGoateSource(Field field, Class dataSource){
         GoateSource[] annotations = field.getAnnotationsByType(GoateSource.class);

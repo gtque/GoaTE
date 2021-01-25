@@ -36,6 +36,7 @@ import com.thegoate.utils.fill.serialize.string.StringConverter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Created by Eric Angeli on 6/26/2018.
@@ -47,6 +48,7 @@ public class Cast extends UnknownUtilType {
     private Goate data;
     private Class dataSource;
     private Field field;
+    private Object container;
 
     public Cast(Goate data, Class dataSource){
         this.data = data;
@@ -89,19 +91,42 @@ public class Cast extends UnknownUtilType {
         return (T)object;
     }
 
+    public Cast container(Object o){
+        this.container = o;
+        return this;
+    }
     public Cast field(Field field){
         this.field = field;
         return this;
     }
 
+    protected Class getType(Class type){
+        Class t = type;
+        if(type == TypeT.class){
+            if(container instanceof TypeT) {
+                try {
+                    Method get_type = container.getClass().getMethod("goateType");
+                    type = (Class) get_type.invoke(container);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    LOGGER.debug("problem detecting type T, will just assume it is the type: " + e.getMessage());
+                }
+            }
+            LOGGER.debug("found a generic type: " + type);
+        }
+        return t;
+    }
+
     protected Object buildFromCastUtil(Class type, Object value){
-        CastUtility caster = (CastUtility)buildUtil(type, CastUtil.class, value);
+        CastUtility caster = (CastUtility)buildUtil(getType(type), CastUtil.class, value);
         if(caster==null){
             LOGGER.error("Cast","Could not build: " + type.getName() +". You may need to implement a CastUtility to support that object type.");
             throw new RuntimeException("Could not build: " + type.getName() +". You may need to implement a CastUtility to support that object type.");
         }
         LOGGER.debug("Cast","Cast utility found, building object.");
         caster.setData(data);
+        if(caster instanceof GoateCastUtility){
+            ((GoateCastUtility)caster).setContainer(container);
+        }
         return caster.dataSource(dataSource).field(field).cast(type);
     }
 

@@ -31,6 +31,7 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.fill.serialize.to.SerializeTo;
+import com.thegoate.utils.togoate.ToGoate;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -44,12 +45,18 @@ import java.util.Map;
  * methods, reflection, and access may be used or altered. Use in production code at your own risk.
  * Created by Eric Angeli on 6/26/2018.
  */
-public class Serializer<T, S> extends Cereal {
-    private BleatBox LOG = BleatFactory.getLogger(getClass());
+public class Serializer<T, S, U> extends Cereal {
     private T pojo;
     private S source;
+    private U cereal;
     private boolean serializeNested = true;
     private boolean alwaysSerializeGoatePojo = false;
+
+    public Serializer(T pojo, S source, U cereal) {
+        this.pojo = pojo;
+        this.source = source;
+        this.cereal = cereal;
+    }
 
     public Serializer(T pojo, S source) {
         this.pojo = pojo;
@@ -99,8 +106,8 @@ public class Serializer<T, S> extends Cereal {
         return data;
     }
 
-    public Object to(SerializeTo serializer){
-        return serializer.source((Class)source).cereal(pojo.getClass()).serialize(pojo);
+    public U to(SerializeTo serializer){
+        return (U)serializer.source((Class)source).cereal(pojo.getClass()).serialize(pojo);
     }
 
     public Map<String, Object> toMap(Class mapType) {
@@ -126,6 +133,9 @@ public class Serializer<T, S> extends Cereal {
                     field.getValue().setAccessible(true);
                     try {
                         Object o = field.getValue().get(pojo);
+                        if(gs != null && gs.serializeTo() != GoateSource.class){
+                            o = doCast(o, gs.serializeTo());
+                        }
                         if (o != null) {
                             Class type = field.getValue().getType();
                             if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {
@@ -138,7 +148,7 @@ public class Serializer<T, S> extends Cereal {
                                 }
                             }
                         }
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalAccessException | InstantiationException e) {
                         LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
                     }
                     field.getValue().setAccessible(acc);

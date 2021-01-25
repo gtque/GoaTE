@@ -37,7 +37,7 @@ import org.json.JSONObject;
 @CompareUtil(operator = "isNull", type = JSONObject.class)
 public class CompareJsonIsNull extends CompareJson {
 
-    Object expected = null;
+    protected Object expected = null;
 
     public CompareJsonIsNull(Object actual) {
         super(actual);

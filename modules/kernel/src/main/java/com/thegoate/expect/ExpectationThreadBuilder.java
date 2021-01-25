@@ -59,6 +59,10 @@ public class ExpectationThreadBuilder {
         return this;
     }
 
+    public List<Expectation> expectations(){
+        return this.expectations;
+    }
+
     public ExpectationThreadBuilder(Goate data){
         this.data = data;
     }

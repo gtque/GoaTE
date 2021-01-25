@@ -240,6 +240,8 @@ public abstract class UnknownUtilType implements Utility {
                                     utility = af.constructor(null).build(c);
                                     break;
                                 }
+                            } else {
+
                             }
                         }
                     }
@@ -247,6 +249,8 @@ public abstract class UnknownUtilType implements Utility {
                     LOG.debug("The class ("+c.getName()+") did not have isType, cannot determine if that class is the correct type. " + e.getMessage(), e);
                 }
             }
+        } else {
+            LOG.info("The utility directory was null for some reason: " + util.getCanonicalName() + ":" + id + ":" + (identifier!=null?identifier.getName():null));
         }
         if(utility==null){
             if(def!=null){
@@ -256,6 +260,8 @@ public abstract class UnknownUtilType implements Utility {
                 } catch (IllegalAccessException | InvocationTargetException |InstantiationException e){
                     LOG.debug("Problem instantiating the default utility ("+def.getName()+"): " + e.getMessage(), e);
                 }
+            } else {
+                LOG.info("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier!=null?identifier.getName():null));
             }
         }
         return utility;

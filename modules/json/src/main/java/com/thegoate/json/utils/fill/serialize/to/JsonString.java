@@ -46,6 +46,7 @@ public class JsonString extends SerializeTo {
 
     @Override
     public Object serialize(Object pojo) {
+        this.original = pojo;
         return (mapFields("", cereal, new JSONObject(pojo).toString(4)));
     }
 
@@ -62,9 +63,22 @@ public class JsonString extends SerializeTo {
         for (Map.Entry<String, Field> field : fields.entrySet()) {
             GoateSource gs = findGoateSource(field.getValue(), source);
             String fieldKey = field.getKey();
+//            Object fieldValue = null;
             String altKey = fieldKey;
             if (gs != null) {
                 altKey = gs.key();
+            }
+
+            if(gs != null && gs.serializeTo() != GoateSource.class){
+                boolean acc = field.getValue().isAccessible();
+                field.getValue().setAccessible(true);
+                try {
+                    value.put(field.getKey(), doCast(field.getValue().get(original), gs.serializeTo()));
+                } catch (IllegalAccessException | InstantiationException e) {
+                    LOG.warn("Problem casting to the source type, using original value, value may not be what you expected: " + e.getMessage(), e);
+                } finally {
+                    field.getValue().setAccessible(acc);
+                }
             }
 
             if(!fieldKey.equals(altKey)) {

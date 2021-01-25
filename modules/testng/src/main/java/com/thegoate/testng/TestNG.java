@@ -33,6 +33,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -40,6 +41,8 @@ import java.util.List;
  * Created by Eric Angeli on 5/11/2017.
  */
 public interface TestNG {
+    void startUp(Method method);
+    void finishUp(Method method);
     Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception;
     void defineDataLoaders();
     void defineDataLoaders(Goate runData, Goate constantData);

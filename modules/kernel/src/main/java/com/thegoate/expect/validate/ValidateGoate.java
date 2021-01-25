@@ -33,6 +33,8 @@ import com.thegoate.utils.get.NotFound;
 
 import java.util.List;
 
+import static com.thegoate.expect.Expectation.EmployeeWorkResult;
+
 /**
  * Validators don't care about type.
  * There must be at least one comparator for each operator the Validator supports.
@@ -81,7 +83,7 @@ public class ValidateGoate extends Validate{
             }
         }
         if (filteredData.size() == 0) {
-            if (exp.get("actual") instanceof String && ((String) exp.get("actual")).equalsIgnoreCase("return")) {
+            if (exp.get("actual") instanceof String && (((String) exp.get("actual")).equalsIgnoreCase("return") || ((String) exp.get("actual")).equalsIgnoreCase(EmployeeWorkResult))) {
                 filteredData.put("" + exp.get("actual"), fromData);
             }
         }

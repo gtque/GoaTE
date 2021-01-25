@@ -184,7 +184,7 @@ public class AnnotationFactory {
      *
      * @return The instance of itself, syntactic sugar for stringing calls together.
      */
-    public AnnotationFactory buildDirectory() {
+    public synchronized AnnotationFactory buildDirectory() {
         if (!directory.containsKey(annotation.getCanonicalName())) {
             directory.put(annotation.getCanonicalName(), new ConcurrentHashMap<>());
         }

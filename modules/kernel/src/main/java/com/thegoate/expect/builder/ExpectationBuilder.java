@@ -41,7 +41,8 @@ public abstract class ExpectationBuilder {
     protected Object actual;
     protected Object expected;
     protected List<Expectation> expectations = new ArrayList<>();
-
+    protected Value actualValue;
+    protected Value expectedValue;
 //    public List<Expectation> build(Expectation expectation){
 //        Goate exp = (Goate)expectation.getExpectations().get(0);
 //        setFrom(expectation.getFrom());
@@ -51,8 +52,34 @@ public abstract class ExpectationBuilder {
 
     public abstract List<Expectation> build();
 
-    protected ExpectationBuilder expect(Expectation expectation){
+    protected ExpectationBuilder expect(Expectation expectation) {
         expectations.add(expectation);
+        return this;
+    }
+
+    public ExpectationBuilder actualValue(Object value) {
+        if(value instanceof Value) {
+            this.actualValue = (Value)value;
+            if (value != null) {
+                this.setActual(this.actualValue.getLocator());
+                this.setFrom(this.actualValue.getContainer());
+            }
+        } else {
+            setActual(value);
+        }
+        return this;
+    }
+
+    public ExpectationBuilder expectedValue(Object value) {
+        if(value instanceof Value) {
+            this.expectedValue = (Value)value;
+            if (value != null) {
+                this.setExpected(this.expectedValue.getLocator());
+                this.setFromExpected(this.expectedValue.getContainer());
+            }
+        } else {
+            setExpected(value);
+        }
         return this;
     }
 
@@ -61,6 +88,9 @@ public abstract class ExpectationBuilder {
     }
 
     public ExpectationBuilder setFrom(Object from) {
+        if(actualValue == null){
+            actualValue = new Value().from(from);
+        }
         this.from = from;
         return this;
     }
@@ -70,14 +100,17 @@ public abstract class ExpectationBuilder {
     }
 
     public ExpectationBuilder setFromExpected(Object fromExpected) {
+        if(expectedValue == null){
+            expectedValue = new Value().from(fromExpected);
+        }
         this.fromExpected = fromExpected;
         return this;
     }
 
     public Object getActual() {
         Object a = actual;
-        if(from!=null){
-            if(!(""+actual).contains("*")&&!(""+actual).contains("+")) {
+        if (from != null) {
+            if (!("" + actual).contains("*") && !("" + actual).contains("+")) {
                 a = new Get(actual).from(from);
             } else {
                 a = from;
@@ -87,6 +120,9 @@ public abstract class ExpectationBuilder {
     }
 
     public ExpectationBuilder setActual(Object actual) {
+        if(actualValue == null){
+            actualValue = new Value(actual);
+        }
         this.actual = actual;
         return this;
     }
@@ -96,6 +132,9 @@ public abstract class ExpectationBuilder {
     }
 
     public ExpectationBuilder setExpected(Object expected) {
+        if(expectedValue == null){
+            expectedValue = new Value(expected);
+        }
         this.expected = expected;
         return this;
     }

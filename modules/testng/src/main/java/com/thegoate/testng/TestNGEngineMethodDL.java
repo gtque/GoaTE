@@ -162,10 +162,10 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         }
     }
 
-    @Override
-    public void startUp(Method method) {
-        super.startUp(method);
-    }
+//    @Override
+//    public void startUp(Method method) {
+//        super.startUp(method);
+//    }
 
     @BeforeMethod(alwaysRun = true)
     public void initDataMethod(Object[] d, Method m) {
@@ -174,6 +174,6 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         } else {
             init(data!=null?data:new Goate());
         }
-        startUp(m);
+//        startUp(m);
     }
 }

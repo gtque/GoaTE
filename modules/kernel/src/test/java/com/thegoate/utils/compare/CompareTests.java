@@ -37,12 +37,14 @@ import com.thegoate.utils.compare.tools.integer.*;
 import com.thegoate.utils.compare.tools.l.CompareLongEqualTo;
 import com.thegoate.utils.compare.tools.l.CompareLongGreaterThanEqualTo;
 
+import com.thegoate.utils.get.Get;
+import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
 import java.math.BigDecimal;
+
+import static com.thegoate.utils.type.GoateNullCheck.isNull;
+import static org.testng.Assert.*;
 
 /**
  * Tests compare utilities.
@@ -365,6 +367,50 @@ public class CompareTests extends TestNGEngineMethodDL {
 		assertTrue(new Compare("2017-06-11T04:00:00.000+0000").using("<").to("2017-06-30").evaluate(), "The date was not less than apparently.");
 	}
 
+	@GoateDLP(name= "string comparisons")
+	public Goate[] sdlp(){
+		Goate[] d = new Goate[2];
+		d[0] = new Goate()
+				.put("dl##", new StaticDL().add("Scenario","abcd<=abcd is true").add("actual", "actual").add("from", new Goate().put("actual", "abcd")).add("expected", "abcd").add("operator", "<=").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","abcd<z is true").add("actual", "actual").add("from", new Goate().put("actual", "abcd")).add("expected", "z").add("operator", "<").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","abcd<=abc is false").add("actual", "actual").add("from", new Goate().put("actual", "abcd")).add("expected", "abc").add("operator", "<=").add("pass", false))
+				.put("dl##", new StaticDL().add("Scenario","abcde>=abcd is true").add("actual", "actual").add("from", new Goate().put("actual", "abcde")).add("expected", "abcd").add("operator", ">=").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","c>abcd is true").add("actual", "actual").add("from", new Goate().put("actual", "c")).add("expected", "abcd").add("operator", ">").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","a>abcd is false").add("actual", "actual").add("from", new Goate().put("actual", "a")).add("expected", "abcd").add("operator", ">").add("pass", false))
+				.put("dl##", new StaticDL().add("Scenario","json null<=abcd is false").add("actual", "actual").add("from", "{\"actual\":null}").add("expected", "abcd").add("operator", "<=").add("pass", false))
+				.put("dl##", new StaticDL().add("Scenario","null<=abcd is false").add("actual", "actual").add("from", new Goate().put("actual", "null::")).add("expected", "abcd").add("operator", "<=").add("pass", false))
+				.put("dl##", new StaticDL().add("Scenario","json null>=abcd is true").add("actual", "actual").add("from", "{\"actual\":null}").add("expected", "abcd").add("operator", ">=").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","null>=abcd is true").add("actual", "actual").add("from", new Goate().put("actual", "null::")).add("expected", "abcd").add("operator", ">=").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","json null<abcd is false").add("actual", "actual").add("from", "{\"actual\":null}").add("expected", "abcd").add("operator", "<").add("pass", false))
+				.put("dl##", new StaticDL().add("Scenario","null<abcd is false").add("actual", "actual").add("from", new Goate().put("actual", "null::")).add("expected", "abcd").add("operator", "<").add("pass", false))
+				.put("dl##", new StaticDL().add("Scenario","json null>abcd is true").add("actual", "actual").add("from", "{\"actual\":null}").add("expected", "abcd").add("operator", ">").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","null>abcd is true").add("actual", "actual").add("from", new Goate().put("actual", "null::")).add("expected", "abcd").add("operator", ">").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","json null<=null is false").add("actual", "actual").add("from", "{\"actual\":null}").add("expected", "abcd").add("operator", "<=").add("pass", false))
+				.put("dl##", new StaticDL().add("Scenario","null<=null is true").add("actual", "actual").add("from", new Goate().put("actual", "null::")).add("expected", "null::").add("operator", "<=").add("pass", true))
+				.put("dl##", new StaticDL().add("Scenario","json null>null is false").add("actual", "actual").add("from", "{\"actual\":null}").add("expected", "abcd").add("operator", "<=").add("pass", false))
+				.put("dl##", new StaticDL().add("Scenario","null<null is false").add("actual", "actual").add("from", new Goate().put("actual", "null::")).add("expected", "abcd").add("operator", "<=").add("pass", false))
+				;
+		return d;
+	}
+	@GoateProvider(name = "string comparisons")
+	@Test(groups = {"unit"}, dataProvider = "methodLoader")
+	public void compareStrings(Goate testdata) {
+		LOG.info("comparing strings", ""+new Get(get("actual", "actual", String.class)).from(get("from")) + get("operator", "", String.class) + get("expected"));
+		boolean result = false;
+		try {
+			expect(Expectation.build()
+					.actual(get("actual"))
+					.from(get("from"))
+					.is(get("operator", "==", String.class))
+					.expected(get("expected")));
+			evaluate();
+			result = true;
+		} catch (Throwable t){
+			LOG.debug("exception was thrown, which means the comparison failed.");
+		}
+		assertEquals(result, (boolean)get("pass", false, Boolean.class));
+	}
+
 	@GoateDLP(name = "compare primitives")
 	public Goate[] dlp(){
 		Goate[] d = new Goate[2];
@@ -417,5 +463,12 @@ public class CompareTests extends TestNGEngineMethodDL {
 			.expected(get("expected")));
 		evaluate();
 		LOG.info("directly called evaluate and it passed.");
+	}
+
+	@Test(groups = {"unit"})
+	public void checkNull(){
+		assertTrue(isNull(null));
+		assertTrue(isNull(JSONObject.NULL));
+		assertFalse(isNull(new JSONObject()));
 	}
 }

@@ -60,6 +60,13 @@ import static org.testng.Assert.assertEquals;
 public class CSVTest extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
+    public void loadCSVWithSpaces() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        SheetUtils sheet = SheetUtils.build("data/foobar/csv/foo2.csv", "the sheet name does not matter.").firstRowIsHeader().trim(true);
+        sheet.load();
+        assertEquals(sheet.get("a", 0), "b");
+    }
+
+    @Test(groups = {"unit"})
     public void loadSimpleCSV() throws IllegalAccessException, InstantiationException, InvocationTargetException {
         SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
         sheet.load();

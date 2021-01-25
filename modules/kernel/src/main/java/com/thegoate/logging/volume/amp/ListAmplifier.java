@@ -17,7 +17,7 @@ public class ListAmplifier extends BasicAmplifier{
 
 	@Override
 	public String amplify(Object message) {
-		return "list>" + (message!=null?(""+message):null);
+		return "(list)" + (message!=null?(""+message):null);
 	}
 
 	@Override

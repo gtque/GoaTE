@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.fill.serialize.GoateCastUtility;
+import com.thegoate.utils.fill.serialize.TypeT;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -64,6 +65,13 @@ public abstract class CastCollection extends GoateCastUtility {
                 try {
                     Method check = typeAnnotation.getMethod("type", types);
                     type = check.invoke(field.getAnnotation(typeAnnotation));
+                    if(type instanceof TypeT || type == TypeT.class){
+                        if(container instanceof TypeT) {
+                            Method get_type = container.getClass().getMethod("goateType");
+                            type = get_type.invoke(container);
+                        }
+                        LOGGER.debug("found a generic type: " + type);
+                    }
 //                    Object u = af.constructor(null).build(c);
 //                    if (check != null && Boolean.parseBoolean("" + check.invoke(field.getAnnotation(typeAnnotation), checkArgs))) {
 //                        utility = u;

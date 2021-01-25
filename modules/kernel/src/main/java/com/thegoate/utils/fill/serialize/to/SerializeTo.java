@@ -34,6 +34,7 @@ import com.thegoate.utils.fill.serialize.Cereal;
 public abstract class SerializeTo extends Cereal {
     protected Class cereal;
     protected Class source;
+    protected Object original;
 
     public SerializeTo source(Class source){
         this.source = source;

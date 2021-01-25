@@ -32,6 +32,8 @@ import com.thegoate.utils.compare.CompareUtility;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.NotFound;
 
+import static com.thegoate.expect.Expectation.EmployeeWorkResult;
+
 /**
  * Validators don't care about type.
  * There must be at least one comparator for each operator the Validator supports.
@@ -181,7 +183,7 @@ public class ValidateNotGoate extends Validate {
 
             }
         } else {
-            if (exp.get("actual") instanceof String && ((String) exp.get("actual")).equalsIgnoreCase("return")) {
+            if (exp.get("actual") instanceof String && (((String) exp.get("actual")).equalsIgnoreCase("return") || ((String) exp.get("actual")).equalsIgnoreCase(EmployeeWorkResult))) {
                 val = rtrn;
             } else {
                 Get get = new Get(exp.get("actual"));//from.doWork());

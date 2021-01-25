@@ -84,7 +84,7 @@ public class CompareObjectEqualTo extends CompareObject {
 						e.printStackTrace();
 					}
 				} else {
-					health.put("not equal", "" + volume(actual) + "!=" + volume(expected));
+					health.put("value", "" + volume(actual) + "!=" + volume(expected));
 				}
 			}
 		}

@@ -60,7 +60,7 @@ public class CastList extends CastCollection {
         }
         while (data.filter("" + i).size() > 0) {
             try {
-                o.add(new Cast(data.filter("" + i).scrubKeys("" + i + "\\."), dataSource).cast(data.get("" + i), getType("" + i, data.get("" + i))));
+                o.add(new Cast(data.filter("" + i).scrubKeys("" + i + "\\."), dataSource).container(container).cast(data.get("" + i), getType("" + i, data.get("" + i))));
             } catch (IllegalAccessException | InstantiationException e) {
                 LOGGER.error("Cast Array", "Failed to build list: " + e.getMessage(), e);
                 throw new RuntimeException("Failed to construct list: " + e.getMessage());

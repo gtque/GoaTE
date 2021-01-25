@@ -6,7 +6,7 @@ import com.thegoate.logging.volume.amp.GoateAmplifier;
 /**
  * Created by Eric Angeli on 7/1/2020.
  */
-@GoateAmplifier(type = SimpleObject.class)
+//@GoateAmplifier(type = SimpleObject.class)
 public class SimpleObjectAmplifier extends BasicAmplifier{
 
 	public SimpleObjectAmplifier(Object message) {

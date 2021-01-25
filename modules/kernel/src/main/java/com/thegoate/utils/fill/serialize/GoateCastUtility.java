@@ -37,6 +37,7 @@ import java.lang.reflect.Field;
  */
 public abstract class GoateCastUtility implements CastUtility {
 
+    protected Object container;
     protected Object value;
     protected Goate data;
     protected Class dataSource;
@@ -71,6 +72,11 @@ public abstract class GoateCastUtility implements CastUtility {
     @Override
     public CastUtility field(Field field) {
         this.field = field;
+        return this;
+    }
+
+    public GoateCastUtility setContainer(Object container){
+        this.container = container;
         return this;
     }
 

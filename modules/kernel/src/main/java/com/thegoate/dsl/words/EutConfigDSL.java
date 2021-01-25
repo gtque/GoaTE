@@ -109,7 +109,9 @@ public class EutConfigDSL extends DSL {
 
     @Override
     public Object evaluate(Goate data) {
-        eut = (Goate)data.get("_goate_:eutConfig", eut);
+        if(data.get("_goate_:eutConfig")!=null){
+            eut = data.get("_goate_:eutConfig", eut, Goate.class);
+        }
         eut.put("_init_", true);
         if(!loaded) {
             loaded = true;

@@ -43,6 +43,7 @@ public class DeSerializer extends Cereal{
     private BleatBox LOG = BleatFactory.getLogger(getClass());
     private Goate data;
     private Class dataSource;
+    private Class genericType;
 
     public <T> T build(Class<T> type){
         Object o = null;
@@ -79,7 +80,7 @@ public class DeSerializer extends Cereal{
                             } else {
                                 d = data.filterStrict(fieldKey.replace("##","[0-9]*"));
                             }
-                            field.getValue().set(o, new Cast(d, dataSource).field(field.getValue()).cast(value,field.getValue().getType()));
+                            field.getValue().set(o, new Cast(d, dataSource).container(o).field(field.getValue()).cast(value,field.getValue().getType()));
                         }
                     } catch (Exception e) {
                         LOG.error("Build Pojo", "Failed to set field: " + e.getMessage(), e);
@@ -98,11 +99,23 @@ public class DeSerializer extends Cereal{
             LOG.error("Build Pojo", "Can't build the pojo if you don't tell me what to build.");
             throw new RuntimeException("The pojo class was not specified.");
         }
-        return type.newInstance();
+        Object o = type.newInstance();
+        if(o instanceof TypeT){
+            ((TypeT)o).setGoateType(genericType);
+        }
+        return o;
     }
 
     public DeSerializer data(Goate data){
         this.data = data;
+        return this;
+    }
+
+    public DeSerializer T(Class type){
+        return genericType(type);
+    }
+    public DeSerializer genericType(Class type){
+        this.genericType = type;
         return this;
     }
 

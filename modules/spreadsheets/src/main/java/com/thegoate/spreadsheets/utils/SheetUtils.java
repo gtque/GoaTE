@@ -51,12 +51,23 @@ public abstract class SheetUtils {
     protected Map<String, List<String>> headers = new ConcurrentHashMap<>();
     protected boolean firstRowIsHeader = true;
     protected boolean loadAllData = false;
+    protected boolean trimWhiteSpace = false;
+
     protected Object file = null;
 
     public abstract int rowCount();
 
     public Goate getRow(int rowNumber) {
         return currentSheet().get("" + rowNumber, new Goate(), Goate.class);
+    }
+
+    public SheetUtils trim(boolean trimWhiteSpace){
+        this.trimWhiteSpace = trimWhiteSpace;
+        return this;
+    }
+
+    public boolean isTrimWhiteSpace(){
+        return trimWhiteSpace;
     }
 
     public Goate currentSheet() {

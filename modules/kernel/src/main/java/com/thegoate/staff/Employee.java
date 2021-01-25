@@ -30,6 +30,7 @@ package com.thegoate.staff;
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationEvaluator;
 import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.expect.Expectation;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.metrics.Stopwatch;
@@ -53,6 +54,7 @@ public abstract class Employee<T> implements Worker<Employee, T> {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected final static BleatBox slog = BleatFactory.getLogger(Employee.class);
     protected HealthRecord hr = new HealthRecord();
+    protected Expectation expectation = null;
     protected Goate data;
     protected Goate definition = new Goate();
     protected String name = "";
@@ -67,6 +69,12 @@ public abstract class Employee<T> implements Worker<Employee, T> {
 
     public Employee<T> setName(String name){
         this.name = name;
+        return this;
+    }
+
+    @Override
+    public Employee<T> expectation(Expectation expectation){
+        this.expectation = expectation;
         return this;
     }
 

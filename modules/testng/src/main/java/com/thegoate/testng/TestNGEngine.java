@@ -27,13 +27,11 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
-import com.thegoate.expect.ExpectEvaluator;
-import com.thegoate.expect.ExpectThreadExecuter;
-import com.thegoate.expect.Expectation;
-import com.thegoate.expect.ExpectationThreadBuilder;
+import com.thegoate.expect.*;
 import com.thegoate.expect.amp.FailAmplifier;
 import com.thegoate.expect.amp.PassAmplifier;
 import com.thegoate.expect.amp.SkippedAmplifier;
+import com.thegoate.expect.amp.ZeroOrMoreAmplifier;
 import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
@@ -53,6 +51,7 @@ import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.thegoate.dsl.words.EutConfigDSL.eut;
@@ -80,6 +79,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     XmlTest xt = null;
     protected ExpectationThreadBuilder etb;
     protected ExpectEvaluator ev;
+    private List<ExpectEvaluator> executedExpectations = new ArrayList<>();
 
     public static int number = 0;
 
@@ -96,6 +96,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @BeforeMethod(alwaysRun = true)
+    @Override
     public void startUp(Method method) {
         UnknownUtilType.clearCache(Get.class);
         methodName = method.getName();
@@ -103,6 +104,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
             Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
         }
         etb = new ExpectationThreadBuilder(data);
+        executedExpectations = new ArrayList<>();
         String startMessage = "\n" +
                 "***************************Starting Up***************************\n" +
                 "*\t" + getTestName() + "\t*\n";
@@ -112,7 +114,8 @@ public abstract class TestNGEngine implements ITest, TestNG {
         LOG.info("Start Up", startMessage);
     }
 
-    @AfterMethod(alwaysRun = true)
+    //    @AfterMethod(alwaysRun = true)
+    @Override
     public void finishUp(Method method) {
         StaticScrubber scrubber = new StaticScrubber();
         if (data != null && data.get("lap", null) != null) {
@@ -138,7 +141,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     public String getTestName() {
         StringBuilder name = new StringBuilder("");
         if (includeClassMethodInName) {
-            name.append((testClass==null?getClass().getCanonicalName():testClass.getCanonicalName())+ ":" + methodName + ":");
+            name.append((testClass == null ? getClass().getCanonicalName() : testClass.getCanonicalName()) + ":" + methodName + ":");
         }
         name.append(scenario);
         name.append("(" + runNumber + ")");
@@ -246,7 +249,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     @Override
     public TestNGEngine expect(Expectation expectation) {
-        if(etb.isBuilt()){
+        if (etb.isBuilt()) {
             clearExpectations();
         }
         if (etb != null) {
@@ -291,38 +294,54 @@ public abstract class TestNGEngine implements ITest, TestNG {
         evaluate(null);
     }
 
+    public void evaluate(boolean clearAfterRunning){
+        evaluate(null, clearAfterRunning);
+    }
+
     @Override
-    public void evaluate(ITestResult testResult){
+    public void evaluate(ITestResult testResult) {
+        evaluate(testResult, false);
+    }
+
+    public void evaluate(ITestResult testResult, boolean clearAfterRunning){
         if (etb.isBuilt()) {
             LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
         } else {
             ev = new ExpectEvaluator(etb);
             boolean result = ev.evaluate();
-            result = logStatuses(ev, result);
-            assertTrue(result, ev.failed());
+            executedExpectations.add(ev);
+            if (ev.fails().size() > 0) {
+                LOG.warn("failures detected...");
+                result = false;
+            }
+            if( ev.skipped().size() > 0) {
+                LOG.warn("skipped tests detected...");
+                result = false;
+            }
+            logStatuses(ev, clearAfterRunning);
+            try {
+                assertTrue(result, ev.failed());
+            } catch (Throwable e) {
+                StringBuilder failures = new StringBuilder();
+                executedExpectations.stream().forEach(ex -> failures.append(getFailures(ex)));
+                throw new ExpectationError(failures.toString());
+//                throw e;
+            } finally {
+                if(clearAfterRunning){
+                    executedExpectations = new ArrayList<>();
+                }
+            }
         }
     }
 
-    public boolean logStatuses(ExpectEvaluator ev) {
-        return logStatuses(ev, true);
-    }
-
-    public boolean logStatuses(ExpectEvaluator ev, boolean currentStatus) {
-        Goate.innerGoate = -1;
-        String passes = new PassAmplifier(null)
-                .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
-                .testName(getTestName())
-                .amplify(ev);
-        if (!passes.isEmpty()) {
-            LOG.info("\npassed:" + passes);
-        }
-
+    private String getFailures(ExpectEvaluator ev) {
+        StringBuilder failures = new StringBuilder();
         String fails = new FailAmplifier(null)
                 .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
                 .testName(getTestName())
                 .amplify(ev);
         if (!fails.isEmpty()) {
-            LOG.info("\nfailed:" + fails);
+            failures.append("\nfailed").append(fails);
         }
 
         String skips = new SkippedAmplifier(null)
@@ -330,15 +349,37 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 .testName(getTestName())
                 .amplify(ev);
         if (!skips.isEmpty()) {
-            LOG.info(skips);
+                failures.append(skips);
         }
-        if(currentStatus){
-            if(ev.fails().size()>0){
-                currentStatus = false;
-            }
+        return failures.toString();
+    }
+
+    public void logStatuses(ExpectEvaluator ev) {
+        logStatuses(ev, true);
+    }
+
+    public void logStatuses(ExpectEvaluator ev, boolean logFailuresDefault) {
+        Goate.innerGoate = -1;
+        String passes = new PassAmplifier(null)
+                .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
+                .testName(getTestName())
+                .amplify(ev);
+        if (!passes.isEmpty()) {
+            LOG.info("Status","\npassed:" + passes);
+        }
+
+        if (eut("assert.printStackTrace", logFailuresDefault, Boolean.class)) {
+            LOG.fail("Status", getFailures(ev));
+        }
+
+        String skipZero = new ZeroOrMoreAmplifier(null)
+                .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
+                .testName(getTestName())
+                .amplify(ev);
+        if (!skipZero.isEmpty()) {
+                LOG.info("Expectations", "may not have been evaluated:"+skipZero);
         }
         Goate.innerGoate = 0;
-        return currentStatus;
     }
 
     @Override
@@ -347,11 +388,11 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return this;
     }
 
-    public void setTestClass(Class testClass){
+    public void setTestClass(Class testClass) {
         this.testClass = testClass;
     }
 
-    public Class getTestClass(){
+    public Class getTestClass() {
         return this.testClass;
     }
 }

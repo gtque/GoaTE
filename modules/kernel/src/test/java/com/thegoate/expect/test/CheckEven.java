@@ -36,9 +36,15 @@ import com.thegoate.staff.GoateJob;
 @GoateJob(jobs = {"check if even"})
 public class CheckEven extends Employee {
     int value = 0;
+
     @Override
     public Employee init() {
         value = Integer.parseInt(""+data.get(getName()+".value"));
+        return this;
+    }
+
+    public CheckEven check(int value){
+        this.value = value;
         return this;
     }
 

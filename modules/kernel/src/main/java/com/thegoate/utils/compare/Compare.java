@@ -50,6 +50,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     Object expected = null;
     boolean compareNumeric = false;
     boolean triedOnce = false;
+    protected boolean triedExpected = false;
 
     public Compare(Object actual) {
         super();
@@ -60,6 +61,11 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     	this.triedOnce = triedOnce;
     	return this;
 	}
+
+	public Compare alreadyTriedExpected(boolean triedExpected){
+        this.triedExpected = triedExpected;
+        return this;
+    }
 
     @Override
     public boolean isType(Object check) {
@@ -84,6 +90,9 @@ public class Compare extends UnknownUtilType implements CompareUtility {
             if (lookupTool()) {
                 result = tool.evaluate();//step into evaluate here to debug the comparator implementation
             }
+            if(!result){
+
+            }
         } catch (Exception e) {
             LOG.debug("Compare", "Failed to compare: " + e.getMessage(), e);
         }
@@ -98,8 +107,9 @@ public class Compare extends UnknownUtilType implements CompareUtility {
             //because the type check may not be doing a parse check, so a string could still be something different,
             //check the expected to see if it has a specific type.
             Class etype = new FindType().type(exp);
-            if(etype!=null){
+            if(etype!=null&&!triedExpected){
                 type = etype;
+                triedExpected = true;
             }
         }
 
@@ -115,7 +125,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
         boolean result = true;
         if (tool == null) {
             result = false;
-            health.put("Tool Not Found", "Could not find \"" + operator + "\" for: " + actual);
+            health.put("Tool Not Found", "Could not find \"" + operator + "\" for: " + actual + ", of type: " + type.getName());
         } else {
             if(compareNumeric&&tool instanceof CompareObject){
                 result = false;
@@ -123,7 +133,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
             } else {
                 LOG.debug("Compare", "Found comparator: " + tool.getClass());
                 if(tool instanceof CompareTool){
-					((CompareTool)tool).triedOnce(triedOnce);
+					((CompareTool)tool).triedOnce(triedOnce).alreadyTriedExpected(triedExpected);
 				}
                 tool.actual(actual).to(expected).using(operator);
             }
