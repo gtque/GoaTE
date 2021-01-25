@@ -459,38 +459,41 @@ public class Goate implements HealthMonitor, Diary {
 	}
 
 	public String toString(String prepadding, String postpadding, boolean newLine) {
-		StringBuilder sb = new StringBuilder();
-		if(innerGoate>0){
-			sb.append("Goate[");
-			if(newLine){
-				sb.append("\n");
+		if(stale) {
+			StringBuilder sb = new StringBuilder();
+			if (innerGoate > 0) {
+				sb.append("Goate[");
+				if (newLine) {
+					sb.append("\n");
+				}
 			}
+			// parentInner = innerGoate;
+			innerGoate++;
+			boolean appendNewLine = false;
+			for (String key : keys()) {
+				if (appendNewLine && newLine) {
+					sb.append("\n");
+				} else if (appendNewLine && !newLine) {
+					sb.append("; ");
+				}
+				appendNewLine = true;
+				Object message = data.get(key);
+				if (key.startsWith(HEALTH_CHECK)) {
+					message = new Veterinarian((Goate) message);
+					key = key.replace(HEALTH_CHECK, "");
+				}
+				sb.append(prepadding).append(key).append(":").append(volume(message)).append(postpadding);
+			}
+			innerGoate--;
+			if (innerGoate > 0) {
+				if (newLine) {
+					sb.append("\n");
+				}
+				sb.append("]");
+			}
+			entry = sb.toString();
 		}
-		// parentInner = innerGoate;
-		innerGoate++;
-		boolean appendNewLine = false;
-		for (String key : keys()) {
-			if (appendNewLine && newLine) {
-				sb.append("\n");
-			} else if(appendNewLine && !newLine){
-				sb.append("; ");
-			}
-			appendNewLine = true;
-			Object message = data.get(key);
-			if (key.startsWith(HEALTH_CHECK)) {
-				message = new Veterinarian((Goate)message);
-				key = key.replace(HEALTH_CHECK, "");
-			}
-			sb.append(prepadding).append(key).append(":").append(volume(message)).append(postpadding);
-		}
-		innerGoate--;
-		if(innerGoate>0){
-			if(newLine){
-				sb.append("\n");
-			}
-			sb.append("]");
-		}
-		return sb.toString();
+		return entry;
 	}
 
 	@Override
@@ -577,8 +580,6 @@ public class Goate implements HealthMonitor, Diary {
 
 	@Override
 	public void writeEntry(String entry) {
-		this.entry = entry;
 		stale = false;
-
 	}
 }

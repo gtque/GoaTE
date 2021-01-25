@@ -27,7 +27,10 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
-import com.thegoate.expect.*;
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.Expectation;
+import com.thegoate.expect.ExpectationError;
+import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.expect.amp.FailAmplifier;
 import com.thegoate.expect.amp.PassAmplifier;
 import com.thegoate.expect.amp.SkippedAmplifier;
@@ -39,12 +42,10 @@ import com.thegoate.metrics.Stopwatch;
 import com.thegoate.statics.StaticScrubber;
 import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.get.Get;
-
 import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
@@ -66,6 +67,7 @@ import static org.testng.Assert.assertTrue;
 public abstract class TestNGEngine implements ITest, TestNG {
 
     private Class testClass = null;
+    protected volatile boolean dd = false;
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
@@ -134,6 +136,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
         setData(data);
         String sKey = getData().findKeyIgnoreCase("Scenario");
         setScenario(get(sKey, "empty::", String.class));
+//        setRunNumber(number);
         bumpRunNumber();
     }
 
@@ -152,6 +155,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     @Override
     @DataProvider(name = "dataLoader")
     public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
+        dd = true;
         number = 0;//resets the count, assumes TestNG loads all the runs before processing the next class.
         this.testContext = context;
         if (context != null) {
@@ -207,8 +211,10 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     @Override
     public void bumpRunNumber() {
-        number++;
-        setRunNumber(number);
+        if(dd) {
+            number++;
+            setRunNumber(number);
+        }
     }
 
     @Override

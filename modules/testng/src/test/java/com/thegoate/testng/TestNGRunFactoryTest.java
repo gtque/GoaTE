@@ -130,6 +130,7 @@ public class TestNGRunFactoryTest extends TestNGEngineMethodDL {
 			.put("run##", new StaticDL().add("sCenArio", "do"));
 		Object[][] runs = TestNGRunFactory.loadRuns(runData, null, true, new String[0], new String[0]);
 		expect(Expectation.build().actual(runs.length).isEqualTo(6));
+//		evaluate();
 	}
 
 	@GoateProvider(name = "scenario")
