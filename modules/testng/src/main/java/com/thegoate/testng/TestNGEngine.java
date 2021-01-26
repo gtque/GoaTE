@@ -27,6 +27,7 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
+import com.thegoate.data.GoateProvider;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationError;
@@ -46,14 +47,15 @@ import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Listeners;
+import org.testng.annotations.*;
 import org.testng.xml.XmlTest;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.thegoate.dsl.words.EutConfigDSL.eut;
 import static org.testng.Assert.assertTrue;
@@ -66,8 +68,8 @@ import static org.testng.Assert.assertTrue;
 @Listeners({TestNGEvaluateListener.class})
 public abstract class TestNGEngine implements ITest, TestNG {
 
-    private Class testClass = null;
-    protected volatile boolean dd = false;
+    private Class testClass = getClass();
+    //    protected volatile boolean dd = false;
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
     protected Goate runData;
@@ -83,7 +85,8 @@ public abstract class TestNGEngine implements ITest, TestNG {
     protected ExpectEvaluator ev;
     private List<ExpectEvaluator> executedExpectations = new ArrayList<>();
 
-    public static int number = 0;
+
+    public static Map<String, Integer> number = new ConcurrentHashMap<>();
 
     public TestNGEngine() {
         setData(null);
@@ -97,11 +100,38 @@ public abstract class TestNGEngine implements ITest, TestNG {
         LOG = box;
     }
 
-    @BeforeMethod(alwaysRun = true)
+    protected boolean isFactoryDriven(){
+        Constructor[] constructors = testClass.getConstructors();
+        for(Constructor constructor:constructors){
+            if(constructor.getAnnotation(Factory.class)!=null){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isDataDriven(Test test, boolean gp){
+        return (!test.dataProvider().isEmpty())||(gp);
+    }
+
+    @BeforeMethod(alwaysRun = true, dependsOnMethods = "initDataMethod")
     @Override
     public void startUp(Method method) {
-        UnknownUtilType.clearCache(Get.class);
         methodName = method.getName();
+        Test test = method.getAnnotation(Test.class);
+        boolean gp = isFactoryDriven();
+        if (isDataDriven(test, gp)) {
+            if(gp){
+                if(!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)){
+                    number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
+                }
+            }
+            bumpRunNumber(methodName);
+            setRunNumber(number.get("" + testClass.getCanonicalName() + ":" + methodName));
+        } else {
+            data = new Goate();
+            setRunNumber(0);
+        }
         if (data != null && data.get("lap", null) != null) {
             Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
         }
@@ -114,6 +144,11 @@ public abstract class TestNGEngine implements ITest, TestNG {
         startMessage += "\n*****************************************************************";
         TestMap.tests.put(getTestName(), this);
         LOG.info("Start Up", startMessage);
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void initDataMethod(){
+        UnknownUtilType.clearCache(Get.class);
     }
 
     //    @AfterMethod(alwaysRun = true)
@@ -137,26 +172,29 @@ public abstract class TestNGEngine implements ITest, TestNG {
         String sKey = getData().findKeyIgnoreCase("Scenario");
         setScenario(get(sKey, "empty::", String.class));
 //        setRunNumber(number);
-        bumpRunNumber();
+//        bumpRunNumber();
     }
 
     @Override
     public String getTestName() {
         StringBuilder name = new StringBuilder("");
         if (includeClassMethodInName) {
-            name.append((testClass == null ? getClass().getCanonicalName() : testClass.getCanonicalName()) + ":" + methodName + ":");
+            name.append((testClass == null ? getClass().getCanonicalName() : testClass.getCanonicalName()))
+                    .append(":")
+                    .append(methodName)
+                    .append(":");
         }
         name.append(scenario);
         name.append("(" + runNumber + ")");
         return name.toString();
     }
 
-
     @Override
     @DataProvider(name = "dataLoader")
     public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
-        dd = true;
-        number = 0;//resets the count, assumes TestNG loads all the runs before processing the next class.
+//        number = 0;//resets the count, assumes TestNG loads all the runs before processing the next class.
+//        number.put("" + method.getRealClass().getCanonicalName() + ":" + "class", 0);
+        testClass = method.getRealClass();
         this.testContext = context;
         if (context != null) {
             xt = context.getCurrentXmlTest();
@@ -210,10 +248,10 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public void bumpRunNumber() {
-        if(dd) {
-            number++;
-            setRunNumber(number);
+    public void bumpRunNumber(String name) {
+        if (number.containsKey("" + testClass.getCanonicalName() + ":" + name)) {
+            int num = number.get("" + testClass.getCanonicalName() + ":" + name);
+            number.put("" + testClass.getCanonicalName() + ":" + name, num + 1);
         }
     }
 
@@ -300,7 +338,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
         evaluate(null);
     }
 
-    public void evaluate(boolean clearAfterRunning){
+    public void evaluate(boolean clearAfterRunning) {
         evaluate(null, clearAfterRunning);
     }
 
@@ -309,7 +347,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
         evaluate(testResult, false);
     }
 
-    public void evaluate(ITestResult testResult, boolean clearAfterRunning){
+    public void evaluate(ITestResult testResult, boolean clearAfterRunning) {
         if (etb.isBuilt()) {
             LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
         } else {
@@ -320,7 +358,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 LOG.warn("failures detected...");
                 result = false;
             }
-            if( ev.skipped().size() > 0) {
+            if (ev.skipped().size() > 0) {
                 LOG.warn("skipped tests detected...");
                 result = false;
             }
@@ -333,7 +371,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 throw new ExpectationError(failures.toString());
 //                throw e;
             } finally {
-                if(clearAfterRunning){
+                if (clearAfterRunning) {
                     executedExpectations = new ArrayList<>();
                 }
             }
@@ -355,7 +393,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 .testName(getTestName())
                 .amplify(ev);
         if (!skips.isEmpty()) {
-                failures.append(skips);
+            failures.append(skips);
         }
         return failures.toString();
     }
@@ -371,7 +409,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 .testName(getTestName())
                 .amplify(ev);
         if (!passes.isEmpty()) {
-            LOG.info("Status","\npassed:" + passes);
+            LOG.info("Status", "\npassed:" + passes);
         }
 
         if (eut("assert.printStackTrace", logFailuresDefault, Boolean.class)) {
@@ -383,7 +421,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 .testName(getTestName())
                 .amplify(ev);
         if (!skipZero.isEmpty()) {
-                LOG.info("Expectations", "may not have been evaluated:"+skipZero);
+            LOG.info("Expectations", "may not have been evaluated:" + skipZero);
         }
         Goate.innerGoate = 0;
     }

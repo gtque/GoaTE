@@ -74,6 +74,7 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
 
     public SpringTestEngine(Goate data) {
         engine = new TestNGEngineMethodDL(data);
+        engine.setTestClass(getClass());
         engine.setLOG(BleatFactory.getLogger(getClass()));
     }
 
@@ -133,8 +134,8 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
-    public void bumpRunNumber() {
-        engine.bumpRunNumber();
+    public void bumpRunNumber(String name) {
+        engine.bumpRunNumber(name);
     }
 
     @Override

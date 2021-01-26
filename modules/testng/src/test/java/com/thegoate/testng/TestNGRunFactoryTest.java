@@ -133,13 +133,13 @@ public class TestNGRunFactoryTest extends TestNGEngineMethodDL {
 //		evaluate();
 	}
 
-	@GoateProvider(name = "scenario")
+	@GoateProvider(name = "scenarios")
 	@Test(groups = {"unit"}, dataProvider = "methodLoader")
 	public void scenarioName(Goate testData) {
 		expect(Expectation.build().actual(getScenario()).isEqualTo("do"));
 	}
 
-	@GoateDLP(name = "scenario")
+	@GoateDLP(name = "scenarios")
 	public Goate[] theData() {
 		Goate[] the = new Goate[2];
 		the[0] = new Goate()

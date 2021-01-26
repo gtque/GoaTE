@@ -119,8 +119,8 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
-    public void bumpRunNumber() {
-        engine.bumpRunNumber();
+    public void bumpRunNumber(String name) {
+        engine.bumpRunNumber(name);
     }
 
     @Override

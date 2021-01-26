@@ -47,6 +47,7 @@ public class TestNGEngineAnnotatedDL extends TestNGEngine {
 
     public TestNGEngineAnnotatedDL(Goate data){
         super(data);
+        setTestClass(getClass());
     }
 
     @Override

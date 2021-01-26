@@ -51,7 +51,7 @@ public interface TestNG {
     Goate getData();
     void setData(Goate data);
     void setRunNumber(int number);
-    void bumpRunNumber();
+    void bumpRunNumber(String name);
     int getRunNumber();
     void setScenario(String scenario);
     String getScenario();

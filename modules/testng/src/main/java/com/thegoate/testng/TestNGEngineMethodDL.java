@@ -67,8 +67,9 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
 
     @DataProvider(name = "methodLoader")
     public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
-        dd = true;
-        number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+        number.put(""+method.getDeclaringClass().getCanonicalName()+":"+method.getName(), 0);
+        //number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+        setTestClass(method.getDeclaringClass());
         this.testContext = context;
         if (context != null) {
             xt = context.getCurrentXmlTest();
