@@ -35,7 +35,7 @@ import com.thegoate.utils.get.Get;
 /**
  * Created by Eric Angeli on 4/27/2018.
  */
-@GoateDSL(word = "job")
+@GoateDSL(word = "job result")
 @GoateDescription(description = "Returns the value of the object specified by the key found in the job results.", parameters = {"The key of the object in the job return."})
 public class GetJobResult extends DSL {
     public GetJobResult(Object value) {
