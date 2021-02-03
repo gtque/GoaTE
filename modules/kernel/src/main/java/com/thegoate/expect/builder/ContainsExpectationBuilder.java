@@ -26,9 +26,9 @@
  */
 package com.thegoate.expect.builder;
 
-import com.thegoate.expect.Expectation;
-
 import java.util.List;
+
+import com.thegoate.expect.Expectation;
 
 /**
  * Created by Eric Angeli on 3/26/2019.
@@ -78,7 +78,7 @@ public class ContainsExpectationBuilder extends ExpectationBuilder {
             }
         }
         expect(buildExpectation(operator));
-        return expectations;
+        return getExpectations();
     }
 
 }

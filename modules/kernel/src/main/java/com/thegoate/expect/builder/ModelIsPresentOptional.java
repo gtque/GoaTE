@@ -91,7 +91,7 @@ public class ModelIsPresentOptional extends ExpectationBuilder {
                 }
             }
         }
-        return expectations;
+        return getExpectations();
     }
 
     private void addExpect(String key) {
