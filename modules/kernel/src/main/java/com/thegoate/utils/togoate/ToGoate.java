@@ -27,21 +27,24 @@
 
 package com.thegoate.utils.togoate;
 
+import java.util.Map;
+
 import com.thegoate.Goate;
 import com.thegoate.utils.UnknownUtilType;
 
 /**
- * The generic get class.
- * This will attempt to look up the specific get utility for the type detected.
+ * The generic togoate class.
+ * This will attempt to look up the specific to goate utility for the type detected.
  * Created by Eric Angeli on 5/5/2017.
  */
 public class ToGoate extends UnknownUtilType implements ToGoateUtility{
     boolean autoIncrement = true;
     ToGoateUtility tool = null;
-    Object original = null;
+    protected Object original = null;
 
     public ToGoate(Object o){
         this.original = o;
+//        useCache = true;
     }
 
     @Override
@@ -57,14 +60,30 @@ public class ToGoate extends UnknownUtilType implements ToGoateUtility{
 
     @Override
     public Goate convert() {
-        tool = (ToGoateUtility)buildUtil(original, ToGoateUtil.class);
         Goate result = null;
-        if(tool!=null){
-            result = tool.autoIncrement(autoIncrement).convert();
-        }
-        if(result==null){
-            LOG.info("Failed to convert: " + original);
+        if(original instanceof Goate){
+            result = (Goate)original;
+        } else {
+            tool = (ToGoateUtility) buildUtil(original, ToGoateUtil.class);
+            if (tool != null) {
+                result = tool.autoIncrement(autoIncrement).convert();
+            }
+            if (result == null) {
+                if(original instanceof Map && ((Map)original).entrySet().iterator().hasNext() && ((Map.Entry)((Map)original).entrySet().iterator().next()).getKey() instanceof String){
+                    result = new Goate((Map<String, ?>)original);
+                } else {
+                    LOG.debug("Failed to convert: " + original);
+                    result = new Goate().put("_original_", original);
+                }
+            }
         }
         return result;
+    }
+
+    @Override
+    public boolean checkType(Class tool, Class type) {
+        //        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
+        //        return tu.type()!=null?(tu.type() == type):(type == null);
+        return false;
     }
 }

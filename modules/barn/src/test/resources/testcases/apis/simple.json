@@ -3,7 +3,7 @@
   "groups":"simple,extendsarray",
   "abstract":false,
   "extends":[
-    "/base.json",
+    "base.json",
     "cleanup.json"
   ],
   "method":"get",

@@ -44,6 +44,9 @@ public class NullFieldDSL extends DSL {
         super(value);
     }
 
+    public static String nullField(){
+        return "null field::";
+    }
     @Override
     public Object evaluate(Goate data) {
         return "null field::";

@@ -26,9 +26,13 @@
  */
 package com.thegoate.json.utils.insert;
 
+import com.thegoate.Goate;
+import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.insert.InsertService;
+import com.thegoate.utils.insert.InsertUtil;
+import com.thegoate.utils.insert.InsertUtility;
+import com.thegoate.utils.togoate.ToGoate;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +40,8 @@ import org.json.JSONObject;
 /**
  * Created by Eric Angeli on 4/18/2018.
  */
-public class InsertJson implements InsertService {
+@InsertUtil
+public class InsertJson implements InsertUtility {
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     String key = null;
     Object value = null;
@@ -53,20 +58,20 @@ public class InsertJson implements InsertService {
     }
 
     @Override
-    public InsertService value(String id, Object value) {
+    public InsertUtility value(String id, Object value) {
         this.key = id;
         this.value = value;
         return this;
     }
 
     @Override
-    public InsertService into(String original) {
+    public InsertUtility into(String original) {
         this.original = original;
         return this;
     }
 
     @Override
-    public InsertService after(String location) throws Exception {
+    public InsertUtility after(String location) throws Exception {
         if (before != null || append || in != null)
             throw new Exception("Trying to set 'after' location, but another location is already set. You can only set one location.");
         this.after = location;
@@ -74,7 +79,7 @@ public class InsertJson implements InsertService {
     }
 
     @Override
-    public InsertService before(String location) throws Exception {
+    public InsertUtility before(String location) throws Exception {
         if (after != null || append || in != null)
             throw new Exception("Trying to set 'before' location, but another location is already set. You can only set one location.");
         this.before = location;
@@ -82,7 +87,7 @@ public class InsertJson implements InsertService {
     }
 
     @Override
-    public InsertService in(String location) throws Exception {
+    public InsertUtility in(String location) throws Exception {
         if (before != null || append || after != null)
             throw new Exception("Trying to set 'in' location, but another location is already set. You can only set one location.");
         this.in = location;
@@ -90,7 +95,7 @@ public class InsertJson implements InsertService {
     }
 
     @Override
-    public InsertService append() throws Exception {
+    public InsertUtility append() throws Exception {
         if (before != null || after != null || in != null)
             throw new Exception("Trying to set 'append' location, but another location is already set. You can only set one location.");
         this.append = true;
@@ -98,13 +103,13 @@ public class InsertJson implements InsertService {
     }
 
     @Override
-    public InsertService replaceExisting(boolean replace) {
+    public InsertUtility replaceExisting(boolean replace) {
         this.replace = replace;
         return this;
     }
 
     @Override
-    public InsertService resetLocation() {
+    public InsertUtility resetLocation() {
         this.after = null;
         this.before = null;
         this.in = null;
@@ -113,7 +118,7 @@ public class InsertJson implements InsertService {
     }
 
     @Override
-    public InsertService resetInsertValue() {
+    public InsertUtility resetInsertValue() {
         this.key = null;
         this.value = null;
         return this;
@@ -125,6 +130,14 @@ public class InsertJson implements InsertService {
         if (setAsOriginal)
             original = result;
         return result;
+    }
+
+    @Override
+    public String insert(Goate data) throws Exception{
+        //probably can't use merge. will need to do a custom merge
+        //based on the mapping if present, otherwise default to after.
+        Goate od = new ToGoate(original).convert().merge(data,true);
+        return new GoateToJSON(od).convert();
     }
 
     @Override

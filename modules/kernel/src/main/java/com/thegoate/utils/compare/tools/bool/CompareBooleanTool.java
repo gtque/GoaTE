@@ -38,7 +38,12 @@ public abstract class CompareBooleanTool extends CompareTool {
 
     @Override
     public boolean isType(Object check) {
-        return (check instanceof Boolean || (check != null && check.getClass().equals(Boolean.TYPE)));
+        boolean result = (check instanceof Boolean || (check != null && check.getClass().equals(Boolean.TYPE)));
+        if(!result){
+            String checkS = ""+check;
+            result = (checkS.equalsIgnoreCase("true")||checkS.equalsIgnoreCase("false"));
+        }
+        return result;
     }
 
 }

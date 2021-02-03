@@ -4,6 +4,7 @@ import com.thegoate.Goate;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.data.StaticDL;
+import com.thegoate.expect.Expectation;
 import com.thegoate.spring.boot.HelloAuto;
 import com.thegoate.spring.boot.TestApplication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -54,7 +54,7 @@ public class SimpleMethodDLSpringTest extends SpringTestEngine {
     @GoateProvider(name = "sample")
     @Test(groups = {"unit", "spring"}, dataProvider = "methodLoader")
     public void testMethod1(Goate d){
-        assertNotNull(bot);
+        expect(Expectation.build().actual(bot).isNull(false));
         assertEquals(bot.autobots(), "roll out");
     }
 }

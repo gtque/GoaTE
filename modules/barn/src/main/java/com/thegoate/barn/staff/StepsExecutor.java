@@ -163,11 +163,16 @@ public class StepsExecutor {
         Goate found = null;
         if (ordered) {
             for (int i = 0; i < Integer.MAX_VALUE; i++) {
-                Goate d = new ToGoate(sup.get("" + i, null)).convert();
-                if (d != null) {
-                    if (("" + d.get("#")).equals("" + index)) {
-                        found = d;
-                        found.put("parent", data);
+                Object suppa = sup.get("" + i, null);
+                if(suppa != null) {
+                    Goate d = new ToGoate(suppa).convert();
+                    if (d != null) {
+                        if (("" + d.get("#")).equals("" + index)) {
+                            found = d;
+                            found.put("parent", data);
+                            break;
+                        }
+                    } else {
                         break;
                     }
                 } else {

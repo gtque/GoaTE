@@ -35,6 +35,8 @@ import com.thegoate.mock.staff.Mock;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.mockito.Spy;
+
 /**
  * Builds and returns a mock of the given object.
  * Created by Eric Angeli on 6/28/2017.
@@ -48,7 +50,7 @@ public class MockBuilder {
     int methodIndex = 0;
     int methodParameterIndex = 0;
 
-    public Mock buildMocker(String mock) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Mock buildMocker(Class mock) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         AnnotationFactory af = new AnnotationFactory();
         return (Mock) af.annotatedWith(Mocker.class).find(mock).using("type").build();
     }
@@ -59,9 +61,9 @@ public class MockBuilder {
 
     public Object build(Goate data){
         Mock mock = null;
-        String type = "object";
+        Class type = Object.class;//"object";
         try {
-            type = ""+data.get("type",type);
+            type = data.get("type", type, Class.class);
             mock = buildMocker(type);
         }catch(Exception e){
             LOG.error("Failed to load the mock builder for: " + type + "\n" + e.getMessage(), e);
@@ -75,14 +77,14 @@ public class MockBuilder {
     }
 
     public MockBuilder object(){
-        return type("object");
+        return type(Object.class);
     }
 
     public MockBuilder spy(){
-        return type("spy");
+        return type(Spy.class);
     }
 
-    public MockBuilder type(String type){
+    public MockBuilder type(Class type){
         return define("type",type);
     }
 

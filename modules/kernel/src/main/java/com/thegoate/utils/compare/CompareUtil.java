@@ -27,6 +27,8 @@
 
 package com.thegoate.utils.compare;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -37,8 +39,10 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 5/5/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Identifies a compare implementation.")
+@Info(classifier = "operator")
 @IndexAnnotated
 public @interface CompareUtil {
     String operator();
-    String type();
+    Class type() default Object.class;
 }

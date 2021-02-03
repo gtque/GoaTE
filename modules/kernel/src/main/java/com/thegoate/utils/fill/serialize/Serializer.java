@@ -30,6 +30,8 @@ import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.fill.serialize.to.SerializeTo;
+import com.thegoate.utils.togoate.ToGoate;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -43,10 +45,18 @@ import java.util.Map;
  * methods, reflection, and access may be used or altered. Use in production code at your own risk.
  * Created by Eric Angeli on 6/26/2018.
  */
-public class Serializer<T, S> extends Cereal {
-    private BleatBox LOG = BleatFactory.getLogger(getClass());
+public class Serializer<T, S, U> extends Cereal {
     private T pojo;
     private S source;
+    private U cereal;
+    private boolean serializeNested = true;
+    private boolean alwaysSerializeGoatePojo = false;
+
+    public Serializer(T pojo, S source, U cereal) {
+        this.pojo = pojo;
+        this.source = source;
+        this.cereal = cereal;
+    }
 
     public Serializer(T pojo, S source) {
         this.pojo = pojo;
@@ -69,12 +79,35 @@ public class Serializer<T, S> extends Cereal {
         return source;
     }
 
+    public Serializer doSerializeNested(){
+        this.serializeNested = true;
+        return this;
+    }
+
+    public Serializer skipSerializingObjects(){
+        this.serializeNested = false;
+        return this;
+    }
+
+    public Serializer alwaysSerializeGoatePojos(){
+        this.alwaysSerializeGoatePojo = true;
+        return this;
+    }
+
+    public Serializer skipSerializingGoatePojos(){
+        this.alwaysSerializeGoatePojo = false;
+        return this;
+    }
     public Goate toGoate() {
         Goate data = new Goate();
         for (Map.Entry<String, Object> entry : toMap(HashMap.class).entrySet()) {
             data.put(entry.getKey(), entry.getValue());
         }
         return data;
+    }
+
+    public U to(SerializeTo serializer){
+        return (U)serializer.source((Class)source).cereal(pojo.getClass()).serialize(pojo);
     }
 
     public Map<String, Object> toMap(Class mapType) {
@@ -100,48 +133,22 @@ public class Serializer<T, S> extends Cereal {
                     field.getValue().setAccessible(true);
                     try {
                         Object o = field.getValue().get(pojo);
-                        if (o != null) {
-                            if (field.getValue().getType().getAnnotation(GoatePojo.class) != null) {
-                                addMap(data, o, fieldKey + ".");
-                            } else if (o instanceof List) {
-                                for (int i = 0; i < ((List) o).size(); i++) {
-                                    Object io = ((List) o).get(i);
-                                    if (io.getClass().getAnnotation(GoatePojo.class) != null) {
-                                        addMap(data, io, fieldKey + "." + i + ".");
-                                    } else {
-                                        data.put(fieldKey + "." + i, io);
-                                    }
-                                }
-                            } else if (o.getClass().isArray()) {
-                                for(int i = 0; i< Array.getLength(o); i++){
-                                    Object io = Array.get(o,i);
-                                    if (io.getClass().getAnnotation(GoatePojo.class) != null) {
-                                        addMap(data, io, fieldKey + "." + i + ".");
-                                    } else {
-                                        data.put(fieldKey + "." + i, io);
-                                    }
-                                }
-                            } else if (o instanceof Map) {
-                                int i = 0;
-                                Iterator keys = ((Map)o).keySet().iterator();
-                                while(keys.hasNext()) {
-                                    Object keyValue = keys.next();
-                                    Object io = ((Map)o).get(keyValue);
-                                    if (io.getClass().getAnnotation(GoatePojo.class) != null) {
-                                        addMap(data, io, fieldKey + "." + i + ".value.");
-                                    } else {
-                                        data.put(fieldKey + "." + i + ".value", io);
-                                    }
-                                    data.put(fieldKey + "." + i + ".key", keyValue);
-                                    data.put(fieldKey + "." + i + ".class", io.getClass().getName());
-                                }
-                            } else {
-                                data.put(fieldKey, o);
-                            }
-                        } else {
-                            data.put(fieldKey, o);
+                        if(gs != null && gs.serializeTo() != GoateSource.class){
+                            o = doCast(o, gs.serializeTo());
                         }
-                    } catch (IllegalAccessException e) {
+                        if (o != null) {
+                            Class type = field.getValue().getType();
+                            if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {
+                                if (checkNotPrimitive(type)&&doSerialize(pojo.getClass())) {
+                                    if(!type.equals(pojo.getClass())) {
+                                        addMap(data, o, fieldKey);
+                                    }
+                                } else {
+                                    data.put(fieldKey, o);
+                                }
+                            }
+                        }
+                    } catch (IllegalAccessException | InstantiationException e) {
                         LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
                     }
                     field.getValue().setAccessible(acc);
@@ -153,10 +160,64 @@ public class Serializer<T, S> extends Cereal {
         return data;
     }
 
+    private boolean doSerialize(Class pojoType){
+        boolean serialize = true;
+        if(!serializeNested){
+            if(alwaysSerializeGoatePojo){
+                if(pojoType.getAnnotation(GoatePojo.class)==null){
+                    serialize = false;
+                }
+            } else {
+                serialize = false;
+            }
+        }
+        return serialize;
+    }
+
     private void addMap(Map<String, Object> data, Object o, String baseKey) {
-        Map<String, Object> innerD = new Serializer(o, source).toMap(HashMap.class);
-        for (Map.Entry<String, Object> entry : innerD.entrySet()) {
-            data.put(baseKey + entry.getKey(), entry.getValue());
+        if (o instanceof List) {
+            data.put(baseKey, o);//ToDo: figure out how to put the correct thing here...
+            for (int i = 0; i < ((List) o).size(); i++) {
+                Object io = ((List) o).get(i);
+                process(data,io,baseKey + "." + i );
+            }
+        } else if (o.getClass().isArray()) {
+            data.put(baseKey, o);
+            for (int i = 0; i < Array.getLength(o); i++) {
+                Object io = Array.get(o, i);
+                process(data,io,baseKey + "." + i );
+            }
+        } else if (o instanceof Map) {
+            int i = 0;
+            data.put(baseKey, o);
+            Iterator keys = ((Map) o).keySet().iterator();
+            while (keys.hasNext()) {
+                Object keyValue = keys.next();
+                Object io = ((Map) o).get(keyValue);
+                process(data,io,baseKey + "." + i + ".value");
+//                if (io.getClass().getAnnotation(GoatePojo.class) != null) {
+//                    addMap(data, io, baseKey + "." + i + ".value");
+//                } else {
+//                    data.put(baseKey + "." + i + ".value", io);
+//                }
+                data.put(baseKey + "." + i + ".key", keyValue);
+                data.put(baseKey + "." + i + ".class", io.getClass().getName());
+            }
+        } else {
+            Map<String, Object> innerD = new Serializer(o, source).toMap(HashMap.class);
+            data.put(baseKey, innerD);
+            for (Map.Entry<String, Object> entry : innerD.entrySet()) {
+                data.put(baseKey + "."+entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private void process(Map<String, Object> data, Object io, String baseKey){
+        Class type = io.getClass();
+        if(checkNotPrimitive(type)){//if (io.getClass().getAnnotation(GoatePojo.class) != null) {
+            addMap(data, io, baseKey);
+        } else {
+            data.put(baseKey, io);
         }
     }
 }

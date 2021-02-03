@@ -27,6 +27,7 @@
 package com.thegoate.utils.fill.serialize.pojos;
 
 import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.collections.MapKeyType;
 import com.thegoate.utils.fill.serialize.collections.MapType;
 
@@ -40,6 +41,7 @@ import java.util.Map;
 public class NestedPojos {
     private ComplexPojo[] cp;
     private List<Object> list;
+    @GoateSource(source = Cheese.class, key="flumbers")
     private int[] numbers;
     private int[] numbers2;
     @MapType(type = Boolean.class)

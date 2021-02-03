@@ -27,51 +27,63 @@
 package com.thegoate.spring;
 
 import com.thegoate.Goate;
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.Expectation;
+import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
 import com.thegoate.testng.TestNGEngineMethodDL;
-import org.springframework.boot.context.embedded.LocalServerPort;
+import com.thegoate.testng.TestNGEvaluateListener;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.ITest;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Wrapper class combines AbstractTestNGSpringContextTests and Test Engine functionality from GoaTE.
  * Created by Eric Angeli on 10/31/2017.
  */
+@Listeners({TestNGEvaluateListener.class})
 public class SpringTestEngine extends AbstractTestNGSpringContextTests implements ITest, TestNG {
     TestNGEngineMethodDL engine = null;
     protected Goate runData = null;
     protected Goate constantData = null;
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
+    protected Goate data;
 
     @LocalServerPort
-    int randomServerPort;
+    protected int randomServerPort;
 //    @LocalManagementPort
 //    int randomServerAdminPort;
 
-    public SpringTestEngine(){
+    public SpringTestEngine() {
         engine = new TestNGEngineMethodDL();
+        engine.setTestClass(getClass());
         engine.setLOG(BleatFactory.getLogger(getClass()));
     }
 
-    public SpringTestEngine(Goate data){
+    public SpringTestEngine(Goate data) {
         engine = new TestNGEngineMethodDL(data);
+        engine.setTestClass(getClass());
         engine.setLOG(BleatFactory.getLogger(getClass()));
     }
 
     @Override
     @DataProvider(name = "dataLoader")
-    public Object[][] dataLoader(ITestContext context) throws Exception {
+    public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();
-        return engine.dataLoader(context);
+        return engine.dataLoader(method, context);
     }
 
     @DataProvider(name = "methodLoader")
@@ -122,8 +134,8 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
-    public void bumpRunNumber() {
-        engine.bumpRunNumber();
+    public void bumpRunNumber(String name) {
+        engine.bumpRunNumber(name);
     }
 
     @Override
@@ -158,7 +170,66 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
 
     @Override
     public TestNG put(String key, Object val) {
-        return engine.put(key, val);
+        engine.put(key, val);
+        return this;
+    }
+
+    @Override
+    public TestNG expect(Expectation expectation) {
+        engine.expect(expectation);
+        return this;
+    }
+
+    @Override
+    public TestNG expect(ExpectationBuilder expectationBuilder){
+        engine.expect(expectationBuilder.build());
+        return this;
+    }
+
+    @Override
+    public TestNG expect(List<Expectation> expectation) {
+        engine.expect(expectation);
+        return this;
+    }
+
+    @Override
+    public TestNG evalPeriod(long periodMS) {
+        engine.evalPeriod(periodMS);
+        return this;
+    }
+
+    @Override
+    public TestNG evalTimeout(long timeoutMS) {
+        engine.evalTimeout(timeoutMS);
+        return this;
+    }
+
+    @Override
+    public void evaluate() {
+        engine.evaluate();
+    }
+
+    @Override
+    public void evaluate(ITestResult testResult) {
+        engine.evaluate(testResult);
+    }
+
+    public void logStatuses(ExpectEvaluator ev) {
+        logStatuses(ev, false);
+    }
+
+    public void logStatuses(ExpectEvaluator ev, boolean logFailuresDefault) {
+        engine.logStatuses(ev, logFailuresDefault);
+    }
+
+    protected String baseURL() {
+        return "http://localhost:" + randomServerPort;
+    }
+
+    @Override
+    public TestNG clearExpectations() {
+        engine.clearExpectations();
+        return this;
     }
 
     @Override
@@ -172,14 +243,22 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
 
     @BeforeMethod(alwaysRun = true)
     public void initDataMethod(Object[] d, Method m) {
-        if (d != null&&d.length>0) {
-            engine.init((Goate)d[0]);
+        if (d != null && d.length > 0) {
+            data = (Goate) d[0];
+            engine.init((Goate) d[0]);
+        } else {
+            data = data != null ? data : new Goate();
+            engine.init(data);
         }
         startUp(m);
     }
 
-    @AfterMethod(alwaysRun = true)
+//    @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         engine.finishUp(method);
+    }
+
+    public ExpectEvaluator getEv() {
+        return engine.getEv();
     }
 }

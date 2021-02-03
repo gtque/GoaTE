@@ -27,20 +27,12 @@
 package com.thegoate.barn;
 
 import com.thegoate.Goate;
-import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.barn.data.BarnDataLoader;
 import com.thegoate.barn.staff.StepsExecutor;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.ExpectationThreadBuilder;
-import com.thegoate.staff.Employee;
-import com.thegoate.staff.GoateJob;
 import com.thegoate.testng.TestNGEngine;
-import com.thegoate.utils.togoate.ToGoate;
 import org.testng.SkipException;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-
-import java.lang.reflect.InvocationTargetException;
 
 import static org.testng.Assert.assertTrue;
 
@@ -49,7 +41,7 @@ import static org.testng.Assert.assertTrue;
  * Created by Eric Angeli on 5/22/2017.
  */
 public class Barn extends TestNGEngine {
-    protected String label = "barn";//label will be used in the future, but not currently used.
+    protected String label = "barn";//default label, all tests in the test case directory belong to this group.
     protected String baseTestCaseDir = "testcases";
     protected ExpectEvaluator ev = null;
     Throwable preFailure = null;
@@ -66,10 +58,9 @@ public class Barn extends TestNGEngine {
 
     @Override
     public void defineDataLoaders() {
-        runData.put("dl##", new BarnDataLoader().testCaseDirectory(baseTestCaseDir).groups(label));
+        runData.put("dl##", new BarnDataLoader().testCaseDirectory(baseTestCaseDir).defaultGroup(label));
     }
 
-    @BeforeMethod(alwaysRun = true)
     public void setup() {
         LOG.debug("Barn Setup", "----running setup----");
         try {
@@ -80,7 +71,6 @@ public class Barn extends TestNGEngine {
         LOG.debug("Barn Setup", "----finished setup----");
     }
 
-    @AfterMethod(alwaysRun = true)
     public void cleanup() {
         LOG.debug("Cleanup", "----running cleanup----");
         try {
@@ -102,6 +92,7 @@ public class Barn extends TestNGEngine {
     }
 
     public void execute() {
+        setup();
         if (data.size() == 0) {
             LOG.skip(getTestName(), "Skipping test because there is nothing to execute.");
             throw new SkipException("No run data.");
@@ -131,38 +122,29 @@ public class Barn extends TestNGEngine {
             } catch (Throwable t) {
                 throw t;
             } finally {
-                if (ev != null) {
-                    for (Goate p : ev.passes()) {
-                        LOG.pass(getTestName(), "PASSED: " + p.toString());
-                    }
-                    for (Goate f : ev.fails()) {
-                        LOG.fail(getTestName(), "FAILED: " + f.toString());
-                    }
-                }
                 LOG.debug(getTestName(), "----finished expectations----");
+                cleanup();
             }
         }
     }
 
     protected void evaluateExpectations() {
-        evaluate("expect");
+        evaluate("expect", false);
     }
 
     protected void evaluatePreconditions() {
-        evaluate("preconditions");
+        evaluate("preconditions", true);
     }
 
     protected void evaluatePostconditions() {
-        evaluate("postconditions");
+        evaluate("postconditions", false);
     }
 
-    protected void evaluate(String stage) {
-        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(new Goate().put("parent",data).merge(data,false));
-        etb.expect(data.filter(stage + "."))
-                .timeout(Long.parseLong("" + data.get(stage + ".timeout", data.get("expect.timeout", 500L))))
-                .period(Long.parseLong("" + data.get(stage + ".period", data.get("expect.period", 50L))));
-        ev = new ExpectEvaluator(etb);
-        boolean result = ev.evaluate();
-        assertTrue(result, stage.toUpperCase()+": " + ev.failed());
+    protected void evaluate(String stage, boolean clearAfterRunning) {
+        etb = new ExpectationThreadBuilder(new Goate().put("parent", data).merge(data, false));
+        etb.expect(data.filter(stage + "\\."));
+        evalTimeout(Long.parseLong("" + data.get(stage + "_timeout", data.get("timeout_expect", 500L))));
+        evalPeriod(Long.parseLong("" + data.get(stage + "_period", data.get("period_expect", 50L))));
+        evaluate(clearAfterRunning);
     }
 }

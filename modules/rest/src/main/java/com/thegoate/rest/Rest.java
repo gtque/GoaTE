@@ -38,12 +38,15 @@ import com.thegoate.logging.BleatFactory;
 public abstract class Rest implements RestSpec {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
 
+    public static final String typeSeparator = "<type>";
+
     protected Goate headers = new Goate();
     protected Goate queryParams = new Goate();
     protected Goate urlParams = new Goate();
     protected Goate pathParams = new Goate();
     protected Goate body = new Goate();
     protected Goate custom = new Goate();
+    protected Object config = null;
     protected String baseURL = "";//this should include the port if different from default.
     protected int timeout = 15;
     protected boolean logAll = true;
@@ -232,7 +235,16 @@ public abstract class Rest implements RestSpec {
 
     @Override
     public RestSpec multipartFormData(String key, Object value) {
+        return multipartFormData(key, value, null);
+    }
+
+    @Override
+    public RestSpec multipartFormData(String key, Object value, String contentType){
         bodyFormat = BODY.multipart;
+        //>=contentType
+        if(contentType!=null){
+            key = typeSeparator+contentType;
+        }
         return body(bodyFormat, key, value);
     }
 
@@ -240,8 +252,9 @@ public abstract class Rest implements RestSpec {
     public RestSpec customData(Goate data){
         if(data!=null) {
             for (String key : data.keys()) {
-                custom.put(key,data.get(key));
-                processCustomData(key, data.get(key));
+                String keyC = ""+data.get("_cust_key:"+key,key);
+                custom.put(keyC,data.get(key));
+                processCustomData(keyC, data.get(key));
             }
         }
         return this;
@@ -299,6 +312,18 @@ public abstract class Rest implements RestSpec {
     public RestSpec timeout(int timeoutSeconds){
         this.timeout = timeoutSeconds;
         return this;
+    }
+
+
+    @Override
+    public RestSpec configure(Object config) {
+        this.config = config;
+        return this;
+    }
+
+    @Override
+    public Object getConfig(){
+        return this.config;
     }
 
     @Override

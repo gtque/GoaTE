@@ -31,8 +31,6 @@ import com.thegoate.Goate;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertTrue;
-
 /**
  * Tests the dsl for shifting the date.
  * Created by gtque on 3/10/2017.
@@ -44,6 +42,59 @@ public class DateShiftTest {
         data.put("test", "date shift::MM-dd-yyyy,11-25-2009,-1");
         String shiftedDate = "" + data.get("test");
         Assert.assertEquals(shiftedDate,"11-24-2009");
+    }
+
+    @Test(groups = {"unit"})
+    public void unitDateShift(){
+        Goate data = new Goate();
+        data.put("test", "date shift::MM-dd-yyyy,11-25-2009,1,n");
+        String shiftedDate = "" + data.get("test");
+        Assert.assertEquals(shiftedDate,"12-25-2009");
+    }
+
+    @Test(groups = {"unit"})
+    public void secondDateTimeShift(){
+        Goate data = new Goate();
+        data.put("test", "dateTime shift::MM-dd-yyyy'T'HH:mm:ss'Z',11-25-2009T12:34:56Z,5,s");
+        String shiftedDate = "" + data.get("test");
+        Assert.assertEquals(shiftedDate,"11-25-2009T12:35:01Z");
+    }
+
+    @Test(groups = {"unit"})
+    public void minuteDateTimeShift(){
+        Goate data = new Goate();
+        data.put("test", "dateTime shift::MM-dd-yyyy'T'HH:mm:ss'Z',11-25-2009T12:34:56Z,1,m");
+        String shiftedDate = "" + data.get("test");
+        Assert.assertEquals(shiftedDate,"11-25-2009T12:35:56Z");
+    }
+
+    @Test(groups = {"unit"})
+    public void hourDateTimeShift(){
+        Goate data = new Goate();
+        data.put("test", "dateTime shift::MM-dd-yyyy'T'HH:mm:ss'Z',11-25-2009T12:34:56Z,-23,h");
+        String shiftedDate = "" + data.get("test");
+        Assert.assertEquals(shiftedDate,"11-24-2009T13:34:56Z");
+    }
+    @Test(groups = {"unit"})
+    public void dayDateTimeShift(){
+        Goate data = new Goate();
+        data.put("test", "dateTime shift::MM-dd-yyyy'T'HH:mm:ss'Z',11-25-2009T12:34:56Z,-1,d");
+        String shiftedDate = "" + data.get("test");
+        Assert.assertEquals(shiftedDate,"11-24-2009T12:34:56Z");
+    }
+    @Test(groups = {"unit"})
+    public void weekDateTimeShift(){
+        Goate data = new Goate();
+        data.put("test", "dateTime shift::MM-dd-yyyy'T'HH:mm:ss'Z',11-25-2009T12:34:56Z,1,w");
+        String shiftedDate = "" + data.get("test");
+        Assert.assertEquals(shiftedDate,"12-02-2009T12:34:56Z");
+    }
+    @Test(groups = {"unit"})
+    public void monthDateTimeShift(){
+        Goate data = new Goate();
+        data.put("test", "dateTime shift::MM-dd-yyyy'T'HH:mm:ss'Z',11-25-2009T12:34:56Z,-1,months");
+        String shiftedDate = "" + data.get("test");
+        Assert.assertEquals(shiftedDate,"10-25-2009T12:34:56Z");
     }
 
     @Test(groups = {"unit"})

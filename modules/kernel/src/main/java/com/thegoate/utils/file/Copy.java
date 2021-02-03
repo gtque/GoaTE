@@ -31,7 +31,6 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
 
-
 import java.io.*;
 import java.net.URL;
 
@@ -45,6 +44,10 @@ public class Copy {
     private String originalFile = null;
     private File file = null;
     private InputStream fileInputStream = null;
+
+    public static Copy copy(File copy){
+        return new Copy(copy);
+    }
 
     public Copy() {
     }

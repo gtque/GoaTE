@@ -32,4 +32,49 @@ package com.thegoate.spreadsheets;
  * Created by Eric Angeli on 9/14/2017.
  */
 public class SpreadSheet {
+    public static String headers = "headers";
+    public static String rowCount = "rowCount";
+    public static String colCount = "colCount";
+    public static String listSheets = "sheet list";
+
+    public static String loadSheet(String sheetName) {
+        return "load sheet:=" + sheetName;
+    }
+
+    public static String getRow(int rowNumber) {
+        return getRow("" + rowNumber);
+    }
+
+    public static String getRow(String rowNumber) {
+        return "get row#" + rowNumber;
+    }
+
+    public static String getCell(int row, int columnNumber){
+        return getCell(""+row, ""+columnNumber);
+    }
+
+    public static String getCell(int row, String columnNumber){
+        return getCell(""+row, columnNumber);
+    }
+
+    public static String getCell(String row, int columnNumber){
+        return getCell(row, ""+columnNumber);
+    }
+
+    public static String getCell(String row, String column){
+        return row + "." + column;
+    }
+
+    public static String getCell(String sheetName, int row, int columnNumber){
+        return getCell(sheetName, ""+row, ""+columnNumber);
+    }
+    public static String getCell(String sheetName, int row, String columnNumber){
+        return getCell(sheetName, ""+row, columnNumber);
+    }
+    public static String getCell(String sheetName, String row, int columnNumber){
+        return getCell(sheetName, row, ""+columnNumber);
+    }
+    public static String getCell(String sheetName, String row, String columnNumber){
+        return sheetName+":"+row+"."+columnNumber;
+    }
 }

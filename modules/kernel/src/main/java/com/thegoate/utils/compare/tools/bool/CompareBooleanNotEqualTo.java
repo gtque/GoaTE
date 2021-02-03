@@ -32,7 +32,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Compares two booleans for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "!=", type = "boolean")
+@CompareUtil(operator = "!=", type = Boolean.class)
 public class CompareBooleanNotEqualTo extends CompareBooleanTool {
 
     public CompareBooleanNotEqualTo(Object actual) {
@@ -41,6 +41,8 @@ public class CompareBooleanNotEqualTo extends CompareBooleanTool {
 
     @Override
     public boolean evaluate() {
-        return Boolean.parseBoolean(""+actual)!=Boolean.parseBoolean(""+expected);
+        String exp = ""+expected;
+        String act = ""+actual;
+        return !act.equals(exp);
     }
 }

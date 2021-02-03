@@ -32,6 +32,9 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Eric Angeli on 5/11/2017.
  */
@@ -63,4 +66,26 @@ public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
         assertEquals(data.size(), 5);
     }
 
+    public int removeDuplicates(int[] nums)
+    {
+        int size = 0;
+        int lastNum = 0;
+        for(int index = 0; index < nums.length; index++){
+            if(size == 0 || lastNum!=nums[index]){
+                lastNum = nums[index];
+                nums[size] = lastNum;
+                size++;
+            }
+        }
+        return size;
+    }
+
+    @Test
+    public void testDup(){
+        int[] ia = {0,0,1,1,1,2,2,3,3,4};
+        List<String> list = new ArrayList<>();
+        list.add(0, "hello");
+        int size = removeDuplicates(ia);
+        assertEquals(size, 5);
+    }
 }

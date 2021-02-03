@@ -42,12 +42,33 @@ import com.thegoate.utils.fill.Fill;
         "\n The default is to treat the object as a string, but it will try to find the appropriate fill utility and only use fill string as a default.",
     parameters = {"The object to be filled, this may be a string or a call to another dsl."})
 public class FillDSL extends DSL {
+    Goate fillData;
+
     public FillDSL(Object value) {
         super(value);
+        fillData = new Goate();
+    }
+
+    public static FillDSL fill(Object value){
+        return new FillDSL("fill::"+value);
+    }
+
+    public FillDSL put(Goate data){
+        fillData.merge(data,false);
+        return this;
+    }
+
+    public FillDSL put(String key, Object value){
+        fillData.put(key, value);
+        return this;
+    }
+
+    public Object evaluate(){
+        return evaluate(fillData);
     }
 
     @Override
     public Object evaluate(Goate data) {
-        return new Fill(get(1,data)).with(data);
+        return new Fill(get(1,data)).with(fillData.merge(data,false));
     }
 }

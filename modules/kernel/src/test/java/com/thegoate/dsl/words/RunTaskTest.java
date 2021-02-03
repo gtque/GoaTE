@@ -28,7 +28,6 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import org.testng.Assert;
@@ -67,6 +66,17 @@ public class RunTaskTest {
         String nt = "" + data.get("test");
         LOG.debug("output: " + nt);
         Assert.assertEquals(nt, "20");
+    }
+
+    @Test(groups = {"unit"})
+    public void runMultiple3(){
+        Goate data = new Goate();
+        data.put("test", "do::multiply three numbers constructor times ${x} times ${y},o::constructorValue,o::paul")
+                .put("paul", 100)
+                .put("constructorValue",10).put("x",2).put("y",3);
+        String nt = "" + data.get("test");
+        LOG.debug("output: " + nt);
+        Assert.assertEquals(nt, "60");
     }
 
     @Test(groups = {"unit"})

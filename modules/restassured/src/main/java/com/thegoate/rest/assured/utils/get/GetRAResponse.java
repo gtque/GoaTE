@@ -28,13 +28,14 @@
 package com.thegoate.rest.assured.utils.get;
 
 import com.thegoate.Goate;
+import com.thegoate.rest.RestResult;
 import com.thegoate.statics.ResetStatic;
 import com.thegoate.statics.ResetStatics;
-import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.GetTool;
 import com.thegoate.utils.get.GetUtil;
 import com.thegoate.utils.get.NotFound;
 import com.thegoate.utils.togoate.ToGoate;
+import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.Response;
 
 import java.io.InputStreamReader;
@@ -42,16 +43,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Loads the file specified in from into a string and returns it.
+ * Gets a rest assure
  * Created by Eric Angeli on 5/18/2017.
  */
-@GetUtil
+@GetUtil(type = Response.class)
 @ResetStatics
 public class GetRAResponse extends GetTool implements ResetStatic {
 
     static Map<Object, Goate> resp = new ConcurrentHashMap<>();
 
-    public GetRAResponse(){
+    public GetRAResponse() {
         super(null);
     }
 
@@ -60,11 +61,11 @@ public class GetRAResponse extends GetTool implements ResetStatic {
     }
 
     @Override
-    public void resetStatics(){
+    public void resetStatics() {
         resp = null;
         resp = new ConcurrentHashMap<>();
     }
-    
+
     @Override
     public boolean isType(Object check) {
         return check instanceof Response;
@@ -73,54 +74,64 @@ public class GetRAResponse extends GetTool implements ResetStatic {
     @Override
     public Object from(Object container) {
         Object result = null;
-        if(container!=null){
-            Response r = (Response)container;
-            if(selector.equals("status code")){
+        if (("" + selector).contains("get_from_rest_response::")) {
+            selector = ("" + selector).replace("get_from_rest_response::", "");
+        }
+        if (container != null) {
+            Response r = (Response) container;
+            if (selector.equals("status code")) {
                 result = r.statusCode();
-            }else if(selector.equals("body")){
+            } else if (selector.equals(RestResult.body)) {
                 result = r.body();
-            }else if(selector.equals("body as a string")){
-                result = r.body().prettyPrint();
-            }else if(selector.equals("response time")){
+            } else if (selector.equals("body as a string")) {
+                result = r.body().asString();
+            } else if (selector.equals("response time")) {
                 result = r.time();
-            }else if(selector.equals("session id")){
+            } else if (selector.equals("session id")) {
                 result = r.sessionId();
-            }else if(selector.equals("status line")){
+            } else if (selector.equals("status line")) {
                 result = r.statusLine();
-            }else if(selector.equals("json")){
+            } else if (selector.equals("json")) {
                 result = r.jsonPath();
-            }else if(selector.equals("xml")){
+            } else if (selector.equals("xml")) {
                 result = r.xmlPath();
-            }else if(selector.equals("html")){
+            } else if (selector.equals("html")) {
                 result = r.htmlPath();
-            }else if(selector.toString().startsWith("header")){
+            } else if (selector.toString().startsWith("header")) {
                 result = r.header(selector.toString().substring("header".length()).trim());
-            }else if(selector.toString().startsWith("cookie")){
+            } else if (selector.toString().startsWith("cookie")) {
                 result = r.cookie(selector.toString().substring("cookie".length()).trim());
-            }else if(selector.toString().startsWith("detailedCookie")){
+            } else if (selector.toString().startsWith("detailedCookie")) {
                 result = r.detailedCookie(selector.toString().substring("detailedCookie".length()).trim());
-            }else if(selector.toString().startsWith("body as input stream")||selector.toString().startsWith("input stream")){
+            } else if (selector.toString().startsWith("body as input stream") || selector.toString().startsWith("input stream")) {
                 result = new InputStreamReader(r.asInputStream());
-            }else{
+            } else if (selector.toString().startsWith(RestResult.content)) {
+                result = ((RestAssuredResponseImpl) r).getContent();
+            } else if (selector.toString().startsWith(RestResult.byteArray)) {
+                result = r.asByteArray();
+            } else {
                 Goate g = null;
-                if(resp.containsKey(container)){
+                if (resp.containsKey(container)) {
                     g = resp.get(container);
-                }else{
-                    g = new ToGoate(r.body().prettyPrint()).convert();
+                } else {
+                    g = new ToGoate(r.body().asString()).convert();
                     resp.put(container, g);
                 }
 //                result = new Get(selector).from(r.body().prettyPrint());
-                if(g!=null){
-                    if(g.keys().contains(""+selector)) {
+                if (g != null) {
+                    if (g.keys().contains("" + selector)) {
                         result = g.get("" + selector);
-                    }else{
-                        result = new NotFound(""+selector);
+                    } else {
+                        result = new NotFound("" + selector);
                     }
                 }
             }
 
         }
-        result = processNested(result);//process nested gets.
+
+        result =
+
+                processNested(result);//process nested gets.
         return result;
     }
 }

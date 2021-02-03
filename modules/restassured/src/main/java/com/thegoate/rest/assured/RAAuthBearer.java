@@ -108,6 +108,14 @@ public class RAAuthBearer extends RestAuthBearer implements RASpec{
         return response;
     }
 
+    @Override
+    public Object head(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.head(endpoint);
+        log(response);
+        return response;
+    }
+
     protected void log(Response response){
         if(doLog()){
             LOG.debug("RAAuthBearer","response follows");
@@ -118,6 +126,15 @@ public class RAAuthBearer extends RestAuthBearer implements RASpec{
 
     @Override
     public RequestSpecification getSpec() {
+        specification = RestAssured.init(given(), this);
         return specification;
+    }
+
+    @Override
+    public RestSpec logSpec() {
+        if(specification!=null){
+            specification.log().all();
+        }
+        return this;
     }
 }

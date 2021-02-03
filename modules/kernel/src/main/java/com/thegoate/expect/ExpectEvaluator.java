@@ -32,6 +32,7 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,8 +48,10 @@ public class ExpectEvaluator {
 
     List<ExpectThreadExecuter> expectations = null;
     StringBuilder failed = new StringBuilder("");
-    List<Goate> fails = new ArrayList<>();
-    List<Goate> passes = new ArrayList<>();
+    volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
+    volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
+    volatile List<Goate> skipped = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
+    volatile List<Goate> zeroOrMore = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
 
     public ExpectEvaluator(ExpectationThreadBuilder etb){
         buildExpectations(etb);
@@ -74,7 +77,12 @@ public class ExpectEvaluator {
             }
             passes.addAll(expect.passes());
         }
+        checkForSkipped();
         return result;
+    }
+
+    public List<ExpectThreadExecuter> expectations(){
+        return expectations;
     }
 
     public List<Goate> fails(){
@@ -83,6 +91,14 @@ public class ExpectEvaluator {
 
     public List<Goate> passes(){
         return passes;
+    }
+
+    public List<Goate> zeroOrMore(){
+        return zeroOrMore;
+    }
+
+    public List<Goate> skipped(){
+        return skipped;
     }
 
     public String failed(){
@@ -123,6 +139,50 @@ public class ExpectEvaluator {
             es.shutdownNow();
             LOG.debug("shutdown finished");
         }
+    }
+
+    private void checkForSkipped(){
+        for (ExpectThreadExecuter expectation : expectations()) {
+            Expectation ex = expectation.getExpectation();
+            Goate eval = ex.getExpectations();
+            for (String key : eval.keys()) {
+                Goate exp = eval.get(key, null, Goate.class);
+                if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), passes())) {
+                    if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), fails())) {
+                        if (!("" + exp.get("actual")).contains("*")&&!("" + exp.get("actual")).contains("+")) {
+//                            logVolume(exp);
+//                            skipped = true;
+//                            ss.append(expectSeparator);
+//                            ss.append(exp.toString("\t", ""));
+                            skipped.add(exp);
+                        } else {
+                            if(!("" + exp.get("actual")).contains("+")) {
+//                                exp.drop("from");
+//                                exp.drop("fromExpected");
+//                                zs.append(expectSeparator);
+//                                zs.append(exp.toString("\t", ""));
+//                                zero = true;
+                                zeroOrMore.add(exp);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean checkInExpectationList(Object actual, String operator, List<Goate> list) {
+        String act = "" + actual;
+        boolean result = false;
+        for (Goate expectation : list) {
+            if (act.equals("" + expectation.get("actual", null))) {
+                if (operator.equals("" + expectation.get("operator", null, String.class))) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
 }

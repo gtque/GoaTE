@@ -37,10 +37,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
- * Some basic utily helpers.
+ * Some basic utility helpers.
  * Created by gtque on 5/3/2017.
  */
 public class GoateUtils {
@@ -68,6 +69,10 @@ public class GoateUtils {
 
     public static String getFilePath(String file){
         return getFilePath(file, false, false);
+    }
+
+    public static boolean fileExists(String file){
+        return new File(getFilePath(file)).exists();
     }
 
     public static String moveUpDir(String fileName){
@@ -139,7 +144,14 @@ public class GoateUtils {
             path = temp.getAbsolutePath();
             LOG.debug("Goate File Util","file path: " + path);
         } catch (Exception e) {
-            LOG.error("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
+            LOG.debug("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
+        }
+        if(path.contains("%")){
+            try {
+                path = URLDecoder.decode(path, "UTF-8");
+            } catch(Exception e){
+                LOG.info("Goate File Util", "Failed to decode a possibly url encoded path to UTF-8");
+            }
         }
         return path;
     }
@@ -280,5 +292,9 @@ public class GoateUtils {
            tabs.append("\t");
         }
         return tabs.toString();
+    }
+
+    public static boolean truth(Object value){
+        return value==null?false:Boolean.parseBoolean(""+value);
     }
 }

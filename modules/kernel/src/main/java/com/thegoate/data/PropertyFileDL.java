@@ -52,14 +52,19 @@ public class PropertyFileDL extends DataLoader {
 
     private Goate loadProperties(Goate props, String file) {
         if (props != null && file != null && new File(GoateUtils.getFilePath(file)).exists()) {
-            String pf = "" + new GetFileAsString(file).from("file::");
+            String pf = "" + new GetFileAsString(file).explode().from("file::");
             if (!pf.isEmpty()) {
                 pf = pf.replace("\n\r", "\r").replace("\r", "\n");
                 for (String line : pf.split("\n")) {
                     if (line != null && !line.isEmpty() && !line.startsWith("#")) {
                         String[] prop = line.split("=");
                         if (prop.length >= 2) {
-                            props.put(prop[0].trim(), prop[1].trim());
+                            String key = prop[0].trim();
+                            if(key.endsWith("##")){
+                                props.put(prop[0].trim(), prop[1].trim());
+                            } else {
+                                props.getStrict(prop[0].trim(), prop[1].trim());
+                            }
                         }
                     }
                 }

@@ -2,6 +2,7 @@
   "extends":"parent.json",
   "abstract":true,
   "job":"api",
+  "groups": "base",
   "setup":[
     {
       "job":"api",

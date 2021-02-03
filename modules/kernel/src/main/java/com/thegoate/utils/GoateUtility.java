@@ -40,6 +40,7 @@ public abstract class GoateUtility implements Utility {
     protected Object nested;
     protected boolean processNested;
     protected Goate health = new Goate();
+    protected Goate data;
 
     public GoateUtility(Object val) {
         processNested = true;
@@ -53,6 +54,12 @@ public abstract class GoateUtility implements Utility {
     @Override
     public boolean isType(Object check) {
         return check instanceof Goate;
+    }
+
+    @Override
+    public GoateUtility setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     @Override

@@ -38,10 +38,10 @@ buildscript {
     }
     dependencies {
         classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:+"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.13.0"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
-        classpath 'goate:gradle8:0.3.201705310130'
+        classpath 'goate:gradle:0.15.8.202002171539'
     }
 }
 
@@ -60,7 +60,9 @@ if (javaVersion.contains(".")) {
     javaVersion = javaVersion.substring(("" + javaVersion).indexOf(".") + 1);
 }
 
-def vbase = '0.14'
+def majorVersion = 0
+def minorVersion = 15
+def vbase = "${majorVersion}.${minorVersion}.${javaVersion}"
 def buildDate = "" + (project.hasProperty("buildDate")?project.buildDate:sdf.format(new Date()))
 def v = "${vbase}." + buildDate
 def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : project.release) : 'beta'
@@ -101,7 +103,7 @@ configurations.all {
 }
 
 wrapper {
-    gradleVersion = '4.8.1' //version required
+    gradleVersion = '6.0.1' //version required
 }
 
 subprojects {
@@ -109,7 +111,8 @@ subprojects {
         annotations;
     }
     boolean oneOff = project.hasProperty("oneOff")
-    def projectName = "${project.name}" + javaVersion
+    def projectJavaLabel = project.hasProperty("projectJavaLabel")?project.projectJavaLabel:"false"
+    def projectName = "${project.name}" + (Boolean.parseBoolean(""+projectJavaLabel)?javaVersion:"")
     projectName = projectName.replace(":", "").replace("module", "")
     apply plugin: 'java'
     apply plugin: 'groovy'
@@ -128,14 +131,18 @@ subprojects {
             name = "${project.name}"
         }
     }
+//    test{
+//        ignoreFailures true
+//    }
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
     dependencies {
-        testCompile 'ch.qos.logback:logback-classic:1.1.7'
-        testCompile 'ch.qos.logback:logback-access:1.1.7'
-        testCompile 'ch.qos.logback:logback-core:1.1.7'
+        testCompile 'ch.qos.logback:logback-classic:1.2.3'
+        testCompile 'ch.qos.logback:logback-access:1.2.3'
+        testCompile 'ch.qos.logback:logback-core:1.2.3'
         testCompile 'org.codehaus.janino:janino:2.7.8'
-        annotationProcessor "org.atteo.classindex:classindex:3.3"
+        annotationProcessor 'org.atteo.classindex:classindex:3.6'
+        testAnnotationProcessor 'org.atteo.classindex:classindex:3.6'
     }
 
     jar.baseName = projectName
@@ -146,7 +153,7 @@ subprojects {
         }
     }
     jacoco {
-        toolVersion = "0.7.6.201602180812"
+        toolVersion = "0.8.5"//"0.7.6.201602180812"
     }
     configurations.all {
         resolutionStrategy.force 'xml-apis:xml-apis:1.4.01'
@@ -179,7 +186,11 @@ subprojects {
     install  {
         repositories.mavenInstaller {
             //System.out.println("installing: " + group + ":" + projectName + ":" + version)
-            GoateGradleHelper.customPom(pom, configurations, project.javaVersion, oneOff)
+            def jv = ""
+            if(Boolean.parseBoolean(""+projectJavaLabel)){
+                jv = project.javaVersion
+            }
+            GoateGradleHelper.customPom(pom, configurations, jv, oneOff)
             pom {
                 project {
                     url siteUrl
@@ -318,6 +329,7 @@ task jacocoMerge(type: JacocoMerge) {
     executionData = getJacocoExecFiles()
     destinationFile = project.file("$buildDir/jacoco/data/jacoco.exec")
 }
+
 // generate coverage report for this project and all its project dependencies
 task jacocoMergedReport(type: JacocoReport) {
     dependsOn jacocoMerge
@@ -328,15 +340,24 @@ task jacocoMergedReport(type: JacocoReport) {
         html.destination file("$buildDir/reports/jacoco")
     }
 
-    classDirectories = files(getJacocoClassDirs().collect {
-        fileTree(dir: it, exclude: ['com/**/gradle/**'])
+    classDirectories.from = files(getJacocoClassDirs().collect {
+        fileTree(dir: it, exclude: ['com/**/gradle/**','com/**/performance/**','com/**/barn/idea/**'])
     })
-    sourceDirectories = getJacocoSrcDirs()
+    sourceDirectories.from = getJacocoSrcDirs()
 
     executionData jacocoMerge.destinationFile
 }
 
 task testReport(type: TestReport) {
+    if(project.hasProperty("testReport")) {
+        subprojects {
+            plugins.withType(JavaPlugin) {
+                test {
+                    ignoreFailures true
+                }
+            }
+        }
+    }
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test

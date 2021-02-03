@@ -29,26 +29,43 @@ package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
+import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.PrimitiveDSL;
 
 import java.math.BigDecimal;
 
 /**
- * Returns a long.
+ * Returns the sum (as a string) calculated using BigDecimal.
  * Created by gtque on 9/20/2017.
  */
 @GoateDSL(word = "sum")
 @GoateDescription(description = "Sums all the entries in the goate collection, returned as a string.",
         parameters = {"The filter to apply to the goate data, optional - if omitted will sum every numeric from the goate collection."})
-public class SumFieldsDSL extends PrimitiveDSL {
+public class SumFieldsDSL extends DSL {
+    Goate sumFields = new Goate();
     public SumFieldsDSL(Object value) {
         super(value);
     }
 
-    @Override
-    public Class classType() {
-        return Long.TYPE;
+    public static SumFieldsDSL sum(){
+        return new SumFieldsDSL("sum::");
+    }
+
+    public static SumFieldsDSL sum(String fieldPattern){
+        return new SumFieldsDSL("sum::"+fieldPattern);
+    }
+
+    public SumFieldsDSL add(Object value){
+        sumFields.put(""+sumFields.size(), value);
+        return this;
+    }
+
+    public String calculate() {
+        return calculate(new Goate());
+    }
+
+    public String calculate(Goate data){
+        return ""+evaluate(data);
     }
 
     @Override
@@ -57,14 +74,18 @@ public class SumFieldsDSL extends PrimitiveDSL {
 
         String filter = "" + get(1,data);
         Goate filtered = data;
+
         if(!filter.equalsIgnoreCase("null")&&!filter.isEmpty()){
             filtered = filtered.filter(filter);
         }
-        for(String key:filtered.keys()){
+        sumFields.merge(filtered,false);
+        for(String key:sumFields.keys()){
             try {
-                sum = sum.add(new BigDecimal("" + filtered.get(key)));
+                if(!key.equals(this.key)) {
+                    sum = sum.add(new BigDecimal("" + sumFields.get(key)));
+                }
             }catch(Exception e){
-                LOG.debug("Sum","Problem adding: " + filtered.get(key), e);
+                LOG.debug("Sum","Problem adding: " + sumFields.get(key), e);
             }
         }
         return sum.toString();

@@ -29,6 +29,6 @@ dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
     compile d.depends(":kernel", project.internalVersion);
     compile d.depends(":json", project.internalVersion);
-    compile "org.mockito:mockito-core:+";
+    compile "org.mockito:mockito-core:2.28.2";
     testCompile d.depends(":testng", project.internalVersion);
 }

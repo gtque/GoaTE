@@ -27,17 +27,22 @@
 package com.thegoate.spring;
 
 import com.thegoate.Goate;
+import com.thegoate.expect.Expectation;
+import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.ITest;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Wrapper class combines AbstractTestNGSpringContextTests and Test Engine functionality from GoaTE.
@@ -60,10 +65,10 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
 
     @Override
     @DataProvider(name = "dataLoader")
-    public Object[][] dataLoader(ITestContext context) throws Exception {
+    public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();
-        return engine.dataLoader(context);
+        return engine.dataLoader(method, context);
     }
 
     @DataProvider(name = "methodLoader")
@@ -114,8 +119,8 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
-    public void bumpRunNumber() {
-        engine.bumpRunNumber();
+    public void bumpRunNumber(String name) {
+        engine.bumpRunNumber(name);
     }
 
     @Override
@@ -150,7 +155,54 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
 
     @Override
     public TestNG put(String key, Object val) {
-        return engine.put(key, val);
+        engine.put(key, val);
+        return this;
+    }
+
+    @Override
+    public TestNG expect(Expectation expectation) {
+        engine.expect(expectation);
+        return this;
+    }
+
+    @Override
+    public TestNG expect(ExpectationBuilder expectationBuilder){
+        engine.expect(expectationBuilder.build());
+        return this;
+    }
+
+    @Override
+    public TestNG expect(List<Expectation> expectation) {
+        engine.expect(expectation);
+        return this;
+    }
+
+    @Override
+    public TestNG evalPeriod(long periodMS) {
+        engine.evalPeriod(periodMS);
+        return this;
+    }
+
+    @Override
+    public TestNG evalTimeout(long timeoutMS) {
+        engine.evalTimeout(timeoutMS);
+        return this;
+    }
+
+    @Override
+    public void evaluate() {
+        engine.evaluate();
+    }
+
+    @Override
+    public void evaluate(ITestResult testResult) {
+        engine.evaluate(testResult);
+    }
+
+    @Override
+    public TestNG clearExpectations() {
+        engine.clearExpectations();
+        return this;
     }
 
     @Override

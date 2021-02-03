@@ -27,6 +27,7 @@
 
 package com.thegoate.annotations;
 
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -37,6 +38,9 @@ import java.lang.annotation.RetentionPolicy;
  * Created by gtque on 4/21/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Marks the class the default choice, used by unknown utilities if a more specific match cannot be found.")
+@Info
 @IndexAnnotated
 public @interface IsDefault {
+    boolean forType() default false;
 }

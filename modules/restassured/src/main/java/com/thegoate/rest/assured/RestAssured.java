@@ -26,21 +26,27 @@
  */
 package com.thegoate.rest.assured;
 
+import com.github.dzieciou.testing.curl.CurlLoggingRestAssuredConfigFactory;
+import com.github.dzieciou.testing.curl.Options;
+import com.github.dzieciou.testing.curl.Platform;
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
-import io.restassured.config.*;
+
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.LogConfig;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.config.SSLConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.params.CoreConnectionPNames;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
@@ -67,13 +73,13 @@ public class RestAssured extends Rest implements RASpec {
 
     public static RequestSpecification init(RequestSpecification specification, RASpec spec) {
         specification = specification == null ? given() : specification;
-        RestAssuredConfig rac = new RestAssuredConfig();
+        RestAssuredConfig rac = spec.getConfig() == null?new RestAssuredConfig():(RestAssuredConfig)spec.getConfig();
         PrintStream streamer = getPrintStream(spec.getLog());
         LogConfig lc = new LogConfig(streamer, true);
         SSLConfig sslc = new SSLConfig().allowAllHostnames().relaxedHTTPSValidation();
         rac = rac.sslConfig(sslc);
         rac = rac.logConfig(lc);
-        if(spec.getHeaders().keys().toArray().length>0) {
+        if (spec.getHeaders().keys().toArray().length > 0) {
             rac = rac.headerConfig(headerConfig()
                     .overwriteHeadersWithName("Content-Type", spec.getHeaders().keysArray()));
         } else {
@@ -81,8 +87,10 @@ public class RestAssured extends Rest implements RASpec {
                     .overwriteHeadersWithName("Content-Type"));
         }
         int timeout = spec.getTimeout();
-        rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout*1000));
+        rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout * 1000));
         rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));
+        Options options = Options.builder().targetPlatform(Platform.UNIX).build();
+        rac = CurlLoggingRestAssuredConfigFactory.updateConfig(rac, options);
         return specification.config(rac);
     }
 
@@ -99,18 +107,21 @@ public class RestAssured extends Rest implements RASpec {
                 mySpec.log().all();
                 spec.getLog().flush();
             }
+//            keeping this as a reference in case I need to expose it for some reason.
+//            io.restassured.RestAssured.urlEncodingEnabled = false;
+
         }
         return mySpec;
     }
 
     @Override
-    public RestSpec config(){
+    public RestSpec config() {
         init(specification, this);
         return this;
     }
 
     @Override
-    public BleatBox getLog(){
+    public BleatBox getLog() {
         return LOG;
     }
 
@@ -119,7 +130,8 @@ public class RestAssured extends Rest implements RASpec {
      * This high-jacks the stream writer to write to our custom logger implementation.
      * This will always write to info. Writing the response to the logger is not controlled by the logging level,
      * but by a separate setting.
-     * @param  log The instance of the log implementation to use.
+     *
+     * @param log The instance of the log implementation to use.
      * @return printStream
      */
     public static PrintStream getPrintStream(BleatBox log) {
@@ -156,6 +168,7 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setURLParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
+//            spec.params(params.data());
             for (String key : params.keys()) {
                 spec.param(key, params.get(key));
             }
@@ -164,6 +177,7 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setQueryParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
+//            spec.queryParams(params.data());
             for (String key : params.keys()) {
                 spec.queryParam(key, params.get(key));
             }
@@ -172,6 +186,7 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setPathParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
+//            spec.pathParams(params.data());
             for (String key : params.keys()) {
                 spec.pathParam(key, params.get(key));
             }
@@ -184,13 +199,37 @@ public class RestAssured extends Rest implements RASpec {
                 Goate b = (Goate) body.get(key);
                 if (b != null) {
                     for (String id : b.keys()) {
+                        String[] keyParts = id.split(typeSeparator);
+                        String type = null;
+                        String idkey = keyParts[0];
+                        if(keyParts.length>1){
+                            type = keyParts[1];
+                        }
                         if (key.equals(BODY.urlencoded.name()) || key.equals(BODY.form.name())) {
-                            spec.formParam(id, b.get(id));
-                        } else if (key.equals(BODY.multipart.name())) {
-                            if (id.startsWith(MP_ID_NOT_SET)) {
+                            spec.formParam(idkey, b.get(id));
+                        } else if (key.startsWith(BODY.multipart.name())) {
+                            if (idkey.equals(MP_ID_NOT_SET)) {
                                 spec.multiPart((File) b.get(id));
                             } else {
-                                spec.multiPart(id, b.get(id));
+                                if (b.get(id) instanceof File) {
+                                    if(type!=null) {
+                                        spec.multiPart(idkey, (File) b.get(id), type);
+                                    } else {
+                                        spec.multiPart(idkey, (File) b.get(id));
+                                    }
+                                } else if (b.get(id) instanceof String) {
+                                    if(type!=null) {
+                                        spec.multiPart(idkey, "" + b.get(id), type);
+                                    } else {
+                                        spec.multiPart(idkey, "" + b.get(id));
+                                    }
+                                } else {
+                                    if(type!=null){
+                                        spec.multiPart(idkey, b.get(id), type);
+                                    } else {
+                                        spec.multiPart(idkey, b.get(id));
+                                    }
+                                }
                             }
                         } else {
                             spec.body(b.get(id));
@@ -208,6 +247,14 @@ public class RestAssured extends Rest implements RASpec {
 
     @Override
     public RestSpec processCustomData(String key, Object value) {
+        return this;
+    }
+
+    @Override
+    public RestSpec logSpec() {
+        if (specification != null) {
+            specification.log().all();
+        }
         return this;
     }
 
@@ -259,6 +306,14 @@ public class RestAssured extends Rest implements RASpec {
         return response;
     }
 
+    @Override
+    public Object head(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.head(endpoint);
+        log(response);
+        return response;
+    }
+
     protected void log(Response response) {
         if (doLog()) {
             LOG.debug("RestAssured", "response follows");
@@ -269,6 +324,8 @@ public class RestAssured extends Rest implements RASpec {
 
     @Override
     public RequestSpecification getSpec() {
+        specification = RestAssured.init(given(), this);
         return specification;
     }
+
 }

@@ -26,9 +26,9 @@
  */
 package com.thegoate.spreadsheets.utils.compare;
 
+import com.thegoate.spreadsheets.csv.CSVRecord;
 import com.thegoate.spreadsheets.utils.CsvRecordUtil;
 import com.thegoate.utils.compare.CompareUtility;
-import org.apache.commons.csv.CSVRecord;
 
 /**
  * Base class for comparing json.
@@ -53,7 +53,9 @@ public abstract class CompareCsvRecord extends CsvRecordUtil implements CompareU
 
     @Override
     public CompareUtility actual(Object actual){
-        this.actual = (CSVRecord)actual;
+        if(actual!=null && actual instanceof CSVRecord) {
+            this.actual = (CSVRecord) actual;
+        }
         return this;
     }
 

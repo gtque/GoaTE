@@ -46,7 +46,7 @@ public class FillString implements FillUtility{
     Goate health = new Goate();
     String fill = "";
     List<String> fillList = new ArrayList<>();
-
+    Goate data;
     public FillString(Object fill){
         this.fill = ""+fill;
     }
@@ -54,6 +54,12 @@ public class FillString implements FillUtility{
     @Override
     public boolean isType(Object check) {
         return check instanceof String;
+    }
+
+    @Override
+    public FillUtility setData(Goate data){
+        this.data = data;
+        return this;
     }
 
     @Override

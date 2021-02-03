@@ -27,6 +27,7 @@
 
 package com.thegoate.annotations;
 
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -39,6 +40,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by gtque on 4/21/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Add a description of what ever is being annotated.")
+@Info
 @IndexAnnotated
 public @interface GoateDescription {
     String description();

@@ -27,11 +27,12 @@
 package com.thegoate.utils;
 
 import com.thegoate.Goate;
+import com.thegoate.HealthMonitor;
 
 /**
  * Created by Eric Angeli on 5/19/2017.
  */
-public interface Utility {
+public interface Utility extends HealthMonitor {
+    Utility setData(Goate data);
     boolean isType(Object check);
-    Goate healthCheck();
 }

@@ -37,7 +37,8 @@ import com.thegoate.dsl.GoateDSL;
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "o")
-@GoateDescription(description = "Returns the value of the object specified by the key.", parameters = {"The key of the object in the goate collection."})
+@GoateDescription(description = "Returns the value of the object specified by the key.",
+        parameters = {"The key of the object in the goate collection.", "default value to return, this is optional"})
 public class ObjectDSL extends DSL {
     public ObjectDSL(Object value) {
         super(value);
@@ -45,6 +46,6 @@ public class ObjectDSL extends DSL {
 
     @Override
     public Object evaluate(Goate data) {
-        return data.get(""+get(1,data));
+        return data.get(""+get(1,data), get(2,data));
     }
 }

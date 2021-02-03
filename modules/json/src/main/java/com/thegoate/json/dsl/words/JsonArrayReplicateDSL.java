@@ -45,6 +45,13 @@ public class JsonArrayReplicateDSL extends DSL {
         super(value);
     }
 
+    public static Object jsonArrayReplicate(String jsonString, int replicationCount){
+        return jsonArrayReplicate(jsonString, replicationCount, new Goate());
+    }
+
+    public static Object jsonArrayReplicate(String jsonString, int replicationCount, Goate data){
+        return new JsonArrayReplicateDSL("json array replicate::"+jsonString+","+replicationCount).evaluate(data);
+    }
     @Override
     public Object evaluate(Goate data) {
         String def = ""+get(1,data);

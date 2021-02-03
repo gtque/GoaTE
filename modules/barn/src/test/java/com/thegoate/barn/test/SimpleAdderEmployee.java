@@ -22,8 +22,8 @@ public class SimpleAdderEmployee extends Employee {
 
     @Override
     public Employee init() {
-        val1 = Integer.parseInt(""+data.get("val1", "-1"));
-        val2 = Integer.parseInt(""+data.get("val2", "-41"));
+        val1 = Integer.parseInt(""+definition.get("val1", "-1"));
+        val2 = Integer.parseInt(""+definition.get("val2", "-41"));
         return this;
     }
 

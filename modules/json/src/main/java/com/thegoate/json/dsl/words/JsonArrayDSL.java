@@ -34,7 +34,7 @@ import com.thegoate.dsl.GoateDSL;
 import org.json.JSONArray;
 
 /**
- * Returns the value of the referenced object.
+ * Returns a json array.
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "json array")
@@ -43,6 +43,14 @@ import org.json.JSONArray;
 public class JsonArrayDSL extends DSL {
     public JsonArrayDSL(Object value) {
         super(value);
+    }
+
+    public static Object jsonArray(String jsonString){
+        return jsonArray(jsonString, new Goate());
+    }
+
+    public static Object jsonArray(String jsonString, Goate data){
+        return new JsonArrayDSL("json array::"+jsonString).evaluate(data);
     }
 
     @Override

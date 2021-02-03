@@ -31,10 +31,12 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.fill.serialize.string.StringConverter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Created by Eric Angeli on 6/26/2018.
@@ -46,6 +48,7 @@ public class Cast extends UnknownUtilType {
     private Goate data;
     private Class dataSource;
     private Field field;
+    private Object container;
 
     public Cast(Goate data, Class dataSource){
         this.data = data;
@@ -63,7 +66,13 @@ public class Cast extends UnknownUtilType {
                 object = serializer.build(type);
             } else {
                 if(type.equals(String.class)){
-                    object = "" + value;
+                    if(value instanceof String) {
+                        object = value;
+                    } else if(value == null){
+                        object = null;
+                    } else {
+                        object = new StringConverter().value(value).convert();
+                    }
                 } else {
                     Constructor constructor = findConstructor(type, value);
                     try {
@@ -82,25 +91,43 @@ public class Cast extends UnknownUtilType {
         return (T)object;
     }
 
+    public Cast container(Object o){
+        this.container = o;
+        return this;
+    }
     public Cast field(Field field){
         this.field = field;
         return this;
     }
 
+    protected Class getType(Class type){
+        Class t = type;
+        if(type == TypeT.class){
+            if(container instanceof TypeT) {
+                try {
+                    Method get_type = container.getClass().getMethod("goateType");
+                    type = (Class) get_type.invoke(container);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    LOGGER.debug("problem detecting type T, will just assume it is the type: " + e.getMessage());
+                }
+            }
+            LOGGER.debug("found a generic type: " + type);
+        }
+        return t;
+    }
+
     protected Object buildFromCastUtil(Class type, Object value){
-//        try{
-//            LOGGER.debug("Cast", "is array: " + type.isArray());
-//            return type.cast(value);
-//        }catch (Throwable t){
-//            LOGGER.debug("Cast", "Failed to cast to: "+type.getName()+", trying to lookup cast utility.");
-//        }
-        CastUtility caster = (CastUtility)buildUtil(type, CastUtil.class, value);
+        CastUtility caster = (CastUtility)buildUtil(getType(type), CastUtil.class, value);
         if(caster==null){
             LOGGER.error("Cast","Could not build: " + type.getName() +". You may need to implement a CastUtility to support that object type.");
             throw new RuntimeException("Could not build: " + type.getName() +". You may need to implement a CastUtility to support that object type.");
         }
         LOGGER.debug("Cast","Cast utility found, building object.");
-        return caster.data(data).dataSource(dataSource).field(field).cast(type);
+        caster.setData(data);
+        if(caster instanceof GoateCastUtility){
+            ((GoateCastUtility)caster).setContainer(container);
+        }
+        return caster.dataSource(dataSource).field(field).cast(type);
     }
 
     protected Constructor findConstructor(Class type, Object value){
@@ -120,5 +147,12 @@ public class Cast extends UnknownUtilType {
             }
         }
         return constructor;
+    }
+
+    @Override
+    public boolean checkType(Class tool, Class type) {
+//        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
+//        return tu.type()!=null?(tu.type() == type):(type == null);
+        return false;
     }
 }

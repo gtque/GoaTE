@@ -30,9 +30,11 @@ package com.thegoate.staff;
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationEvaluator;
 import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.expect.Expectation;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.metrics.Stopwatch;
+import com.thegoate.utils.togoate.ToGoate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -44,46 +46,119 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Defines an employee object. An employee does some type of work by calling the work method.<br>
  * In order to make full use of an employee with other GoaTE frameworks, they should be annotated
  * with {@literal @}GoateJob to provide a list of jobs the employee fills.
+ * Use param(key) or param(key,default) to get the parameters for the job or directly access definition.
+ * When manipulating or setting the test run data use the class variable data.
  * Created by gtque on 4/21/2017.
  */
-public abstract class Employee {
+public abstract class Employee<T> implements Worker<Employee, T> {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected final static BleatBox slog = BleatFactory.getLogger(Employee.class);
     protected HealthRecord hr = new HealthRecord();
+    protected Expectation expectation = null;
     protected Goate data;
+    protected Goate definition = new Goate();
     protected String name = "";
+    protected volatile long startTime = 0L;
+    protected volatile T result = null;
+    protected long period = 50L;
+    protected boolean periodHasBeenSet = false;
 
     public HealthRecord getHrReport() {
         return hr;
     }
 
-    protected Employee setName(String name){
+    public Employee<T> setName(String name){
         this.name = name;
         return this;
     }
 
-    protected String parameterName(String parameter){
+    @Override
+    public Employee<T> expectation(Expectation expectation){
+        this.expectation = expectation;
+        return this;
+    }
+
+    public String parameterName(String parameter){
         return new StringBuilder(name).append(name.isEmpty()?"":".").append(parameter).toString();
     }
 
-    protected String getName(){
+    public String getName(){
         return name;
     }
 
-    public Employee setData(Goate data) {
+    public String getNameDef(){
+        return name + ".definition";
+    }
+
+    public Employee<T> initData(){
+        if(data==null) {
+            data = new Goate();
+        }
+        return this;
+    }
+
+    protected Object param(String paramName) {
+        return param(paramName, null);
+    }
+
+    protected Object param(String paramName, Object def){
+        return definition!=null?definition.get(paramName,def):def;
+    }
+
+    public Employee<T> setData(Goate data) {
         this.data = data;
         //no point in processing the annotations until the data is set.
         new AnnotationEvaluator().process(this, getClass());//stubbed for now, but intended for processing of annotations for auto wire like functionality.
         return this;
     }
 
-    public Object work() {
-        Object result = null;
+    public Employee<T> defaultPeriod(long period){
+        if(!periodHasBeenSet){
+            this.period = period;
+        }
+        return this;
+    }
+
+    public Employee<T> period(long period){
+        this.period = period;
+        periodHasBeenSet = true;
+        return this;
+    }
+
+    public synchronized final T syncWork(){
+        return syncWork(period);
+    }
+
+    public synchronized final T syncWork(long waitMs){
+        if(System.currentTimeMillis()-startTime>waitMs){
+            result = work();
+            startTime = System.currentTimeMillis();
+        }
+        return result;
+    }
+
+    /**
+     * Always called immediately before doWork().<br>
+     * Override this method to define any common setup/configuration/initialization that needs
+     * to be done just prior to working after the definition and other parameters have been set.
+     * @return syntactic sugar, returns itself.
+     */
+    public Employee<T> clockIn(){
+        return this;
+    }
+
+    public final T work() {
+        result = null;
+        String lap = ""+System.nanoTime();
         try {
             if(data!=null&&data.get("lap",null)!=null) {
-                Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
+                String lt = data.get("lap", lap, String.class);
+                if(!lt.isEmpty()){
+                    lap = lt;
+                }
+                Stopwatch.global.start(lap);
             }
-            result = doWork();
+            result = (T)clockIn().doWork();
         } catch (Throwable t) {
             try {
                 //Creates a report in HR. Most reports are going to be exceptions.
@@ -98,14 +173,14 @@ public abstract class Employee {
             throw t;
         }finally {
             if(data!=null&&data.get("lap",null)!=null) {
-                Stopwatch.global.split(data.get("lap", Thread.currentThread().getName(), String.class));
+                Stopwatch.global.split(lap);
             }
         }
         return result;
     }
 
     public Goate scrub(Goate data){
-        String[] baseScrub = {"Scenario", "job", "abstract", "extends", "groups", "expect", "override"};
+        String[] baseScrub = {"Scenario", "job", "abstract", "extends", "groups", "expect", "override", getName()+"\\.definition"};
         Goate scrubbed = clean(new Goate().merge(data,false),baseScrub);
         return clean(scrubbed, detailedScrub());
     }
@@ -121,14 +196,29 @@ public abstract class Employee {
 
     public abstract String[] detailedScrub();
 
-    public Employee init(Goate data) {
-        setData(data);
+    public final Employee<T> build(){
         return init();
     }
 
-    public abstract Employee init();
+    public Employee<T> init(Goate data) {
+        setData(data);
+        if(data!=null) {
+            Object def = data.get(getName() + ".definition");
+            def = def != null ? def : data;
+            definition = new ToGoate(def).convert();
+            definition.merge(scrub(data), false);
+        }
+        return init();
+    }
 
-    protected abstract Object doWork();
+    public Employee<T> mergeData(Goate data){
+        definition.merge(scrub(data),false);
+        return this;
+    }
+
+    protected abstract Employee<T> init();
+
+    protected abstract T doWork();
 
     public static Employee recruit(Class job, Goate data) {
         GoateJob theJob = (GoateJob) job.getAnnotation(GoateJob.class);
@@ -139,7 +229,18 @@ public abstract class Employee {
         return employee;
     }
 
-    public static Employee recruit(String job, Goate data) {
+    public static Employee<Object> recruit(String job, Goate data) {
+        return recruit(job, data, null, Object.class);
+    }
+
+    public static <T> Employee<T> recruit(String job, Goate data, Class<T> type) {
+        return recruit(job, data, null, type);
+    }
+
+    public static Employee<Object> recruit(String job, Goate definition, Goate parentData) {
+        return recruit (job, definition, parentData, Object.class);
+    }
+    public static <T> Employee<T> recruit(String job, Goate definition, Goate parentData, Class<T> type){
         Employee employee = null;
         String id = "";
         if(job.contains("#")){
@@ -156,7 +257,10 @@ public abstract class Employee {
             }
         }
         if (employee != null) {
-            employee.init(data);
+            if(definition!=null) {
+                definition.merge(employee.scrub(parentData), false);
+            }
+            employee.init(definition);
         }
         return employee;
     }

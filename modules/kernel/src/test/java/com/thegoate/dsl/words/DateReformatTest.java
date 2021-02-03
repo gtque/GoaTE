@@ -44,4 +44,15 @@ public class DateReformatTest {
         Assert.assertEquals(shiftedDate,"24-Nov-2009");
     }
 
+    @Test(groups = {"unit"})
+    public void simpleDateReformatStatic(){
+        String shiftedDate = DateReformatDSL.dateReformat("MM-dd-yyyy","11-24-2009","dd-MMM-yyyy");
+        Assert.assertEquals(shiftedDate,"24-Nov-2009");
+    }
+
+    @Test(groups = {"unit"})
+    public void simpleDateTimeReformatStatic(){
+        String shiftedDate = DateTimeReformatDSL.dateTimeReformat("MM-dd-yyyy HH:mm:ss","11-24-2009 00:10:00","dd-MMM-yyyy mm:HH:ss");
+        Assert.assertEquals(shiftedDate,"24-Nov-2009 10:00:00");
+    }
 }

@@ -28,6 +28,7 @@ package com.thegoate.utils.fill.serialize.collections;
 
 import com.thegoate.utils.fill.serialize.Cast;
 import com.thegoate.utils.fill.serialize.CastUtil;
+import com.thegoate.utils.togoate.ToGoate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +55,12 @@ public class CastList extends CastCollection {
         LOGGER.debug("Cast list", "building from data.");
         List<Object> o = new ArrayList<>();//this needs to be set up from the serialization somehow.
         int i = 0;
+        if(data.filter("" + i).size() == 0){
+            data = new ToGoate(data.get(0)).convert();
+        }
         while (data.filter("" + i).size() > 0) {
             try {
-                o.add(new Cast(data.filter("" + i).scrubKeys("" + i + "\\."), dataSource).cast(data.get("" + i), getType("" + i, data.get("" + i))));
+                o.add(new Cast(data.filter("" + i).scrubKeys("" + i + "\\."), dataSource).container(container).cast(data.get("" + i), getType("" + i, data.get("" + i))));
             } catch (IllegalAccessException | InstantiationException e) {
                 LOGGER.error("Cast Array", "Failed to build list: " + e.getMessage(), e);
                 throw new RuntimeException("Failed to construct list: " + e.getMessage());

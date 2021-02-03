@@ -26,6 +26,7 @@
  */
 package com.thegoate.utils.fill.serialize;
 
+import com.thegoate.annotations.GoateDescription;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -35,6 +36,7 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 6/26/2018.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "used by the deserializer to find the mapping for the default source.")
 @IndexAnnotated
 @GoateSourceDef(id = "default")
 public @interface DefaultSource {

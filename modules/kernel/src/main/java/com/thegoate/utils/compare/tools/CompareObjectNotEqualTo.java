@@ -26,17 +26,24 @@
  */
 package com.thegoate.utils.compare.tools;
 
+import java.util.Objects;
+
+import com.thegoate.HealthMonitor;
 import com.thegoate.annotations.IsDefault;
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
+
+import static com.thegoate.logging.volume.VolumeKnob.volume;
 
 /**
  * Compares two booleans for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "!=", type = "object")
+@CompareUtil(operator = "!=")
 @IsDefault
-public class CompareObjectNotEqualTo extends CompareTool {
+public class CompareObjectNotEqualTo extends CompareObject {
 
     public CompareObjectNotEqualTo(Object actual) {
         super(actual);
@@ -49,6 +56,23 @@ public class CompareObjectNotEqualTo extends CompareTool {
 
     @Override
     public boolean evaluate() {
-        return !(actual!=null?actual.equals(expected):expected==null);
+        boolean result = false;
+        GoateReflection gr = new GoateReflection();
+        if (expected != null && (gr.isPrimitive(expected.getClass()) || expected instanceof Number)){
+            LOG.debug("isNotEqualTo", "Detected a primitive, will try to compare as that formatted primitive type.");
+            Compare comp = new Compare(expected);
+            result = comp.compareNumeric(expected instanceof Number).to(actual).using("!=").evaluate();
+            health = comp.healthCheck();
+        } else {
+            result = !(Objects.equals(actual, expected));
+        }
+        if(actual instanceof HealthMonitor){
+            health = (((HealthMonitor) actual).healthCheck());
+        } else {
+            if(!result) {
+                health.put("is equal", "" + volume(actual) + "==" + volume(expected));
+            }
+        }
+        return result;
     }
 }

@@ -27,6 +27,7 @@
 package com.thegoate.rest.staff;
 
 import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.rest.RestCall;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
 import com.thegoate.staff.Employee;
@@ -39,12 +40,18 @@ import java.lang.reflect.InvocationTargetException;
  * the data and looking up the right Rest wrapper implementation.
  * Created by Eric Angeli on 5/17/2017.
  */
-public abstract class ApiEmployee extends Employee {
+public abstract class ApiEmployee<T> extends Employee<T> {
     RestSpec rest = null;
+
+    public void logRequest(){
+        if(rest!=null){
+            rest.logSpec();
+        }
+    }
 
     @Override
     public Employee init() {
-        String security = "" + data.get("security", "none");
+        String security = "" + definition.get("security", "none");
         try {
             rest = findAndBuildRestSpec(security);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
@@ -58,19 +65,25 @@ public abstract class ApiEmployee extends Employee {
         AnnotationFactory af = new AnnotationFactory();
         spec = (RestSpec)af.annotatedWith(GoateRest.class).find(security).using("security").build();
         if(spec!=null) {
-            spec.baseURL(data.get("base url", null, true, String.class));
-            spec.headers(data.filterAndSplitKeyValuePairs("headers."));
-            spec.urlParams(data.filterAndSplitKeyValuePairs("url params."));
-            spec.queryParams(data.filterAndSplitKeyValuePairs("query params."));
-            spec.pathParams(data.filterAndSplitKeyValuePairs("path params."));
-            if(data.get("body")!=null) {
-                spec.body(data.get("body"));
+            spec.baseURL(definition.get("base url", null, true, String.class));
+            spec.headers(definition.filterAndSplitKeyValuePairs("headers."));
+            spec.urlParams(definition.filterAndSplitKeyValuePairs("url params."));
+            spec.queryParams(definition.filterAndSplitKeyValuePairs("query params."));
+            spec.pathParams(definition.filterAndSplitKeyValuePairs("path params."));
+            if(definition.get("body")!=null) {
+                spec.body(definition.get("body"));
             }
-            spec.formData(data.filterAndSplitKeyValuePairs("form params."));
-            spec.multipartData(data.filterAndSplitKeyValuePairs("multipart"));
-            spec.customData(data.filterAndSplitKeyValuePairs("custom params."));
-            spec.timeout(Integer.parseInt(""+data.get("rest.timeout",15)));
+            spec.formData(definition.filterAndSplitKeyValuePairs("form params."));
+            spec.multipartData(definition.filterAndSplitKeyValuePairs("multipart"));
+            spec.customData(definition.filterAndSplitKeyValuePairs("custom params."));
+            spec.timeout(Integer.parseInt(""+definition.get("rest.timeout",15)));
+            spec.configure(definition.get("config", null));
             spec.config();
+            if(definition.get(RestCall.ENABLE_LOG, true, Boolean.class)){
+                spec.enableLog();
+            } else {
+                spec.disableLog();
+            }
         }
         return spec;
     }

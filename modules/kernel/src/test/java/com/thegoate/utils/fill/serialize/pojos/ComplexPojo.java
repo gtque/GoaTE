@@ -26,19 +26,20 @@
  */
 package com.thegoate.utils.fill.serialize.pojos;
 
-import com.thegoate.utils.fill.serialize.GoatePojo;
-import com.thegoate.utils.fill.serialize.GoateSource;
-import com.thegoate.utils.fill.serialize.collections.MapKeyType;
-import com.thegoate.utils.fill.serialize.collections.MapType;
-
 import java.time.LocalDate;
 import java.util.Map;
+
+import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.Kid;
+import com.thegoate.utils.fill.serialize.collections.MapKeyType;
+import com.thegoate.utils.fill.serialize.collections.MapType;
 
 /**
  * Created by Eric Angeli on 6/27/2018.
  */
 @GoatePojo(id = "complex pojo")
-public class ComplexPojo {
+public class ComplexPojo extends Kid {
 
     private LocalDate date;
 

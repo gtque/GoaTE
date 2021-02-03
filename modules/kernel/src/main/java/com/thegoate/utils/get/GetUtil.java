@@ -27,6 +27,8 @@
 
 package com.thegoate.utils.get;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -36,6 +38,9 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 5/5/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Identifies get utilities.")
+@Info
 @IndexAnnotated
 public @interface GetUtil {
+	Class type() default Object.class;
 }

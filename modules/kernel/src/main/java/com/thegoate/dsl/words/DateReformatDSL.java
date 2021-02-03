@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Returns the value of the referenced object.
+ * Returns the formatted date as a string.
  * Created by gtque on 3/10/2018.
  */
 @GoateDSL(word = "date reformat")
@@ -46,19 +46,36 @@ public class DateReformatDSL extends DSL {
     public DateReformatDSL(Object value) {
         super(value);
     }
+    protected String datePattern;
+    protected DateTimeFormatter dtf;
+    protected String dateOrigin;
+    protected String datePattern2;
+    protected DateTimeFormatter dtf2;
+
+    public static String dateReformat(String originalPattern, String date, String newPattern){
+        return dateReformat(originalPattern, date, newPattern, new Goate());
+    }
+
+    public static String dateReformat(String originalPattern, String date, String newPattern, Goate data){
+        return ""+new DateReformatDSL("date reformat::"+originalPattern+","+date+","+newPattern).evaluate(data);
+    }
 
     @Override
     public Object evaluate(Goate data) {
-        String datePattern = "" + get(1, data);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(datePattern);
-        LOG.debug("Date Reformat", "Pattern: " + datePattern);
-        String dateOrigin = "" + get(2, data);
-        LOG.debug("Date Reformat", "Date: " + dateOrigin);
-        String datePattern2 = "" + get(3, data);
-        DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern(datePattern2);
+        initFormat(data);
         LocalDate date = LocalDate.parse(dateOrigin, dtf);
-        String dateShifted = date.format(dtf2);
-        LOG.debug("Date Reformat", "New Date: " + dateShifted);
-        return dateShifted;
+        String dateFormatted = date.format(dtf2);
+        LOG.debug("Date Reformat", "New Date: " + dateFormatted);
+        return dateFormatted;
+    }
+
+    protected void initFormat(Goate data){
+        datePattern = "" + get(1, data);
+        dtf = DateTimeFormatter.ofPattern(datePattern);
+        LOG.debug("Date Reformat", "Pattern: " + datePattern);
+        dateOrigin = "" + get(2, data);
+        LOG.debug("Date Reformat", "Date: " + dateOrigin);
+        datePattern2 = "" + get(3, data);
+        dtf2 = DateTimeFormatter.ofPattern(datePattern2);
     }
 }

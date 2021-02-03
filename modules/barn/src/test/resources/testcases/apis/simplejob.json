@@ -1,0 +1,9 @@
+{
+  "Scenario":"test loading setup and overloading job.",
+  "groups":"simple,extendsarray",
+  "abstract":false,
+  "extends":[
+    "subjob.json"
+  ],
+  "job": "hello_world"
+}

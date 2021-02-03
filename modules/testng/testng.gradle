@@ -28,6 +28,6 @@ import com.thegoate.gradle.GoateDepends
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
     compile d.depends(":kernel", project.internalVersion);
-    compile "org.testng:testng:+"
-    compile "org.apache.commons:commons-lang3:+"
+    compile "org.testng:testng:6.14.3"
+    compile "org.apache.commons:commons-lang3:3.9"
 }

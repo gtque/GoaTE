@@ -26,9 +26,12 @@
  */
 package com.thegoate.json.utils.compare.tools;
 
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
+
 import com.thegoate.json.JsonUtil;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.utils.get.NotFound;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +48,8 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
     String json2;
     boolean checkingContains = true;
     boolean secondCheck = false;
+    boolean onSecondCheck = false;
+
     public CompareJson(Object val) {
         super(val);
     }
@@ -58,8 +63,10 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
     public int comparison(String json1, String json2) {
         checkingContains = false;
         secondCheck = false;
+        onSecondCheck = false;
         int compare1 = compare(json1, json2);
-        secondCheck = true;
+        onSecondCheck = true;
+        secondCheck = !Boolean.parseBoolean(eut("json.compare.strict",""+false));
         int compare2 = compare(json2, json1);
         return compare1 + compare2;
     }
@@ -126,8 +133,13 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
             String key = (String) it.next();
             try {
                 Object o = j1.get(key);
-                Object o2 = j2.get(key);
-                if (o != null && o2 != null) {
+                Object o2 = new NotFound("Field Not found");
+                try{
+                    o2 = j2.get(key);
+                } catch (Exception e){
+                    LOG.debug("Compare Json", "Field not found in expected: " + key);
+                }
+                if ((o != null && o2 != null)&&(o != JSONObject.NULL && o2 != JSONObject.NULL)) {
                     if (o instanceof JSONObject) {
                         if (o2 instanceof JSONObject) {
                             result += compare((JSONObject) o, (JSONObject) o2, baseKey + key + ".", checkingArray);
@@ -157,9 +169,9 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
                         result++;
 //                        }
                     }
-                } else if (o == null && o2 == null) {
+                } else if ((o == null && o2 == null)||(o == JSONObject.NULL && o2 == JSONObject.NULL)) {
                     LOG.debug(key + ": both objects were null");
-                } else if (o != null) {
+                } else if (o != null || o != JSONObject.NULL) {
                     if(!checkingArray&&!secondCheck) {
                         health.put("mismatched##", baseKey + key + ": " + o + " != " + o2);
                     }
@@ -202,7 +214,7 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
             for (int i2 = 0; i2 < j2.length(); i2++) {
                 int r2 = 0;
                 Object o2 = j2.get(i2);
-                if (o != null && o2 != null) {
+                if ((o != null && o2 != null)&&(o != JSONObject.NULL && o2 != JSONObject.NULL)) {
                     if (o instanceof JSONObject) {
                         if (o2 instanceof JSONObject) {
                             r2 = compare((JSONObject) o, (JSONObject) o2, baseKey + i + ".", true);
@@ -223,10 +235,10 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
                         r2++;
 //                        }
                     }
-                } else if (o != null) {
+                } else if (o != null || o != JSONObject.NULL) {
                     LOG.debug(i2 + ": the second object was null.");
                     r2++;
-                } else if (o2 != null) {
+                } else if (o2 != null || o2 != JSONObject.NULL) {
                     LOG.debug(i2 + ": the object was null.");
                     r2++;
                 }
@@ -236,7 +248,7 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
                 }
             }
             if (!found&&!secondCheck) {
-                health.put("not found##", baseKey + i + ":" + o);
+                health.put("not found##", baseKey + i + ":" + o + ">not in " + (onSecondCheck?"actual":"expected"));
                 LOG.debug("the object was not found in the other array.");
                 result++;
             }

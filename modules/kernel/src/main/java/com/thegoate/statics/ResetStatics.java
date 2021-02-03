@@ -27,16 +27,19 @@
 
 package com.thegoate.statics;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Use this to mark something as default.
  * Created by gtque on 4/21/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Used to indicate if there are any static variables that have to be reset, especially between test execution.")
+@Info
 @IndexAnnotated
 public @interface ResetStatics {
 }

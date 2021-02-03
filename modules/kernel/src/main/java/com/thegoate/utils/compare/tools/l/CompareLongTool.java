@@ -26,12 +26,14 @@
  */
 package com.thegoate.utils.compare.tools.l;
 
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.ParseDetector;
 import com.thegoate.utils.compare.CompareTool;
 
 /**
  * Created by Eric Angeli on 7/14/2017.
  */
-public abstract class CompareLongTool extends CompareTool {
+public abstract class CompareLongTool extends CompareTool implements ParseDetector {
     public CompareLongTool(Object actual) {
         super(actual);
     }
@@ -40,11 +42,32 @@ public abstract class CompareLongTool extends CompareTool {
     public boolean isType(Object check) {
         boolean istype = false;
         try{
-            Long.parseLong(""+actual);
-            istype = true;
+            GoateReflection gr = new GoateReflection();
+            if (gr.isLongType(check.getClass())) {
+                LOG.debug("Check Type", "detected primitive long");
+                istype = true;
+            } else {
+                LOG.debug("Check Type", "not a primitive long.");
+            }
         }catch(Throwable e){
 //            LOG.debug(""+actual + " is not a long.");
         }
         return istype;
+    }
+
+    @Override
+    public boolean parseDetector(Object object){
+        boolean result = false;
+        try{
+            parseLong(object);
+            result = true;
+        } catch (Exception e){
+            LOG.debug("Parse Detector", "Not a parsable long.");
+        }
+        return result;
+    }
+
+    protected long parseLong(Object o){
+        return new GoateReflection().parseLong(o);
     }
 }

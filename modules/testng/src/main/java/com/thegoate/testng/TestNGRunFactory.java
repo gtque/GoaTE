@@ -32,9 +32,11 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
 
-
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Loads the run data and builds the runs.
@@ -43,7 +45,7 @@ import java.util.List;
 public class TestNGRunFactory {
     static final BleatBox LOG = BleatFactory.getLogger(TestNGRunFactory.class);
 
-    public static Object[][] loadRuns(Goate runData, Goate constantData, boolean atLeastOneRun) {
+    public static Object[][] loadRuns(Goate runData, Goate constantData, boolean atLeastOneRun, String[] include, String[] exclude) {
         List<Goate> runs = new ArrayList<>();
         Goate constants = new Goate();
         if (runData != null) {
@@ -54,9 +56,9 @@ public class TestNGRunFactory {
         }
         if (constantData != null) {
             for (String key : constantData.keys()) {
-                if(key.equals("_goate:method")){
-                    constants.put(key,constantData.get(key));
-                }else {
+                if (key.equals("_goate:method")) {
+                    constants.put(key, constantData.get(key));
+                } else {
                     constants.merge(((DataLoader) constantData.get(key)).load().get(0), true);
                     //the last loaded value of the constant wins.
                 }
@@ -65,37 +67,84 @@ public class TestNGRunFactory {
         if (runs.size() == 0) {
             runs.add(null);
         }
-        runs = filter(runs);
         if (constants.size() > 0) {
             for (Goate data : runs) {
                 int i = -42;
-                if(data==null){
+                if (data == null) {
                     i = runs.indexOf(data);
                     data = new Goate();
                 }
                 data.merge(constants, false);
-                if(i!=-42){
-                    runs.set(i,data);
+                if (i != -42) {
+                    runs.set(i, data);
                 }
                 //a constant can be overloaded by setting it in the run data.
             }
         }
-        if(runs.size()==1&&runs.get(0)==null){
+        runs = filter(runs);
+        if (runs.size() == 1 && runs.get(0) == null) {
             runs = new ArrayList<>();
         }
-        Object[][] rawData = new Object[runs.size()][runs.size()>0?1:0];
+        Object[][] rawData = new Object[runs.size()][runs.size() > 0 ? 1 : 0];
         for (int i = 0; i < rawData.length; i++) {
             rawData[i][0] = runs.get(i);
         }
         Object[][] empty = {};
-        return rawData.length>0?rawData:empty;
+        return rawData.length > 0 ? rawData : empty;
+    }
+
+    protected static List<Goate> filterGroups(List<Goate> runs, String[] include, String[] exclude) {
+        List<Goate> filteredInc = new ArrayList<>();
+        List<Goate> filtered = new ArrayList<>();
+        if (include != null && include.length > 0) {
+            for (Goate run : runs) {
+                String groups = run.get("groups", "", String.class);
+                if (!groups.isEmpty()) {
+
+                }
+            }
+        }
+
+        return filtered;
+    }
+
+    protected static boolean checkRunGroups(Object runData, String[] runGroups) {
+        boolean check = true;
+        if (runGroups != null && runGroups.length > 0) {
+            Object run = runData;
+            if (runData != null && runData instanceof Goate) {
+                run = ((Goate) runData).get("groups");
+            }
+            if (run != null) {
+                if (run instanceof String) {
+                    String runsIn = ("-r-" + run + "-r-").replace(",", "-r-,-r-").replaceAll("\\s*-r-\\s*", "-r-");
+                    check = Arrays.stream(runGroups).parallel().anyMatch(runsIn::contains);
+                } else {
+                    check = false;
+                }
+            } else {
+                check = false;
+            }
+        }
+        return check;
+    }
+
+    protected static List<Goate> filterRunGroups(List<Goate> runs) {
+        List<Goate> filtered = runs;
+        String runId = "" + GoateUtils.getProperty("runGroups", "empty::");
+        if (!runId.equals("null") && !runId.isEmpty()) {
+            String[] runIds = ("-r-" + runId.replace(",", "-r-,-r-") + "-r-").replaceAll("\\s*-r-\\s*", "-r-").split(",");
+            filtered = runs.stream().filter(run -> checkRunGroups(run, runIds)).collect(Collectors.toList());
+        }
+
+        return filtered;
     }
 
     protected static List<Goate> filter(List<Goate> runs) {
         List<Goate> filtered = new ArrayList<>();
         String runId = "" + GoateUtils.getProperty("run", "empty::");
         if (!runId.equals("null") && !runId.isEmpty()) {
-            String[] runIds = runId.split(",");
+            String[] runIds = runId.split("" + GoateUtils.getProperty("runDelimiter", ","));
             for (String run : runIds) {
                 int runNum = -42;
                 try {
@@ -107,23 +156,37 @@ public class TestNGRunFactory {
                 int count = 0;
                 for (Goate rd : runs) {
                     count++;
-                    if(rd!=null) {
-                        if (runNum >= 0) {
-                            if (runNum == count) {
-                                filtered.add(rd);
-                            }
-                        } else {
-                            String scene = "" + rd.get("Scenario");
-                            if (scene.equals(run)) {
-                                filtered.add(rd);
+                    if (rd != null) {
+                        boolean runEnabled = Boolean.parseBoolean("" + rd.get("runEnabled", "true"));
+                        if (runEnabled) {
+                            if (runNum >= 0) {
+                                if (runNum == count) {
+                                    filtered.add(rd.drop("runEnabled"));
+                                }
+                            } else {
+                                String sKey = rd.findKeyIgnoreCase("Scenario");
+                                String scene = "" + rd.get(sKey);
+                                if (scene.equals(run)) {
+                                    filtered.add(rd.drop("runEnabled"));
+                                }
                             }
                         }
                     }
                 }
             }
         } else {
-            filtered = runs;
+            for (Goate rd : runs) {
+                Object b = "true";
+                if (rd != null) {
+                    b = rd.get("runEnabled", "true");
+                    rd.drop("runEnabled");
+                }
+                boolean runEnabled = Boolean.parseBoolean("" + b);
+                if (runEnabled) {
+                    filtered.add(rd);
+                }
+            }
         }
-        return filtered;
+        return filterRunGroups(filtered);
     }
 }

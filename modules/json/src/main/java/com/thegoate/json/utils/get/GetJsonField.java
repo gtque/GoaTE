@@ -40,7 +40,7 @@ import org.json.JSONObject;
  * Get the field from the given json.
  * Created by Eric Angeli on 5/19/2017.
  */
-@GetUtil
+@GetUtil(type = JSONObject.class)
 public class GetJsonField extends JsonUtil implements GetUtility {
 
     public GetJsonField(Object val) {

@@ -28,32 +28,48 @@
 package com.thegoate.utils.get;
 
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.UtilCache;
 
 /**
  * The generic get class.
  * This will attempt to look up the specific get utility for the type detected.
  * Created by Eric Angeli on 5/5/2017.
  */
-public class Get extends UnknownUtilType implements GetUtility{
-    GetUtility tool = null;
-    Object find = null;
+@UtilCache(name = "get", clear = true, useCache = true)
+public class Get extends UnknownUtilType implements GetUtility {
 
-    public Get(Object o){
-        this.find = o;
-    }
+	GetUtility tool = null;
+	Object find = null;
 
-    @Override
-    public boolean isType(Object check) {
-        return false;
-    }
+	public Get() {
+		super();
+	}
 
-    @Override
-    public Object from(Object container) {
-        tool = (GetUtility)buildUtil(container, GetUtil.class, find);
-        Object result = null;
-        if(tool!=null){
-            result = tool.from(container);
-        }
-        return result;
-    }
+	public Get(Object o) {
+		super();
+		this.find = o;
+		nameIsHash = true;
+	}
+
+	@Override
+	public boolean isType(Object check) {
+		return false;
+	}
+
+	@Override
+	public Object from(Object container) {
+		tool = (GetUtility) buildUtil(container, GetUtil.class, find);
+		Object result = new NotFound("Get tool not found, make sure a proper get util is implemented or on the class path.");
+		if (tool != null) {
+			result = tool.from(container);
+		}
+		return result;
+	}
+
+	@Override
+	public boolean checkType(Class tool, Class type) {
+		GetUtil tu = (GetUtil) tool.getAnnotation(GetUtil.class);
+		return tu.type() != null ? tu.equals(type) : type == null;
+		//        return false;
+	}
 }

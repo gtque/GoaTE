@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.data.DLProvider;
 import com.thegoate.data.GoateDLP;
+import com.thegoate.data.GoateNullClass;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.reflection.GoateReflection;
 import org.testng.ITestContext;
@@ -66,7 +67,9 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
 
     @DataProvider(name = "methodLoader")
     public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
-        number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+        number.put(""+method.getDeclaringClass().getCanonicalName()+":"+method.getName(), 0);
+        //number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+        setTestClass(method.getDeclaringClass());
         this.testContext = context;
         if (context != null) {
             xt = context.getCurrentXmlTest();
@@ -74,7 +77,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         Goate rdl = new Goate();
         Goate cdl = new Goate();
         buildDataLoaders(rdl, cdl, method);
-        return TestNGRunFactory.loadRuns(rdl, cdl, false);
+        return TestNGRunFactory.loadRuns(rdl, cdl, false,testContext.getIncludedGroups(),testContext.getExcludedGroups());
     }
 
     protected void buildDataLoaders(Goate rdl, Goate cdl, Method method) {
@@ -98,7 +101,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
                     rdl.merge(provider.getRunDataLoaders(), true);
                     cdl.merge(provider.getConstantDataLoaders(), true);
                 } else {
-                    Goate[] providers = buildMethodProviders(gp.name(), method);
+                    Goate[] providers = buildMethodProviders(gp.name(), method, gp.container());
                     if (providers == null) {
                         throw new Exception("Failed to find the DLProvider: " + gp.name());
                     }else{
@@ -120,16 +123,21 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         }
     }
 
-    protected Goate[] buildMethodProviders(String name, Method method) {
+    protected Goate[] buildMethodProviders(String name, Method method, Class container) {
         Goate[] providers = null;
         GoateReflection gr = new GoateReflection();
         List<Method> methods = new ArrayList<>();
-        gr.getAllMethods(method.getDeclaringClass(), methods);//getClass(), methods);
-        for (Method m : methods) {//ToDo:make a way to call DL methods from other classes?
+        Class declaring_class = method.getDeclaringClass();
+        if(!container.equals(GoateNullClass.class)) {
+            declaring_class = container;
+        }
+        gr.getAllMethods(declaring_class, methods);
+
+        for (Method m : methods) {
             GoateDLP dlp = m.getAnnotation(GoateDLP.class);
             if (m.getName().equals(name) || (dlp != null && dlp.name().equals(name))) {
                 try {
-                    providers = (Goate[]) m.invoke(method.getDeclaringClass().newInstance());
+                    providers = (Goate[]) m.invoke(declaring_class.newInstance());
                     break;
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     LOG.error("Problem defining data loaders for a method: " + name + "\n" + e.getMessage(), e);
@@ -156,16 +164,18 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         }
     }
 
-    @Override
-    public void startUp(Method method) {
-        super.startUp(method);
-    }
+//    @Override
+//    public void startUp(Method method) {
+//        super.startUp(method);
+//    }
 
     @BeforeMethod(alwaysRun = true)
     public void initDataMethod(Object[] d, Method m) {
         if (d != null&&d.length>0) {
             init((Goate)d[0]);
+        } else {
+            init(data!=null?data:new Goate());
         }
-        startUp(m);
+//        startUp(m);
     }
 }

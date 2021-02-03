@@ -29,9 +29,7 @@ package com.thegoate.spreadsheets.data;
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.spreadsheets.utils.SheetUtils;
-import com.thegoate.utils.get.GetFileAsString;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,11 +47,15 @@ public class SpreadSheetDL extends DataLoader {
         String fileName = ""+parameters.get("fileName");
         String sheetName = ""+parameters.get("sheetName","Sheet1");
         boolean firstRow = Boolean.parseBoolean(""+parameters.get("firstRowIsHeader",true));
+        boolean trim = Boolean.parseBoolean(""+parameters.get("trim",false));
         try {
-            SheetUtils sheet = SheetUtils.build(fileName, sheetName).firstRowIsHeader(firstRow);
+            SheetUtils sheet = SheetUtils.build(fileName, sheetName).trim(trim).firstRowIsHeader(firstRow);
             Goate info = sheet.load();
             for(String key:info.keys()){
-                data.add((Goate)info.get(key));
+                Goate page = (Goate)info.get(key);
+                for(String row:page.keys()){
+                    data.add((Goate)page.get(row));
+                }
             }
         } catch(Exception e){
             LOG.error("failed to load spread sheet ("+fileName+"): "+e.getMessage(), e);
@@ -73,6 +75,11 @@ public class SpreadSheetDL extends DataLoader {
 
     public SpreadSheetDL firstRowIsHeader(boolean headerRow){
         setParameter("firstRowIsHeader", headerRow);
+        return this;
+    }
+
+    public SpreadSheetDL trim(boolean trim){
+        setParameter("trim", trim);
         return this;
     }
 }

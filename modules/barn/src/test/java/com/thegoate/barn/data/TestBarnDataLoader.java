@@ -30,6 +30,8 @@ import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.GoateUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -42,15 +44,40 @@ import static org.testng.Assert.assertEquals;
  */
 public class TestBarnDataLoader extends TestNGEngineMethodDL {
 
-    @Test(groups = {"unit"})
-    public void nestedExtends(){
+    Object tg = null;
+    Object eg = null;
+    Object rg = null;
+
+    @BeforeMethod
+    public void clearGroups(){
+        tg = GoateUtils.getProperty("testGroups");
+        eg = GoateUtils.getProperty("excludeGroups");
+        rg = GoateUtils.getProperty("runGroups");
         GoateUtils.setEnvironment("testGroups", null);
         GoateUtils.setEnvironment("excludeGroups", null);
-        DataLoader dl = new BarnDataLoader().testCaseDirectory("barn/data");
+        GoateUtils.setEnvironment("runGroups", null);
+    }
+
+    @AfterMethod
+    public void resetGroups(){
+        if(tg != null){
+            GoateUtils.setEnvironment("testGroups", ""+tg);
+        }
+        if(eg != null){
+            GoateUtils.setEnvironment("excludeGroups", ""+eg);
+        }
+        if(rg != null){
+            GoateUtils.setEnvironment("runGroups", ""+rg);
+        }
+    }
+    @Test(groups = {"unit"})
+    public void nestedExtends(){
+        DataLoader dl = new BarnDataLoader().testCaseDirectory("barn/data").defaultGroup("unit");
         List<Goate> list = dl.load();
+        LOG.debug("size: " + list.size());
         assertEquals(list.size(),1);
         Goate d = list.get(0);
         LOG.debug("Nested Extends", d.toString());
-        assertEquals(d.size(),5);
+        assertEquals(d.size(),6);
     }
 }

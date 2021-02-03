@@ -41,7 +41,7 @@ public class CastInt extends GoateCastUtility {
 
     @Override
     public <T> T cast(Class<T> type) {
-        return (T)(Object)Integer.parseInt("" + value);
+        return (T)(Object)Integer.parseInt("" + ((""+value).equalsIgnoreCase("true")?1:(""+value).equalsIgnoreCase("false")?0:value));
     }
 
     @Override

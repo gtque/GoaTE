@@ -31,9 +31,6 @@ import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
 import com.thegoate.testng.TestNGEngine;
 import org.testng.annotations.Factory;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Created by Eric Angeli on 5/11/2017.

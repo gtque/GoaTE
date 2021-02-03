@@ -36,7 +36,9 @@ import com.thegoate.Goate;
 public abstract class DLProvider {
     protected Goate runData = new Goate();
     protected Goate constantData = new Goate();
-
+    public static final int size = 2;
+    public static final int runs = 0;
+    public static final int constants = 1;
     public DLProvider data(Goate data){
         this.runData = data;
         return this;

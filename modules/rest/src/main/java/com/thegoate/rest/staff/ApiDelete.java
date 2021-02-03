@@ -37,7 +37,7 @@ public class ApiDelete extends ApiEmployee {
 
     @Override
     protected Object doWork() {
-        Object response = rest.delete(data.get("end point","", true, String.class));
+        Object response = rest.delete(definition.get("end point","", true, String.class));
         data.put("response", response);
         return response;
     }

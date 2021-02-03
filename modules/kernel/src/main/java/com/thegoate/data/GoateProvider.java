@@ -26,6 +26,8 @@
  */
 package com.thegoate.data;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -36,7 +38,10 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 5/5/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Identifies a provider definition.")
+@Info(classifier = "name")
 @IndexAnnotated
 public @interface GoateProvider {
     String name();
+    Class container() default GoateNullClass.class;
 }

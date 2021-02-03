@@ -28,6 +28,8 @@
 package com.thegoate.utils.get;
 
 import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.type.IsType;
+import com.thegoate.utils.type.TypeUtility;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,8 +40,9 @@ import java.nio.file.Paths;
  * Loads the file specified in from into a string and retuns it.
  * Created by Eric Angeli on 5/5/2017.
  */
-@GetUtil
-public class GetFileAsString extends GetTool{
+@IsType
+@GetUtil(type = GetFileAsString.class)
+public class GetFileAsString extends GetTool implements TypeUtility {
     boolean explode = false;
     boolean overwrite = false;
 
@@ -93,5 +96,10 @@ public class GetFileAsString extends GetTool{
         }
         result = processNested(result);//process nested gets.
         return result;
+    }
+
+    @Override
+    public Class type(Object check) {
+        return getClass();
     }
 }

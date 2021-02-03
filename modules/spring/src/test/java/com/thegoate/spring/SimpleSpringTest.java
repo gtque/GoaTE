@@ -2,6 +2,7 @@ package com.thegoate.spring;
 
 import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
+import com.thegoate.expect.Expectation;
 import com.thegoate.spring.boot.HelloAuto;
 import com.thegoate.spring.boot.TestApplication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class SimpleSpringTest extends SpringTestEngine {
 
     @Test(groups = {"unit", "spring"})
     public void test1(){
-        assertNotNull(bot);
+        expect(Expectation.build().actual(bot).isNull(false));
         assertEquals(bot.autobots(), "roll out");
     }
 }

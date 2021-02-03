@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * Created by eangeli on 8/3/2016.
  */
-@SpringBootApplication
+@SpringBootApplication//(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 @EnableTransactionManagement
 public class TestApplication {
 

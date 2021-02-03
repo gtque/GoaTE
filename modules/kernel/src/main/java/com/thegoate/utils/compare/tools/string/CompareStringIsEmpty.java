@@ -37,7 +37,7 @@ import com.thegoate.utils.compare.CompareUtil;
  *  example: field1,==,null::
  * Created by Eric Angeli on 7/7/2017.
  */
-@CompareUtil(operator = "isEmpty", type="String")
+@CompareUtil(operator = "isEmpty", type = String.class)
 @IsDefault
 public class CompareStringIsEmpty extends CompareStringTool {
     public CompareStringIsEmpty(Object actual) {

@@ -24,11 +24,11 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.gradle.test.plugin;
+package com.thegoate.gradle.test.plugin
 
-import com.thegoate.gradle.BaseGoatePlugin;
-import org.gradle.api.Project;
-import org.gradle.api.tasks.testing.Test;
+import com.thegoate.gradle.BaseGoatePlugin
+import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
 
 /**
  * Define the test closure.

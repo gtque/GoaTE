@@ -27,6 +27,8 @@
 
 package com.thegoate.dsl;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
@@ -36,6 +38,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by gtque on 4/21/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Used to define a new word in the GoaTE DSL.")
+@Info(classifier = "word")
 @IndexAnnotated
 public @interface GoateDSL {
     String word();

@@ -27,6 +27,7 @@
 package com.thegoate.json;
 
 import com.thegoate.Goate;
+import com.thegoate.json.utils.type.JsonType;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.Utility;
@@ -44,6 +45,7 @@ public abstract class JsonUtil implements Utility {
     protected Object nested;
     protected boolean processNested;
     protected Goate health = new Goate();
+    protected Goate data;
 
     public JsonUtil(Object val) {
         processNested = true;
@@ -62,31 +64,21 @@ public abstract class JsonUtil implements Utility {
     }
 
     @Override
+    public JsonUtil setData(Goate data){
+        this.data = data;
+        return this;
+    }
+
+    @Override
     public Goate healthCheck(){
         return health;
     }
 
     @Override
     public boolean isType(Object check) {
-        boolean istype = true;
-        try{
-            if(!(check instanceof JSONObject)) {
-                if (new JSONObject(""+check) == null) {
-                    istype = false;
-                }
-            }
-        }catch(JSONException je){
-            try{
-                if(!(check instanceof JSONArray)) {
-                    if (new JSONArray(""+check) == null) {
-                        istype = false;
-                    }
-                }
-            }catch (Exception e){
-                istype = false;
-            }
-        }
-        return istype;
+        return new JsonType().isType(check);
     }
+
+
     protected abstract Object processNested(Object subContainer);
 }

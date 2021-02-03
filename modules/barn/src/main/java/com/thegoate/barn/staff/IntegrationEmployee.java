@@ -42,13 +42,13 @@ public class IntegrationEmployee extends Employee {
 
     @Override
     public Employee init() {
-        steps = "" + data.get("steps", "[]");//default to get if not specified.
+        steps = "" + definition.get("steps", "[]");//default to get if not specified.
         return this;
     }
 
     @Override
     protected Object doWork() {
-        StepsExecutor dosteps = new StepsExecutor(data).ordered().override(!Boolean.parseBoolean(""+data.get("doOverride","false")));
+        StepsExecutor dosteps = new StepsExecutor(definition).ordered().override(!Boolean.parseBoolean(""+definition.get("doOverride","false")));
         Goate r = dosteps.doSteps(steps);
         return r;
     }
