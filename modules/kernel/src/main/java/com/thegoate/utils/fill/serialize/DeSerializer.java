@@ -66,7 +66,7 @@ public class DeSerializer extends Cereal{
                         fieldKey = gs.key();
                         flatten = gs.flatten();
                     }
-                    Object value = data.get(fieldKey);
+                    Object value = fieldKey.isEmpty()?data:data.get(fieldKey);
                     boolean acc = field.getValue().isAccessible();
                     field.getValue().setAccessible(true);
                     try {
@@ -76,7 +76,10 @@ public class DeSerializer extends Cereal{
                                 ||field.getValue().getType().getAnnotation(GoatePojo.class)!=null) {
                             Goate d = new Goate().merge(data,false);
                             if(!flatten){
-                                d = data.filter(fieldKey.replace("##", "[0-9]*")).scrubKeys(fieldKey+"\\.");
+                                d = data.filter(fieldKey.replace("##", "[0-9]*"));
+                                if(!fieldKey.isEmpty()){
+                                    d = d.scrubKeys(fieldKey+"\\.");
+                                }
                             } else {
                                 d = data.filterStrict(fieldKey.replace("##","[0-9]*"));
                             }

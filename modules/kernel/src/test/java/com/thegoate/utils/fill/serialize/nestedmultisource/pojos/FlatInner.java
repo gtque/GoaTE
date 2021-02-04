@@ -1,8 +1,9 @@
-package com.thegoate.utils.fill.serialize.pojos;
+package com.thegoate.utils.fill.serialize.nestedmultisource.pojos;
 
 import com.thegoate.utils.fill.serialize.GoatePojo;
 import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.Kid;
+import com.thegoate.utils.fill.serialize.pojos.Cheese;
 
 /**
  * Created by Eric Angeli on 6/18/2020.
