@@ -40,9 +40,11 @@ public abstract class ExpectationBuilder {
     protected Object fromExpected;
     protected Object actual;
     protected Object expected;
-    protected List<Expectation> expectations = new ArrayList<>();
+    private List<Expectation> expectations = new ArrayList<>();
     protected Value actualValue;
     protected Value expectedValue;
+    protected long period = -42;
+    protected long timeoutMS = -42;
 //    public List<Expectation> build(Expectation expectation){
 //        Goate exp = (Goate)expectation.getExpectations().get(0);
 //        setFrom(expectation.getFrom());
@@ -53,8 +55,12 @@ public abstract class ExpectationBuilder {
     public abstract List<Expectation> build();
 
     protected ExpectationBuilder expect(Expectation expectation) {
-        expectations.add(expectation);
+        expectations.add(expectation.retryTimeout(timeoutMS).retryPeriod(period));
         return this;
+    }
+
+    protected List<Expectation> getExpectations() {
+        return expectations;
     }
 
     public ExpectationBuilder actualValue(Object value) {
@@ -80,6 +86,16 @@ public abstract class ExpectationBuilder {
         } else {
             setExpected(value);
         }
+        return this;
+    }
+
+    public ExpectationBuilder timeout(long timeoutMS){
+        this.timeoutMS = timeoutMS;
+        return this;
+    }
+
+    public ExpectationBuilder period(long period){
+        this.period = period;
         return this;
     }
 
