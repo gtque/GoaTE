@@ -30,6 +30,7 @@ package com.thegoate.expect;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.Executioner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,37 +108,12 @@ public class ExpectEvaluator {
 
     protected void process(int threadSize){
         LOG.debug("starting executor to evaluate expectations.");
-        boolean running = true;
-        ExecutorService es = Executors.newFixedThreadPool(threadSize);
-        //need a way to provide an order of execution for expectations,
-        //if not careful could fill up the thread pool with blocking threads waiting for something else to
-        //to be executed, but can't because the pool is full.
-        List<Future<?>> futures = new ArrayList<>();
-        for (ExpectThreadExecuter expectation : expectations) {
-            futures.add(es.submit(expectation));
-        }
-        while(running){
-            running = false;
-            for(Future<?> f:futures){
-                if(!f.isDone()){
-                    running = true;
-                }
-            }
-        }
-        try {
-            LOG.debug("shutting down executor");
-            es.shutdown();
-            es.awaitTermination(5, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException e) {
-            LOG.error("interrupted: " + e.getMessage(), e);
-        }
-        finally {
-            if (!es.isTerminated()) {
-                LOG.error("force cancel non-finished tasks");
-            }
-            es.shutdownNow();
-            LOG.debug("shutdown finished");
+        if(new Executioner<ExpectThreadExecuter>(threadSize).process(expectations())){
+            LOG.debug("Expectations", "Evaluation finished successfully");
+        } else {
+            LOG.warn("Expectations", "Evaluation did not finish successfully");
+            failed.append("/nNot all expectation threads were executed successfully for some reason, please review the logs.");
+            fails.add(new Goate().put("actual", expectations().size()).put("health check", "failed to execute all the threads for some reason."));
         }
     }
 

@@ -36,6 +36,7 @@ import com.thegoate.expect.validate.Validate;
 import com.thegoate.locate.Locate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.Executioner;
 import com.thegoate.staff.Employee;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.fill.serialize.DeSerializer;
@@ -58,7 +59,7 @@ import static com.thegoate.logging.volume.VolumeKnob.volume;
  */
 public class Expectation {
 
-    public final static String EmployeeWorkResult = GOATE_VARIABLE_PREFIX+"Employee Work Result";
+    public final static String EmployeeWorkResult = GOATE_VARIABLE_PREFIX + "Employee Work Result";
 
     public Validate getValidator() {
         return validator;
@@ -212,7 +213,7 @@ public class Expectation {
             }
         }
         if (name == null || name.isEmpty() || name.equals(actual)) {
-            if(source!=null) {
+            if (source != null) {
                 name = volume(source);
             }
         }
@@ -239,9 +240,10 @@ public class Expectation {
         return this.fromExpected;
     }
 
-    public String getFailureMessage(){
+    public String getFailureMessage() {
         return this.failureMessage;
     }
+
     /**
      * When adding a new expectation to an existing one you must set actual, is, and expected, (even if expected is null)
      * Except for the last one added.
@@ -265,13 +267,13 @@ public class Expectation {
         Goate ex = expectation.getExpectations();
         for (String key : ex.keys()) {
             Goate exp = (Goate) ex.get(key);
-            actual(exp.getStrict("actual")).is("" + exp.getStrict("operator")).expected(exp.getStrict("expected")).failureMessage(""+exp.getStrict("failure message"));
+            actual(exp.getStrict("actual")).is("" + exp.getStrict("operator")).expected(exp.getStrict("expected")).failureMessage("" + exp.getStrict("failure message"));
         }
         return this;
     }
 
-    public Expectation actualValue(Value value){
-        if(value!=null) {
+    public Expectation actualValue(Value value) {
+        if (value != null) {
             actual(value.getLocator());
             if (value.getContainer() != null) {
                 from(value.getContainer());
@@ -281,8 +283,8 @@ public class Expectation {
     }
 
     public Expectation actual(Object actual) {
-        if(actual instanceof Value){
-            return actualValue((Value)actual);
+        if (actual instanceof Value) {
+            return actualValue((Value) actual);
         }
         if (actual instanceof Locate) {
             actual = ((Locate) actual).toPath();
@@ -367,8 +369,8 @@ public class Expectation {
         return this;
     }
 
-    public Expectation expectedValue(Value value){
-        if(value!=null) {
+    public Expectation expectedValue(Value value) {
+        if (value != null) {
             expected(value.getLocator());
             if (value.getContainer() != null) {
                 fromExpected(value.getContainer());
@@ -378,8 +380,8 @@ public class Expectation {
     }
 
     public Expectation expected(Object expected) {
-        if(expected instanceof Value){
-            return expectedValue((Value)expected);
+        if (expected instanceof Value) {
+            return expectedValue((Value) expected);
         }
 
         if (expected instanceof Locate) {
@@ -414,7 +416,7 @@ public class Expectation {
                 failureMessage = null;
                 clearedState = key;
             }
-        }else{
+        } else {
             clearedState = null;
         }
     }
@@ -477,28 +479,11 @@ public class Expectation {
 //                            exp.put("from", source);
 //                        }
                         Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);
-                        checker.start();
+//                        checker.start();
                         checkers.add(checker);
                     }
                 }
-                boolean notFinished = true;
-                while (notFinished) {
-                    try {
-                        Thread.sleep(50L);
-                    } catch (Exception e) {
-                        LOG.debug("Expectation", "Problem sleeping while evaluating: " + e.getMessage(), e);
-                    }
-                    notFinished = false;
-                    for (Validate checker : checkers) {
-                        if (checker.running()) {
-                            notFinished = true;
-                        } else {
-                            if (!checker.result()) {
-                                result = false;
-                            }
-                        }
-                    }
-                }
+                result = playCheckers(checkers);
             } catch (Throwable t) {
                 result = false;
                 logFail(t);
@@ -513,6 +498,16 @@ public class Expectation {
             logFail(new Exception("The source of the data to check was not set"), expect);
 //            failed.append("the source of the data to check was not set.");
 //            fails.add(expect);
+        }
+        return result;
+    }
+
+    private boolean playCheckers(List<Validate> checkers) {
+        boolean result = new Executioner<Validate>().process(checkers);
+        for (Validate checker : checkers) {
+            if (!checker.result()) {
+                result = false;
+            }
         }
         return result;
     }
@@ -605,9 +600,9 @@ public class Expectation {
         }
     }
 
-    public Expectation failureMessage(String failureMessage){
-        if(clearedState != null){
-            ((Goate)expect.get(clearedState)).put("failure message", failureMessage);
+    public Expectation failureMessage(String failureMessage) {
+        if (clearedState != null) {
+            ((Goate) expect.get(clearedState)).put("failure message", failureMessage);
         } else {
             this.failureMessage = failureMessage;
         }

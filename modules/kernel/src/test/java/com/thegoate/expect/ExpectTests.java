@@ -37,6 +37,8 @@ import com.thegoate.expect.validate.ValidateAbsence;
 import com.thegoate.expect.validate.ValidateNotGoate;
 import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.json.utils.insert.InsertJson;
+import com.thegoate.reflection.Executioner;
+import com.thegoate.reflection.test.SkipThread;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.fill.serialize.DeSerializer;
@@ -141,9 +143,9 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
 //                    .fromExpected(loans));
             expect(Expectation.build()
                     .actual("cheeseNumber")
-                    .from(cheese.get(""+i))
+                    .from(cheese.get("" + i))
                     .isLessThan("cheeseNumber")
-                    .fromExpected(cheese.get(""+(i+1))));
+                    .fromExpected(cheese.get("" + (i + 1))));
         }
 
         LOG.debug("expecting: " + etb.expectations());
@@ -1528,6 +1530,51 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
         expect(Expectation.build()
                 .actual(api1FormattedPT)
                 .isEqualTo(api2FormattedP));
+    }
+
+    @Test(groups = {"unit"})
+    public void isNotEqualToNull() {
+        expect(Expectation.build()
+                .actual("hello, world!")
+                .isNotEqualTo(null));
+    }
+
+    @Test(groups = {"unit"})
+    public void listContains() {
+        List<String> headers = new ArrayList<>();
+        headers.add("A");
+        headers.add("B");
+        headers.add("C");
+        headers.add("D");
+        headers.add("E");
+        headers.add("F");
+        String expectedString = "c";
+        expect(new ContainsExpectationBuilder()
+                .lookFor(new Value(expectedString.toUpperCase()))
+                .lookIn(new Value(headers)));
+    }
+
+    @Test(groups = {"unit"})
+    public void goateValueTrue() {
+        String message = "has value";
+        expect(Expectation.build()
+                .actual(message)
+                .from(new Goate().put(message, true))
+                .isEqualTo(true));
+        expect(Expectation.build()
+                .actual(message)
+                .from(new Goate().put(message, true))
+                .isEqualTo(true));
+    }
+
+    @Test(groups = {"unit"})
+    public void skippedThread() {
+        List<SkipThread> threads = new ArrayList<>();
+        threads.add(new SkipThread());
+        expect(Expectation.build()
+                .actual(new Executioner<SkipThread>().process(threads))
+                .isEqualTo(false)
+                .failureMessage("the number of threads to be process and the number of threads processed should not be equal, but they were."));
     }
 
     @Test(groups = {"unit"})
