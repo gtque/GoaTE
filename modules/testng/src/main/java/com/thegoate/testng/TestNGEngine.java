@@ -125,6 +125,8 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 if(!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)){
                     number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
                 }
+            } else if(!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)){
+                number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
             }
             bumpRunNumber(methodName);
             setRunNumber(number.get("" + testClass.getCanonicalName() + ":" + methodName));

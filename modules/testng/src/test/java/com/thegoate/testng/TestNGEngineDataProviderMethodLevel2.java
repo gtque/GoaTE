@@ -30,8 +30,10 @@ import com.thegoate.Goate;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.data.StaticDL;
+import com.thegoate.expect.Expectation;
 import com.thegoate.testng.test.DataContainer;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -41,7 +43,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
 
-    public TestNGEngineDataProviderMethodLevel2(){
+    public TestNGEngineDataProviderMethodLevel2() {
         super();
     }
 
@@ -50,13 +52,14 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
      * Implement a method that returns an array of Goate with length 2.<br>
      * The first index (0) is the run data. The second index (1) is the constant data.<br>
      * You can annotate the method with {@literal @}GoateDLP if you want to have a more descriptive name.
+     *
      * @return an array of length 2 of Goate objects.
      */
-    @GoateDLP(name="sample2")
-    public Goate[] dlp(){
+    @GoateDLP(name = "sample2")
+    public Goate[] dlp() {
         Goate[] d = new Goate[2];
-        d[0] = new Goate().put("dl##", new StaticDL().add("a","x").add("Scenario", "use method provider 1."))
-        .put("dl##", new StaticDL().add("a","x").add("Scenario", "use method provider 2."));
+        d[0] = new Goate().put("dl##", new StaticDL().add("a", "x").add("Scenario", "use method provider 1."))
+                .put("dl##", new StaticDL().add("a", "x").add("Scenario", "use method provider 2."));
         return d;
     }
 
@@ -65,13 +68,14 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
      * Implement a method that returns an array of Goate with length 2.<br>
      * The first index (0) is the run data. The second index (1) is the constant data.<br>
      * You do not have to annotate the method if you do not want to, instead reference it using the method name.
+     *
      * @return an array of length 2 of Goate objects.
      */
-    public Goate[] sample3(){
+    public Goate[] sample3() {
         Goate[] d = new Goate[2];
-        d[0] = new Goate().put("dl##", new StaticDL().add("a","x").add("Scenario", "use method provider 3."))
-            .put("dl##", new StaticDL().add("a","x").add("Scenario", "use method provider 3."));
-        d[1] = new Goate().put("dl##", new StaticDL().add("b","y"));
+        d[0] = new Goate().put("dl##", new StaticDL().add("a", "x").add("Scenario", "use method provider 3."))
+                .put("dl##", new StaticDL().add("a", "x").add("Scenario", "use method provider 3."));
+        d[1] = new Goate().put("dl##", new StaticDL().add("b", "y"));
         return d;
     }
 
@@ -79,10 +83,10 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData(Goate d) throws Exception {
         assertEquals(data.size(), 3);
-        assertEquals(get("b"),null);
-        assertEquals(get("a"),"x");
+        assertEquals(get("b"), null);
+        assertEquals(get("a"), "x");
         put("c", 3);
-        assertEquals(get("c"),3);
+        assertEquals(get("c"), 3);
         assertEquals(data.size(), 4);
     }
 
@@ -90,10 +94,10 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData2(Goate d) throws Exception {
         assertEquals(data.size(), 4);
-        assertEquals(get("b"),"y");
-        assertEquals(get("a"),"x");
+        assertEquals(get("b"), "y");
+        assertEquals(get("a"), "x");
         put("c", 3);
-        assertEquals(get("c"),3);
+        assertEquals(get("c"), 3);
         assertEquals(data.size(), 5);
     }
 
@@ -101,10 +105,10 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData4(Goate d) throws Exception {
         assertEquals(data.size(), 4);
-        assertEquals(get("b"),"y");
-        assertEquals(get("a"),"x");
+        assertEquals(get("b"), "y");
+        assertEquals(get("a"), "x");
         put("c", 3);
-        assertEquals(get("c"),3);
+        assertEquals(get("c"), 3);
         assertEquals(data.size(), 5);
     }
 
@@ -112,10 +116,24 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData5(Goate d) throws Exception {
         assertEquals(data.size(), 4);
-        assertEquals(get("b"),"x");
-        assertEquals(get("a"),"y");
+        assertEquals(get("b"), "x");
+        assertEquals(get("a"), "y");
         put("c", 3);
-        assertEquals(get("c"),3);
+        assertEquals(get("c"), 3);
         assertEquals(data.size(), 5);
+    }
+
+    @Test(groups = {"unit"}, dataProvider = "custom_provider")
+    public void customProviderTest(Goate d) {
+        expect(Expectation.build()
+                .actual(d.get("truth"))
+                .isEqualTo(true));
+    }
+
+    @DataProvider
+    public Object[][] custom_provider(){
+        Object[][] o = new Object[1][1];
+        o[0][0] = new Goate().put("Scenario", "custom data provider").put("truth", true);
+        return o;
     }
 }

@@ -7,8 +7,8 @@ import org.testng.annotations.Test;
 
 public class CommandTest extends TestNGEngineMethodDL {
 
-    @Test(groups = {"unit"})
-    public void kubectl(){
+    @Test(groups = {"unit"}, enabled = false)
+    public void kubectl() {
         Goate cmd = new Command("kubectl").arg("version").execute();
 
         expect(Expectation.build().actual(cmd.get("output")).isEqualTo("Client Version: version.Info{Major:\"1\", Minor:\"15\", GitVersion:\"v1.15.4\", GitCommit:\"67d2fcf276fcd9cf743ad4be9a9ef5828adc082f\", GitTreeState:\"clean\", BuildDate:\"2019-09-18T14:51:13Z\", GoVersion:\"go1.12.9\", Compiler:\"gc\", Platform:\"windows/amd64\"}\n" +
@@ -16,14 +16,24 @@ public class CommandTest extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-    public void noCommand(){
+    public void echo() {
+        Goate cmd = new Command("cmd").arg("/c").arg("echo hello world!!!").execute();
+        expect(Expectation.build()
+                .actual("output")
+                .from(cmd)
+                .isEqualTo("hello world!!!\n"));
+
+    }
+
+    @Test(groups = {"unit"})
+    public void noCommand() {
         Goate cmd = new Command("").execute();
 
         expect(Expectation.build().actual(cmd.get("output")).isEqualTo("no command defined"));
     }
 
     @Test(groups = {"unit"})
-    public void badCommand(){
+    public void badCommand() {
         Goate cmd = new Command("booger").execute();
 
         expect(Expectation.build().actual(cmd.get("output")).isEqualTo("Cannot run program \"booger\": CreateProcess error=2, The system cannot find the file specified"));

@@ -64,8 +64,8 @@ def majorVersion = 0
 def minorVersion = 15
 def vbase = "${majorVersion}.${minorVersion}.${javaVersion}"
 def buildDate = "" + (project.hasProperty("buildDate")?project.buildDate:sdf.format(new Date()))
-def v = "${vbase}." + buildDate
-def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : project.release) : 'beta'
+def v = "${vbase}." + (project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? buildDate : '0'):'0')
+def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : ('-'+project.release)) : '-SNAPSHOT'
 
 allprojects {
     repositories {
@@ -79,10 +79,10 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
-    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'signing'
     apply plugin: 'jacoco'
     version = v + release;
-    group = "goate"
+    group = "com.thegoate"
     configurations {
         goatescala
     }
@@ -117,7 +117,6 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'jacoco'
-    apply plugin: 'com.jfrog.bintray'
     apply plugin: 'goate.test'
     //apply plugin: 'application'
 
@@ -165,23 +164,6 @@ subprojects {
 
     def siteUrl = 'http://www.thegoate.com'
     def gitUrl = 'https://github.com/gtque/goate'
-    bintray {
-        user = bintray_user
-        key = bintray_api_key
-
-        configurations = ['archives'] //When uploading configuration files
-        pkg {
-            userOrg = 'goate'
-            repo = 'GoaTE'
-            name = projectName
-            websiteUrl = siteUrl
-            issueTrackerUrl = 'https://github.com/gtque/goate/issues'
-            vcsUrl = gitUrl
-            licenses = ['MIT']
-            labels = ['GoaTE', projectName.replace(javaVersion,"")]
-            publicDownloadNumbers = true
-        }
-    }
 
     install  {
         repositories.mavenInstaller {
@@ -193,6 +175,8 @@ subprojects {
             GoateGradleHelper.customPom(pom, configurations, jv, oneOff)
             pom {
                 project {
+                    description = 'goate module for ' + projectName
+                    name projectName
                     url siteUrl
                     // Set your license
                     licenses {
@@ -207,6 +191,9 @@ subprojects {
                             name 'Eric Angeli'
                         }
                     }
+                    scm {
+                        url gitUrl
+                    }
                 }
             }
             doLast{
@@ -220,6 +207,25 @@ subprojects {
                 from components.java
                 groupId "goate"
                 artifactId projectName
+                pom {
+                    description = 'goate module for ' + projectName
+                    name = projectName
+                    licenses {
+                        license {
+                            name = 'MIT'
+                            url = 'http://www.thegoate.com/licenses/LICENSE-MIT.txt'
+                        }
+                    }
+                    developers {
+                        developer{
+                            id = 'gtque'
+                            name = 'Eric Angeli'
+                        }
+                    }
+                    scm {
+                        url = gitUrl
+                    }
+                }
                 GoateGradleHelper.customPom(pom, configurations, project.javaVersion, true)
             }
         }
@@ -230,65 +236,130 @@ subprojects {
         }
     }
 
-    artifactory {
-        contextUrl = "${artifactory_url}"
-        //The base Artifactory URL if not overridden by the publisher/resolver
-        publish {
-            repository {
-                repoKey = 'release'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-            }
-            defaults {
-                publications('goate')
-            }
-        }
-        resolve {
-            repository {
-                repoKey = 'libs-release'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                def jv = ""
+                if(Boolean.parseBoolean(""+projectJavaLabel)){
+                    jv = project.javaVersion
+                }
+                GoateGradleHelper.customPom(pom, configurations, jv, oneOff)
+                pom {
+                    project {
+                        description = 'goate module for ' + projectName
+                        name projectName
+                        url siteUrl
+                        // Set your license
+                        licenses {
+                            license {
+                                name 'MIT'
+                                url 'http://www.thegoate.com/licenses/LICENSE-MIT.txt'
+                            }
+                        }
+                        developers {
+                            developer{
+                                id 'gtque'
+                                name 'Eric Angeli'
+                            }
+                        }
+                        scm {
+                            url gitUrl
+                        }
+                    }
+                }
             }
         }
     }
+//    bintray {
+//        user = bintray_user
+//        key = bintray_api_key
+//
+//        configurations = ['archives'] //When uploading configuration files
+//        pkg {
+//            description = 'goate module for ' + projectName
+//            userOrg = 'goate'
+//            repo = 'GoaTE'
+//            name = projectName
+//            websiteUrl = siteUrl
+//            issueTrackerUrl = 'https://github.com/gtque/goate/issues'
+//            vcsUrl = gitUrl
+//            licenses = ['MIT']
+//            labels = ['GoaTE', projectName.replace(javaVersion,"")]
+//            publicDownloadNumbers = true
+//        }
+//    }
+//    artifactory {
+//        contextUrl = "${artifactory_url}"
+//        //The base Artifactory URL if not overridden by the publisher/resolver
+//        publish {
+//            repository {
+//                repoKey = 'release'
+//                username = "${artifactory_user}"
+//                password = "${artifactory_password}"
+//                maven = true
+//            }
+//            defaults {
+//                publications('goate')
+//            }
+//        }
+//        resolve {
+//            repository {
+//                repoKey = 'libs-release'
+//                username = "${artifactory_user}"
+//                password = "${artifactory_password}"
+//                maven = true
+//
+//            }
+//        }
+//    }
     idea {
         module {
             scopes.PROVIDED.plus += [configurations.annotations]
         }
     }
     task jarTest(type: Jar) {
-        classifier = "tests"
+        archiveClassifier.set("tests")
         from sourceSets.test.output, sourceSets.main.output
     }
 
     task sourcesJar(type: Jar) {
         from sourceSets.main.allSource
-        classifier = 'sources'
-        baseName = "${projectName}"
+        archiveClassifier.set('sources')
+        archiveBaseName.set("${projectName}")
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+        archiveClassifier.set('jdoc')
         from javadoc.destinationDir
-        baseName = "${projectName}"
+        archiveBaseName.set("${projectName}")
     }
     task groovydocJar(type: Jar, dependsOn: groovydoc) {
-        classifier = 'groovydoc'
+        archiveClassifier.set('gdoc')
         from groovydoc.destinationDir
-        baseName = "${projectName}"
+        archiveBaseName.set("${projectName}")
     }
 
     task alldocsJar(type: Jar, dependsOn: [javadocJar,groovydocJar]){
-        classifier = 'doc'
-        from groovydocJar.archivePath,javadocJar.archivePath
-        baseName = "${projectName}"
+        archiveClassifier.set('javadoc')
+        from groovydocJar.archiveFile,javadocJar.archiveFile
+        archiveBaseName.set("${projectName}")
     }
     artifacts {
         archives alldocsJar
         archives sourcesJar
+    }
+    signing {
+        sign configurations.archives
     }
 }
 
