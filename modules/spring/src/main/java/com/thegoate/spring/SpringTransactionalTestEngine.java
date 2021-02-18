@@ -31,6 +31,7 @@ import com.thegoate.expect.Expectation;
 import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
+import com.thegoate.testng.TestNGEngine;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.ITest;
@@ -52,15 +53,18 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     TestNGEngineMethodDL engine = null;
     protected Goate runData = null;
     protected Goate constantData = null;
+    protected Goate data = null;
 
     public SpringTransactionalTestEngine(){
         engine = new TestNGEngineMethodDL();
         engine.setLOG(BleatFactory.getLogger(getClass()));
+        this.data = engine.getData();
     }
 
     public SpringTransactionalTestEngine(Goate data){
         engine = new TestNGEngineMethodDL(data);
         engine.setLOG(BleatFactory.getLogger(getClass()));
+        this.data = engine.getData();
     }
 
     @Override
@@ -210,20 +214,34 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
         return engine.getTestName();
     }
 
-    public void startUp(Method method) {
-        engine.startUp(method);
+    @BeforeMethod(alwaysRun = true, dependsOnMethods = "initDataMethod")
+    public void startUp(Method method, ITestResult result) {
+        engine.startUp(method, result);
     }
 
     @BeforeMethod(alwaysRun = true)
     public void initDataMethod(Object[] d, Method m) {
-        if (d != null&&d.length>0) {
-            engine.init((Goate)d[0]);
-        }
-        startUp(m);
+        TestNGEngine.doInitData(d, m, this);
     }
 
     @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         engine.finishUp(method);
+    }
+
+    @Override
+    public void init(Goate data) {
+        engine.init(data);
+        this.data = data;
+    }
+
+    @Override
+    public boolean isExpectationsSet() {
+        return engine.isExpectationsSet();
+    }
+
+    @Override
+    public boolean isExpectationsNotEvaluated() {
+        return engine.isExpectationsNotEvaluated();
     }
 }

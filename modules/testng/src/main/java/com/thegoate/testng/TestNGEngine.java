@@ -27,7 +27,6 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
-import com.thegoate.data.GoateProvider;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationError;
@@ -52,6 +51,7 @@ import org.testng.xml.XmlTest;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +84,8 @@ public abstract class TestNGEngine implements ITest, TestNG {
     protected ExpectationThreadBuilder etb;
     protected ExpectEvaluator ev;
     private List<ExpectEvaluator> executedExpectations = new ArrayList<>();
-
+    protected volatile boolean expectationsSet = false;
+    protected volatile boolean expectationsNotEvaluated = true;
 
     public static Map<String, Integer> number = new ConcurrentHashMap<>();
 
@@ -114,9 +115,10 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return (!test.dataProvider().isEmpty())||(gp);
     }
 
+
     @BeforeMethod(alwaysRun = true, dependsOnMethods = "initDataMethod")
     @Override
-    public void startUp(Method method) {
+    public void startUp(Method method, ITestResult testResult) {
         methodName = method.getName();
         Test test = method.getAnnotation(Test.class);
         boolean gp = isFactoryDriven();
@@ -125,8 +127,12 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 if(!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)){
                     number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
                 }
-            } else if(!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)){
-                number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
+//                initGoate(testResult.getParameters(), method);//change to getFactoryParameters() after upgrading verison of TestNG
+            } else {
+                if(!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)){
+                    number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
+                }
+//                initGoate(testResult.getParameters(), method);
             }
             bumpRunNumber(methodName);
             setRunNumber(number.get("" + testClass.getCanonicalName() + ":" + methodName));
@@ -134,8 +140,13 @@ public abstract class TestNGEngine implements ITest, TestNG {
             data = new Goate();
             setRunNumber(0);
         }
-        if (data != null && data.get("lap", null) != null) {
-            Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
+        if (data != null){
+            if(getScenario()==null||getScenario().isEmpty()){
+                setScenario((String)data.get("Scenario"));
+            }
+            if(data.get("lap", null) != null) {
+                Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
+            }
         }
         etb = new ExpectationThreadBuilder(data);
         executedExpectations = new ArrayList<>();
@@ -169,7 +180,41 @@ public abstract class TestNGEngine implements ITest, TestNG {
         LOG.info("Shut Down", endMessage);
     }
 
+    @BeforeMethod(alwaysRun = true)
+    public void initGoate(Object[] data, Method method){
+        doInitData(data, method, this);
+    }
+
+    public static void doInitData(Object[] data, Method method, TestNG test){
+        if(data!=null){
+            if(data.length>0) {
+                if (data[0] instanceof Goate) {
+                    test.init((Goate) data[0]);
+                } else {
+                    Goate dGoate = new Goate();
+                    if (data[0] instanceof Map) {
+                        for (Map.Entry<String, String> entry : ((Map<String, String>) data[0]).entrySet()) {
+                            dGoate.put(entry.getKey(), entry.getValue());
+                        }
+                    } else {
+                        Parameter[] parameters = method.getParameters();
+                        for (int i = 0; i < parameters.length; i++) {
+                            Parameter parameter = parameters[i];
+                            dGoate.put(parameter.getName(), data[i]);
+                        }
+                    }
+                    test.init(dGoate);
+                }
+            } else {
+                if(test.getData()==null) {
+                    test.init(new Goate());
+                }
+            }
+        }
+    }
+
     public void init(Goate data) {
+        LOG.debug("Init", "setting test data for the class.");
         setData(data);
         String sKey = getData().findKeyIgnoreCase("Scenario");
         setScenario(get(sKey, "empty::", String.class));
@@ -186,7 +231,9 @@ public abstract class TestNGEngine implements ITest, TestNG {
                     .append(methodName)
                     .append(":");
         }
-        name.append(scenario);
+        if(scenario!=null) {
+            name.append(scenario);
+        }
         name.append("(" + runNumber + ")");
         return name.toString();
     }
@@ -300,6 +347,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
         }
         if (etb != null) {
             etb.expect(expectation);
+            expectationsSet = true;
         }
         return this;
     }
@@ -353,6 +401,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
         if (etb.isBuilt()) {
             LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
         } else {
+            expectationsNotEvaluated = false;
             ev = new ExpectEvaluator(etb);
             boolean result = ev.evaluate();
             executedExpectations.add(ev);
@@ -431,7 +480,21 @@ public abstract class TestNGEngine implements ITest, TestNG {
     @Override
     public TestNGEngine clearExpectations() {
         etb = new ExpectationThreadBuilder(data);
+        expectationsSet = false;
+        expectationsNotEvaluated = true;
         return this;
+    }
+
+    @Override
+    public boolean isExpectationsSet()
+    {
+        return this.expectationsSet;
+    }
+
+    @Override
+    public boolean isExpectationsNotEvaluated()
+    {
+        return this.expectationsNotEvaluated;
     }
 
     public void setTestClass(Class testClass) {

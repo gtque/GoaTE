@@ -121,24 +121,18 @@ public class ExpectEvaluator {
         for (ExpectThreadExecuter expectation : expectations()) {
             Expectation ex = expectation.getExpectation();
             Goate eval = ex.getExpectations();
-            for (String key : eval.keys()) {
-                Goate exp = eval.get(key, null, Goate.class);
-                if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), passes())) {
-                    if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), fails())) {
-                        if (!("" + exp.get("actual")).contains("*")&&!("" + exp.get("actual")).contains("+")) {
-//                            logVolume(exp);
-//                            skipped = true;
-//                            ss.append(expectSeparator);
-//                            ss.append(exp.toString("\t", ""));
-                            skipped.add(exp);
-                        } else {
-                            if(!("" + exp.get("actual")).contains("+")) {
-//                                exp.drop("from");
-//                                exp.drop("fromExpected");
-//                                zs.append(expectSeparator);
-//                                zs.append(exp.toString("\t", ""));
-//                                zero = true;
-                                zeroOrMore.add(exp);
+            if(eval.size()>(passes().size()+fails().size())) {
+                LOG.debug("Evaluate", "detected possible skipped expectation.");
+                for (String key : eval.keys()) {
+                    Goate exp = eval.get(key, null, Goate.class);
+                    if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), passes())) {
+                        if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), fails())) {
+                            if (!("" + exp.get("actual")).contains("*") && !("" + exp.get("actual")).contains("+")) {
+                                skipped.add(exp);
+                            } else {
+                                if (!("" + exp.get("actual")).contains("+")) {
+                                    zeroOrMore.add(exp);
+                                }
                             }
                         }
                     }

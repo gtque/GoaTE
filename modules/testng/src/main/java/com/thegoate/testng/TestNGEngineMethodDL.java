@@ -113,10 +113,6 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
                         cdl.merge(providers[1], true);
                     }
                 }
-//                for(String k:rdl.keys()){
-//                    Goate g = (Goate)rdl.get(k);
-//                    g.put("_goate:method", method);
-//                }
             } catch (Exception e) {
                 LOG.error("There was a problem building the providers: " + e.getMessage(), e);
             }
@@ -162,20 +158,5 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         }catch(Exception e){
             LOG.info("Define Data Loaders", "Not using factory");
         }
-    }
-
-//    @Override
-//    public void startUp(Method method) {
-//        super.startUp(method);
-//    }
-
-    @BeforeMethod(alwaysRun = true)
-    public void initDataMethod(Object[] d, Method m) {
-        if (d != null&&d.length>0) {
-            init((Goate)d[0]);
-        } else {
-            init(data!=null?data:new Goate());
-        }
-//        startUp(m);
     }
 }

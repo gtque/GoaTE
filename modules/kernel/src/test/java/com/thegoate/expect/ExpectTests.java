@@ -28,6 +28,9 @@
 package com.thegoate.expect;
 
 import com.thegoate.Goate;
+import com.thegoate.data.GoateDLP;
+import com.thegoate.data.GoateProvider;
+import com.thegoate.data.StaticDL;
 import com.thegoate.expect.builder.ContainsExpectationBuilder;
 import com.thegoate.expect.builder.ModelIsPresentOptional;
 import com.thegoate.expect.builder.Value;
@@ -40,6 +43,7 @@ import com.thegoate.json.utils.insert.InsertJson;
 import com.thegoate.reflection.Executioner;
 import com.thegoate.reflection.test.SkipThread;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
+import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.fill.serialize.DeSerializer;
 import com.thegoate.utils.fill.serialize.DefaultSource;
@@ -62,7 +66,7 @@ import static org.testng.Assert.*;
  * Test expect framework.
  * Created by Eric Angeli on 5/10/2017.
  */
-public class ExpectTests extends TestNGEngineAnnotatedDL {
+public class ExpectTests extends TestNGEngineMethodDL {
 
     //	final BleatBox LOG = BleatFactory.getLogger(getClass());
     String sample = "{\n" +
@@ -1577,6 +1581,32 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
                 .failureMessage("the number of threads to be process and the number of threads processed should not be equal, but they were."));
     }
 
+    @GoateDLP(name = "gw")
+    public Goate[] gw() {
+        Goate[] runs = new Goate[2];
+        runs[0] = new Goate();
+        for (int i = 0; i < 2; i++) {
+            runs[0].put("run ##", new StaticDL().add("Scenario", "run: " + i));
+        }
+        return runs;
+    }
+
+    @GoateProvider(name = "gw")
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void stringToDecimalComparisonUsingGoateWrapper(Goate testData) {
+        Object expected = new Get("val").from("{\"val\":98800.0}");
+        expectValue("has button", true, true);
+        expectValue("button 1", "98,800.00", expected);
+        expectValue("button 2", "98,800.00", expected);
+    }
+
+    private void expectValue(String message, Object actual, Object expected) {
+        expect(Expectation.build()
+                .actual(message)
+                .from(new Goate().put(message, actual))
+                .isEqualTo(expected));
+    }
+
     @Test(groups = {"unit"})
     public void expectWildcardIndex() {
         String json = "[" +
@@ -1696,6 +1726,21 @@ public class ExpectTests extends TestNGEngineAnnotatedDL {
             LOG.info("I threw the error I was NOT expecting.");
         }
         expect(Expectation.build().actual(failed).isEqualTo(true));
+    }
+
+    @Test(groups = {"unit"})
+    public void doSkipTestOnPurpose() {
+        expect(Expectation.build().actual("noop").from(new SkipExpectation()).isNull(false));
+        boolean skipped = false;
+        try {
+            evaluate();
+            LOG.debug("Skip Test", "If the test passed, I shouldn't see this message in the logs.");
+        } catch (Throwable t) {
+            skipped = true;
+        }
+        expect(Expectation.build()
+                .actual(skipped)
+                .isEqualTo(true));
     }
 
     @Test

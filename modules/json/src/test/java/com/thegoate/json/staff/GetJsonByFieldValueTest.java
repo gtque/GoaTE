@@ -28,6 +28,7 @@ package com.thegoate.json.staff;
 
 import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
+import com.thegoate.expect.Expectation;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.get.Get;
 import org.testng.annotations.Factory;
@@ -39,11 +40,12 @@ import static org.testng.Assert.assertEquals;
  * Created by Eric Angeli on 8/28/2018.
  */
 public class GetJsonByFieldValueTest extends TestNGEngineMethodDL {
-    public GetJsonByFieldValueTest(){
+    public GetJsonByFieldValueTest() {
         super();
     }
+
     @Factory(dataProvider = "dataLoader")
-    public GetJsonByFieldValueTest(Goate data){
+    public GetJsonByFieldValueTest(Goate data) {
         super(data);
     }
 
@@ -65,13 +67,16 @@ public class GetJsonByFieldValueTest extends TestNGEngineMethodDL {
                 .put("dl##", new StaticDL().add("Scenario", "find nested by cc")
                         .add(".definition", "file::find_defD.json")
                         .add("expected", 2)
-                        .add("check field","size()"));
+                        .add("check field", "size()"));
     }
 
     @Test(groups = {"unit"})
-    public void findObjectInArray(){
+    public void findObjectInArray() {
         Object found = new GetJsonByFieldValue().init(data).work();
-        String actual = "" + new Get(get("check field","name")).from(found);
-        assertEquals(actual, ""+data.get("expected"));
+        String actual = "" + new Get(get("check field", "name")).from(found);
+//        assertEquals(actual, ""+data.get("expected"));
+        expect(Expectation.build()
+                .actual(actual)
+                .isEqualTo("" + data.get("expected")));
     }
 }

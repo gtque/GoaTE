@@ -26,6 +26,7 @@
  */
 package com.thegoate.testng;
 
+import com.thegoate.expect.ExpectationError;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import org.testng.*;
@@ -82,6 +83,13 @@ public class TestNGEvaluateListener implements IInvokedMethodListener, ITestList
                 try {
                     if (test != null) {
                         test.evaluate(result);
+                        if(test.isExpectationsSet()){
+                            if(test.isExpectationsNotEvaluated()){
+                                LOG.warn("Evaluate", "Looks like some expectations were defined, but never evaluated.");
+                                throw new ExpectationError("Failed to evaluate defined expectations.");
+                            }
+                        }
+                        test.clearExpectations();
                     }
                 } catch (Throwable t) {
                     result.setStatus(ITestResult.FAILURE);

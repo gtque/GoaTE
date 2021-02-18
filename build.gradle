@@ -31,17 +31,11 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        maven{
-            url "https://dl.bintray.com/goate/GoaTE"
-        }
         mavenLocal()
     }
     dependencies {
         classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.13.0"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
-        classpath 'goate:gradle:0.15.8.202002171539'
     }
 }
 
@@ -71,9 +65,6 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven{
-            url "https://dl.bintray.com/goate/GoaTE"
-        }
         mavenLocal()
     }
     apply plugin: 'idea'
@@ -205,7 +196,7 @@ subprojects {
         publications {
             goate(MavenPublication) {
                 from components.java
-                groupId "goate"
+                groupId "com.thegoate"
                 artifactId projectName
                 pom {
                     description = 'goate module for ' + projectName

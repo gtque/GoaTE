@@ -41,8 +41,9 @@ import java.util.List;
  * Created by Eric Angeli on 5/11/2017.
  */
 public interface TestNG {
-    void startUp(Method method);
+    void startUp(Method method, ITestResult result);
     void finishUp(Method method);
+    void init(Goate data);
     Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception;
     void defineDataLoaders();
     void defineDataLoaders(Goate runData, Goate constantData);
@@ -67,4 +68,6 @@ public interface TestNG {
     void evaluate();
     void evaluate(ITestResult testResult);
     TestNG clearExpectations();
+    boolean isExpectationsSet();
+    boolean isExpectationsNotEvaluated();
 }

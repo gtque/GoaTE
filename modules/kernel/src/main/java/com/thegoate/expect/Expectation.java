@@ -32,6 +32,7 @@ import com.thegoate.expect.builder.Value;
 import com.thegoate.expect.extras.Extra;
 import com.thegoate.expect.extras.OneOrMore;
 import com.thegoate.expect.extras.ZeroOrMore;
+import com.thegoate.expect.test.SkipExpectation;
 import com.thegoate.expect.validate.Validate;
 import com.thegoate.locate.Locate;
 import com.thegoate.logging.BleatBox;
@@ -444,53 +445,57 @@ public class Expectation {
         }
 
         if (source != null) {
-            List<Validate> checkers = new ArrayList<>();
-            try {
-                LOG.debug("Expectation", "evaluating expectations.");
-                Object rtrn = new ToGoate(source).convert();//source;//from.work();
-                if (rtrn == null) {
-                    rtrn = new Goate().get("source", source);
-                }
-                if (rtrn instanceof Goate) {
-                    Set<String> keys = ((Goate) rtrn).keys();
-                    if (keys.size() == 1 && keys.contains("_original_")) {
-                        rtrn = source;
+            if(source instanceof SkipExpectation){
+                LOG.info("Expectation", "Specifically skipped an expectation.");
+            } else {
+                List<Validate> checkers = new ArrayList<>();
+                try {
+                    LOG.debug("Expectation", "evaluating expectations.");
+                    Object rtrn = new ToGoate(source).convert();//source;//from.work();
+                    if (rtrn == null) {
+                        rtrn = new Goate().get("source", source);
                     }
-                }
-                if (expect.size() == 0) {
-                    logFail(new Exception("Expection not defined properly."), new Goate()
-                            .put("actual", getActual())
-                            .put("from", getFrom())
-                            .put("operator", getOperator())
-                            .put("expected", getExpected())
-                            .put("fromExpected", getFromExpected())
-                            .put("failure message", getFailureMessage()));
-                    result = false;
-                } else {
-                    for (String key : expect.keys()) {
-                        Goate exp = (Goate) expect.get(key);
-                        if (forceFrom) {
-                            exp.put("actual", "actual");
-                            exp.put("from", from);
+                    if (rtrn instanceof Goate) {
+                        Set<String> keys = ((Goate) rtrn).keys();
+                        if (keys.size() == 1 && keys.contains("_original_")) {
+                            rtrn = source;
                         }
+                    }
+                    if (expect.size() == 0) {
+                        logFail(new Exception("Expection not defined properly."), new Goate()
+                                .put("actual", getActual())
+                                .put("from", getFrom())
+                                .put("operator", getOperator())
+                                .put("expected", getExpected())
+                                .put("fromExpected", getFromExpected())
+                                .put("failure message", getFailureMessage()));
+                        result = false;
+                    } else {
+                        for (String key : expect.keys()) {
+                            Goate exp = (Goate) expect.get(key);
+                            if (forceFrom) {
+                                exp.put("actual", "actual");
+                                exp.put("from", from);
+                            }
 //                        String act = exp.get("actual", null, String.class);
 //                        if(act != null && act.equals(EmployeeWorkResult)){
 //                            exp.put("actual", "actual");
 //                            exp.put("from", source);
 //                        }
-                        Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);
+                            Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);
 //                        checker.start();
-                        checkers.add(checker);
+                            checkers.add(checker);
+                        }
                     }
-                }
-                result = playCheckers(checkers);
-            } catch (Throwable t) {
-                result = false;
-                logFail(t);
-            } finally {
-                for (Validate checker : checkers) {
-                    passes.addAll(checker.getPasses());
-                    fails.addAll(checker.getFails());
+                    result = playCheckers(checkers);
+                } catch (Throwable t) {
+                    result = false;
+                    logFail(t);
+                } finally {
+                    for (Validate checker : checkers) {
+                        passes.addAll(checker.getPasses());
+                        fails.addAll(checker.getFails());
+                    }
                 }
             }
         } else {

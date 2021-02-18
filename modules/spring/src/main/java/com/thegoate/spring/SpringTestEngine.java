@@ -33,6 +33,7 @@ import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
+import com.thegoate.testng.TestNGEngine;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.testng.TestNGEvaluateListener;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -41,7 +42,6 @@ import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
@@ -59,7 +59,7 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     protected Goate runData = null;
     protected Goate constantData = null;
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
-    protected Goate data;
+    protected Goate data = null;
 
     @LocalServerPort
     protected int randomServerPort;
@@ -70,12 +70,14 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
         engine = new TestNGEngineMethodDL();
         engine.setTestClass(getClass());
         engine.setLOG(BleatFactory.getLogger(getClass()));
+        this.data = engine.getData();
     }
 
     public SpringTestEngine(Goate data) {
         engine = new TestNGEngineMethodDL(data);
         engine.setTestClass(getClass());
         engine.setLOG(BleatFactory.getLogger(getClass()));
+        this.data = engine.getData();
     }
 
     @Override
@@ -233,29 +235,39 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
+    public boolean isExpectationsSet() {
+        return engine.isExpectationsSet();
+    }
+
+    @Override
+    public boolean isExpectationsNotEvaluated() {
+        return engine.isExpectationsNotEvaluated();
+    }
+
+    @Override
     public String getTestName() {
         return engine.getTestName();
     }
 
-    public void startUp(Method method) {
-        engine.startUp(method);
+    @BeforeMethod(alwaysRun = true, dependsOnMethods = "initDataMethod")
+    public void startUp(Method method, ITestResult result) {
+        engine.startUp(method, result);
     }
 
     @BeforeMethod(alwaysRun = true)
     public void initDataMethod(Object[] d, Method m) {
-        if (d != null && d.length > 0) {
-            data = (Goate) d[0];
-            engine.init((Goate) d[0]);
-        } else {
-            data = data != null ? data : new Goate();
-            engine.init(data);
-        }
-        startUp(m);
+        TestNGEngine.doInitData(d, m, this);
     }
 
 //    @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         engine.finishUp(method);
+    }
+
+    @Override
+    public void init(Goate data) {
+        engine.init(data);
+//        this.data = data;
     }
 
     public ExpectEvaluator getEv() {

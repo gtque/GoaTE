@@ -32,6 +32,8 @@ import com.thegoate.data.DLProvider;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 
+import java.lang.reflect.Method;
+
 /**
  * Useful when specifying the data loader/provider using annotations.
  * The test class should be annotated with {@literal @}GoateProvider <br>
@@ -49,6 +51,11 @@ public class TestNGEngineAnnotatedDL extends TestNGEngine {
         super(data);
         setTestClass(getClass());
     }
+
+//    @Override
+//    public void startUp(Method method) {
+//
+//    }
 
     @Override
     public void defineDataLoaders() {
