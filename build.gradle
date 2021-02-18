@@ -36,6 +36,7 @@ buildscript {
     dependencies {
         classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        classpath 'com.thegoate:gradle:0.15.8.202102092109'
     }
 }
 
