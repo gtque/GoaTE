@@ -494,6 +494,9 @@ public class Expectation {
                 } finally {
                     for (Validate checker : checkers) {
                         passes.addAll(checker.getPasses());
+                        if(checker.getFails().size()>0){
+                            LOG.warn("Expectation Checker", "detected failed expectations.");
+                        }
                         fails.addAll(checker.getFails());
                     }
                 }

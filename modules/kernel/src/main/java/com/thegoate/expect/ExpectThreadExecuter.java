@@ -49,7 +49,7 @@ public class ExpectThreadExecuter extends Thread {
     long period = 50;
     long startTime = 0;
     long endTime = 0;
-    StringBuilder failed = new StringBuilder("");
+    final StringBuilder failed = new StringBuilder("");
     Goate data;
 
     public ExpectThreadExecuter(Expectation expectation) {
@@ -85,27 +85,29 @@ public class ExpectThreadExecuter extends Thread {
 
     @Override
     public void run() {
-        status = false;
-        if (expectation != null) {
-            executing = true;
-            timeoutMS = expectation.getRetryTimeout()<0?timeoutMS:expectation.getRetryTimeout();
-            period = expectation.getRetryPeriod()<0?period:expectation.getRetryPeriod();
-            startTime = System.currentTimeMillis();
-            long current = System.currentTimeMillis();
-            while (executing && !status && (current - startTime) <= timeoutMS) {
-                status = expectation.evaluate();
-                if (!status) {
-                    GoateUtils.sleep(period, LOG);
+        synchronized (failed) {
+            status = false;
+            if (expectation != null) {
+                executing = true;
+                timeoutMS = expectation.getRetryTimeout() < 0 ? timeoutMS : expectation.getRetryTimeout();
+                period = expectation.getRetryPeriod() < 0 ? period : expectation.getRetryPeriod();
+                startTime = System.currentTimeMillis();
+                long current = System.currentTimeMillis();
+                while (executing && !status && (current - startTime) <= timeoutMS) {
+                    status = expectation.evaluate();
+                    if (!status) {
+                        GoateUtils.sleep(period, LOG);
+                    }
+                    current = System.currentTimeMillis();
                 }
-                current = System.currentTimeMillis();
+                if (!status) {
+                    failed.append("The expectation(s) failed or timed out.\n");
+                    failed.append(expectation.failed());
+                }
+                executing = false;
             }
-            if (!status) {
-                failed.append("The expectation(s) failed or timed out.\n");
-                failed.append(expectation.failed());
-            }
-            executing = false;
+            running = false;
         }
-        running = false;
     }
 
     public boolean status() {
@@ -113,7 +115,9 @@ public class ExpectThreadExecuter extends Thread {
     }
 
     public String failedMessage() {
-        return failed.toString();
+        synchronized (failed) {
+            return failed.toString();
+        }
     }
 
     public List<Goate> fails() {

@@ -72,6 +72,7 @@ public class ExpectEvaluator {
         process(threadSize);
         for(ExpectThreadExecuter expect:expectations){
             if(!expect.status()){
+//                LOG.debug("Expect Evaluation", "detected a failed expectation: " + expect.getExpectation().getExpectations());
                 result = false;
                 failed.append(expect.failedMessage());
                 fails.addAll(expect.fails());

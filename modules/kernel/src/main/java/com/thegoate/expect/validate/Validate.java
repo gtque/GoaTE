@@ -64,9 +64,10 @@ public abstract class Validate extends Thread {
     private volatile boolean running = true;
     int patternIndex = 0;
     int checkIndex = 1;
-    volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());
-    volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());
+    final List<Goate> fails = Collections.synchronizedList(new ArrayList<>());
+    final List<Goate> passes = Collections.synchronizedList(new ArrayList<>());
     volatile List<Goate> notExecuted = Collections.synchronizedList(new ArrayList<>());
+    private final Object syncrho = new Object();
 
     public String operator() {
         return this.operator;
@@ -132,11 +133,15 @@ public abstract class Validate extends Thread {
     }
 
     public List<Goate> getFails() {
-        return fails;
+        synchronized (syncrho) {
+            return fails;
+        }
     }
 
     public List<Goate> getPasses() {
-        return passes;
+        synchronized (syncrho) {
+            return passes;
+        }
     }
 
     public String name() {
@@ -261,20 +266,22 @@ public abstract class Validate extends Thread {
      * @return True if condition met, otherwise false
      */
     protected boolean compare(Object val, Object expV, Goate ev) {
-        boolean result = true;
-        CompareUtility compare = new Compare(val).to(expV).using(ev.get("operator"));
-        compare.setData(getData());
-        if (!(compare.evaluate())) {//step into here to debug the comparator
-            fails.add(ev);
-            result = false;
-        } else {
-            passes.add(ev);
+        synchronized (syncrho){
+            boolean result = true;
+            CompareUtility compare = new Compare(val).to(expV).using(ev.get("operator"));
+            compare.setData(getData());
+            if (!(compare.evaluate())) {//step into here to debug the comparator
+                fails.add(ev);
+                result = false;
+            } else {
+                passes.add(ev);
+            }
+            Goate health = compare.healthCheck();
+            if (health.size() > 0) {
+                ev.put(HEALTH_CHECK + "_health check", health);
+            }
+            return result;
         }
-        Goate health = compare.healthCheck();
-        if (health.size() > 0) {
-            ev.put(HEALTH_CHECK + "_health check", health);
-        }
-        return result;
     }
 
     protected boolean checkEvaluated(List<Goate> passed, String act1, int index) {
