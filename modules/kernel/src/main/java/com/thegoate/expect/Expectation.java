@@ -128,7 +128,7 @@ public class Expectation {
     String expectedName = "";
     String id = "";
     Goate data = null;
-    Goate expect = new Goate();
+    volatile Goate expect = new Goate();
     String simpleState = "";
     volatile Object actual;
     String operator = "";
@@ -147,6 +147,7 @@ public class Expectation {
     boolean includeExtras = false;
     private long retryTimeout = -42L;
     private long retryPeriod = -42L;
+    private final Object synchro = new Object();
 
     public Expectation(Goate data) {
         this.data = data;
@@ -423,91 +424,93 @@ public class Expectation {
     }
 
     public boolean evaluate() {
-        failed = new StringBuilder("");//only the last failure is preserved. if the expectation is executed more than once it resets the failure message.
-        fails = new ArrayList<>();
-        passes = new ArrayList<>();
-        boolean result = true;//assume true, and if a failure is detected set to false.
-        boolean forceFrom = false;
-        if (from == null) {
-            forceFrom = true;
-            from = new Goate().put("actual", source);
-        }
-        try {
-            if (from instanceof Employee) {
-                source = ((Employee) from).expectation(this).defaultPeriod(cachePeriod).syncWork();
-            } else {
-                source = from;
+        synchronized (synchro) {
+            failed = new StringBuilder("");//only the last failure is preserved. if the expectation is executed more than once it resets the failure message.
+            fails = new ArrayList<>();
+            passes = new ArrayList<>();
+            boolean result = true;//assume true, and if a failure is detected set to false.
+            boolean forceFrom = false;
+            if (from == null) {
+                forceFrom = true;
+                from = new Goate().put("actual", source);
             }
-        } catch (Throwable e) {
-            LOG.error("Expectation", "Problem getting the source for comparison: " + e.getMessage(), e);
-            logFail(e);
-            source = null;
-        }
+            try {
+                if (from instanceof Employee) {
+                    source = ((Employee) from).expectation(this).defaultPeriod(cachePeriod).syncWork();
+                } else {
+                    source = from;
+                }
+            } catch (Throwable e) {
+                LOG.error("Expectation", "Problem getting the source for comparison: " + e.getMessage(), e);
+                logFail(e);
+                source = null;
+            }
 
-        if (source != null) {
-            if(source instanceof SkipExpectation){
-                LOG.info("Expectation", "Specifically skipped an expectation.");
-            } else {
-                List<Validate> checkers = new ArrayList<>();
-                try {
-                    LOG.debug("Expectation", "evaluating expectations.");
-                    Object rtrn = new ToGoate(source).convert();//source;//from.work();
-                    if (rtrn == null) {
-                        rtrn = new Goate().get("source", source);
-                    }
-                    if (rtrn instanceof Goate) {
-                        Set<String> keys = ((Goate) rtrn).keys();
-                        if (keys.size() == 1 && keys.contains("_original_")) {
-                            rtrn = source;
+            if (source != null) {
+                if (source instanceof SkipExpectation) {
+                    LOG.info("Expectation", "Specifically skipped an expectation.");
+                } else {
+                    List<Validate> checkers = new ArrayList<>();
+                    try {
+                        LOG.debug("Expectation", "evaluating expectations.");
+                        Object rtrn = new ToGoate(source).convert();//source;//from.work();
+                        if (rtrn == null) {
+                            rtrn = new Goate().get("source", source);
                         }
-                    }
-                    if (expect.size() == 0) {
-                        logFail(new Exception("Expection not defined properly."), new Goate()
-                                .put("actual", getActual())
-                                .put("from", getFrom())
-                                .put("operator", getOperator())
-                                .put("expected", getExpected())
-                                .put("fromExpected", getFromExpected())
-                                .put("failure message", getFailureMessage()));
-                        result = false;
-                    } else {
-                        for (String key : expect.keys()) {
-                            Goate exp = (Goate) expect.get(key);
-                            if (forceFrom) {
-                                exp.put("actual", "actual");
-                                exp.put("from", from);
+                        if (rtrn instanceof Goate) {
+                            Set<String> keys = ((Goate) rtrn).keys();
+                            if (keys.size() == 1 && keys.contains("_original_")) {
+                                rtrn = source;
                             }
+                        }
+                        if (expect.size() == 0) {
+                            logFail(new Exception("Expection not defined properly."), new Goate()
+                                    .put("actual", getActual())
+                                    .put("from", getFrom())
+                                    .put("operator", getOperator())
+                                    .put("expected", getExpected())
+                                    .put("fromExpected", getFromExpected())
+                                    .put("failure message", getFailureMessage()));
+                            result = false;
+                        } else {
+                            for (String key : expect.keys()) {
+                                Goate exp = (Goate) expect.get(key);
+                                if (forceFrom) {
+                                    exp.put("actual", "actual");
+                                    exp.put("from", from);
+                                }
 //                        String act = exp.get("actual", null, String.class);
 //                        if(act != null && act.equals(EmployeeWorkResult)){
 //                            exp.put("actual", "actual");
 //                            exp.put("from", source);
 //                        }
-                            Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);
+                                Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);
 //                        checker.start();
-                            checkers.add(checker);
+                                checkers.add(checker);
+                            }
                         }
-                    }
-                    result = playCheckers(checkers);
-                } catch (Throwable t) {
-                    result = false;
-                    logFail(t);
-                } finally {
-                    for (Validate checker : checkers) {
-                        passes.addAll(checker.getPasses());
-                        if(checker.getFails().size()>0){
-                            LOG.warn("Expectation Checker", "detected failed expectations.");
+                        result = playCheckers(checkers);
+                    } catch (Throwable t) {
+                        result = false;
+                        logFail(t);
+                    } finally {
+                        for (Validate checker : checkers) {
+                            passes.addAll(checker.getPasses());
+                            if (checker.getFails().size() > 0) {
+                                LOG.warn("Expectation Checker", "detected failed expectations.");
+                            }
+                            fails.addAll(checker.getFails());
                         }
-                        fails.addAll(checker.getFails());
                     }
                 }
-            }
-        } else {
-            result = false;
-            logFail(new Exception("The source of the data to check was not set"), expect);
+            } else {
+                result = false;
+                logFail(new Exception("The source of the data to check was not set"), expect);
 //            failed.append("the source of the data to check was not set.");
 //            fails.add(expect);
+            }
+            return result;
         }
-        return result;
     }
 
     private boolean playCheckers(List<Validate> checkers) {
@@ -534,18 +537,24 @@ public class Expectation {
     }
 
     public String failed() {
-        if (from instanceof Employee) {
-            failed.append(((Employee) from).getHrReport().printRecords());
+        synchronized (synchro) {
+            if (from instanceof Employee) {
+                failed.append(((Employee) from).getHrReport().printRecords());
+            }
+            return failed.toString();
         }
-        return failed.toString();
     }
 
     public List<Goate> fails() {
-        return fails;
+        synchronized (synchro) {
+            return fails;
+        }
     }
 
     public List<Goate> passes() {
-        return passes;
+        synchronized (synchro) {
+            return passes;
+        }
     }
 
     /**

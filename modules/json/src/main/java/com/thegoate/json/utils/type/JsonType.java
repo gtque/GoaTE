@@ -43,6 +43,7 @@ public class JsonType extends FindType {
 				}
 			}
 		}catch(JSONException je){
+//			LOG.debug("Check if JSON", "this was not json.");
 			istype = false;
 		}
 		return istype;

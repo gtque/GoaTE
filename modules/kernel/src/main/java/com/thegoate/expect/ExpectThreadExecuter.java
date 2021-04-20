@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class ExpectThreadExecuter extends Thread {
     final BleatBox LOG = BleatFactory.getLogger(getClass());
-    Expectation expectation = null;
+    volatile Expectation expectation = null;
     volatile boolean status = false;
     volatile boolean running = false;
     volatile boolean executing = false;
@@ -49,7 +49,8 @@ public class ExpectThreadExecuter extends Thread {
     long period = 50;
     long startTime = 0;
     long endTime = 0;
-    final StringBuilder failed = new StringBuilder("");
+    volatile StringBuilder failed = new StringBuilder("");
+    private final Object synchro = new Object();
     Goate data;
 
     public ExpectThreadExecuter(Expectation expectation) {
@@ -85,16 +86,18 @@ public class ExpectThreadExecuter extends Thread {
 
     @Override
     public void run() {
-        synchronized (failed) {
+        synchronized (synchro) {
             status = false;
             if (expectation != null) {
                 executing = true;
                 timeoutMS = expectation.getRetryTimeout() < 0 ? timeoutMS : expectation.getRetryTimeout();
                 period = expectation.getRetryPeriod() < 0 ? period : expectation.getRetryPeriod();
                 startTime = System.currentTimeMillis();
-                long current = System.currentTimeMillis();
-                while (executing && !status && (current - startTime) <= timeoutMS) {
+                long current = startTime;
+                boolean executedOnce = false;
+                while (!executedOnce || (executing && !status && (current - startTime) <= timeoutMS)) {
                     status = expectation.evaluate();
+                    executedOnce = true;
                     if (!status) {
                         GoateUtils.sleep(period, LOG);
                     }
@@ -115,17 +118,21 @@ public class ExpectThreadExecuter extends Thread {
     }
 
     public String failedMessage() {
-        synchronized (failed) {
+        synchronized (synchro) {
             return failed.toString();
         }
     }
 
     public List<Goate> fails() {
-        return expectation != null ? expectation.fails() : new ArrayList<>();
+        synchronized (synchro) {
+            return expectation != null ? expectation.fails() : new ArrayList<>();
+        }
     }
 
     public List<Goate> passes() {
-        return expectation != null ? expectation.passes() : new ArrayList<>();
+        synchronized (synchro) {
+            return expectation != null ? expectation.passes() : new ArrayList<>();
+        }
     }
 
     @Override

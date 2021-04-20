@@ -244,4 +244,9 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     public boolean isExpectationsNotEvaluated() {
         return engine.isExpectationsNotEvaluated();
     }
+
+    @Override
+    public void initRunNumber(Method method) {
+        engine.initRunNumber(method);
+    }
 }

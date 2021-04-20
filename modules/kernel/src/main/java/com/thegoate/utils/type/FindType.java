@@ -8,6 +8,11 @@ import com.thegoate.utils.UnknownUtilType;
  */
 public class FindType extends UnknownUtilType implements TypeUtility {
 
+//	public FindType(){
+//	}
+//
+//	public FindType(Object... arguments){}
+
 	@Override
 	public boolean isType(Object check) {
 		return false;

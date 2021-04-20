@@ -56,9 +56,9 @@ public abstract class UnknownUtilType implements Utility {
     protected boolean useCache = false;
     protected boolean nameIsHash = false;
 
-    public UnknownUtilType(){
+    public UnknownUtilType() {
         UtilCache uc = getClass().getAnnotation(UtilCache.class);
-        if(uc != null){
+        if (uc != null) {
             region = uc.name();
             resetCache = uc.clear();
             useCache = uc.useCache();
@@ -71,12 +71,12 @@ public abstract class UnknownUtilType implements Utility {
     }
 
     @Override
-    public UnknownUtilType setData(Goate data){
+    public UnknownUtilType setData(Goate data) {
         this.data = data;
         return this;
     }
 
-    public Goate healthCheck(){
+    public Goate healthCheck() {
         return health;
     }
 
@@ -98,28 +98,31 @@ public abstract class UnknownUtilType implements Utility {
 
     /**
      * Attempts to find and build the correct implementation of the utility.
-     * @param obj the obj
-     * @param util the type of utility
-     * @param val the value to be operated on
-     * @param id the id of the utility to use
+     *
+     * @param obj        the obj
+     * @param util       the type of utility
+     * @param val        the value to be operated on
+     * @param id         the id of the utility to use
      * @param identifier the method to use to identify the utility
      * @return the utility that was found.
      */
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier) {
-        return buildUtil(obj, util, val, id, identifier,"isType");
+        return buildUtil(obj, util, val, id, identifier, "isType");
     }
 
-    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier, Class type){
+    protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier, Class type) {
         return buildUtil(obj, util, val, id, identifier, "isType", type);
     }
+
     /**
      * Attempts to find and build the correct implementation of the utility.
-     * @param obj the obj
-     * @param util the type of utility
-     * @param val the value to be operated on
-     * @param id the id of the utility to use
+     *
+     * @param obj        the obj
+     * @param util       the type of utility
+     * @param val        the value to be operated on
+     * @param id         the id of the utility to use
      * @param identifier the method to use to identify the utility
-     * @param isType the type to look for.
+     * @param isType     the type to look for.
      * @return the utility that was found.
      */
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier, String isType) {
@@ -131,12 +134,12 @@ public abstract class UnknownUtilType implements Utility {
         Object[] args = {val};
         Object[] checkArgs = {obj};
         utility = cached(util, args, obj, id, type);
-        if(utility == null){
+        if (utility == null) {
             utility = uncached(util, args, checkArgs, id, identifier, isType, type);
-            if(utility!=null) {
-                if(obj!=null && useCache && !(obj instanceof String)) {
+            if (utility != null) {
+                if (obj != null && useCache && !(obj instanceof String)) {
                     Goate cache = pokedex.get(region, new Goate(), Goate.class);
-                    if(cache!=null) {
+                    if (cache != null) {
                         cache.put(key(util, obj, id, type), utility.getClass());
                     }
                 }
@@ -145,37 +148,37 @@ public abstract class UnknownUtilType implements Utility {
         return utility;
     }
 
-    public static void clearCache(Class<? extends UnknownUtilType> klass){
+    public static void clearCache(Class<? extends UnknownUtilType> klass) {
         UtilCache uc = klass.getAnnotation(UtilCache.class);
-        if(uc.clear()){
+        if (uc.clear()) {
             pokedex.put(uc.name(), new Goate());
         }
     }
 
-    public void clearFromCache(Class<? extends java.lang.annotation.Annotation> util, Object obj, String id, Class isType){
+    public void clearFromCache(Class<? extends java.lang.annotation.Annotation> util, Object obj, String id, Class isType) {
         pokedex.drop(key(util, obj, id, isType));
     }
 
-    protected String key(Class<? extends java.lang.annotation.Annotation> util, Object obj, String id, Class isType){
+    protected String key(Class<? extends java.lang.annotation.Annotation> util, Object obj, String id, Class isType) {
         return util.getName() + ":" + getName(obj, isType) + ":" + id + ":" + isType;
     }
 
-    protected String getName(Object obj, Class isType){
+    protected String getName(Object obj, Class isType) {
         String name = null;
-        if(nameIsHash){
-            name = obj!=null?(""+obj.hashCode()):null;
+        if (nameIsHash) {
+            name = obj != null ? ("" + obj.hashCode()) : null;
         } else {
 //            GoateReflection gr = new GoateReflection();
-            if(isType!=null) {
+            if (isType != null) {
                 name = isType.getTypeName();
             }
         }
         return name;
     }
 
-    protected Object cached(Class<? extends java.lang.annotation.Annotation> util, Object[] args, Object obj, String id, Class isType){
+    protected Object cached(Class<? extends java.lang.annotation.Annotation> util, Object[] args, Object obj, String id, Class isType) {
         Object utility = null;
-        if(useCache) {
+        if (useCache) {
             Goate cache = pokedex.get(region, null, Goate.class);
             if (obj != null && cache != null) {
                 Class c = cache.get(key(util, obj, id, isType), null, Class.class);
@@ -193,31 +196,112 @@ public abstract class UnknownUtilType implements Utility {
         return utility;
     }
 
-    protected Object uncached(Class<? extends java.lang.annotation.Annotation> util, Object[] args, Object[] checkArgs, String id, Method identifier, String isType, Class type){
+    protected Class getDefault(String isType, Class c) {
+        Method check = null;
+        Class def = null;
+        Class[] types = {Object.class};
+        try {
+            check = c.getMethod(isType, types);
+        } catch (NoSuchMethodException nsme) {
+            LOG.debug("Unknown Util", "No type method: " + isType);
+        }
+        if (check != null) {
+            def = c;
+        }
+        return def;
+    }
+
+    protected boolean isDefault(Class c, Class def){
+        IsDefault d = (IsDefault) c.getAnnotation(IsDefault.class);
+        return d != null && !d.forType() && def == null;
+    }
+
+    protected Object getUtility(Class c, Class[] _def, AnnotationFactory af, String isType, Class type, Object[] checkArgs){
+        Object utility = null;
+        Class[] types = {Object.class};
+        Method check = null;
+        IsDefault d = (IsDefault) c.getAnnotation(IsDefault.class);
+        try {
+            if (type != null && type.equals(NotFound.class)) {
+                try {
+                    check = c.getMethod(isType, types);
+                } catch (NoSuchMethodException nsme) {
+                    LOG.debug("Unknown Util", "No type method: " + isType);
+                }
+                Object u = af.constructor(null).build(c);
+                if (check != null && Boolean.parseBoolean("" + check.invoke(u, checkArgs))) {
+                    if (d != null && d.forType()) {
+                        _def[0] = c;
+                    } else {
+                        utility = u;
+//                    break;
+                    }
+                } else {
+                    LOG.debug("Util Look up by type", "not: " + c.getName());
+                }
+            } else {
+                if (checkType(c, type)) {
+                    if (d != null && d.forType()) {
+                        _def[0] = c;
+                    } else {
+                        utility = af.constructor(null).build(c);
+//                    break;
+                    }
+                } else {
+                    LOG.debug("Util Look up by checkType", "not: " + c.getName());
+                }
+            }
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            LOG.debug("The class (" + c.getName() + ") did not have isType, cannot determine if that class is the correct type. " + e.getMessage(), e);
+        }
+        return utility;
+    }
+
+    protected boolean checkUtility(Class c, Class[] _def, Object[] _util, String isType, AnnotationFactory af, Class type, Object[] checkArgs){
+        if(_util[0] == null) {
+            if (isDefault(c, _def[0])) {
+                _def[0] = getDefault(isType, c);
+            } else {
+                _util[0] = getUtility(c, _def, af, isType, type, checkArgs);
+            }
+        }
+        return _util[0] != null;
+    }
+
+    protected Object uncached(Class<? extends java.lang.annotation.Annotation> util, Object[] args, Object[] checkArgs, String id, Method identifier, String isType, Class type) {
         Object utility = null;
         Class def = null;
         AnnotationFactory af = new AnnotationFactory();
         af.constructorArgs(args);
         Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
-        if(utils!=null) {
-            for (String key : utils.keySet()){
+        if (utils != null) {
+            final Class[] _def = new Class[1];
+            final Object[] _util = new Object[1];
+            _def[0] = null;
+            _util[0] = null;
+
+            utils.keySet().stream().filter(key -> checkUtility(utils.get(key), _def, _util, isType, af, type, checkArgs)).findFirst();
+            utility = _util[0];
+            def = _def[0];
+            /**
+            for (String key : utils.keySet()) {
                 Class c = Object.class;
                 try {
                     c = utils.get(key);
-                    IsDefault d = (IsDefault)c.getAnnotation(IsDefault.class);
+                    IsDefault d = (IsDefault) c.getAnnotation(IsDefault.class);
                     Class[] types = {Object.class};
                     Method check = null;
-                    if(d!=null&&!d.forType()&&def==null){
-                        try{
+                    if (d != null && !d.forType() && def == null) {
+                        try {
                             check = c.getMethod(isType, types);
-                        } catch (NoSuchMethodException nsme){
+                        } catch (NoSuchMethodException nsme) {
                             LOG.debug("Unknown Util", "No type method: " + isType);
                         }
-                        if(check!=null) {
+                        if (check != null) {
                             def = c;
                         }
-                    }else {
-                        if(type!=null && type.equals(NotFound.class)) {
+                    } else {
+                        if (type != null && type.equals(NotFound.class)) {
                             try {
                                 check = c.getMethod(isType, types);
                             } catch (NoSuchMethodException nsme) {
@@ -231,9 +315,11 @@ public abstract class UnknownUtilType implements Utility {
                                     utility = u;
                                     break;
                                 }
+                            } else {
+                                LOG.debug("Util Look up by type", "not: " + c.getName());
                             }
                         } else {
-                            if(checkType(c, type)){
+                            if (checkType(c, type)) {
                                 if (d != null && d.forType()) {
                                     def = c;
                                 } else {
@@ -241,27 +327,27 @@ public abstract class UnknownUtilType implements Utility {
                                     break;
                                 }
                             } else {
-
+                                LOG.debug("Util Look up by checkType", "not: " + c.getName());
                             }
                         }
                     }
-                } catch (IllegalAccessException | InvocationTargetException |InstantiationException e) {
-                    LOG.debug("The class ("+c.getName()+") did not have isType, cannot determine if that class is the correct type. " + e.getMessage(), e);
+                } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                    LOG.debug("The class (" + c.getName() + ") did not have isType, cannot determine if that class is the correct type. " + e.getMessage(), e);
                 }
-            }
+            }/**/
         } else {
-            LOG.info("The utility directory was null for some reason: " + util.getCanonicalName() + ":" + id + ":" + (identifier!=null?identifier.getName():null));
+            LOG.info("The utility directory was null for some reason: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
         }
-        if(utility==null){
-            if(def!=null){
-                try{
+        if (utility == null) {
+            if (def != null) {
+                try {
                     utility = af.constructor(null).build(def);
-                    ((Utility)utility).setData(data);
-                } catch (IllegalAccessException | InvocationTargetException |InstantiationException e){
-                    LOG.debug("Problem instantiating the default utility ("+def.getName()+"): " + e.getMessage(), e);
+                    ((Utility) utility).setData(data);
+                } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                    LOG.debug("Problem instantiating the default utility (" + def.getName() + "): " + e.getMessage(), e);
                 }
             } else {
-                LOG.debug("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier!=null?identifier.getName():null));
+                LOG.debug("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
             }
         }
         return utility;

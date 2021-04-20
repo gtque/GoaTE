@@ -29,6 +29,7 @@ modules/selenium/temp
 # PDT-specific
 .buildpath
 
+**/flow/
 
 #################
 ## Visual Studio

@@ -27,6 +27,7 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GhostProtocol;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationError;
@@ -66,6 +67,7 @@ import static org.testng.Assert.assertTrue;
  * Created by Eric Angeli on 5/11/2017.
  */
 @Listeners({TestNGEvaluateListener.class})
+@GhostProtocol(ghosts = {"_testng_test_name"})
 public abstract class TestNGEngine implements ITest, TestNG {
 
     private Class testClass = getClass();
@@ -101,50 +103,51 @@ public abstract class TestNGEngine implements ITest, TestNG {
         LOG = box;
     }
 
-    protected boolean isFactoryDriven(){
+    protected boolean isFactoryDriven() {
         Constructor[] constructors = testClass.getConstructors();
-        for(Constructor constructor:constructors){
-            if(constructor.getAnnotation(Factory.class)!=null){
+        for (Constructor constructor : constructors) {
+            if (constructor.getAnnotation(Factory.class) != null) {
                 return true;
             }
         }
         return false;
     }
 
-    protected boolean isDataDriven(Test test, boolean gp){
-        return (!test.dataProvider().isEmpty())||(gp);
+    protected boolean isDataDriven(Test test, boolean gp) {
+        return (!test.dataProvider().isEmpty()) || (gp);
     }
 
 
-    @BeforeMethod(alwaysRun = true, dependsOnMethods = "initDataMethod")
+    @BeforeMethod(alwaysRun = true, dependsOnMethods = "initGoate")
     @Override
     public void startUp(Method method, ITestResult testResult) {
         methodName = method.getName();
-        Test test = method.getAnnotation(Test.class);
-        boolean gp = isFactoryDriven();
-        if (isDataDriven(test, gp)) {
-            if(gp){
-                if(!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)){
-                    number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
-                }
-//                initGoate(testResult.getParameters(), method);//change to getFactoryParameters() after upgrading verison of TestNG
-            } else {
-                if(!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)){
-                    number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
-                }
-//                initGoate(testResult.getParameters(), method);
+//        Test test = method.getAnnotation(Test.class);
+//        boolean gp = isFactoryDriven();
+//        if (isDataDriven(test, gp)) {
+//            if (gp) {
+//                if (!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)) {
+//                    number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
+//                }
+//                getData().drop("_testng_test_name");
+////                initGoate(testResult.getParameters(), method);//change to getFactoryParameters() after upgrading verison of TestNG
+//            } else {
+//                if (!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)) {
+//                    number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
+//                }
+////                initGoate(testResult.getParameters(), method);
+//            }
+//            bumpRunNumber(methodName);
+//            setRunNumber(number.get("" + testClass.getCanonicalName() + ":" + methodName));
+//        } else {
+//            data = new Goate();
+//            setRunNumber(0);
+//        }
+        if (data != null) {
+            if (getScenario() == null || getScenario().isEmpty()) {
+                setScenario((String) data.get("Scenario"));
             }
-            bumpRunNumber(methodName);
-            setRunNumber(number.get("" + testClass.getCanonicalName() + ":" + methodName));
-        } else {
-            data = new Goate();
-            setRunNumber(0);
-        }
-        if (data != null){
-            if(getScenario()==null||getScenario().isEmpty()){
-                setScenario((String)data.get("Scenario"));
-            }
-            if(data.get("lap", null) != null) {
+            if (data.get("lap", null) != null) {
                 Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
             }
         }
@@ -160,7 +163,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void initDataMethod(){
+    public void initDataMethod() {
         UnknownUtilType.clearCache(Get.class);
     }
 
@@ -180,14 +183,40 @@ public abstract class TestNGEngine implements ITest, TestNG {
         LOG.info("Shut Down", endMessage);
     }
 
-    @BeforeMethod(alwaysRun = true)
-    public void initGoate(Object[] data, Method method){
+    @BeforeMethod(alwaysRun = true, dependsOnMethods = "initDataMethod")
+    public void initGoate(Object[] data, Method method) {
         doInitData(data, method, this);
     }
 
-    public static void doInitData(Object[] data, Method method, TestNG test){
-        if(data!=null){
-            if(data.length>0) {
+    @Override
+    public void initRunNumber(Method method) {
+        methodName = method.getName();
+        Test test = method.getAnnotation(Test.class);
+        boolean gp = isFactoryDriven();
+        if (isDataDriven(test, gp)) {
+            if (gp) {
+                if (!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)) {
+                    number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
+                }
+                getData().drop("_testng_test_name");
+//                initGoate(testResult.getParameters(), method);//change to getFactoryParameters() after upgrading verison of TestNG
+            } else {
+                if (!number.containsKey("" + testClass.getCanonicalName() + ":" + methodName)) {
+                    number.put("" + testClass.getCanonicalName() + ":" + methodName, 0);
+                }
+//                initGoate(testResult.getParameters(), method);
+            }
+            bumpRunNumber(methodName);
+            setRunNumber(number.get("" + testClass.getCanonicalName() + ":" + methodName));
+        } else {
+            data = new Goate();
+            setRunNumber(0);
+        }
+    }
+
+    public static void doInitData(Object[] data, Method method, TestNG test) {
+        if (data != null) {
+            if (data.length > 0) {
                 if (data[0] instanceof Goate) {
                     test.init((Goate) data[0]);
                 } else {
@@ -206,11 +235,12 @@ public abstract class TestNGEngine implements ITest, TestNG {
                     test.init(dGoate);
                 }
             } else {
-                if(test.getData()==null) {
+                if (test.getData() == null) {
                     test.init(new Goate());
                 }
             }
         }
+        test.initRunNumber(method);
     }
 
     public void init(Goate data) {
@@ -224,14 +254,21 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     @Override
     public String getTestName() {
+        String name = get("_testng_test_name", "init::" + eut("testng.test.name.pattern", "default"), String.class);
+        if (name.equalsIgnoreCase("default")) {
+            name = defaultTestName();
+            put("_testng_test_name", name);
+        }
+        return name;
+    }
+
+    private String defaultTestName() {
         StringBuilder name = new StringBuilder("");
         if (includeClassMethodInName) {
-            name.append((testClass == null ? getClass().getCanonicalName() : testClass.getCanonicalName()))
-                    .append(":")
-                    .append(methodName)
+            name.append(methodName)
                     .append(":");
         }
-        if(scenario!=null) {
+        if (scenario != null) {
             name.append(scenario);
         }
         name.append("(" + runNumber + ")");
@@ -417,6 +454,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
             try {
                 assertTrue(result, ev.failed());
             } catch (Throwable e) {
+                LOG.info("Evaluate", "assert" + e.getMessage(), e);
                 StringBuilder failures = new StringBuilder();
                 executedExpectations.stream().forEach(ex -> failures.append(getFailures(ex)));
                 throw new ExpectationError(failures.toString());
@@ -455,24 +493,41 @@ public abstract class TestNGEngine implements ITest, TestNG {
 
     public void logStatuses(ExpectEvaluator ev, boolean logFailuresDefault) {
         Goate.innerGoate = -1;
-        String passes = new PassAmplifier(null)
-                .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
-                .testName(getTestName())
-                .amplify(ev);
-        if (!passes.isEmpty()) {
-            LOG.info("Status", "\npassed:" + passes);
+        try {
+            String passes = new PassAmplifier(null)
+                    .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
+                    .testName(getTestName())
+                    .amplify(ev);
+            if (!passes.isEmpty()) {
+                LOG.info("Status", "\npassed:" + passes);
+            }
+        } catch (Throwable t) {
+            LOG.info("TestNGEngine", "Something really bad happened here while logging passed expectations: " + t.getMessage());
+            t.printStackTrace();
+            throw t;
         }
 
-        if (eut("assert.printStackTrace", logFailuresDefault, Boolean.class)) {
-            LOG.fail("Status", getFailures(ev));
+        try {
+            if (eut("assert.printStackTrace", logFailuresDefault, Boolean.class)) {
+                LOG.fail("Status", getFailures(ev));
+            }
+        } catch (Throwable t) {
+            LOG.info("TestNGEngine", "Something really bad happened here while logging failed expectations: " + t.getMessage());
+            t.printStackTrace();
+            throw t;
         }
-
-        String skipZero = new ZeroOrMoreAmplifier(null)
-                .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
-                .testName(getTestName())
-                .amplify(ev);
-        if (!skipZero.isEmpty()) {
-            LOG.info("Expectations", "may not have been evaluated:" + skipZero);
+        try {
+            String skipZero = new ZeroOrMoreAmplifier(null)
+                    .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
+                    .testName(getTestName())
+                    .amplify(ev);
+            if (!skipZero.isEmpty()) {
+                LOG.info("Expectations", "may not have been evaluated:" + skipZero);
+            }
+        } catch (Throwable t) {
+            LOG.info("TestNGEngine", "Something really bad happened here while logging skipped expectations: " + t.getMessage());
+            t.printStackTrace();
+            throw t;
         }
         Goate.innerGoate = 0;
     }
@@ -486,14 +541,12 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public boolean isExpectationsSet()
-    {
+    public boolean isExpectationsSet() {
         return this.expectationsSet;
     }
 
     @Override
-    public boolean isExpectationsNotEvaluated()
-    {
+    public boolean isExpectationsNotEvaluated() {
         return this.expectationsNotEvaluated;
     }
 

@@ -54,6 +54,7 @@ public interface TestNG {
     void setRunNumber(int number);
     void bumpRunNumber(String name);
     int getRunNumber();
+    void initRunNumber(Method method);
     void setScenario(String scenario);
     String getScenario();
     Object get(String key);
