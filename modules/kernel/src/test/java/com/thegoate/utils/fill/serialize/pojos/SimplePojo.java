@@ -35,7 +35,7 @@ import java.math.BigDecimal;
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-//@GoatePojo(id = "simple pojo")
+@GoatePojo(id = "simple pojo")
 public class SimplePojo extends Kid {
 
     private String fieldName = "what?";

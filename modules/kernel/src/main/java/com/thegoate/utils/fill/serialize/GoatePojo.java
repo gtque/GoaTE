@@ -44,4 +44,5 @@ import java.lang.annotation.RetentionPolicy;
 @Inherited
 public @interface GoatePojo {
     String id() default "";
+    boolean forceCast() default false;
 }

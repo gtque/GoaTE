@@ -61,9 +61,14 @@ public class Cast extends UnknownUtilType {
         if(gr.isPrimitive(type)){
             object = buildFromCastUtil(type, value);
         } else{
-            if(type.getAnnotation(GoatePojo.class)!=null){
-                DeSerializer serializer = new DeSerializer().data(data).from(dataSource);
-                object = serializer.build(type);
+            GoatePojo goatePojo = type.getAnnotation(GoatePojo.class);
+            if(goatePojo!=null){
+                if(goatePojo.forceCast()) {
+                    object = buildFromCastUtil(type, value);
+                } else {
+                    DeSerializer serializer = new DeSerializer().data(data).from(dataSource);
+                    object = serializer.build(type);
+                }
             } else {
                 if(type.equals(String.class)){
                     if(value instanceof String) {

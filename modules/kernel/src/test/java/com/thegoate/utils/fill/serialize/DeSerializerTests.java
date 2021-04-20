@@ -32,7 +32,11 @@ import com.thegoate.expect.Expectation;
 import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.testng.TestNGEngineMethodDL;
+import com.thegoate.utils.fill.serialize.nullable.primitive.NullableDouble;
 import com.thegoate.utils.fill.serialize.pojos.*;
+import com.thegoate.utils.fill.serialize.pojos.nullable.Wrapper;
+import com.thegoate.utils.fill.serialize.pojos.nullable.WrapperDouble;
+import com.thegoate.utils.fill.serialize.pojos.nullable.WrapperPrimitiveDouble;
 import com.thegoate.utils.fill.serialize.primitives.CastBoolean;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
@@ -371,5 +375,80 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         expect(Expectation.build()
                 .actual(next.getInner().getName())
                 .isEqualTo("Tarun"));
+    }
+
+    @Test(groups = {"unit"})
+    public void nullableWrapper() {
+        Goate g = new Goate().put("d", "42.314159");
+
+        Wrapper wrapper = new DeSerializer().data(g).build(Wrapper.class);
+        Wrapper ew = new Wrapper();
+        ew.setD(NullableDouble.build("42.314159"));
+
+        expect(Expectation.build().actual(wrapper).isEqualTo(ew));
+    }
+
+    @Test(groups = {"unit"})
+    public void nullableWrapperNullNotEqual() {
+        Goate g = new Goate().put("d", "null::");
+
+        Wrapper wrapper = new DeSerializer().data(g).build(Wrapper.class);
+        Wrapper ew = new Wrapper();
+        ew.setD(NullableDouble.build("42.314159"));
+
+        expect(Expectation.build().actual(wrapper).isNotEqualTo(ew));
+    }
+
+    @Test(groups = {"unit"})
+    public void nullableWrapperNullEqual() {
+        Goate g = new Goate().put("d", "null::");
+
+        Wrapper wrapper = new DeSerializer().data(g).build(Wrapper.class);
+        Wrapper ew = new Wrapper();
+
+        expect(Expectation.build().actual(wrapper).isEqualTo(ew));
+    }
+
+    @Test(groups = {"unit"})
+    public void doubleWrapper() {
+        Goate g = new Goate().put("d", "42.314159");
+
+        WrapperDouble wrapper = new DeSerializer().data(g).build(WrapperDouble.class);
+        WrapperDouble ew = new WrapperDouble();
+        ew.setD(42.314159D);
+
+        expect(Expectation.build().actual(wrapper).isEqualTo(ew));
+    }
+
+    @Test(groups = {"unit"})
+    public void doubleWrapperNullNotEqual() {
+        Goate g = new Goate().put("d", "null::");
+
+        WrapperDouble wrapper = new DeSerializer().data(g).build(WrapperDouble.class);
+        WrapperDouble ew = new WrapperDouble();
+        ew.setD(42.314159);
+
+        expect(Expectation.build().actual(wrapper).isNotEqualTo(ew));
+    }
+
+    @Test(groups = {"unit"})
+    public void doubleWrapperNullEqual() {
+        Goate g = new Goate().put("d", "null::");
+
+        WrapperDouble wrapper = new DeSerializer().data(g).build(WrapperDouble.class);
+        WrapperDouble ew = new WrapperDouble();
+
+        expect(Expectation.build().actual(wrapper).isEqualTo(ew));
+    }
+
+    @Test(groups = {"unit"})
+    public void primitiveDoubleWrapper() {
+        Goate g = new Goate().put("d", "42.314159");
+
+        WrapperPrimitiveDouble wrapper = new DeSerializer().data(g).build(WrapperPrimitiveDouble.class);
+        WrapperPrimitiveDouble ew = new WrapperPrimitiveDouble();
+        ew.setD(42.314159D);
+
+        expect(Expectation.build().actual(wrapper).isEqualTo(ew));
     }
 }
