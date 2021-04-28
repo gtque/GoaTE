@@ -110,8 +110,9 @@ public class Cast extends UnknownUtilType {
         if(type == TypeT.class){
             if(container instanceof TypeT) {
                 try {
-                    Method get_type = container.getClass().getMethod("goateType");
-                    type = (Class) get_type.invoke(container);
+
+                    Method get_type = container.getClass().getMethod("goateType", int.class);
+                    type = (Class) get_type.invoke(container, 0);
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                     LOGGER.debug("problem detecting type T, will just assume it is the type: " + e.getMessage());
                 }

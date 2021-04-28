@@ -32,6 +32,8 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +45,7 @@ public class DeSerializer extends Cereal{
     private BleatBox LOG = BleatFactory.getLogger(getClass());
     private Goate data;
     private Class dataSource;
-    private Class genericType;
+    private List<Class> genericType = new ArrayList<>();
 
     public <T> T build(Class<T> type){
         Object o = null;
@@ -83,7 +85,7 @@ public class DeSerializer extends Cereal{
                             } else {
                                 d = data.filterStrict(fieldKey.replace("##","[0-9]*"));
                             }
-                            field.getValue().set(o, new Cast(d, dataSource).container(o).field(field.getValue()).cast(value,field.getValue().getType()));
+                            field.getValue().set(o, new Cast(d, dataSource).container(o).field(field.getValue()).cast(value,getType(field.getValue())));
                         }
                     } catch (Exception e) {
                         LOG.error("Build Pojo", "Failed to set field: " + e.getMessage(), e);
@@ -95,6 +97,20 @@ public class DeSerializer extends Cereal{
             LOG.error("Build Pojo", "Failed to build the pojo: " + e.getMessage(), e);
         }
         return (T)o;
+    }
+
+    private Class getType(Field field){
+        Class c = field.getType();
+        if(c == Object.class){
+            IsTypeT t = field.getAnnotation(IsTypeT.class);
+            if(t != null) {
+                int index = t.index();
+                if(genericType.size()>index){
+                    c = genericType.get(index);
+                }
+            }
+        }
+        return c;
     }
 
     private Object buildInstance(Class type) throws IllegalAccessException, InstantiationException {
@@ -118,7 +134,7 @@ public class DeSerializer extends Cereal{
         return genericType(type);
     }
     public DeSerializer genericType(Class type){
-        this.genericType = type;
+        this.genericType.add(type);
         return this;
     }
 

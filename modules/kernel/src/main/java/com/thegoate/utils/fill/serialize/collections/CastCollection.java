@@ -64,11 +64,19 @@ public abstract class CastCollection extends GoateCastUtility {
                 Class[] types = {};
                 try {
                     Method check = typeAnnotation.getMethod("type", types);
+                    int index = 0;
+
                     type = check.invoke(field.getAnnotation(typeAnnotation));
+                    try {
+                        Method typeIndex = typeAnnotation.getMethod("index", types);
+                        index = (Integer)typeIndex.invoke(container);
+                    } catch (Throwable indexE){
+                        LOGGER.debug("Cast Collection", "index not supported for " + typeAnnotation +", assuming index of 0");
+                    }
                     if(type instanceof TypeT || type == TypeT.class){
                         if(container instanceof TypeT) {
-                            Method get_type = container.getClass().getMethod("goateType");
-                            type = get_type.invoke(container);
+                            Method get_type = container.getClass().getMethod("goateType", int.class);
+                            type = get_type.invoke(container, index);
                         }
                         LOGGER.debug("found a generic type: " + type);
                     }
