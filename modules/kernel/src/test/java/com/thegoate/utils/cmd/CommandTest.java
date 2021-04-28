@@ -28,7 +28,6 @@ public class CommandTest extends TestNGEngineMethodDL {
     @Test(groups = {"unit"})
     public void noCommand() {
         Goate cmd = new Command("").execute();
-
         expect(Expectation.build().actual(cmd.get("output")).isEqualTo("no command defined"));
     }
 

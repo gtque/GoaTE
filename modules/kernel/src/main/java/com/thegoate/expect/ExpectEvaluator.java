@@ -48,7 +48,7 @@ public class ExpectEvaluator {
     final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     List<ExpectThreadExecuter> expectations = null;
-    StringBuilder failed = new StringBuilder("");
+    volatile StringBuilder failed = new StringBuilder("");
     volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
     volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
     volatile List<Goate> skipped = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
@@ -74,6 +74,7 @@ public class ExpectEvaluator {
             if(!expect.status()){
 //                LOG.debug("Expect Evaluation", "detected a failed expectation: " + expect.getExpectation().getExpectations());
                 result = false;
+                LOG.info("Expect Evaluation", "detected failed expectations: " + expect.failedMessage());
                 failed.append(expect.failedMessage());
                 fails.addAll(expect.fails());
             }
@@ -104,7 +105,7 @@ public class ExpectEvaluator {
     }
 
     public String failed(){
-        return failed.toString();
+        return failed!=null?failed.toString():"no failed messages";
     }
 
     protected void process(int threadSize){
@@ -112,7 +113,7 @@ public class ExpectEvaluator {
         if(new Executioner<ExpectThreadExecuter>(threadSize).process(expectations())){
             LOG.debug("Expectations", "Evaluation finished successfully");
         } else {
-            LOG.warn("Expectations", "Evaluation did not finish successfully");
+            LOG.info("Expectations", "Evaluation did not finish successfully, at least one expectation was not executed for some reason.");
             failed.append("/nNot all expectation threads were executed successfully for some reason, please review the logs.");
             fails.add(new Goate().put("actual", expectations().size()).put("health check", "failed to execute all the threads for some reason."));
         }
@@ -122,8 +123,8 @@ public class ExpectEvaluator {
         for (ExpectThreadExecuter expectation : expectations()) {
             Expectation ex = expectation.getExpectation();
             Goate eval = ex.getExpectations();
-            if(eval.size()>(passes().size()+fails().size())) {
-                LOG.debug("Evaluate", "detected possible skipped expectation.");
+            //if(eval.size()>(passes().size()+fails().size())) {
+                //LOG.debug("Evaluate", "detected possible skipped expectation.");
                 for (String key : eval.keys()) {
                     Goate exp = eval.get(key, null, Goate.class);
                     if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), passes())) {
@@ -138,7 +139,7 @@ public class ExpectEvaluator {
                         }
                     }
                 }
-            }
+            //}
         }
     }
 

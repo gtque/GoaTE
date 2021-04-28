@@ -30,6 +30,9 @@ package com.thegoate;
 import static com.thegoate.expect.validate.Validate.HEALTH_CHECK;
 import static com.thegoate.logging.volume.VolumeKnob.volume;
 
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.annotations.GhostProtocol;
+import com.thegoate.dsl.GoateDSL;
 import com.thegoate.dsl.Interpreter;
 import com.thegoate.logging.volume.Diary;
 import com.thegoate.reflection.GoateReflection;
@@ -47,7 +50,9 @@ import java.util.stream.Collectors;
 public class Goate implements HealthMonitor, Diary {
 
 	public static final String GOATE_VARIABLE_PREFIX = "_goate_(%$#)_";
-	Map<String, Object> data = new ConcurrentHashMap<>();
+	volatile Map<String, Object> data = new ConcurrentHashMap<>();
+	volatile Map<String, Object> ghosted = new ConcurrentHashMap<>();
+	public volatile static List<String> ghosts = null;
 	Interpreter dictionary;
 	boolean increment = true;
 
@@ -62,6 +67,21 @@ public class Goate implements HealthMonitor, Diary {
 
 	protected void init() {
 		dictionary = new Interpreter(this);
+		if(ghosts == null){
+			ghosts = Collections.synchronizedList(new ArrayList<>());
+			findGhosts();
+		}
+	}
+
+	private void findGhosts(){
+		AnnotationFactory af = new AnnotationFactory().annotatedWith(GhostProtocol.class).buildDirectory();
+		Map<?,?> directory = AnnotationFactory.directory.get(GhostProtocol.class.getCanonicalName());
+		for(Map.Entry entry:directory.entrySet()){
+			//ghosts.add(""+entry.getValue());
+			Class thGhost = (Class)entry.getValue();
+			GhostProtocol gp = (GhostProtocol)thGhost.getAnnotation(GhostProtocol.class);
+			ghosts.addAll(Arrays.asList(gp.ghosts()));
+		}
 	}
 
 	public Goate autoIncrement(boolean increment) {
@@ -110,6 +130,12 @@ public class Goate implements HealthMonitor, Diary {
 	public Goate put(String key, Object value) {
 		if (data == null) {
 			data = new ConcurrentHashMap<>();
+		}
+		if(ghosts != null){
+			if(ghosts.contains(key)){
+				ghosted.put(key, value == null ? "null::" : value);
+				return this;
+			}
 		}
 		//        if(value!=null) {
 		if (key.contains("##")) {
@@ -184,17 +210,26 @@ public class Goate implements HealthMonitor, Diary {
 				if (value == null) {
 					value = System.getenv(key);
 					if (value == null) {
-						if (data.containsKey(key)) {
-							value = data.get(key);
-						} else if (def != null) {
-							data.put(key, def);
-							stale = true;
-							value = def;
+						if(ghosts.contains(key)){
+							if (ghosted.containsKey(key)) {
+								value = ghosted.get(key);
+							} else if (def != null) {
+								ghosted.put(key, def);
+								value = def;
+							}
+						} else {
+							if (data.containsKey(key)) {
+								value = data.get(key);
+							} else if (def != null) {
+								data.put(key, def);
+								stale = true;
+								value = def;
+							}
 						}
 					}
 				}
 			}
-			if (value == null && !data.containsKey(key)) {
+			if (value == null && !data.containsKey(key) && !ghosted.containsKey(key)) {
 				value = def;
 			}
 			if (value != null && dsl) {
@@ -246,8 +281,12 @@ public class Goate implements HealthMonitor, Diary {
 	}
 
 	public Goate drop(String key) {
-		data.remove(key);
-		stale = true;
+		if(ghosts.contains(key)){
+			ghosted.remove(key);
+		} else {
+			data.remove(key);
+			stale = true;
+		}
 		return this;
 	}
 

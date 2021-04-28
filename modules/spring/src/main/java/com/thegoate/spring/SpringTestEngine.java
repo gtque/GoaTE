@@ -146,6 +146,11 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
+    public void initRunNumber(Method method) {
+        engine.initRunNumber(method);
+    }
+
+    @Override
     public void setScenario(String scenario) {
         engine.setScenario(scenario);
     }

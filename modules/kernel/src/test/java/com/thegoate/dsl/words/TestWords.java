@@ -37,30 +37,30 @@ public class TestWords extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-    public void dateShiftStatic(){
+    public void dateShiftStatic() {
         expect(Expectation.build()
-                .actual(DateShiftDSL.dateShift("yyyy-MM-dd", "2009-11-22",2))
+                .actual(DateShiftDSL.dateShift("yyyy-MM-dd", "2009-11-22", 2))
                 .isEqualTo("2009-11-24"));
     }
 
     @Test(groups = {"unit"})
-    public void dateShiftStaticNegativeUnits(){
+    public void dateShiftStaticNegativeUnits() {
         expect(Expectation.build()
-                .actual(DateShiftDSL.dateShift("yyyy-MM-dd", "2009-12-24",-1,"n"))
+                .actual(DateShiftDSL.dateShift("yyyy-MM-dd", "2009-12-24", -1, "n"))
                 .isEqualTo("2009-11-24"));
     }
 
     @Test(groups = {"unit"})
-    public void dateTimeShiftStatic(){
+    public void dateTimeShiftStatic() {
         expect(Expectation.build()
-                .actual(DateTimeShiftDSL.dateTimeShift("yyyy-MM-dd HH:mm:ss", "2009-11-23 00:00:00",24,"h"))
+                .actual(DateTimeShiftDSL.dateTimeShift("yyyy-MM-dd HH:mm:ss", "2009-11-23 00:00:00", 24, "h"))
                 .isEqualTo("2009-11-24 00:00:00"));
     }
 
     @Test(groups = {"unit"})
-    public void dateTimeShiftNegativeStatic(){
+    public void dateTimeShiftNegativeStatic() {
         expect(Expectation.build()
-                .actual(DateTimeShiftDSL.dateTimeShift("uuuu-MM-dd HH:mm:ss", "2009-11-25 00:00:00",-1))
+                .actual(DateTimeShiftDSL.dateTimeShift("uuuu-MM-dd HH:mm:ss", "2009-11-25 00:00:00", -1))
                 .isEqualTo("2009-11-24  00:00:00"));
     }
 }
