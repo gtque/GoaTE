@@ -1,15 +1,15 @@
 package com.thegoate.utils.fill.serialize.pojos;
 
-import com.thegoate.utils.fill.serialize.IsTypeT;
+import com.thegoate.utils.fill.serialize.Generic;
 import com.thegoate.utils.fill.serialize.Kid;
 
 public class GenericTypes<T,U,V> extends Kid {
 
-    @IsTypeT
+    @Generic
     private T a;
-    @IsTypeT(index = 1)
+    @Generic(index = 1)
     private U b;
-    @IsTypeT(index = 2)
+    @Generic(index = 2)
     private V c;
 
     public T getA() {

@@ -102,7 +102,7 @@ public class DeSerializer extends Cereal{
     private Class getType(Field field){
         Class c = field.getType();
         if(c == Object.class){
-            IsTypeT t = field.getAnnotation(IsTypeT.class);
+            Generic t = field.getAnnotation(Generic.class);
             if(t != null) {
                 int index = t.index();
                 if(genericType.size()>index){

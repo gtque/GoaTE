@@ -36,13 +36,13 @@ import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Created by Eric Angeli on 4/27/2021.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@GoateDescription(description = "Identifies a variable as using the generic type T")
+@GoateDescription(description = "Identifies a variable as using a generic type, can specify the index if more than one generic type.")
 @Info()
 @IndexAnnotated
 @Inherited
-public @interface IsTypeT {
+public @interface Generic {
 	int index() default 0;
 }

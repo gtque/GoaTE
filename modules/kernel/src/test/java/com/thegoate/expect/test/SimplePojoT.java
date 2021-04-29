@@ -1,13 +1,13 @@
 package com.thegoate.expect.test;
 
-import com.thegoate.utils.fill.serialize.IsTypeT;
+import com.thegoate.utils.fill.serialize.Generic;
 import com.thegoate.utils.fill.serialize.Kid;
 
 public class SimplePojoT<T,U> extends Kid {
 
-	@IsTypeT
+	@Generic
 	private T field;
-	@IsTypeT(index = 1)
+	@Generic(index = 1)
 	private U field2;
 
 	public T getField() {
