@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.dsl.Interpreter;
 import com.thegoate.expect.builder.Value;
 import com.thegoate.expect.extras.Extra;
+import com.thegoate.expect.extras.IgnoreOrder;
 import com.thegoate.expect.extras.OneOrMore;
 import com.thegoate.expect.extras.ZeroOrMore;
 import com.thegoate.expect.test.SkipExpectation;
@@ -97,7 +98,7 @@ public class Expectation {
     }
 
     enum EXTRAS {
-        ZERO_OR_MORE("zeroOrMore", new ZeroOrMore()), ONE_OR_MORE("oneOrMore", new OneOrMore());
+        ZERO_OR_MORE("zeroOrMore", new ZeroOrMore()), ONE_OR_MORE("oneOrMore", new OneOrMore()), IGNORE_ORDER("ignoreOrder", new IgnoreOrder());
         String label;
         Extra extra;
 
@@ -139,6 +140,7 @@ public class Expectation {
     Object fromExpected = null;
     Object source = null;
     boolean zeroOrMore = true;
+    boolean ignoreOrder = false;
     String clearedState = null;
     StringBuilder failed = new StringBuilder("");
     String failureMessage = null;
@@ -186,6 +188,11 @@ public class Expectation {
     public Expectation zeroOrMore() {
         zeroOrMore = true;
         includeExtras = true;
+        return this;
+    }
+
+    public Expectation ignoreOrder() {
+        ignoreOrder = true;
         return this;
     }
 
@@ -307,6 +314,10 @@ public class Expectation {
         return is("==").expected(expected);
     }
 
+    public Expectation isEqualToIgnoreOrder(Object expected) {
+        return is("~==").expected(expected);
+    }
+
     public Expectation isEqualToIgnoreCase(Object expected) {
         return is("~=").expected(expected);
     }
@@ -395,6 +406,11 @@ public class Expectation {
         return this;
     }
 
+    public Expectation includeExtras(){
+        includeExtras = true;
+        return this;
+    }
+
     protected void checkState(boolean force) {
         if ((simpleState.length() == 3 && simpleState.contains("a") && simpleState.contains("i") && simpleState.contains("c")) || force) {
             if (actual != null && operator != null && !operator.isEmpty()) {//must at least set actual and operator fields.
@@ -408,6 +424,7 @@ public class Expectation {
                 if (includeExtras) {
                     Goate extras = new Goate();
                     extras.put("zeroOrMore", zeroOrMore);
+                    extras.put("ignoreOrder", ignoreOrder);
                     exp.put("extras", extras);
                 }
                 expect.put(key, exp);

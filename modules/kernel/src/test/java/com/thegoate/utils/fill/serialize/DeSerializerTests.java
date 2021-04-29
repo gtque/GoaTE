@@ -29,6 +29,8 @@ package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.Goate;
 import com.thegoate.expect.Expectation;
+import com.thegoate.expect.test.NestedObject;
+import com.thegoate.expect.test.SimpleObject;
 import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.testng.TestNGEngineMethodDL;
@@ -48,10 +50,7 @@ import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.testng.Assert.*;
 
@@ -172,7 +171,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         data.put("nested.big decimal", "3.14159");
         data.put("nested.double D", "42.42");
         data.put("nested.long l", 42L);
-        ComplexPojo pojo = data.get("complex pojo", "pojo::complex pojo,simple expected", ComplexPojo.class);//new DeSerializer().data(data).from(SimpleSource.class).build(ComplexPojo.class);
+        ComplexPojo pojo = data.get("complex pojo", "goatePojo::complex pojo,simple expected", ComplexPojo.class);//new DeSerializer().data(data).from(SimpleSource.class).build(ComplexPojo.class);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         assertEquals(pojo.getDate(), LocalDate.parse("2009-11-24", formatter));
         assertEquals(pojo.getNested().getFieldName(), "Hello, world!");
@@ -450,5 +449,67 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         ew.setD(42.314159D);
 
         expect(Expectation.build().actual(wrapper).isEqualTo(ew));
+    }
+
+    @Test(groups = {"unit"})
+    public void fillPojo() {
+        Goate g = new Goate().put("pojo", "fill::o::actual")
+                .put("actual", new GenericTypes<String, Boolean, Integer>())
+                .put("a", "Hello")
+                .put("b", true)
+                .put("c", 42);
+        GenericTypes<String, Boolean, Integer> e = new GenericTypes<>();
+        e.setA("Hello").setB(true).setC(42);
+        expect(Expectation.build()
+                .actual(g.get("pojo"))
+                .isEqualTo(e));
+
+    }
+
+    @Test(groups = {"unit"})
+    public void pojoDSLClassObjects() {
+        Goate g = new Goate().put("pojo", "pojo::o::actual,o::first,o::second,o::third")
+                .put("actual", GenericTypes.class)
+                .put("first", String.class)
+                .put("second", Boolean.class)
+                .put("third", Integer.class)
+                .put("a", "Hello")
+                .put("b", true)
+                .put("c", 42);
+        GenericTypes<String, Boolean, Integer> e = new GenericTypes<>();
+        e.setA("Hello").setB(true).setC(42);
+        expect(Expectation.build()
+                .actual(g.get("pojo"))
+                .isEqualTo(e));
+
+    }
+
+    @Test(groups = {"unit"})
+    public void pojoDSLClassGenericStrings() {
+        Goate g = new Goate().put("pojo", "pojo::o::actual,java.lang.String,java.lang.Boolean,java.lang.Integer")
+                .put("actual", GenericTypes.class)
+                .put("a", "Hello")
+                .put("b", true)
+                .put("c", 42);
+        GenericTypes<String, Boolean, Integer> e = new GenericTypes<>();
+        e.setA("Hello").setB(true).setC(42);
+        expect(Expectation.build()
+                .actual(g.get("pojo"))
+                .isEqualTo(e));
+
+    }
+
+    @Test(groups = {"unit"})
+    public void pojoDSLClassString() {
+        Goate g = new Goate().put("pojo", "pojo::com.thegoate.expect.test.SimpleObject")
+                .put("a", "Hello")
+                .put("b", true)
+                .put("nested.no", "world");
+        SimpleObject e = new SimpleObject();
+        e.setA("Hello").setB(true).setNested(new NestedObject().setNo("world"));
+        expect(Expectation.build()
+                .actual(g.get("pojo"))
+                .isEqualTo(e));
+
     }
 }

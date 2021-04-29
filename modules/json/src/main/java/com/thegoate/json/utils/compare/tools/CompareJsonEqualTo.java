@@ -37,7 +37,7 @@ import org.json.JSONObject;
 @CompareUtil(operator = "==", type = JSONObject.class)
 public class CompareJsonEqualTo extends CompareJson {
 
-    Object expected = null;
+    protected Object expected = null;
 
     public CompareJsonEqualTo(Object actual) {
         super(actual);

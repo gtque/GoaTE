@@ -17,6 +17,9 @@ import com.thegoate.utils.compare.CompareUtility;
 public class Nanny implements HealthMonitor, TypeT {
 
 	@GoateIgnore
+	protected String equalityCheck = "==";
+
+	@GoateIgnore
 	private List<Class> goateType = new ArrayList<>();
 
 	@GoateIgnore
@@ -24,6 +27,10 @@ public class Nanny implements HealthMonitor, TypeT {
 
 	public void setGoateType(List<Class> type) {
 		this.goateType = type;
+	}
+	public Nanny equalityCheck(String check){
+		this.equalityCheck = check;
+		return this;
 	}
 
 	@Override
@@ -72,7 +79,7 @@ public class Nanny implements HealthMonitor, TypeT {
 					field.getValue().setAccessible(true);
 					Object actual = field.getValue().get(this);
 					Object expected = field.getValue().get(compare);
-					CompareUtility check = new Compare(actual).to(expected).using("==");
+					CompareUtility check = new Compare(actual).to(expected).using(equalityCheck);
 					if (!check.evaluate()) {
 						result = false;
 						String checkHealth = check.healthCheck().toString("\t\t", "", true);

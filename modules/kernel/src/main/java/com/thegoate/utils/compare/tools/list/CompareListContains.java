@@ -27,6 +27,7 @@
 package com.thegoate.utils.compare.tools.list;
 
 import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.tools.string.CompareStringTool;
 
@@ -38,7 +39,7 @@ import java.util.List;
  */
 @CompareUtil(operator = "contains", type = List.class)
 @IsDefault
-public class CompareListContains extends CompareStringTool {
+public class CompareListContains extends CompareTool {
     public CompareListContains(Object actual) {
         super(actual);
     }
@@ -47,5 +48,10 @@ public class CompareListContains extends CompareStringTool {
     public boolean evaluate() {
         List<?> act = (List)expected;
         return act.contains(actual);
+    }
+
+    @Override
+    public boolean isType(Object check) {
+        return check instanceof List;
     }
 }

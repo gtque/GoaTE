@@ -165,9 +165,9 @@ public class FillJson extends JsonUtil implements FillUtility {
                 if (value != null) {
                     if (value.equals("drop field::"))
                         drop.add("" + index);//jsonData.remove(key);
-                    else if (value.equals("empty field::"))
+                    else if (value.equals("empty field::")|value.equals("empty::"))
                         jsonArray.put(index, "");
-                    else if (value.equals("null field::"))
+                    else if (value.equals("null field::")|value.equals("null::"))
                         jsonArray.put(index, JSONObject.NULL);
                     else if (!value.equals(""))
                         jsonArray.put(index, value);

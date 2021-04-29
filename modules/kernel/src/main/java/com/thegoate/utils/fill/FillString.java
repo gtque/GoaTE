@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
  * Created by Eric Angeli on 5/5/2017.
  */
 @FillUtil
-@IsDefault
 public class FillString implements FillUtility{
     Goate health = new Goate();
     String fill = "";
