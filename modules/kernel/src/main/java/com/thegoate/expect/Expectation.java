@@ -223,7 +223,11 @@ public class Expectation {
         }
         if (name == null || name.isEmpty() || name.equals(actual)) {
             if (source != null) {
-                name = volume(source);
+                String prename = "actual:";
+                if(setFrom){
+                    prename = "from:";
+                }
+                name = prename + volume(source);
             }
         }
         return this;
@@ -673,7 +677,7 @@ public class Expectation {
         if (workerId instanceof String) {
             source = "" + workerId;
             String[] sourceInfo = source.split("#");//if the source does not define an id number, assume 0.
-            this.name = volume(sourceInfo[0]);
+//            this.name = volume(sourceInfo[0]);
             if (sourceInfo.length > 1) {
                 this.id = sourceInfo[1];
             } else {

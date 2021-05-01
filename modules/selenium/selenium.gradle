@@ -27,7 +27,7 @@
 import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
-    compile "org.seleniumhq.selenium:selenium-java:3.141.59"
-    compile d.depends(":kernel", project.internalVersion);
-    testCompile d.depends(":testng", project.internalVersion);
+    api  "org.seleniumhq.selenium:selenium-java:3.141.59"
+    api  d.depends(":kernel", project.internalVersion);
+    testImplementation d.depends(":testng", project.internalVersion);
 }

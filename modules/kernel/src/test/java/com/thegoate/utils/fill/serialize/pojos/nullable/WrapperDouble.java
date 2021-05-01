@@ -6,7 +6,7 @@ import com.thegoate.utils.fill.serialize.Kid;
 @GoatePojo
 public class WrapperDouble extends Kid {
 
-	private Double d;
+	private Double d = 42d;
 
 	public Double getD() {
 		return d;

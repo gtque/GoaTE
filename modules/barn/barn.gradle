@@ -27,9 +27,9 @@
 import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
-    compile d.depends(":kernel", project.internalVersion);
-    compile d.depends(":json", project.internalVersion);
-    compile d.depends(":rest", project.internalVersion);
-    compile d.depends(":testng", project.internalVersion);
-    testCompile d.depends(":restassured", project.internalVersion);
+    api  d.depends(":kernel", project.internalVersion);
+    api  d.depends(":json", project.internalVersion);
+    api  d.depends(":rest", project.internalVersion);
+    api  d.depends(":testng", project.internalVersion);
+    testImplementation d.depends(":restassured", project.internalVersion);
 }

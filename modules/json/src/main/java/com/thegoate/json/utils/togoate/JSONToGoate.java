@@ -75,7 +75,7 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
                 try{
                     takeActionOn = new JSONArray(""+takeActionOn);
                 }catch (Exception e){
-                    LOG.warn("Failed to convert the string to a JSONObject or JSONArray.\n"+e.getMessage());
+                    LOG.warn("Conjert JSON to Goate","Failed to convert the string to a JSONObject or JSONArray.\n"+e.getMessage());
                 }
             }
         }
@@ -86,7 +86,7 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
             }else if(takeActionOn instanceof JSONArray){
                 find((JSONArray) takeActionOn, "");
             }else{
-                LOG.warn("It does not appear as though the takeActionOn is json.");
+                LOG.warn("Conjert JSON to Goate","It does not appear as though the takeActionOn is json.");
             }
         }
         return result;
@@ -94,7 +94,7 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
 
     protected void put(Object o, String currentPath, String key){
         String id = currentPath+(currentPath.length()>0?".":"")+key;
-        result.put(id,o);
+        result.put(id,o == JSONObject.NULL ? "null::" : o);
         if(o instanceof JSONObject){
             find((JSONObject) o, id);
         }else if(o instanceof JSONArray){

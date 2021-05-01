@@ -26,7 +26,7 @@
  */
 package com.thegoate.rest.assured;
 
-import com.github.dzieciou.testing.curl.CurlLoggingRestAssuredConfigFactory;
+import com.github.dzieciou.testing.curl.CurlRestAssuredConfigFactory;
 import com.github.dzieciou.testing.curl.Options;
 import com.github.dzieciou.testing.curl.Platform;
 import com.thegoate.Goate;
@@ -90,7 +90,7 @@ public class RestAssured extends Rest implements RASpec {
         rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout * 1000));
         rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));
         Options options = Options.builder().targetPlatform(Platform.UNIX).build();
-        rac = CurlLoggingRestAssuredConfigFactory.updateConfig(rac, options);
+        rac = CurlRestAssuredConfigFactory.updateConfig(rac, options);
         return specification.config(rac);
     }
 

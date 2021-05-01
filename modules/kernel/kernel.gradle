@@ -27,10 +27,10 @@
 import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    compile "org.slf4j:slf4j-api:1.7.26"
-    compile "org.atteo.classindex:classindex:3.6"
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile d.depends(":json", project.internalVersion);
-    testCompile d.depends(":spreadsheets", project.internalVersion);
-//    testCompile d.depends(":xml", project.internalVersion);
+    api  "org.atteo.classindex:classindex:3.10"
+    api  "org.slf4j:slf4j-api:1.7.30"
+    testImplementation d.depends(":testng", project.internalVersion);
+    testImplementation d.depends(":json", project.internalVersion);
+    testImplementation d.depends(":spreadsheets", project.internalVersion);
+//    testImplementation d.depends(":xml", project.internalVersion);
 }

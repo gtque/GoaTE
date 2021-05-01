@@ -351,9 +351,19 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         sd.setValue(3.14159D);
         pojo2.setInnerDoubleField(sd);
         String jstring = "" + new Serializer<>(pojo2, Cheese.class).to(new JsonString());
+        String expected = "{\n" +
+                "   \"charles\": {\"yeager\": 3.14159},\n" +
+                "   \"chuck\": {\"bartowski\": 42}\n" +
+                "}";
         System.out.println(jstring);
-        assertEquals(new Get("chuck.bartowski").from(jstring), 42);
-        assertEquals(new Get("charles.yeager").from(jstring), 3.14159D);
+        expect(Expectation.build()
+                .actual(jstring)
+                .isEqualTo(expected));
+        LOG.debug("get from json: " + new Get("charles.yeager").from(jstring));
+        expect(Expectation.build().actual("chuck.bartowski").from(jstring).isEqualTo(42));
+        expect(Expectation.build().actual("charles.yeager").from(jstring).isEqualTo(3.14159D));
+//        assertEquals(new Get("charles.yeager").from(jstring), 3.14159D);
+        LOG.debug("place holder");
     }
 
     @Test(groups = {"unit"})
@@ -421,6 +431,17 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
+    public void doubleWrapperJSONNull() {
+        Goate g = new ToGoate("{\"d\":null}").convert();
+
+        WrapperDouble wrapper = new DeSerializer().data(g).build(WrapperDouble.class);
+        WrapperDouble ew = new WrapperDouble();
+        ew.setD(null);
+
+        expect(Expectation.build().actual(wrapper).isEqualTo(ew));
+    }
+
+    @Test(groups = {"unit"})
     public void doubleWrapperNullNotEqual() {
         Goate g = new Goate().put("d", "null::");
 
@@ -437,7 +458,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
 
         WrapperDouble wrapper = new DeSerializer().data(g).build(WrapperDouble.class);
         WrapperDouble ew = new WrapperDouble();
-
+        ew.setD(null);
         expect(Expectation.build().actual(wrapper).isEqualTo(ew));
     }
 
@@ -463,8 +484,8 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         ContentJA<Inside> ea = new ContentJA<>();
         ea.setContent(in);
         expect(Expectation.build()
-            .actual(root)
-            .isEqualTo(ea));
+                .actual(root)
+                .isEqualTo(ea));
     }
 
     @Test(groups = {"poc"})
@@ -478,8 +499,8 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         ContentJA<Inside> ea = new ContentJA<>();
         ea.setContent(in);
         expect(Expectation.build()
-            .actual(root)
-            .isEqualTo(ea));
+                .actual(root)
+                .isEqualTo(ea));
     }
 
 
@@ -544,4 +565,6 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
                 .isEqualTo(e));
 
     }
+
+
 }

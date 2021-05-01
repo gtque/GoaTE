@@ -27,14 +27,14 @@
 import com.thegoate.gradle.GoateDepends
 apply plugin: 'com.github.johnrengelman.shadow'
 dependencies{
-    compile gradleApi()
+    api  gradleApi()
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-//    compile d.depends(":kernel", project.internalVersion);
-    //compile d.depends(":ssh", project.internalVersion);
-    //compile d.depends(":xml", project.internalVersion);
-//    compile 'org.eclipse.jgit:org.eclipse.jgit:5.3.1.201904271842-r'
-    testCompile d.depends(":kernel", project.internalVersion);
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile 'com.google.inject:guice:4.1.0'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+//    api  d.depends(":kernel", project.internalVersion);
+    //api  d.depends(":ssh", project.internalVersion);
+    //api  d.depends(":xml", project.internalVersion);
+//    api  'org.eclipse.jgit:org.eclipse.jgit:5.3.1.201904271842-r'
+    testImplementation d.depends(":kernel", project.internalVersion);
+    testImplementation d.depends(":testng", project.internalVersion);
+    testImplementation 'com.google.inject:guice:5.0.1'
+    testImplementation 'org.mockito:mockito-all:1.10.19'
 }
