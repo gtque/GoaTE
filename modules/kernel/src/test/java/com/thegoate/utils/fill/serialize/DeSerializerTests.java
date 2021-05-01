@@ -34,6 +34,7 @@ import com.thegoate.expect.test.SimpleObject;
 import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.testng.TestNGEngineMethodDL;
+import com.thegoate.utils.fill.serialize.collections.ListType;
 import com.thegoate.utils.fill.serialize.nullable.primitive.NullableDouble;
 import com.thegoate.utils.fill.serialize.pojos.*;
 import com.thegoate.utils.fill.serialize.pojos.nullable.Wrapper;
@@ -450,6 +451,37 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
 
         expect(Expectation.build().actual(wrapper).isEqualTo(ew));
     }
+
+    @Test(groups = {"poc"})
+    public void jaRootWrappedInJsonObject() {
+        JSONArray jad = new JSONArray("[{\"a\":\"hello\"},{\"a\":\"world\"}]");
+        Goate ja = new ToGoate(new JSONObject().put("content", jad)).convert();
+        ContentJA<Inside> root = new DeSerializer().data(ja).T(Inside.class).build(ContentJA.class);
+        List<Inside> in = new ArrayList<>();
+        in.add(new Inside().setA("hello"));
+        in.add(new Inside().setA("world"));
+        ContentJA<Inside> ea = new ContentJA<>();
+        ea.setContent(in);
+        expect(Expectation.build()
+            .actual(root)
+            .isEqualTo(ea));
+    }
+
+    @Test(groups = {"poc"})
+    public void jaRoot() {
+        JSONArray jad = new JSONArray("[{\"a\":\"hello\"},{\"a\":\"world\"}]");
+        Goate ja = new ToGoate(jad).convert();
+        ContentJA<Inside> root = new DeSerializer().data(ja).T(Inside.class).from(Inside.class).build(ContentJA.class);
+        List<Inside> in = new ArrayList<>();
+        in.add(new Inside().setA("hello"));
+        in.add(new Inside().setA("world"));
+        ContentJA<Inside> ea = new ContentJA<>();
+        ea.setContent(in);
+        expect(Expectation.build()
+            .actual(root)
+            .isEqualTo(ea));
+    }
+
 
     @Test(groups = {"unit"})
     public void fillPojo() {
