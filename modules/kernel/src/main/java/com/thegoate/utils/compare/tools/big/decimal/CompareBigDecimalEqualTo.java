@@ -46,7 +46,7 @@ public class CompareBigDecimalEqualTo extends CompareBigDecimalTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = parseBigDecimal(actual).equals(parseBigDecimal(expected));
+            result = parseBigDecimal(actual).compareTo(parseBigDecimal(expected))==0;
         }catch(Exception e){
             result = tryExpectedType("==");
         }
