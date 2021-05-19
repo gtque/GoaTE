@@ -26,13 +26,19 @@
  */
 package com.thegoate.expect.builder;
 
+import com.thegoate.locate.Locate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+
 /**
  * Simple pojo to better couple the value and the from, aka containing object or employee.
  * Introduced to improve readability in defining expectations.
  */
 public class Value {
+    BleatBox LOG = BleatFactory.getLogger(getClass());
     Object locator;
     Object container;
+    boolean or = false;
 
     public Value(){}
 
@@ -57,13 +63,52 @@ public class Value {
     public Value get(Object locator){
         return find(locator);
     }
+
+    public Value orGet(Object locator){
+        or = true;
+        return find(locator);
+    }
+
+    public Value orFind(Object locator){
+        or = true;
+        return find(locator);
+    }
+
     /**
      * The "locator" or value to store.
      * @param locator the locator or value
      * @return self
      */
     public Value find(Object locator){
-        this.locator = locator;
+        Object locate = locator;
+        if(locator != null && locator instanceof Locate){
+            locate = ((Locate)locator).toPath();
+        }
+        boolean appendLocate = true;
+        if(or){
+            if(this.locator != null && this.locator instanceof String && !((String)this.locator).isEmpty()) {
+                if(locate != null && locate instanceof String) {
+                    this.locator = ""+this.locator + "||";
+                } else {
+                    LOG.debug("You can't use or for non-String locators: " + locate.getClass());
+                    appendLocate = false;
+                }
+            } else {
+                if(this.locator == null) {
+                    this.locator = "";
+                } else if(!(this.locator instanceof String)) {
+                    LOG.debug("locator is already not a string: " + this.locator.getClass() + ", you can't use or on non-String locators.");
+                    appendLocate = false;
+                }
+            }
+        }
+        if(or){
+            if(appendLocate) {
+                this.locator = ""+this.locator+locate;
+            }
+        } else {
+            this.locator = locate;
+        }
         return this;
     }
 

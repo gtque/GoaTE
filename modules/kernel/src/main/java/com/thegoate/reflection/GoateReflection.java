@@ -392,7 +392,9 @@ public class GoateReflection {
 				}
 			}
 		} else {
-			klass = o.getClass();
+			if(isPrimitive(o.getClass()) || o instanceof Number) {
+				klass = o.getClass();
+			}
 		}
 		return klass;
 	}

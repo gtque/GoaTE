@@ -39,6 +39,7 @@ import com.thegoate.locate.Locate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.Executioner;
+import com.thegoate.reflection.GoateReflection;
 import com.thegoate.staff.Employee;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.fill.serialize.DeSerializer;
@@ -62,6 +63,7 @@ import static com.thegoate.logging.volume.VolumeKnob.volume;
 public class Expectation {
 
     public final static String EmployeeWorkResult = GOATE_VARIABLE_PREFIX + "Employee Work Result";
+    public final static String OR = "||";
 
     public Validate getValidator() {
         return validator;
@@ -150,9 +152,11 @@ public class Expectation {
     private long retryTimeout = -42L;
     private long retryPeriod = -42L;
     private final Object synchro = new Object();
+    private StackTraceElement[] stack;
 
     public Expectation(Goate data) {
         this.data = data;
+        stackTrace(new Throwable().getStackTrace());
     }
 
     public static Expectation build() {
@@ -163,11 +167,16 @@ public class Expectation {
         if (data == null) {
             data = new Goate();
         }
+        StackTraceElement[] stack = new Throwable().getStackTrace();
         return new Expectation(data);
     }
 
+    public Expectation stackTrace(StackTraceElement[] stack){
+        this.stack = stack;
+        return this;
+    }
     public String fullName() {
-        return name + "#" + id + (expectedName.isEmpty() ? "" : "::" + expectedName) + (validator == null ? "" : "::" + validator.getName());
+        return name + "#" + id + (from != null ? "-" + from.hashCode() : "") + (expectedName.isEmpty() ? "" : "::" + expectedName) + (validator == null ? "" : "::" + validator.getName());
     }
 
     public String id() {
@@ -224,7 +233,7 @@ public class Expectation {
         if (name == null || name.isEmpty() || name.equals(actual)) {
             if (source != null) {
                 String prename = "actual:";
-                if(setFrom){
+                if (setFrom) {
                     prename = "from:";
                 }
                 name = prename + volume(source);
@@ -269,6 +278,7 @@ public class Expectation {
         actual = null;
         operator = "";
         expected = null;
+        stackTrace(new Throwable().getStackTrace());
         return this;
     }
 
@@ -405,13 +415,21 @@ public class Expectation {
             expected = ((Locate) expected).toPath();
         }
         this.expected = expected;
+        if ((new GoateReflection().isPrimitiveOrNumerical(expected) || expected instanceof String) && expectedName.isEmpty()) {
+            expectedName = "" + expected;
+        }
         simpleState += "c";
         checkState(false);
         return this;
     }
 
-    public Expectation includeExtras(){
+    public Expectation includeExtras() {
         includeExtras = true;
+        return this;
+    }
+
+    public Expectation setId(String id) {
+        this.id = id;
         return this;
     }
 
@@ -425,6 +443,8 @@ public class Expectation {
                 exp.put("expected", expected);
                 exp.put("from", from);
                 exp.put("failure message", failureMessage);
+                exp.put("stack", stack);
+
                 if (includeExtras) {
                     Goate extras = new Goate();
                     extras.put("zeroOrMore", zeroOrMore);
@@ -438,6 +458,7 @@ public class Expectation {
                 simpleState = "";
                 failureMessage = null;
                 clearedState = key;
+                stack = null;
             }
         } else {
             clearedState = null;

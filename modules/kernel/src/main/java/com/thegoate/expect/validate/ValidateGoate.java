@@ -85,6 +85,10 @@ public class ValidateGoate extends Validate{
         if (filteredData.size() == 0) {
             if (exp.get("actual") instanceof String && (((String) exp.get("actual")).equalsIgnoreCase("return") || ((String) exp.get("actual")).equalsIgnoreCase(EmployeeWorkResult))) {
                 filteredData.put("" + exp.get("actual"), fromData);
+            } else {
+                if(!ofp.contains("+") && !(ofp.contains("*"))) {
+                    filteredData.put("" + exp.get("actual"), new NotFound("" + exp.get("actual")));
+                }
             }
         }
         if(!evalComparisons(filteredData, filterExtra)){

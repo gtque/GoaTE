@@ -43,6 +43,7 @@
 <!--  <logger name="com.thegoate.utils.GoateUtils" level="DEBUG"/>-->
   <logger name="com.thegoate.reflection.GoateReflection" level="INFO"/>
   <!--<logger name="com.thegoate.json.logging.volume.JsonAmplifier" level="ERROR"/>-->
+  <logger name="com.thegoate.expect.amp.StackTraceAmplifier" level="INFO"/>
   <logger name="curl" level="DEBUG"/>
   <root level="INFO">
     <appender-ref ref="stdout"/>

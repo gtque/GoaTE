@@ -38,7 +38,7 @@ import java.util.List;
  * Created by Eric Angeli on 4/17/2018.
  */
 @CompareUtil(operator = "contains", type = List.class)
-@IsDefault
+@IsDefault(forType = true)
 public class CompareListContains extends CompareTool {
     public CompareListContains(Object actual) {
         super(actual);

@@ -95,7 +95,9 @@ public class ExpectationThreadBuilder {
         for(Expectation expectation:expectations){
             if(map.containsKey(expectation.fullName())){
                 Expectation expTemp = map.get(expectation.fullName()).getExpectation();
-                expTemp.addNewExpectation().add(expectation);
+                if(expTemp.getFrom()!=null&&expTemp.getFrom().equals(expectation.getFrom())) {
+                    expTemp.addNewExpectation().add(expectation);
+                }
             }else{
                 ExpectThreadExecuter et = new ExpectThreadExecuter(expectation.setData(data).period(period-1)).timeout(timeoutMS).period(period);
                 map.put(expectation.fullName(), et);

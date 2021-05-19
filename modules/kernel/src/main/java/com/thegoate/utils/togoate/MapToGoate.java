@@ -1,23 +1,23 @@
 package com.thegoate.utils.togoate;
 
-import java.util.Arrays;
-
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.Utility;
 import com.thegoate.utils.fill.serialize.Serializer;
 
+import java.util.Arrays;
+import java.util.Map;
+
 /**
- * Converts the given object to a goate collection.
+ * Converts the given map to a goate collection.
  * If a string, assumes it is in a semicolon separated list of key=value pairs.
  * Otherwise it will attempt to serialize it to a Goate collection using the default source.
  */
 @ToGoateUtil()
-@IsDefault
-public class ObjectToGoate implements ToGoateUtility {
+public class MapToGoate implements ToGoateUtility {
 	Object takeActionOn;
 
-	public ObjectToGoate(Object val) {
+	public MapToGoate(Object val) {
 		takeActionOn = val;
 	}
 
@@ -33,7 +33,7 @@ public class ObjectToGoate implements ToGoateUtility {
 
 	@Override
 	public boolean isType(Object check) {
-		return true;
+		return check instanceof Map;
 	}
 
 	@Override
@@ -46,10 +46,14 @@ public class ObjectToGoate implements ToGoateUtility {
 		Goate goate = new Goate();
 
 		if(takeActionOn != null){
-			if(takeActionOn instanceof String) {
-				goate = processString(goate, ""+takeActionOn);
-			} else {
-				goate = new Serializer(takeActionOn, takeActionOn.getClass()).toGoate();
+			Map map = (Map) takeActionOn;
+			for(Object key:map.keySet()){
+				Object val = map.get(key);
+				if(val!=null) {
+					goate.put("" + key, val);
+				} else {
+					goate.put("" + key, "null::");
+				}
 			}
 		}
 		return goate;

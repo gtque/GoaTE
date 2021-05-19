@@ -28,6 +28,7 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.utils.togoate.ToGoate;
@@ -37,6 +38,8 @@ import com.thegoate.utils.togoate.ToGoate;
  * Created by gtque on 4/21/2021.
  */
 @GoateDSL(word = "toGoate")
+@GoateDescription(description = "Builds a goate object from based on the given parameter. You can specify a semicolon list of key=value pairs to build new goate collection from a string.",
+        parameters = {"the thing to build a goate collection from."})
 public class ToGoateDSL extends DSL {
     public ToGoateDSL(Object value) {
         super(value);

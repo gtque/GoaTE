@@ -22,6 +22,7 @@ public class ZeroOrMoreAmplifier extends StatusAmplifier {
         if (p.get("failure message", null) == null) {
             p.drop("failure message");
         }
+        p.drop("stack");
     }
 
     @Override

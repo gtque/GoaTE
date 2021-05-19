@@ -169,7 +169,7 @@ public abstract class Validate extends Thread {
         running = true;
         try {
             result = true;
-            if (!check(getExp(), getKey(), (Goate) getRtrn())) {
+            if (!doCheck(getExp(), getKey(), (Goate) getRtrn())) {
                 result = false;
                 if (getKey().contains("*")) {
                     fails.add(getExp());
@@ -254,6 +254,24 @@ public abstract class Validate extends Thread {
         return ic;
     }
 
+    private boolean doCheck(Goate exp, String key, Goate fromData) {
+        boolean result = true;
+        String actual = ""+exp.get("actual");
+        if(actual.contains("||")){
+            for(String act:actual.split("\\|\\|")) {
+                result = false;
+                Goate exp2 = new Goate().merge(exp, false);
+                exp2.put("actual", act);
+                if(check(exp2, key, fromData)){
+                    result = true;
+                    break;
+                }
+            }
+        } else {
+            result = check(exp, key, fromData);
+        }
+        return result;
+    }
     protected abstract boolean check(Goate exp, String key, Goate fromData);
 
     /**

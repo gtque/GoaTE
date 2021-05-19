@@ -29,17 +29,17 @@ public abstract class StatusAmplifier extends BasicAmplifier {
         level = LOG.level();
     }
 
-    public StatusAmplifier muteFrom(boolean mute){
+    public StatusAmplifier muteFrom(boolean mute) {
         this.mute = mute;
         return this;
     }
 
-    public StatusAmplifier testName(String test){
+    public StatusAmplifier testName(String test) {
         this.test = test;
         return this;
     }
 
-    protected void logVolume(Goate p){
+    protected void logVolume(Goate p) {
         if (eut("expect.scenario", false, Boolean.class)) {
             p.put("_scenario", test);
         }
@@ -47,20 +47,24 @@ public abstract class StatusAmplifier extends BasicAmplifier {
             p.drop("from");
             p.drop("fromExpected");
         }
-        if (level.isLoudEnough(Level.SEVERE)){
+        if (level.isLoudEnough(Level.SEVERE)) {
             p.drop("actual");
             p.drop("expected");
         }
-        if(p.get("actual")!=null && p.get("actual") instanceof String){
-            if(p.get("actual", "", String.class).equals(p.get("from"))){
+        //StackTrace amplifier has to be controlled by the log level of the stack trace amplifier, not the status amplifier.
+        if (BleatFactory.getLogger(StackTraceAmplifier.class).level().isLoudEnough(Level.INFO)) {
+            p.drop("stack");
+        }
+        if (p.get("actual") != null && p.get("actual") instanceof String) {
+            if (p.get("actual", "", String.class).equals(p.get("from"))) {
                 p.drop("from");
             }
-            p.put("actual", p.get("actual","", String.class).replace(GOATE_VARIABLE_PREFIX, ""));
+            p.put("actual", p.get("actual", "", String.class).replace(GOATE_VARIABLE_PREFIX, ""));
         }
     }
 
     @Override
-    public String amplify(Object message){
+    public String amplify(Object message) {
         ev = (ExpectEvaluator) message;
         setStatus();
         return amplify();
@@ -75,7 +79,7 @@ public abstract class StatusAmplifier extends BasicAmplifier {
             ps.append(expectSeparator);
             ps.append(p.toString("\t", ""));
         }
-        if(ps.length()>0){
+        if (ps.length() > 0) {
             ps.append(expectSeparator);
         }
         return ps.toString();
