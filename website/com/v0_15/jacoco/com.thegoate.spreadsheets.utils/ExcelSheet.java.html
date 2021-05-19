@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ExcelSheet.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.spreadsheets.utils</a> &gt; <span class="el_source">ExcelSheet.java</span></div><h1>ExcelSheet.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.spreadsheets.utils;
+
+import com.thegoate.Goate;
+import com.thegoate.utils.GoateUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * Provides support for excel files (xls and xlsx)
+ * Created by Eric Angeli on 9/14/2017.
+ */
+@GoateSheet(fileTypes = {&quot;xls&quot;, &quot;xlsx&quot;})
+<span class="fc" id="L48">public class ExcelSheet extends SheetUtils {</span>
+<span class="fc" id="L49">    XSSFSheet sheet = null;</span>
+<span class="fc" id="L50">    XSSFWorkbook workbook = null;</span>
+<span class="fc" id="L51">    FileInputStream in = null;</span>
+
+    public int rowCount(){
+<span class="fc" id="L54">        int rowCount = 0;</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        if(sheet !=null){</span>
+<span class="fc" id="L56">            rowCount = sheet.getLastRowNum();</span>
+        }
+<span class="fc" id="L58">        return rowCount;</span>
+    }
+
+    @Override
+    public Goate load() {
+<span class="fc" id="L63">        data = new Goate();</span>
+<span class="fc" id="L64">        Goate sheetData = new Goate();</span>
+<span class="fc" id="L65">        sheet = loadSheet();</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (sheet == null) {</span>
+<span class="nc" id="L67">            LOG.warn(&quot;could not load the sheet: &quot; + sheetName);</span>
+        } else {
+<span class="fc" id="L69">            Iterator&lt;Row&gt; rowIterator = sheet.iterator();</span>
+<span class="fc" id="L70">            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();</span>
+<span class="fc" id="L71">            boolean headersFound = false;</span>
+<span class="fc" id="L72">            int rowIndex = 0;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">            while (rowIterator.hasNext()) {</span>
+<span class="fc" id="L74">                Goate theRow = new Goate();</span>
+<span class="fc" id="L75">                Row row = rowIterator.next();</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                if (row.getRowNum() != rowIndex) {</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">                    if(loadAllData){</span>
+<span class="fc" id="L78">                        rowIndex = row.getRowNum();</span>
+                    }else {
+                        break;
+                    }
+                }
+<span class="fc" id="L83">                Iterator&lt;Cell&gt; col = row.cellIterator();</span>
+<span class="fc" id="L84">                List&lt;String&gt; headerList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">                while (col.hasNext()) {</span>
+<span class="fc" id="L86">                    Cell cell = col.next();</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                    if (cell != null) {</span>
+<span class="fc" id="L88">                        CellValue cellValue = evaluator.evaluate(cell);</span>
+<span class="fc" id="L89">                        String value = cellValue.formatAsString().replace(&quot;\&quot;&quot;, &quot;&quot;);</span>
+<span class="fc bfc" id="L90" title="All 4 branches covered.">                        if (firstRowIsHeader &amp;&amp; !headersFound) {</span>
+<span class="fc" id="L91">                            headerList.add(&quot;&quot; + value);</span>
+                        } else {
+<span class="fc" id="L93">                            String id = &quot;&quot; + cell.getColumnIndex();</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">                            if (firstRowIsHeader) {</span>
+<span class="fc" id="L95">                                int colId = Integer.parseInt(id);</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">                                if (colId &lt; headers.get(sheetName).size()) {</span>
+<span class="fc" id="L97">                                    id = headers.get(sheetName).get(colId);</span>
+                                } else {
+<span class="nc" id="L99">                                    value = null;</span>
+                                }
+                            }
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">                            if (value != null) {</span>
+<span class="fc" id="L103">                                theRow.put(id, value);</span>
+                            }
+                        }
+                    }
+<span class="fc" id="L107">                }</span>
+<span class="fc bfc" id="L108" title="All 4 branches covered.">                if (headersFound || !firstRowIsHeader) {</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">                    sheetData.put(&quot;&quot; + (firstRowIsHeader ? rowIndex - 1 : rowIndex), theRow);</span>
+                } else {
+<span class="fc" id="L111">                    headers.put(sheetName, headerList);</span>
+                }
+<span class="fc" id="L113">                rowIndex++;</span>
+<span class="fc" id="L114">                headersFound = true;</span>
+<span class="fc" id="L115">            }</span>
+<span class="fc" id="L116">            data.put(sheetName, sheetData);</span>
+        }
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">        if(in != null){</span>
+            try {
+<span class="fc" id="L120">                in.close();</span>
+<span class="nc" id="L121">            }catch(Exception e){</span>
+<span class="nc" id="L122">                LOG.info(&quot;Excel Sheet&quot;, &quot;Problem closing input stream: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L123">            }</span>
+        }
+<span class="fc" id="L125">        return data;</span>
+    }
+
+    private XSSFSheet loadSheet() {
+<span class="fc" id="L129">        sheet = null;</span>
+        try {
+<span class="fc" id="L131">            File file = new File(GoateUtils.getFilePath(fileName));</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">            if (file.exists()) {</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">                if(in!=null){</span>
+<span class="fc" id="L134">                    in.close();</span>
+                }
+<span class="fc" id="L136">                in = new FileInputStream(file);</span>
+<span class="fc" id="L137">                workbook = new XSSFWorkbook(in);</span>
+<span class="fc" id="L138">                sheet = workbook.getSheet(sheetName);</span>
+            }
+<span class="nc" id="L140">        } catch (IOException ioe) {</span>
+<span class="nc" id="L141">            LOG.error(&quot;The file (&quot; + fileName + &quot;) could not be found: &quot; + ioe.getMessage(), ioe);</span>
+<span class="fc" id="L142">        }</span>
+<span class="fc" id="L143">        return sheet;</span>
+    }
+
+    @Override
+    public SheetUtils createNew() {
+<span class="fc" id="L148">        workbook = new XSSFWorkbook();</span>
+<span class="fc" id="L149">        data = new Goate();</span>
+<span class="fc" id="L150">        return this;</span>
+    }
+
+    @Override
+    public SheetUtils writeToFile() {
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (workbook != null) {</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">            for (String pageName : data.keys()) {</span>
+<span class="fc" id="L157">                Sheet page = workbook.getSheet(pageName);</span>
+<span class="fc" id="L158">                Goate pageData = data.get(pageName, null, Goate.class);</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">                if(page==null){</span>
+<span class="fc" id="L160">                    page = workbook.createSheet(pageName);</span>
+                }
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">                if(pageData!=null) {</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">                    for(String rowId:pageData.keys()) {</span>
+<span class="fc" id="L164">                        Goate rowData = pageData.get(rowId, null, Goate.class);</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">                        if(rowData!=null) {</span>
+<span class="fc" id="L166">                            int rowI = Integer.parseInt(rowId);</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">                            if (firstRowIsHeader) {</span>
+<span class="fc" id="L168">                                rowI++;</span>
+                            }
+<span class="fc" id="L170">                            Row row = page.getRow(rowI);</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">                            if (row == null) {</span>
+<span class="fc" id="L172">                                row = page.createRow(rowI);</span>
+                            }
+<span class="fc bfc" id="L174" title="All 2 branches covered.">                            for(String colId:rowData.keys()){</span>
+<span class="fc" id="L175">                                int colI = -42;</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">                                if(firstRowIsHeader){</span>
+<span class="fc" id="L177">                                    colI = findColIndex(headers.get(pageName),colId);</span>
+                                } else {
+<span class="nc" id="L179">                                    colI = Integer.parseInt(colId);</span>
+                                }
+<span class="fc" id="L181">                                Cell cell = row.getCell(colI);</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">                                if(cell==null){</span>
+<span class="fc" id="L183">                                    cell = row.createCell(colI);</span>
+                                }
+<span class="fc" id="L185">                                cell.setCellValue(&quot;&quot;+rowData.get(colId));</span>
+<span class="fc" id="L186">                            }</span>
+                        }
+
+<span class="fc" id="L189">                    }</span>
+                }
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">                if(firstRowIsHeader){</span>
+<span class="fc" id="L192">                    List&lt;String&gt; headerList = headers.get(pageName);</span>
+<span class="fc" id="L193">                    Row headerRow = page.getRow(0);</span>
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">                    if(headerRow == null){</span>
+<span class="fc" id="L195">                        headerRow = page.createRow(0);</span>
+                    }
+<span class="fc bfc" id="L197" title="All 2 branches covered.">                    for(int i=0;i&lt;headerList.size();i++){</span>
+<span class="fc" id="L198">                        Cell cell = headerRow.getCell(i);</span>
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">                        if(cell == null){</span>
+<span class="fc" id="L200">                            cell = headerRow.createCell(i);</span>
+                        }
+<span class="fc" id="L202">                        cell.setCellValue(&quot;&quot;+headerList.get(i));</span>
+                    }
+                }
+<span class="fc" id="L205">            }</span>
+            try {
+<span class="fc" id="L207">                File destFile = new File(fileName);</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">                if (destFile.getParentFile().mkdirs())</span>
+<span class="nc" id="L209">                    LOG.debug(&quot;directory did not exist, had to make it.&quot;);</span>
+<span class="fc" id="L210">                FileOutputStream fileOut = new FileOutputStream(fileName);</span>
+<span class="fc" id="L211">                workbook.write(fileOut);</span>
+<span class="fc" id="L212">                fileOut.close();</span>
+<span class="nc" id="L213">            } catch (IOException e) {</span>
+<span class="nc" id="L214">                LOG.error(&quot;Save Excel File&quot;, &quot;Failed to save excel to a file: &quot;+ fileName+&quot;\n&quot;+e.getMessage());</span>
+<span class="nc" id="L215">                e.printStackTrace();</span>
+<span class="fc" id="L216">            }</span>
+        }
+<span class="fc" id="L218">        return this;</span>
+    }
+
+    protected int findColIndex(List&lt;String&gt; headerList, String header){
+<span class="fc" id="L222">        int col = 0;</span>
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">        if(headerList!=null){</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">            for(int i=0; i&lt;headerList.size(); i++){</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">                if(headerList.get(i).equals(header)){</span>
+<span class="fc" id="L226">                    col = i;</span>
+<span class="fc" id="L227">                    break;</span>
+                }
+            }
+        }
+<span class="fc" id="L231">        return col;</span>
+    }
+
+    @Override
+    public SheetUtils close(){
+<span class="pc bpc" id="L236" title="1 of 2 branches missed.">        if(workbook!=null){</span>
+            try {
+<span class="fc" id="L238">                workbook.close();</span>
+<span class="nc" id="L239">            }catch (IOException ioe){</span>
+<span class="nc" id="L240">                LOG.debug(&quot;Excel Close&quot;, &quot;Problem closing workbook: &quot; + ioe.getMessage(), ioe);</span>
+<span class="fc" id="L241">            }</span>
+        }
+<span class="fc bfc" id="L243" title="All 2 branches covered.">        if(in != null){</span>
+            try {
+<span class="fc" id="L245">                in.close();</span>
+<span class="nc" id="L246">            } catch (IOException e) {</span>
+<span class="nc" id="L247">                LOG.debug(&quot;Excel&quot;, &quot;Failed to close input stream: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L248">            }</span>
+        }
+<span class="fc" id="L250">        return this;</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

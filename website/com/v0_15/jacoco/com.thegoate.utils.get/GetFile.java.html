@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GetFile.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.utils.get</a> &gt; <span class="el_source">GetFile.java</span></div><h1>GetFile.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.utils.get;
+
+import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.type.IsType;
+import com.thegoate.utils.type.TypeUtility;
+
+import java.io.File;
+import java.nio.file.Paths;
+
+/**
+ * Loads the file specified in from into a file and returns it.
+ * Created by Eric Angeli on 5/5/2017.
+ */
+@IsType
+@GetUtil(type = GetFile.class)
+public class GetFile extends GetTool implements TypeUtility {
+<span class="pc" id="L44">    boolean explode = false;</span>
+<span class="pc" id="L45">    boolean overwrite = false;</span>
+
+    public GetFile(){
+<span class="nc" id="L48">        super(&quot;fileIO::&quot;);</span>
+<span class="nc" id="L49">    }</span>
+
+    public GetFile(Object selector) {
+<span class="fc" id="L52">        super(selector);</span>
+<span class="fc" id="L53">    }</span>
+
+    @Override
+    public boolean isType(Object check) {
+<span class="fc" id="L57">        return (&quot;&quot;+check).equalsIgnoreCase(&quot;fileIO::&quot;);</span>
+    }
+
+    public GetFile explode(){
+<span class="fc" id="L61">        this.explode = true;</span>
+<span class="fc" id="L62">        return this;</span>
+    }
+
+    public GetFile overwrite(){
+<span class="nc" id="L66">        this.overwrite = true;</span>
+<span class="nc" id="L67">        return this;</span>
+    }
+    @Override
+    public Object from(Object container) {
+<span class="fc" id="L71">        Object result = null;</span>
+<span class="fc" id="L72">        String file = &quot;&quot; + selector;</span>
+
+<span class="pc bpc" id="L74" title="2 of 4 branches missed.">        if (!file.equals(&quot;&quot;) &amp;&amp; !file.equalsIgnoreCase(&quot;null&quot;)) {</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">            String fullPath = GoateUtils.getFilePath(file, !explode, overwrite);</span>
+            try {
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">                if (fullPath.contains(&quot;:&quot;)) {</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                    if (fullPath.indexOf(&quot;/&quot;) == 0) {</span>
+<span class="nc" id="L79">                        fullPath = fullPath.substring(1);</span>
+                    }
+                }
+<span class="fc" id="L82">                result = new File(Paths.get(fullPath).toUri());</span>
+<span class="nc" id="L83">            } catch (Exception e) {</span>
+<span class="nc" id="L84">                LOG.error(&quot;Problem loading file into a string: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L85">            }</span>
+        }
+<span class="fc" id="L87">        return result;</span>
+    }
+
+    @Override
+    public Class type(Object check) {
+<span class="nc" id="L92">        return getClass();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

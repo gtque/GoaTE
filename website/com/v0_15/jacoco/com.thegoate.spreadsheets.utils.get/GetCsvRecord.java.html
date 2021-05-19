@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GetCsvRecord.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.spreadsheets.utils.get</a> &gt; <span class="el_source">GetCsvRecord.java</span></div><h1>GetCsvRecord.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.spreadsheets.utils.get;
+
+import com.thegoate.spreadsheets.csv.CSVRecord;
+import com.thegoate.spreadsheets.utils.CsvRecordUtil;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.GetUtil;
+import com.thegoate.utils.get.GetUtility;
+
+/**
+ * Get the field from the given json.
+ * Created by Eric Angeli on 5/19/2017.
+ */
+@GetUtil(type = CSVRecord.class)
+public class GetCsvRecord extends CsvRecordUtil implements GetUtility {
+
+    public GetCsvRecord(Object val) {
+<span class="fc" id="L43">        super(val);</span>
+<span class="fc" id="L44">    }</span>
+
+    /**
+     * Helpful definitions of what can be accessed from a csv row.
+     */
+<span class="nc" id="L49">    public static class row {</span>
+<span class="nc" id="L50">        public static String colCount = &quot;colCount&quot;;</span>
+        public static String getColumn(String header){
+<span class="nc" id="L52">            return header;</span>
+        }
+        public static String getColumn(int columnNumber){
+<span class="nc" id="L55">            return &quot;&quot;+columnNumber;</span>
+        }
+    }
+
+    @Override
+    protected Object processNested(Object subContainer) {
+<span class="nc" id="L61">        Object result = subContainer;</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (nested != null) {</span>
+<span class="nc" id="L63">            result = new Get(nested).from(subContainer);</span>
+        }
+<span class="nc" id="L65">        return result;</span>
+    }
+
+    @Override
+    public Object from(Object container) {
+<span class="nc" id="L70">        Object result = null;</span>
+<span class="nc" id="L71">        String selector = &quot;&quot; + takeActionOn;</span>
+<span class="nc" id="L72">        CSVRecord csv = (CSVRecord) container;</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (selector.startsWith(&quot;colCount&quot;)) {</span>
+<span class="nc" id="L74">            result = csv.size();</span>
+        } else {
+            try{
+<span class="nc" id="L77">                int colNumber = Integer.parseInt(selector);</span>
+<span class="nc" id="L78">                result = csv.get(colNumber);</span>
+<span class="nc" id="L79">            }catch(Exception e){</span>
+                try {
+<span class="nc" id="L81">                    result = csv.get(selector);</span>
+<span class="nc" id="L82">                }catch(Exception e2){</span>
+<span class="nc" id="L83">                    LOG.debug(&quot;Get CSV Record&quot;, &quot;Failed to get &quot; + selector + &quot;: &quot; + e.getMessage(), e2);</span>
+<span class="nc" id="L84">                }</span>
+<span class="nc" id="L85">            }</span>
+        }
+<span class="nc" id="L87">        result = processNested(result);</span>
+<span class="nc" id="L88">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

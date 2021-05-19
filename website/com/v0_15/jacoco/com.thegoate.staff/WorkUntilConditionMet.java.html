@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>WorkUntilConditionMet.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.staff</a> &gt; <span class="el_source">WorkUntilConditionMet.java</span></div><h1>WorkUntilConditionMet.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.staff;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.Expectation;
+import com.thegoate.expect.ExpectationThreadBuilder;
+import com.thegoate.utils.togoate.ToGoate;
+
+/**
+ * Runs the job until either the timeout has lapsed
+ * or the condition(s) are met.
+ * Created by Eric Angeli on 9/7/2018.
+ */
+@GoateJob(jobs = {&quot;work until&quot;})
+@GoateDescription(description = &quot;Run the defined job until the condition is met or it timesout. The default time out is 15 seconds.&quot;,
+        parameters = {&quot;timeout = the timeout duration in milliseconds, defaults to 15000, set a negative time to enver timeout.&quot;,
+                &quot;period = the period in milliseconds at which to re-run the job, defaults to 1000&quot;,
+                &quot;work = the definition of the job to execute&quot;,
+                &quot;return last = true/false to always return the last result, if false returns null, defaults to false&quot;,
+                &quot;expect = the array, [], of conditions/expectations that should be met to consider the job completed.&quot;,
+                &quot;timeout_expect = the timeout in milliseconds for the expected conditions to be checked, defaults to 50mS, optional and not usually needed&quot;,
+                &quot;period_expect = the period in milliseconds at which to check the expected condtions, defaults to 50mS, optional and not usually needed&quot;})
+<span class="fc" id="L50">public class WorkUntilConditionMet extends Employee {</span>
+
+    private Employee actualJob;
+<span class="fc" id="L53">    private Long timeout = 15000L;</span>
+<span class="fc" id="L54">    private Long period = 1000L;</span>
+<span class="fc" id="L55">    private boolean lastReturn = false;</span>
+
+    public WorkUntilConditionMet returnLast(){
+<span class="nc" id="L58">        lastReturn = true;</span>
+<span class="nc" id="L59">        definition.put(&quot;return last&quot;, lastReturn);</span>
+<span class="nc" id="L60">        return this;</span>
+    }
+
+    public WorkUntilConditionMet job(String job){
+<span class="nc" id="L64">        return setJob(job);</span>
+    }
+
+    public WorkUntilConditionMet job(Employee job){
+<span class="nc" id="L68">        return setJob(job);</span>
+    }
+
+    private WorkUntilConditionMet setJob(Object job){
+<span class="nc" id="L72">        Goate work = definition.get(&quot;work&quot;, new Goate(), Goate.class);</span>
+<span class="nc" id="L73">        work.put(&quot;job&quot;, job);</span>
+<span class="nc" id="L74">        return this;</span>
+    }
+
+    public WorkUntilConditionMet expect(Expectation expectation){
+<span class="nc" id="L78">        Goate expect = definition.get(&quot;expect&quot;, new Goate(), Goate.class);</span>
+<span class="nc" id="L79">        expect.put(&quot;&quot;+expect.size(), expectation);</span>
+<span class="nc" id="L80">        return this;</span>
+    }
+
+    public WorkUntilConditionMet expectTimeout(long timeoutMS){
+<span class="nc" id="L84">        definition.put(&quot;timeout_expect&quot;, timeoutMS);</span>
+<span class="nc" id="L85">        return this;</span>
+    }
+
+    public WorkUntilConditionMet expectPeriod(long periodMS){
+<span class="nc" id="L89">        definition.put(&quot;period_expect&quot;, periodMS);</span>
+<span class="nc" id="L90">        return this;</span>
+    }
+
+    public WorkUntilConditionMet period(long periodMS){
+<span class="nc" id="L94">        super.period(periodMS);</span>
+<span class="nc" id="L95">        definition.put(&quot;period&quot;, period);</span>
+<span class="nc" id="L96">        return this;</span>
+    }
+
+    public WorkUntilConditionMet timeout(long timeoutMS){
+<span class="nc" id="L100">        definition.put(&quot;timeout&quot;, timeoutMS);</span>
+<span class="nc" id="L101">        return this;</span>
+    }
+
+    @Override
+    public String[] detailedScrub() {
+<span class="fc" id="L106">        return new String[]{&quot;timeout&quot;, &quot;work&quot;, &quot;expect&quot;};</span>
+    }
+
+    @Override
+    public Employee init() {
+<span class="fc" id="L111">        Goate actualJobDefinition = new ToGoate(definition.get(&quot;work&quot;, new Goate())).convert();</span>
+<span class="fc" id="L112">        timeout = Long.parseLong(&quot;&quot; + definition.get(&quot;timeout&quot;, timeout));</span>
+<span class="fc" id="L113">        period = Long.parseLong(&quot;&quot; + definition.get(&quot;period&quot;, period));</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if(actualJobDefinition.get(&quot;job&quot;) instanceof Employee){</span>
+<span class="nc" id="L115">            actualJob = (Employee)actualJobDefinition.get(&quot;job&quot;);</span>
+        } else {
+<span class="fc" id="L117">            actualJob = recruit(&quot;&quot; + actualJobDefinition.get(&quot;job&quot;), actualJobDefinition, data);</span>
+        }
+<span class="fc" id="L119">        lastReturn = Boolean.parseBoolean(&quot;&quot;+definition.get(&quot;return last&quot;, lastReturn));</span>
+<span class="fc" id="L120">        return this;</span>
+    }
+
+    @Override
+    protected Object doWork() {
+<span class="fc" id="L125">        Object result = null;</span>
+<span class="fc" id="L126">        boolean conditionsMet = false;</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        if (actualJob != null) {</span>
+<span class="fc" id="L128">            Long startTime = System.currentTimeMillis();</span>
+<span class="fc bfc" id="L129" title="All 4 branches covered.">            while (!conditionsMet &amp;&amp; (System.currentTimeMillis() - startTime) &lt; timeout) {</span>
+<span class="fc" id="L130">                result = actualJob.work();</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">                if (checkConditions(result)) {</span>
+<span class="fc" id="L132">                    conditionsMet = true;</span>
+                } else {
+                    try{
+<span class="fc" id="L135">                        Thread.sleep(period);</span>
+<span class="nc" id="L136">                    } catch (InterruptedException e) {</span>
+<span class="nc" id="L137">                        LOG.debug(&quot;Work Until Condition&quot;, &quot;Problem sleeping: &quot; + e.getMessage(), e);</span>
+<span class="pc" id="L138">                    }</span>
+                }
+            }
+        }
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        if(!conditionsMet){</span>
+<span class="fc" id="L143">            LOG.debug(&quot;Work Until Condition&quot;, &quot;Last work result:\n&quot; + result);</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">            if(!lastReturn) {</span>
+<span class="fc" id="L145">                result = null;</span>
+            }
+        }
+<span class="fc" id="L148">        return result;</span>
+    }
+
+    private boolean checkConditions(Object check) {
+<span class="fc" id="L152">        Object conditions = definition.get(&quot;expect&quot;, null);</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">        boolean met = conditions == null;</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        if (!met) {</span>
+<span class="fc" id="L155">            met = evaluate(new ToGoate(conditions).convert().put(&quot;_goate_result&quot;, check));</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">            if (met) {</span>
+<span class="fc" id="L157">                LOG.debug(&quot;Work Until Condition&quot;, &quot;Condition has been met, stopping execution&quot;);</span>
+            } else {
+<span class="fc" id="L159">                LOG.debug(&quot;Work Until Condition&quot;, &quot;Condition has not been met, execution will continue unless timedout:\n&quot; + conditions.toString());</span>
+            }
+        }
+<span class="fc" id="L162">        return met;</span>
+    }
+
+    protected boolean evaluate(Goate conditions) {
+<span class="fc" id="L166">        ExpectationThreadBuilder etb = new ExpectationThreadBuilder(new Goate().put(&quot;parent&quot;, definition).merge(data, false).put(&quot;_goate_result&quot;, conditions.get(&quot;_goate_result&quot;)));</span>
+<span class="fc" id="L167">        etb.expect(conditions)</span>
+<span class="fc" id="L168">                .timeout(Long.parseLong(&quot;&quot; + definition.get(&quot;timeout_expect&quot;, 50L)))</span>
+<span class="fc" id="L169">                .period(Long.parseLong(&quot;&quot; + definition.get(&quot;period_expect&quot;, 50L)));</span>
+<span class="fc" id="L170">        ExpectEvaluator ev = new ExpectEvaluator(etb);</span>
+<span class="fc" id="L171">        return ev.evaluate();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

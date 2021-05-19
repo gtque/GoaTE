@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SumFieldsDSL.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.dsl.words</a> &gt; <span class="el_source">SumFieldsDSL.java</span></div><h1>SumFieldsDSL.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.dsl.words;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+
+import java.math.BigDecimal;
+
+/**
+ * Returns the sum (as a string) calculated using BigDecimal.
+ * Created by gtque on 9/20/2017.
+ */
+@GoateDSL(word = &quot;sum&quot;)
+@GoateDescription(description = &quot;Sums all the entries in the goate collection, returned as a string.&quot;,
+        parameters = {&quot;The filter to apply to the goate data, optional - if omitted will sum every numeric from the goate collection.&quot;})
+public class SumFieldsDSL extends DSL {
+<span class="fc" id="L45">    Goate sumFields = new Goate();</span>
+    public SumFieldsDSL(Object value) {
+<span class="fc" id="L47">        super(value);</span>
+<span class="fc" id="L48">    }</span>
+
+    public static SumFieldsDSL sum(){
+<span class="nc" id="L51">        return new SumFieldsDSL(&quot;sum::&quot;);</span>
+    }
+
+    public static SumFieldsDSL sum(String fieldPattern){
+<span class="nc" id="L55">        return new SumFieldsDSL(&quot;sum::&quot;+fieldPattern);</span>
+    }
+
+    public SumFieldsDSL add(Object value){
+<span class="nc" id="L59">        sumFields.put(&quot;&quot;+sumFields.size(), value);</span>
+<span class="nc" id="L60">        return this;</span>
+    }
+
+    public String calculate() {
+<span class="nc" id="L64">        return calculate(new Goate());</span>
+    }
+
+    public String calculate(Goate data){
+<span class="nc" id="L68">        return &quot;&quot;+evaluate(data);</span>
+    }
+
+    @Override
+    public Object evaluate(Goate data) {
+<span class="fc" id="L73">        BigDecimal sum = new BigDecimal(&quot;0&quot;);</span>
+
+<span class="fc" id="L75">        String filter = &quot;&quot; + get(1,data);</span>
+<span class="fc" id="L76">        Goate filtered = data;</span>
+
+<span class="pc bpc" id="L78" title="1 of 4 branches missed.">        if(!filter.equalsIgnoreCase(&quot;null&quot;)&amp;&amp;!filter.isEmpty()){</span>
+<span class="fc" id="L79">            filtered = filtered.filter(filter);</span>
+        }
+<span class="fc" id="L81">        sumFields.merge(filtered,false);</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        for(String key:sumFields.keys()){</span>
+            try {
+<span class="fc bfc" id="L84" title="All 2 branches covered.">                if(!key.equals(this.key)) {</span>
+<span class="fc" id="L85">                    sum = sum.add(new BigDecimal(&quot;&quot; + sumFields.get(key)));</span>
+                }
+<span class="fc" id="L87">            }catch(Exception e){</span>
+<span class="fc" id="L88">                LOG.debug(&quot;Sum&quot;,&quot;Problem adding: &quot; + sumFields.get(key), e);</span>
+<span class="fc" id="L89">            }</span>
+<span class="fc" id="L90">        }</span>
+<span class="fc" id="L91">        return sum.toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

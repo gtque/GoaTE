@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<center>
+	<div class="center" id="content">
+		<div id="page">
+			<div id="tutorial_tree">
+				place holder for tutorial tree.
+				<p>build a collapsible tree based on tutorial files.</p>
+			</div>
+			<div id="tutorial_content">
+				<nothtml type="_p">
+					Intro to GoaTE Farming! Here you will learn all the in and outs of GoaTE. And hopefully be inspired to test better.
+				</nothtml>
+				<p>content in this section will be driven by a query parameter.</p>
+			</div>
+		</div>
+	</div>
+</center>

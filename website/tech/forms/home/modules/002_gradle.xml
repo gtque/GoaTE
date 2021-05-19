@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<q>
+	<p class="module_title">gradle</p>
+	<p class="module_definition">A Gradle plugin for facilitating the module builds of the GoaTE project. It also provides some boiler plate for setting up the TestNG plugin for running tests using the Gradle command line.</p>
+</q>

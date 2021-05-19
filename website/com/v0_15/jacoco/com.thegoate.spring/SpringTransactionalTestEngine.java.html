@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SpringTransactionalTestEngine.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.spring</a> &gt; <span class="el_source">SpringTransactionalTestEngine.java</span></div><h1>SpringTransactionalTestEngine.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.spring;
+
+import com.thegoate.Goate;
+import com.thegoate.expect.Expectation;
+import com.thegoate.expect.builder.ExpectationBuilder;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.testng.TestNG;
+import com.thegoate.testng.TestNGEngine;
+import com.thegoate.testng.TestNGEngineMethodDL;
+import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.testng.ITest;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+
+import java.lang.reflect.Method;
+import java.util.List;
+
+/**
+ * Wrapper class combines AbstractTestNGSpringContextTests and Test Engine functionality from GoaTE.
+ * Created by Eric Angeli on 10/31/2017.
+ */
+public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSpringContextTests implements ITest, TestNG {
+<span class="pc" id="L53">    TestNGEngineMethodDL engine = null;</span>
+<span class="pc" id="L54">    protected Goate runData = null;</span>
+<span class="pc" id="L55">    protected Goate constantData = null;</span>
+<span class="pc" id="L56">    protected Goate data = null;</span>
+
+<span class="fc" id="L58">    public SpringTransactionalTestEngine(){</span>
+<span class="fc" id="L59">        engine = new TestNGEngineMethodDL();</span>
+<span class="fc" id="L60">        engine.setLOG(BleatFactory.getLogger(getClass()));</span>
+<span class="fc" id="L61">        this.data = engine.getData();</span>
+<span class="fc" id="L62">    }</span>
+
+<span class="nc" id="L64">    public SpringTransactionalTestEngine(Goate data){</span>
+<span class="nc" id="L65">        engine = new TestNGEngineMethodDL(data);</span>
+<span class="nc" id="L66">        engine.setLOG(BleatFactory.getLogger(getClass()));</span>
+<span class="nc" id="L67">        this.data = engine.getData();</span>
+<span class="nc" id="L68">    }</span>
+
+    @Override
+    @DataProvider(name = &quot;dataLoader&quot;)
+    public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
+<span class="nc" id="L73">        engine.initDataLoaders();</span>
+<span class="nc" id="L74">        defineDataLoaders();</span>
+<span class="nc" id="L75">        return engine.dataLoader(method, context);</span>
+    }
+
+    @DataProvider(name = &quot;methodLoader&quot;)
+    public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
+<span class="nc" id="L80">        engine.initDataLoaders();</span>
+<span class="nc" id="L81">        defineDataLoaders();</span>
+<span class="nc" id="L82">        return engine.dataLoader(context, method);</span>
+    }
+
+    @Override
+    /**
+     * You should override this method, but call super.defineDataLoaders() as the first line,
+     * then you can use runData and constantData like you would normally.
+     */
+    public void defineDataLoaders() {
+<span class="nc" id="L91">        runData = engine.getRunDataLoader();</span>
+<span class="nc" id="L92">        constantData = engine.getConstantDataLoader();</span>
+<span class="nc" id="L93">    }</span>
+
+    @Override
+    public void defineDataLoaders(Goate runData, Goate constantData) {
+<span class="nc" id="L97">        engine.defineDataLoaders(runData, constantData);</span>
+<span class="nc" id="L98">    }</span>
+
+    @Override
+    public Goate getRunDataLoader() {
+<span class="nc" id="L102">        return engine.getRunDataLoader();</span>
+    }
+
+    @Override
+    public Goate getConstantDataLoader() {
+<span class="nc" id="L107">        return engine.getConstantDataLoader();</span>
+    }
+
+    @Override
+    public Goate getData() {
+<span class="nc" id="L112">        return engine.getData();</span>
+    }
+
+    @Override
+    public void setData(Goate data) {
+<span class="nc" id="L117">        engine.setData(data);</span>
+<span class="nc" id="L118">    }</span>
+
+    @Override
+    public void setRunNumber(int number) {
+<span class="nc" id="L122">        engine.setRunNumber(number);</span>
+<span class="nc" id="L123">    }</span>
+
+    @Override
+    public void bumpRunNumber(String name) {
+<span class="nc" id="L127">        engine.bumpRunNumber(name);</span>
+<span class="nc" id="L128">    }</span>
+
+    @Override
+    public int getRunNumber() {
+<span class="nc" id="L132">        return engine.getRunNumber();</span>
+    }
+
+    @Override
+    public void setScenario(String scenario) {
+<span class="nc" id="L137">        engine.setScenario(scenario);</span>
+<span class="nc" id="L138">    }</span>
+
+    @Override
+    public String getScenario() {
+<span class="nc" id="L142">        return engine.getScenario();</span>
+    }
+
+    @Override
+    public Object get(String key) {
+<span class="nc" id="L147">        return engine.get(key);</span>
+    }
+
+    @Override
+    public Object get(String key, Object def) {
+<span class="nc" id="L152">        return engine.get(key, def);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T get(String key, Object def, Class&lt;T&gt; type) {
+<span class="nc" id="L157">        return engine.get(key, def, type);</span>
+    }
+
+    @Override
+    public TestNG put(String key, Object val) {
+<span class="nc" id="L162">        engine.put(key, val);</span>
+<span class="nc" id="L163">        return this;</span>
+    }
+
+    @Override
+    public TestNG expect(Expectation expectation) {
+<span class="nc" id="L168">        engine.expect(expectation);</span>
+<span class="nc" id="L169">        return this;</span>
+    }
+
+    @Override
+    public TestNG expect(ExpectationBuilder expectationBuilder){
+<span class="nc" id="L174">        engine.expect(expectationBuilder.build());</span>
+<span class="nc" id="L175">        return this;</span>
+    }
+
+    @Override
+    public TestNG expect(List&lt;Expectation&gt; expectation) {
+<span class="nc" id="L180">        engine.expect(expectation);</span>
+<span class="nc" id="L181">        return this;</span>
+    }
+
+    @Override
+    public TestNG evalPeriod(long periodMS) {
+<span class="nc" id="L186">        engine.evalPeriod(periodMS);</span>
+<span class="nc" id="L187">        return this;</span>
+    }
+
+    @Override
+    public TestNG evalTimeout(long timeoutMS) {
+<span class="nc" id="L192">        engine.evalTimeout(timeoutMS);</span>
+<span class="nc" id="L193">        return this;</span>
+    }
+
+    @Override
+    public void evaluate() {
+<span class="nc" id="L198">        engine.evaluate();</span>
+<span class="nc" id="L199">    }</span>
+
+    @Override
+    public void evaluate(ITestResult testResult) {
+<span class="nc" id="L203">        engine.evaluate(testResult);</span>
+<span class="nc" id="L204">    }</span>
+
+    @Override
+    public TestNG clearExpectations() {
+<span class="nc" id="L208">        engine.clearExpectations();</span>
+<span class="nc" id="L209">        return this;</span>
+    }
+
+    @Override
+    public String getTestName() {
+<span class="fc" id="L214">        return engine.getTestName();</span>
+    }
+
+    @BeforeMethod(alwaysRun = true, dependsOnMethods = &quot;initDataMethod&quot;)
+    public void startUp(Method method, ITestResult result) {
+<span class="nc" id="L219">        engine.startUp(method, result);</span>
+<span class="nc" id="L220">    }</span>
+
+    @BeforeMethod(alwaysRun = true)
+    public void initDataMethod(Object[] d, Method m) {
+<span class="nc" id="L224">        TestNGEngine.doInitData(d, m, this);</span>
+<span class="nc" id="L225">    }</span>
+
+    @AfterMethod(alwaysRun = true)
+    public void finishUp(Method method) {
+<span class="nc" id="L229">        engine.finishUp(method);</span>
+<span class="nc" id="L230">    }</span>
+
+    @Override
+    public void init(Goate data) {
+<span class="nc" id="L234">        engine.init(data);</span>
+<span class="nc" id="L235">        this.data = data;</span>
+<span class="nc" id="L236">    }</span>
+
+    @Override
+    public boolean isExpectationsSet() {
+<span class="nc" id="L240">        return engine.isExpectationsSet();</span>
+    }
+
+    @Override
+    public boolean isExpectationsNotEvaluated() {
+<span class="nc" id="L245">        return engine.isExpectationsNotEvaluated();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

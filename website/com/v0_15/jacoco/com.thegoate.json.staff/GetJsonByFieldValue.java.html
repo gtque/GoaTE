@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GetJsonByFieldValue.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.json.staff</a> &gt; <span class="el_source">GetJsonByFieldValue.java</span></div><h1>GetJsonByFieldValue.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.json.staff;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.json.utils.togoate.JSONToGoate;
+import com.thegoate.locate.Locate;
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.GoateJob;
+import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.NotFound;
+import com.thegoate.utils.togoate.ToGoate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Finds a json field by value.
+ * Created by Eric Angeli on 8/27/2018.
+ */
+@GoateJob(jobs = {&quot;json by value&quot;})
+@GoateDescription(description = &quot;Find the value in the defined json, finds and returns the first match.&quot;,
+        parameters = {&quot;value: the value to find, required&quot;,
+                &quot;path: pattern for the field(s) to check, required&quot;,
+                &quot;from result: true if from result, optional, defaults to false&quot;,
+                &quot;json: the json to look in, required if not from result&quot;,})
+<span class="fc" id="L55">public class GetJsonByFieldValue extends Employee {</span>
+
+<span class="fc" id="L57">    protected boolean notFound = false;//return original by default.</span>
+
+    public static GetJsonByFieldValue value(Object value) {
+<span class="nc" id="L60">        return new GetJsonByFieldValue().valueToFind(value);</span>
+    }
+
+    public GetJsonByFieldValue returnNotFound() {
+<span class="nc" id="L64">        notFound = true;</span>
+<span class="nc" id="L65">        return this;</span>
+    }
+
+    public GetJsonByFieldValue returnOriginal() {
+<span class="nc" id="L69">        notFound = false;</span>
+<span class="nc" id="L70">        return this;</span>
+    }
+
+    public GetJsonByFieldValue root(Locate path){
+<span class="nc" id="L74">        return root(path.toPath());</span>
+    }
+
+    public GetJsonByFieldValue root(String rootPattern) {
+<span class="fc" id="L78">        definition.put(&quot;root&quot;, rootPattern);</span>
+<span class="fc" id="L79">        return this;</span>
+    }
+
+    public GetJsonByFieldValue valueToFind(Object value) {
+<span class="fc" id="L83">        definition.put(&quot;value&quot;, value);</span>
+<span class="fc" id="L84">        return this;</span>
+    }
+
+    public GetJsonByFieldValue pathPattern(Locate path){
+<span class="nc" id="L88">        return pathPattern(path.toPath());</span>
+    }
+
+    public GetJsonByFieldValue pathPattern(String pattern) {
+<span class="fc" id="L92">        definition.put(&quot;key&quot;, pattern);</span>
+<span class="fc" id="L93">        return this;</span>
+    }
+
+    public GetJsonByFieldValue fromResult() {
+<span class="nc" id="L97">        return fromResult(true);</span>
+    }
+
+    public GetJsonByFieldValue fromResult(boolean fromResult) {
+<span class="nc" id="L101">        definition.put(&quot;from result&quot;, fromResult);</span>
+<span class="nc" id="L102">        return this;</span>
+    }
+
+    public GetJsonByFieldValue from(Object source) {
+<span class="nc" id="L106">        definition.put(&quot;from result&quot;, true);</span>
+<span class="nc" id="L107">        definition.put(&quot;_goate_result&quot;, source);</span>
+<span class="nc" id="L108">        return this;</span>
+    }
+
+    public GetJsonByFieldValue json(Object json) {
+<span class="fc" id="L112">        definition.put(&quot;json&quot;, json).put(&quot;from result&quot;, false);</span>
+<span class="fc" id="L113">        return this;</span>
+    }
+
+    public GetJsonByFieldValue secondaryCondition(String secondBase, Locate pathPattern, Object value) {
+<span class="nc" id="L117">        return secondaryCondition(secondBase, pathPattern.toPath(), value);</span>
+    }
+    public GetJsonByFieldValue secondaryCondition(Locate secondBase, String pathPattern, Object value) {
+<span class="nc" id="L120">        return secondaryCondition(secondBase.toPath(), pathPattern, value);</span>
+    }
+    public GetJsonByFieldValue secondaryCondition(Locate secondBase, Locate pathPattern, Object value) {
+<span class="nc" id="L123">        return secondaryCondition(secondBase.toPath(), pathPattern.toPath(), value);</span>
+    }
+    public GetJsonByFieldValue secondaryCondition(String secondBase, String pathPattern, Object value) {
+<span class="fc" id="L126">        List&lt;Condition&gt; secondary = definition.get(&quot;secondary&quot;, new ArrayList&lt;Condition&gt;(), List.class);</span>
+<span class="fc" id="L127">        secondary.add(new Condition(secondBase, pathPattern, value));</span>
+<span class="fc" id="L128">        return this;</span>
+    }
+
+    @Override
+    public Employee init() {
+<span class="fc" id="L133">        return this;</span>
+    }
+
+    @Override
+    protected Object doWork() {
+        Goate json;
+<span class="fc" id="L139">        List&lt;Condition&gt; secondary = definition.get(&quot;secondary&quot;, new ArrayList&lt;Condition&gt;(), List.class);</span>
+<span class="fc" id="L140">        String foundKey = &quot;&quot;;</span>
+<span class="fc" id="L141">        String root = definition.get(&quot;root&quot;, null, String.class);</span>
+<span class="fc" id="L142">        Object theJson = definition.get(&quot;json&quot;, &quot;{}&quot;);</span>
+<span class="fc" id="L143">        boolean fromResult = definition.get(&quot;from result&quot;, false, Boolean.class);</span>
+<span class="fc" id="L144">        Object value = definition.get(&quot;value&quot;, null);</span>
+<span class="fc" id="L145">        String field = definition.get(&quot;key&quot;, definition.get(&quot;node.path&quot;, &quot;.*&quot;), String.class);</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (!fromResult) {</span>
+<span class="fc" id="L147">            json = new JSONToGoate(theJson).convert();</span>
+        } else {
+<span class="nc" id="L149">            json = new JSONToGoate(new Get(&quot;body as a string&quot;).from(definition.get(&quot;_goate_result&quot;, &quot;{}&quot;))).convert();</span>
+        }
+<span class="fc" id="L151">        List&lt;Object&gt; roots = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        if (root == null) {</span>
+<span class="fc" id="L153">            roots.add(json);</span>
+        } else {
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            for (String key : json.filterStrict(root).keys()) {</span>
+<span class="fc" id="L156">                roots.add(json.get(key));</span>
+<span class="fc" id="L157">            }</span>
+        }
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        for (Object oj : roots) {</span>
+<span class="fc" id="L160">            Goate jt = new ToGoate(oj).convert();</span>
+<span class="fc" id="L161">            Goate filtered = jt.filterStrict(field);</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">            for (String key : filtered.keys()) {</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">                if (new Compare(filtered.get(key)).to(value).using(&quot;==&quot;).evaluate()) {</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">                    if (checkSecond(jt, key, secondary)) {</span>
+<span class="fc" id="L165">                        foundKey = key;</span>
+<span class="fc" id="L166">                        break;</span>
+                    }
+                }
+<span class="fc" id="L169">            }</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">            if (!foundKey.isEmpty()) {</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">                if (root != null) {</span>
+<span class="fc" id="L172">                    theJson = oj;</span>
+<span class="fc" id="L173">                    foundKey = &quot;&quot;;</span>
+                }
+                break;
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">            } else if(notFound){</span>
+<span class="nc" id="L177">                theJson = new NotFound(field + &quot;(&quot;+ value + &quot;): not found in the json&quot;);</span>
+            }
+<span class="fc" id="L179">        }</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">        return foundKey.isEmpty() ? theJson : findValidParent(foundKey, json);</span>
+    }
+
+    private boolean checkSecond(Goate jt, String key, List&lt;Condition&gt; secondary) {
+<span class="fc" id="L184">        boolean result = true;</span>
+<span class="pc bpc" id="L185" title="1 of 4 branches missed.">        if (secondary != null &amp;&amp; secondary.size() &gt; 0) {</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">            for (Condition second : secondary) {</span>
+<span class="fc" id="L187">                Pattern p = Pattern.compile(second.getBase());</span>
+<span class="fc" id="L188">                Matcher m = p.matcher(key);</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">                if (m.find()) {</span>
+<span class="fc" id="L190">                    String keyBase = m.group();</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">                    String secondKey = keyBase + (keyBase.isEmpty() ? &quot;&quot; : &quot;.&quot;) + second.getPathPattern();</span>
+<span class="fc" id="L192">                    Goate filtered = jt.filterStrict(secondKey);</span>
+<span class="fc" id="L193">                    result = false;</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">                    for (String key2 : filtered.keys()) {</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">                        if (new Compare(filtered.get(key2)).to(second.getValue()).using(&quot;==&quot;).evaluate()) {</span>
+<span class="fc" id="L196">                            result = true;</span>
+<span class="fc" id="L197">                            break;</span>
+                        }
+<span class="fc" id="L199">                    }</span>
+                }
+<span class="fc" id="L201">            }</span>
+        }
+<span class="fc" id="L203">        return result;</span>
+    }
+
+    private Object findValidParent(String foundKey, Goate json) {
+<span class="fc" id="L207">        Object result = null;</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">        if (foundKey.contains(&quot;.&quot;)) {</span>
+<span class="fc" id="L209">            foundKey = foundKey.substring(0, foundKey.lastIndexOf('.'));</span>
+        } else {
+<span class="nc" id="L211">            foundKey = &quot;&quot;;</span>
+        }
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">        if (!foundKey.isEmpty()) {</span>
+<span class="fc" id="L214">            result = json.get(foundKey);</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">            if (result == null) {</span>
+<span class="nc" id="L216">                result = findValidParent(foundKey, json);</span>
+            }
+        }
+<span class="fc" id="L219">        return result;</span>
+    }
+
+    @Override
+    public String[] detailedScrub() {
+<span class="fc" id="L224">        String[] scrub = {&quot;root&quot;, &quot;path&quot;, &quot;key&quot;, &quot;value&quot;, &quot;from result&quot;, &quot;json&quot;};</span>
+<span class="fc" id="L225">        return scrub;</span>
+    }
+
+    private class Condition {
+        protected String base;
+        protected String pathPattern;
+        protected Object value;
+
+<span class="fc" id="L233">        Condition(String base, String pathPattern, Object value) {</span>
+<span class="fc" id="L234">            this.base = base;</span>
+<span class="fc" id="L235">            this.pathPattern = pathPattern;</span>
+<span class="fc" id="L236">            this.value = value;</span>
+<span class="fc" id="L237">        }</span>
+
+        public String getBase() {
+<span class="fc" id="L240">            return base;</span>
+        }
+
+        public void setBase(String base) {
+<span class="nc" id="L244">            this.base = base;</span>
+<span class="nc" id="L245">        }</span>
+
+        public String getPathPattern() {
+<span class="fc" id="L248">            return pathPattern;</span>
+        }
+
+        public void setPathPattern(String pathPattern) {
+<span class="nc" id="L252">            this.pathPattern = pathPattern;</span>
+<span class="nc" id="L253">        }</span>
+
+        public Object getValue() {
+<span class="fc" id="L256">            return value;</span>
+        }
+
+        public void setValue(Object value) {
+<span class="nc" id="L260">            this.value = value;</span>
+<span class="nc" id="L261">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

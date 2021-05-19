@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ExpectEvaluator.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.expect</a> &gt; <span class="el_source">ExpectEvaluator.java</span></div><h1>ExpectEvaluator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.expect;
+
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.Executioner;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Maintains a simple thread pool and executes expectations in threads.
+ * Created by Eric Angeli on 5/10/2017.
+ */
+public class ExpectEvaluator {
+<span class="fc" id="L48">    final BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+
+<span class="fc" id="L50">    List&lt;ExpectThreadExecuter&gt; expectations = null;</span>
+<span class="fc" id="L51">    StringBuilder failed = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L52">    volatile List&lt;Goate&gt; fails = Collections.synchronizedList(new ArrayList&lt;&gt;());//new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L53">    volatile List&lt;Goate&gt; passes = Collections.synchronizedList(new ArrayList&lt;&gt;());//new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L54">    volatile List&lt;Goate&gt; skipped = Collections.synchronizedList(new ArrayList&lt;&gt;());//new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L55">    volatile List&lt;Goate&gt; zeroOrMore = Collections.synchronizedList(new ArrayList&lt;&gt;());//new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L57">    public ExpectEvaluator(ExpectationThreadBuilder etb){</span>
+<span class="fc" id="L58">        buildExpectations(etb);</span>
+<span class="fc" id="L59">    }</span>
+
+    protected void buildExpectations(ExpectationThreadBuilder etb){
+<span class="fc" id="L62">        expectations = etb.build();</span>
+<span class="fc" id="L63">    }</span>
+
+    public boolean evaluate() {
+<span class="fc" id="L66">        return evaluate(10);</span>
+    }
+
+    public boolean evaluate(int threadSize) {
+<span class="fc" id="L70">        boolean result = true;</span>
+<span class="fc" id="L71">        failed = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L72">        process(threadSize);</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for(ExpectThreadExecuter expect:expectations){</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            if(!expect.status()){</span>
+<span class="fc" id="L75">                result = false;</span>
+<span class="fc" id="L76">                failed.append(expect.failedMessage());</span>
+<span class="fc" id="L77">                fails.addAll(expect.fails());</span>
+            }
+<span class="fc" id="L79">            passes.addAll(expect.passes());</span>
+<span class="fc" id="L80">        }</span>
+<span class="fc" id="L81">        checkForSkipped();</span>
+<span class="fc" id="L82">        return result;</span>
+    }
+
+    public List&lt;ExpectThreadExecuter&gt; expectations(){
+<span class="fc" id="L86">        return expectations;</span>
+    }
+
+    public List&lt;Goate&gt; fails(){
+<span class="fc" id="L90">        return fails;</span>
+    }
+
+    public List&lt;Goate&gt; passes(){
+<span class="fc" id="L94">        return passes;</span>
+    }
+
+    public List&lt;Goate&gt; zeroOrMore(){
+<span class="fc" id="L98">        return zeroOrMore;</span>
+    }
+
+    public List&lt;Goate&gt; skipped(){
+<span class="fc" id="L102">        return skipped;</span>
+    }
+
+    public String failed(){
+<span class="fc" id="L106">        return failed.toString();</span>
+    }
+
+    protected void process(int threadSize){
+<span class="fc" id="L110">        LOG.debug(&quot;starting executor to evaluate expectations.&quot;);</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if(new Executioner&lt;ExpectThreadExecuter&gt;(threadSize).process(expectations())){</span>
+<span class="fc" id="L112">            LOG.debug(&quot;Expectations&quot;, &quot;Evaluation finished successfully&quot;);</span>
+        } else {
+<span class="nc" id="L114">            LOG.warn(&quot;Expectations&quot;, &quot;Evaluation did not finish successfully&quot;);</span>
+<span class="nc" id="L115">            failed.append(&quot;/nNot all expectation threads were executed successfully for some reason, please review the logs.&quot;);</span>
+<span class="nc" id="L116">            fails.add(new Goate().put(&quot;actual&quot;, expectations().size()).put(&quot;health check&quot;, &quot;failed to execute all the threads for some reason.&quot;));</span>
+        }
+<span class="fc" id="L118">    }</span>
+
+    private void checkForSkipped(){
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        for (ExpectThreadExecuter expectation : expectations()) {</span>
+<span class="fc" id="L122">            Expectation ex = expectation.getExpectation();</span>
+<span class="fc" id="L123">            Goate eval = ex.getExpectations();</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            if(eval.size()&gt;(passes().size()+fails().size())) {</span>
+<span class="fc" id="L125">                LOG.debug(&quot;Evaluate&quot;, &quot;detected possible skipped expectation.&quot;);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">                for (String key : eval.keys()) {</span>
+<span class="fc" id="L127">                    Goate exp = eval.get(key, null, Goate.class);</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">                    if (!checkInExpectationList(exp.get(&quot;actual&quot;), exp.get(&quot;operator&quot;, null, String.class), passes())) {</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">                        if (!checkInExpectationList(exp.get(&quot;actual&quot;), exp.get(&quot;operator&quot;, null, String.class), fails())) {</span>
+<span class="fc bfc" id="L130" title="All 4 branches covered.">                            if (!(&quot;&quot; + exp.get(&quot;actual&quot;)).contains(&quot;*&quot;) &amp;&amp; !(&quot;&quot; + exp.get(&quot;actual&quot;)).contains(&quot;+&quot;)) {</span>
+<span class="fc" id="L131">                                skipped.add(exp);</span>
+                            } else {
+<span class="fc bfc" id="L133" title="All 2 branches covered.">                                if (!(&quot;&quot; + exp.get(&quot;actual&quot;)).contains(&quot;+&quot;)) {</span>
+<span class="fc" id="L134">                                    zeroOrMore.add(exp);</span>
+                                }
+                            }
+                        }
+                    }
+<span class="fc" id="L139">                }</span>
+            }
+<span class="fc" id="L141">        }</span>
+<span class="fc" id="L142">    }</span>
+
+    private boolean checkInExpectationList(Object actual, String operator, List&lt;Goate&gt; list) {
+<span class="fc" id="L145">        String act = &quot;&quot; + actual;</span>
+<span class="fc" id="L146">        boolean result = false;</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        for (Goate expectation : list) {</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">            if (act.equals(&quot;&quot; + expectation.get(&quot;actual&quot;, null))) {</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">                if (operator.equals(&quot;&quot; + expectation.get(&quot;operator&quot;, null, String.class))) {</span>
+<span class="fc" id="L150">                    result = true;</span>
+<span class="fc" id="L151">                    break;</span>
+                }
+            }
+<span class="fc" id="L154">        }</span>
+<span class="fc" id="L155">        return result;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

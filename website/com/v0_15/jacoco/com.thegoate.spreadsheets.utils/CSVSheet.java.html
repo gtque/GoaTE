@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CSVSheet.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.spreadsheets.utils</a> &gt; <span class="el_source">CSVSheet.java</span></div><h1>CSVSheet.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.spreadsheets.utils;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.utils.GoateUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * Provides support for csv files and is the default.
+ * Opens using RFC4180
+ * Created by Eric Angeli on 9/14/2017.
+ */
+@IsDefault
+@GoateSheet(fileTypes = {&quot;csv&quot;})
+<span class="fc" id="L50">public class CSVSheet extends SheetUtils {</span>
+
+<span class="fc" id="L52">    int maxColumnCount = 0;</span>
+
+    @Override
+    public SheetUtils sheet(String sheetName) {
+<span class="fc" id="L56">        return this;</span>
+    }
+
+    @Override
+    public Goate load() {
+<span class="fc" id="L61">        data = new Goate();</span>
+<span class="fc" id="L62">        Reader in = null;</span>
+<span class="fc" id="L63">        Goate sheetData = new Goate();</span>
+<span class="pc bpc" id="L64" title="3 of 8 branches missed.">        if (fileName != null &amp;&amp; !fileName.isEmpty() &amp;&amp; (file == null || !(file instanceof Reader))) {</span>
+<span class="fc" id="L65">            fileName = GoateUtils.getFilePath(fileName);</span>
+            try {
+<span class="fc bfc" id="L67" title="All 2 branches covered.">                if (new File(fileName).exists()) {</span>
+<span class="fc" id="L68">                    in = new FileReader(fileName);</span>
+                }
+<span class="nc" id="L70">            } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L71">                e.printStackTrace();</span>
+<span class="fc" id="L72">            }</span>
+        }
+<span class="pc bpc" id="L74" title="1 of 4 branches missed.">        if (file != null || in == null) {</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">            if (file instanceof Reader) {</span>
+<span class="nc" id="L76">                in = (Reader) file;</span>
+            } else {
+                try {
+<span class="fc" id="L79">                    in = new FileReader((File) file);</span>
+<span class="nc" id="L80">                } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L81">                    e.printStackTrace();</span>
+<span class="fc" id="L82">                }</span>
+            }
+        }
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (in != null) {</span>
+            try {
+<span class="fc" id="L87">                Iterable&lt;CSVRecord&gt; records = CSVFormat.RFC4180.withTrim(trimWhiteSpace).parse(in);</span>
+<span class="fc" id="L88">                boolean headersFound = false;</span>
+<span class="fc" id="L89">                int row = 0;</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">                for (CSVRecord record : records) {</span>
+<span class="fc" id="L91">                    Iterator iterator = record.iterator();</span>
+<span class="fc" id="L92">                    int count = 0;</span>
+<span class="fc" id="L93">                    Goate theRow = new Goate();</span>
+<span class="fc" id="L94">                    List&lt;String&gt; headerList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">                    while (iterator.hasNext()) {</span>
+<span class="fc" id="L96">                        Object value = iterator.next();</span>
+<span class="fc bfc" id="L97" title="All 4 branches covered.">                        if (firstRowIsHeader &amp;&amp; !headersFound) {</span>
+<span class="fc" id="L98">                            headerList.add(&quot;&quot; + value);</span>
+                        } else {
+<span class="fc" id="L100">                            String id = &quot;&quot; + count;</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">                            if (firstRowIsHeader) {</span>
+<span class="fc" id="L102">                                id = headers.get(sheetName).get(count);</span>
+                            }
+<span class="fc" id="L104">                            theRow.put(id, value);</span>
+                        }
+<span class="fc" id="L106">                        count++;</span>
+<span class="fc" id="L107">                    }</span>
+<span class="fc bfc" id="L108" title="All 4 branches covered.">                    if (headersFound || !firstRowIsHeader) {</span>
+<span class="fc" id="L109">                        sheetData.put(&quot;&quot; + row, theRow);</span>
+<span class="fc" id="L110">                        row++;</span>
+                    } else {
+<span class="fc" id="L112">                        headers.put(sheetName, headerList);</span>
+                    }
+<span class="fc" id="L114">                    headersFound = true;</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">                    if(count&gt;maxColumnCount){</span>
+<span class="fc" id="L116">                        maxColumnCount=count;</span>
+                    }
+<span class="fc" id="L118">                }</span>
+<span class="fc" id="L119">                data.put(sheetName, sheetData);</span>
+<span class="fc" id="L120">                in.close();</span>
+<span class="nc" id="L121">            } catch (Exception e) {</span>
+<span class="nc" id="L122">                LOG.warn(&quot;problem loading csv file (&quot; + fileName + &quot;):&quot; + e.getMessage(), e);</span>
+<span class="fc" id="L123">            }</span>
+        }
+<span class="fc" id="L125">        return data;</span>
+    }
+
+    @Override
+    public SheetUtils set(int col, int row, Object value) {
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if(col+1&gt;maxColumnCount){</span>
+<span class="fc" id="L131">            maxColumnCount = col+1;</span>
+        }
+<span class="fc" id="L133">        return super.set(col, row, value);</span>
+    }
+    @Override
+    public int rowCount() {
+<span class="fc" id="L137">        return data.get(sheetName, new Goate(), Goate.class).size();</span>
+    }
+
+    @Override
+    public SheetUtils createNew() {
+<span class="fc" id="L142">        return this;</span>
+    }
+
+    @Override
+    public SheetUtils writeToFile() {
+        try{
+<span class="fc" id="L148">            BufferedWriter writer = Files.newBufferedWriter(Paths.get(this.fileName));</span>
+<span class="fc" id="L149">            CSVFormat format = CSVFormat.DEFAULT;</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">            if(firstRowIsHeader){</span>
+<span class="fc" id="L151">                String[] head = headers().toArray(new String[headers.size()]);</span>
+<span class="fc" id="L152">                format = format.withHeader(head);</span>
+            }
+<span class="fc" id="L154">            CSVPrinter printer = new CSVPrinter(writer, format);</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            for(int i=0; i&lt;rowCount(); i++){</span>
+<span class="fc" id="L156">                printer.printRecord(rowAsList(i));</span>
+            }
+<span class="fc" id="L158">            printer.flush();</span>
+<span class="fc" id="L159">            printer.close();</span>
+<span class="nc" id="L160">        } catch (Exception e){</span>
+<span class="nc" id="L161">            LOG.info(&quot;CSV Sheet&quot;, &quot;Problem writing file: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L162">        }</span>
+<span class="fc" id="L163">        return this;</span>
+    }
+
+    private List&lt;Object&gt; rowAsList(int rowNumber){
+<span class="fc" id="L167">        Goate row = getRow(rowNumber);</span>
+<span class="fc" id="L168">        List&lt;Object&gt; rowData = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">        if(firstRowIsHeader){</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">            headers().stream().forEach(header -&gt; rowData.add(row.get(header)==null?&quot;&quot;:row.get(header)));</span>
+        } else {
+<span class="nc bnc" id="L172" title="All 2 branches missed.">            for(int i=0; i&lt;maxColumnCount; i++){</span>
+<span class="nc" id="L173">                Object value = get(i, rowNumber);</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                rowData.add(value==null?&quot;&quot;:value);</span>
+            }
+        }
+<span class="fc" id="L177">        return rowData;</span>
+    }
+    @Override
+    public SheetUtils close() {
+<span class="nc" id="L181">        return this;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

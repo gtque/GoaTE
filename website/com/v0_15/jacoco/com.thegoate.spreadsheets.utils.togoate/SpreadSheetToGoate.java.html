@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SpreadSheetToGoate.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.spreadsheets.utils.togoate</a> &gt; <span class="el_source">SpreadSheetToGoate.java</span></div><h1>SpreadSheetToGoate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.spreadsheets.utils.togoate;
+
+import com.thegoate.Goate;
+import com.thegoate.map.EnumMap;
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.spreadsheets.utils.SheetUtils;
+import com.thegoate.spreadsheets.utils.SpreadSheetUtil;
+import com.thegoate.utils.fill.serialize.DeSerializer;
+import com.thegoate.utils.fill.serialize.DefaultSource;
+import com.thegoate.utils.fill.serialize.Serializer;
+import com.thegoate.utils.togoate.ToGoateUtil;
+import com.thegoate.utils.togoate.ToGoateUtility;
+
+import java.util.Map;
+
+/**
+ * Created by Eric Angeli on 12/6/2018.
+ */
+@ToGoateUtil
+public class SpreadSheetToGoate extends SpreadSheetUtil implements ToGoateUtility {
+
+<span class="fc" id="L48">    boolean autoIncrement = false;</span>
+<span class="fc" id="L49">    Class&lt;?&gt; theEnum = null;</span>
+<span class="fc" id="L50">    Map&lt;String, String&gt; theMap = null;</span>
+<span class="fc" id="L51">    Class pojo = null;</span>
+<span class="fc" id="L52">    Class csvSource = null;</span>
+<span class="fc" id="L53">    Class csvDestination = null;</span>
+
+    public SpreadSheetToGoate(Object val) {
+<span class="fc" id="L56">        super(val);</span>
+
+<span class="fc" id="L58">    }</span>
+
+    public &lt;E extends Enum&lt;E&gt;&gt; SpreadSheetToGoate mapTo(Class&lt;E&gt; enumClass) {
+<span class="fc" id="L61">        this.theEnum = enumClass;</span>
+<span class="fc" id="L62">        return this;</span>
+    }
+
+    public SpreadSheetToGoate mapTo(Map&lt;String, String&gt; map) {
+<span class="fc" id="L66">        this.theMap = map;</span>
+<span class="fc" id="L67">        return this;</span>
+    }
+
+    public SpreadSheetToGoate mapToPojo(Class pojo) {
+<span class="nc" id="L71">        return mapToPojo(pojo, DefaultSource.class, DefaultSource.class);</span>
+    }
+
+    public SpreadSheetToGoate mapToPojo(Class pojo, Class source) {
+<span class="fc" id="L75">        return mapToPojo(pojo, source, DefaultSource.class);</span>
+    }
+
+    public SpreadSheetToGoate mapToPojo(Class pojo, Class source, Class destination) {
+<span class="fc" id="L79">        this.pojo = pojo;</span>
+<span class="fc" id="L80">        this.csvSource = source;</span>
+<span class="fc" id="L81">        this.csvDestination = destination;</span>
+<span class="fc" id="L82">        return this;</span>
+    }
+
+    @Override
+    protected void init(Object val){
+<span class="fc" id="L87">        processNested = false;</span>
+<span class="fc" id="L88">        super.init(val);</span>
+<span class="fc" id="L89">    }</span>
+
+    @Override
+    protected Object processNested(Object subContainer) {
+<span class="nc" id="L93">        return subContainer;</span>
+    }
+
+    @Override
+    public ToGoateUtility autoIncrement(boolean increment) {
+<span class="fc" id="L98">        this.autoIncrement = increment;</span>
+<span class="fc" id="L99">        return this;</span>
+    }
+
+    @Override
+    public Goate convert() {
+        //JSONArray ja = new JSONArray(&quot;[]&quot;);
+<span class="fc" id="L105">        Goate goate = new Goate();</span>
+
+<span class="fc" id="L107">        SheetUtils sheet = (SheetUtils) takeActionOn;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        for (int rowIndex = 0; rowIndex &lt; sheet.rowCount(); rowIndex++) {</span>
+<span class="fc" id="L109">            Goate row = sheet.getRow(rowIndex);</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">            if(pojo!=null){</span>
+                {
+<span class="fc" id="L112">                    Object rPojo = new DeSerializer().data(row).from(csvSource).build(pojo);</span>
+<span class="fc" id="L113">                    row = new Serializer&lt;&gt;(rPojo,csvDestination).toGoate();</span>
+                }
+            }
+            //JSONObject rjo = new JSONObject(&quot;{}&quot;);
+<span class="fc" id="L117">            Goate rjo = new Goate();</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">            for (String key : row.keys()) {</span>
+<span class="fc" id="L119">                String colId = generateKey(key, theEnum, theMap);</span>
+<span class="fc" id="L120">                rjo.put(colId, checkPrimitive(row.get(key)));</span>
+<span class="fc" id="L121">                goate.put(&quot;&quot;+rowIndex+&quot;.&quot;+colId,rjo.getStrict(colId));</span>
+<span class="fc" id="L122">            }</span>
+<span class="fc" id="L123">            goate.put(&quot;&quot;+rowIndex,rjo);</span>
+//            goate.merge(rjo,false);
+        }
+<span class="fc" id="L126">        return goate;</span>
+    }
+
+    private Object checkPrimitive(Object check) {
+<span class="fc" id="L130">        GoateReflection gr = new GoateReflection();</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (gr.isBoolean(check)) {</span>
+<span class="fc" id="L132">            check = Boolean.parseBoolean(&quot;&quot; + check);</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        } else if (gr.isInteger(check)) {</span>
+<span class="fc" id="L134">            check = Integer.parseInt(&quot;&quot; + check);</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        } else if (gr.isDouble(check)) {</span>
+<span class="fc" id="L136">            check = Double.parseDouble(&quot;&quot; + check);</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">        } else if (gr.isFloat(check)) {</span>
+<span class="nc" id="L138">            check = Float.parseFloat(&quot;&quot; + check);</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        } else if (gr.isLong(check)) {</span>
+<span class="nc" id="L140">            check = Long.parseLong(&quot;&quot; + check);</span>
+        }
+<span class="fc" id="L142">        return check;</span>
+    }
+
+    private String generateKey(final String key, Class map, Map&lt;String, String&gt; altMap) {
+<span class="fc" id="L146">        String mappedKey = key;</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        if (altMap != null) {</span>
+<span class="fc" id="L148">            mappedKey = altMap.entrySet().parallelStream().filter(e -&gt; e.getValue().equals(key)).map(Map.Entry::getKey).findFirst().orElse(key);</span>
+        } else {
+            try {
+<span class="fc" id="L151">                mappedKey = EnumMap.map(key).to(map).toString();</span>
+<span class="fc" id="L152">            } catch (Exception e) {</span>
+<span class="fc" id="L153">                LOG.debug(&quot;Spreadsheet To Goate&quot;, &quot;Failed to map: &quot; + key);</span>
+<span class="fc" id="L154">            }</span>
+        }
+<span class="fc" id="L156">        return mappedKey;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

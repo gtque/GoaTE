@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mylinks>
+	<div class="delicious">
+		<h3>Links</h3>
+		<ul class="ul-cat">
+			<div class="delicious-posts" id="delicious-posts-milo317">
+				<ul>
+					<li><a type="LINK" href="http://www.thegoate.com">The main GoaTE Farm.</a></li>
+					<li><a type="LINK" href="https://github.com/gtque/GoaTE">GoaTE DNA</a></li>
+					<li><a type="LINK" href="http://www.thegoate.org">Become a GoaTE Farmer</a></li>
+				</ul>
+			</div>
+		</ul>
+	</div>
+</mylinks>

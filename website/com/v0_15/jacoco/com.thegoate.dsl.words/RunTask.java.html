@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RunTask.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.dsl.words</a> &gt; <span class="el_source">RunTask.java</span></div><h1>RunTask.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.dsl.words;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+import com.thegoate.staff.GoateTask;
+import com.thegoate.staff.GoateTaskContainer;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Executes and runs the specified task.
+ * Returns the return from the task or null if the task is void.
+ * Created by gtque on 4/21/2017.
+ */
+@GoateDSL(word = &quot;do&quot;)
+public class RunTask extends DSL {
+<span class="fc" id="L50">    Goate parameters = new Goate();</span>
+
+    public RunTask(Object value) {
+<span class="fc" id="L53">        super(value);</span>
+<span class="fc" id="L54">    }</span>
+
+<span class="fc" id="L56">    AnnotationFactory af = new AnnotationFactory();</span>
+
+    public static RunTask task(String task){
+<span class="nc" id="L59">        return new RunTask(&quot;do::&quot;+task);</span>
+    }
+
+    public RunTask parameter(String key, Object value){
+<span class="nc" id="L63">        parameters.put(key, value);</span>
+<span class="nc" id="L64">        return this;</span>
+    }
+
+    public Object run(){
+<span class="nc" id="L68">        return run(new Goate());</span>
+    }
+
+    public Object run(Goate data){
+<span class="nc" id="L72">        return evaluate(data);</span>
+    }
+
+    @Override
+    public Object evaluate(Goate data){
+<span class="fc" id="L77">        parameters.merge(data, false);</span>
+<span class="fc" id="L78">        String task = &quot;&quot; + get(1, parameters);</span>
+<span class="fc" id="L79">        Object result = null;</span>
+<span class="fc" id="L80">        Object[] constructorParams = null;</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if(definition.size()&gt;2){</span>
+<span class="fc" id="L82">            constructorParams = new Object[definition.size()-2];</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            for(int i = 0; i&lt;constructorParams.length;i++){</span>
+<span class="fc" id="L84">                constructorParams[i] = get(i+2,parameters);</span>
+            }
+        }
+        try {
+<span class="fc" id="L88">            af.annotatedWith(GoateTaskContainer.class)</span>
+<span class="fc" id="L89">                    .findByMethod(makeGeneric(task))</span>
+<span class="fc" id="L90">                    .methodAnnotatedWith(GoateTask.class)</span>
+<span class="fc" id="L91">                    .constructorArgs(constructorParams);</span>
+<span class="fc" id="L92">            Object owner = findOwner();</span>
+<span class="fc" id="L93">            Method m = findTask();</span>
+<span class="fc" id="L94">            Object[] args = buildArgs(m, task, parameters);</span>
+            try {
+<span class="fc" id="L96">                boolean accessible = m.isAccessible();</span>
+<span class="fc" id="L97">                LOG.debug(&quot;class: &quot; + m.getDeclaringClass());</span>
+<span class="fc" id="L98">                LOG.debug(&quot;method: &quot; + m.getName());</span>
+<span class="fc" id="L99">                LOG.debug(&quot;parameters: &quot; + printArgs(args));</span>
+<span class="fc" id="L100">                m.setAccessible(true);</span>
+<span class="fc" id="L101">                result = m.invoke(owner, args);</span>
+<span class="fc" id="L102">                m.setAccessible(accessible);</span>
+<span class="nc" id="L103">            } catch (IllegalAccessException e) {</span>
+<span class="nc" id="L104">                LOG.error(&quot;Problem executing task: task\n&quot; + e.getMessage(), e);</span>
+<span class="fc" id="L105">            } catch(InvocationTargetException ite){</span>
+<span class="fc" id="L106">                result = ite.getCause();</span>
+<span class="pc" id="L107">            }</span>
+<span class="nc" id="L108">        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {</span>
+<span class="nc" id="L109">            LOG.error(&quot;There was a problem processing the word: &quot; + value + &quot;\n&quot; + e.getMessage(), e);</span>
+<span class="fc" id="L110">        }</span>
+<span class="fc" id="L111">        return result;</span>
+    }
+
+    protected String printArgs(Object[] args){
+<span class="fc" id="L115">        String arg = &quot;&quot;;</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        for(Object o:args){</span>
+<span class="fc" id="L117">            arg += &quot;&quot; + o +&quot;, &quot;;</span>
+        }
+<span class="fc" id="L119">        int last = arg.lastIndexOf(&quot;, &quot;);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if(last&lt;0){</span>
+<span class="fc" id="L121">            last = arg.length();</span>
+        }
+<span class="fc" id="L123">        return arg.substring(0,last);</span>
+    }
+
+    public Object findOwner() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+<span class="fc" id="L127">        Object owner = af.build();</span>
+<span class="fc" id="L128">        return owner;</span>
+    }
+
+    public Method findTask(){
+<span class="fc" id="L132">        Method m = af.getMethod();</span>
+<span class="fc" id="L133">        return m;</span>
+    }
+
+    public String makeGeneric(String task){
+<span class="fc" id="L137">        String gen = task;</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        while(gen.contains(&quot;${&quot;)){</span>
+<span class="fc" id="L139">            String val = gen.substring(gen.indexOf(&quot;${&quot;)+2,gen.indexOf(&quot;}&quot;));</span>
+<span class="fc" id="L140">            gen = gen.replace(&quot;${&quot;+val+&quot;}&quot;,&quot;&amp;&amp;var&amp;&amp;&quot;);</span>
+<span class="fc" id="L141">        }</span>
+<span class="fc" id="L142">        return gen.replaceAll(&quot;&amp;&amp;var&amp;&amp;&quot;,&quot;\\${var}&quot;);</span>
+    }
+
+    public Object[] buildArgs(Method m, String task, Goate data){
+<span class="fc" id="L146">        Object[] args = null;</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        if(m!=null){</span>
+<span class="fc" id="L148">            args = new Object[m.getParameterCount()];</span>
+<span class="fc" id="L149">            Map&lt;Long, String&gt; values = extractValues(task);</span>
+<span class="fc" id="L150">            int index = 0;</span>
+<span class="fc" id="L151">            Object[] valKeys = filteredKeys(values);</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">            for(Parameter p:m.getParameters()){</span>
+<span class="fc" id="L153">                Long ix = Long.parseLong(&quot;&quot;+valKeys[index]);</span>
+<span class="fc" id="L154">                Object v = data.get(&quot;&quot;+values.get(ix),null);</span>
+<span class="fc" id="L155">                args[index] = v;</span>
+<span class="fc" id="L156">                index++;</span>
+            }
+        }
+<span class="fc" id="L159">        return args;</span>
+    }
+
+    protected Map&lt;Long, String&gt; extractValues(String task){
+<span class="fc" id="L163">        Map&lt;Long, String&gt; vals = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L164">        String params = task;</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        while(params.contains(&quot;${&quot;)){</span>
+<span class="fc" id="L166">            Long stamp = System.nanoTime();</span>
+<span class="fc" id="L167">            String val = params.substring(params.indexOf(&quot;${&quot;)+2,params.indexOf(&quot;}&quot;));</span>
+<span class="fc" id="L168">            params = params.replace(&quot;${&quot;+val+&quot;}&quot;,&quot;&quot;+stamp);</span>
+<span class="fc" id="L169">            vals.put(stamp, val);</span>
+<span class="fc" id="L170">        }</span>
+<span class="fc" id="L171">        return vals;</span>
+    }
+
+    protected Object[] filteredKeys(Map&lt;Long, String&gt; map){
+<span class="fc" id="L175">        List&lt;Long&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L176">        Set&lt;Long&gt; keys = map.keySet();</span>
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">        if(map!=null){</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">            for(Long k:keys){</span>
+<span class="fc" id="L179">                list.add(k);</span>
+<span class="fc" id="L180">            }</span>
+<span class="fc" id="L181">            Collections.sort(list);</span>
+        }
+<span class="fc" id="L183">        return list.toArray();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

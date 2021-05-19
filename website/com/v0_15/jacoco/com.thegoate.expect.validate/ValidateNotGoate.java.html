@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ValidateNotGoate.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.expect.validate</a> &gt; <span class="el_source">ValidateNotGoate.java</span></div><h1>ValidateNotGoate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.expect.validate;
+
+import com.thegoate.Goate;
+import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.NotFound;
+
+import static com.thegoate.expect.Expectation.EmployeeWorkResult;
+
+/**
+ * Validators don't care about type.
+ * There must be at least one comparator for each operator the Validator supports.
+ * Created by Eric Angeli on 3/20/2019.
+ */
+@Validator(operators = {&quot;&quot;})
+public class ValidateNotGoate extends Validate {
+
+<span class="pc" id="L45">    boolean resultC = true;</span>
+
+    public ValidateNotGoate() {
+<span class="nc" id="L48">        super();</span>
+<span class="nc" id="L49">    }</span>
+
+    public ValidateNotGoate(Goate exp, String key, Object from, Object fromExpected, Object rtrn, long cachePeriod, Goate data) {
+<span class="fc" id="L52">        super(exp, key, from, fromExpected, rtrn, cachePeriod, data);</span>
+<span class="fc" id="L53">    }</span>
+
+    public static Validate using(String operator) {
+<span class="nc" id="L56">        Validate vlad = new ValidateNotGoate();</span>
+<span class="nc" id="L57">        return vlad.setOperator(operator);</span>
+    }
+
+    public static Validate using(CompareUtility compare) {
+<span class="nc" id="L61">        return using(compare.getClass());</span>
+    }
+
+    public static Validate using(Class compare) {
+<span class="nc" id="L65">        CompareUtil op = getOp(compare);</span>
+<span class="nc" id="L66">        return using(op.operator());</span>
+    }
+
+    public Object getRtrn() {
+<span class="fc" id="L70">        return new Goate().put(&quot;return&quot;, rtrn);</span>
+    }
+
+    protected boolean check(Goate exp, String key, Goate rtrn) {
+<span class="fc" id="L74">        boolean result = true;</span>
+        try {
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            if (!check2(exp, key, rtrn.get(&quot;return&quot;), 0)) {</span>
+<span class="fc" id="L77">                result = false;</span>
+<span class="fc" id="L78">                resultC = false;</span>
+            }
+<span class="fc" id="L80">        } catch (Throwable t) {</span>
+<span class="pc bpc" id="L81" title="2 of 4 branches missed.">            if (key.contains(&quot;*&quot;)||key.contains(&quot;+&quot;)) {</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">                if (!resultC) {</span>
+<span class="fc" id="L83">                    result = false;</span>
+<span class="fc" id="L84">                    fails.add(exp);</span>
+                }
+            } else {
+<span class="nc" id="L87">                result = false;</span>
+            }
+<span class="fc" id="L89">        }</span>
+<span class="fc" id="L90">        return result;</span>
+    }
+
+    private boolean check2(Goate exp, String key, Object rtrn, int indexLevel) {
+<span class="fc" id="L94">        exp = new Goate().merge(exp, true);</span>
+<span class="fc" id="L95">        boolean result = true;</span>
+<span class="fc" id="L96">        Object val = null;</span>
+<span class="fc" id="L97">        String act = &quot;&quot; + exp.get(&quot;actual&quot;);</span>
+<span class="fc" id="L98">        String actP = act;</span>
+<span class="fc" id="L99">        int plus = act.indexOf(&quot;+&quot;);</span>
+<span class="fc" id="L100">        int star = act.indexOf(&quot;*&quot;);</span>
+<span class="fc" id="L101">        boolean moreThanZero = true;</span>
+<span class="pc bpc" id="L102" title="2 of 6 branches missed.">        if (plus &gt; -1 &amp;&amp; (plus &lt; star || star &lt; 0)) {</span>
+<span class="fc" id="L103">            moreThanZero = false;</span>
+<span class="fc" id="L104">            act = act.substring(0, plus) + &quot;*&quot; + act.substring(plus + 1);</span>
+        }
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        if (act.contains(&quot;*&quot;)) {</span>
+<span class="fc" id="L107">            int index = 0;</span>
+<span class="fc" id="L108">            star = act.indexOf(&quot;*&quot;) - 1;</span>
+<span class="fc" id="L109">            String start = null;</span>
+<span class="fc" id="L110">            String expectedSize = null;</span>
+<span class="fc" id="L111">            int size = -42;</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (star &gt;= 0) {</span>
+<span class="fc" id="L113">                start = &quot;&quot; + act.charAt(star);</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">                if (start.equals(&quot;[&quot;)) {</span>
+<span class="nc" id="L115">                    expectedSize = act.substring(star + 2, act.indexOf(&quot;]&quot;));</span>
+<span class="nc" id="L116">                    actP = expectedSize;</span>
+                    try {
+<span class="nc bnc" id="L118" title="All 2 branches missed.">                        if (expectedSize.contains(&quot;,&quot;)) {</span>
+<span class="nc" id="L119">                            String[] es = expectedSize.split(&quot;,&quot;);</span>
+<span class="nc" id="L120">                            index = Integer.parseInt(es[0]);</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">                            expectedSize = es.length &gt; 1 ? es[1] : &quot;&quot;;</span>
+                        }
+<span class="nc" id="L123">                        size = Integer.parseInt(expectedSize) + index;</span>
+<span class="nc" id="L124">                    } catch (NumberFormatException nfe) {</span>
+<span class="nc" id="L125">                        LOG.debug(&quot;Expectation&quot;, &quot;Detected wildcard with expected, but seems it is malformed, defaulting to any number.&quot;, nfe);</span>
+<span class="nc" id="L126">                    }</span>
+                }
+            }
+<span class="pc bpc" id="L129" title="2 of 4 branches missed.">            String act1 = size &gt; 0 || index &gt; 0 ? act.replaceFirst(&quot;\\[&quot;, &quot;&quot;).replaceFirst(&quot;&quot; + actP + &quot;]&quot;, &quot;&quot;) : act;</span>
+<span class="fc" id="L130">            Goate expt = new Goate().merge(exp, true);</span>
+<span class="fc" id="L131">            String act2 = &quot;fiddly bit&quot;;</span>
+            try {
+<span class="fc" id="L133">                boolean running = true;</span>
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">                while (running) {</span>
+<span class="fc" id="L135">                    act2 = act1.replaceFirst(&quot;\\*&quot;, &quot;&quot; + index);//act.substring(0, star) + index + act.substring(star + 1);</span>
+<span class="fc" id="L136">                    String keyt = key.replace(act, act2);</span>
+<span class="fc" id="L137">                    expt.put(&quot;actual&quot;, act2);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">                    if (expt.get(&quot;expected&quot;) instanceof String) {</span>
+<span class="fc" id="L139">                        expt.put(&quot;expected&quot;, expt.get(&quot;expected&quot;, &quot;&quot;, String.class).replaceAll(&quot;\\\\%&quot;, &quot;_mwi_&quot;).replaceAll(&quot;\\%&quot;, &quot;&quot; + index).replaceAll(&quot;_mwi_&quot;, &quot;%&quot;));</span>
+                    }
+<span class="fc" id="L141">                    boolean check = check2(expt, keyt, rtrn, indexLevel+1);</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">                    if (!check) {</span>
+<span class="fc" id="L143">                        resultC = false;</span>
+<span class="fc" id="L144">                        result = false;</span>
+                    }
+<span class="fc" id="L146">                    index++;</span>
+<span class="pc bpc" id="L147" title="3 of 4 branches missed.">                    if (size &gt; 0 &amp;&amp; index &gt; size) {</span>
+<span class="nc" id="L148">                        running = false;</span>
+                        //if there are more than expected this should fail.
+<span class="nc" id="L150">                        resultC = false;</span>
+<span class="nc" id="L151">                        result = false;</span>
+                    }
+<span class="fc" id="L153">                }</span>
+<span class="fc" id="L154">            } catch (Throwable t) {</span>
+<span class="pc bpc" id="L155" title="5 of 6 branches missed.">                if (size &gt; 0 &amp;&amp; (index == 0 || index != size)) {</span>
+                    //this should cause a failure if the expected size is not reached.
+                    //use [*###] where ### is the expected size, ie: [*84]
+<span class="nc" id="L158">                    resultC = false;</span>
+<span class="nc" id="L159">                    result = false;</span>
+                }
+<span class="fc bfc" id="L161" title="All 2 branches covered.">                if (!moreThanZero) {</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">                    if (indexLevel == 0) {</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">                        if (!checkEvaluated(passes, act1, index)) {</span>
+<span class="nc" id="L164">                            resultC = false;</span>
+<span class="nc" id="L165">                            result = false;</span>
+                        }
+<span class="fc bfc" id="L167" title="All 2 branches covered.">                    } else if (checkAct1(act1, rtrn, index)) {</span>
+<span class="fc" id="L168">                        resultC = false;</span>
+<span class="fc" id="L169">                        result = false;</span>
+                    }
+                }
+//                    if (index == 0) {//escape back. This will leave the current result state
+                //that means if the first index is NotFound there is nothing to evaluate, if it should fail
+                //because a field should be present you will have to check for that some other way other than
+                //using the wild card, otherwise you could end up in an infinite recursive loop.
+                //you could, if checking elements inside an array, check that the size of the array is greater than 0.
+//                if(!parentFound) {
+<span class="fc bfc" id="L178" title="All 4 branches covered.">                if(indexLevel&gt;0&amp;&amp;index==0) {</span>
+<span class="fc" id="L179">                    throw t;</span>
+                }
+//                }
+//                    }
+
+<span class="nc" id="L184">            }</span>
+<span class="fc" id="L185">        } else {</span>
+<span class="pc bpc" id="L186" title="1 of 6 branches missed.">            if (exp.get(&quot;actual&quot;) instanceof String &amp;&amp; (((String) exp.get(&quot;actual&quot;)).equalsIgnoreCase(&quot;return&quot;) || ((String) exp.get(&quot;actual&quot;)).equalsIgnoreCase(EmployeeWorkResult))) {</span>
+<span class="fc" id="L187">                val = rtrn;</span>
+            } else {
+<span class="fc" id="L189">                Get get = new Get(exp.get(&quot;actual&quot;));//from.doWork());</span>
+<span class="fc" id="L190">                val = get.from(rtrn);</span>
+            }
+<span class="fc bfc" id="L192" title="All 2 branches covered.">            if (val instanceof NotFound) {</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">                if (!exp.get(&quot;operator&quot;).equals(&quot;doesNotExist&quot;)) {</span>
+<span class="fc" id="L194">                    LOG.info(&quot;&quot; + exp.get(&quot;actual&quot;) + &quot; was not found, but this does not necessarily indicate a failure, to check if something is not present use 'doesNotExist'.&quot;);</span>
+<span class="fc" id="L195">                    exp.put(&quot;actual_value&quot;, &quot;_NOT_FOUND_&quot;);</span>
+<span class="fc" id="L196">                    throw new RuntimeException(&quot;Did not find: &quot; + exp.get(&quot;actual&quot;));</span>
+                } else {
+<span class="nc" id="L198">                    exp.put(&quot;actual_value&quot;, val);</span>
+<span class="nc" id="L199">                    passes.add(exp);</span>
+                }
+            } else {
+<span class="fc" id="L202">                exp.put(&quot;actual_value&quot;, val);</span>
+<span class="fc" id="L203">                Object expV = getExpectedValue(exp.getStrict(&quot;expected&quot;), &quot;&quot; + exp.get(&quot;actual&quot;));</span>
+<span class="fc" id="L204">                exp.put(&quot;expected_value&quot;, expV);</span>
+//                    LOG.info(&quot;evaluating \&quot;&quot; + fullName() + &quot;\&quot;: &quot; + exp.get(&quot;actual&quot;) + &quot;(&quot; + val + &quot;) &quot; + exp.get(&quot;operator&quot;) + (exp.get(&quot;expected&quot;) == null ? &quot;&quot; : &quot; &quot; + exp.get(&quot;expected&quot;)));
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">                LOG.debug(new StringBuilder(&quot;evaluating \&quot;&quot;).append(exp.get(&quot;actual&quot;)).append(&quot;(&quot;).append(val).append(&quot;) &quot;).append(exp.get(&quot;operator&quot;)).append((exp.get(&quot;expected&quot;) == null ? &quot;&quot; : &quot; &quot; + exp.get(&quot;expected&quot;))).append(&quot;\n&quot;).toString());</span>
+<span class="fc" id="L207">                result = compare(val, expV, exp);</span>
+            }
+        }
+<span class="fc" id="L210">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

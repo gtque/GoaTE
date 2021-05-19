@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ExpectationBuilder.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.expect.builder</a> &gt; <span class="el_source">ExpectationBuilder.java</span></div><h1>ExpectationBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.expect.builder;
+
+import com.thegoate.expect.Expectation;
+import com.thegoate.utils.get.Get;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by Eric Angeli on 3/26/2019.
+ */
+<span class="fc" id="L38">public abstract class ExpectationBuilder {</span>
+    protected Object from;
+    protected Object fromExpected;
+    protected Object actual;
+    protected Object expected;
+<span class="fc" id="L43">    private List&lt;Expectation&gt; expectations = new ArrayList&lt;&gt;();</span>
+    protected Value actualValue;
+    protected Value expectedValue;
+<span class="fc" id="L46">    protected long period = -42;</span>
+<span class="fc" id="L47">    protected long timeoutMS = -42;</span>
+//    public List&lt;Expectation&gt; build(Expectation expectation){
+//        Goate exp = (Goate)expectation.getExpectations().get(0);
+//        setFrom(expectation.getFrom());
+//        setActual(exp.get(&quot;actual&quot;));
+//        return build();
+//    }
+
+    public abstract List&lt;Expectation&gt; build();
+
+    protected ExpectationBuilder expect(Expectation expectation) {
+<span class="fc" id="L58">        expectations.add(expectation.retryTimeout(timeoutMS).retryPeriod(period));</span>
+<span class="fc" id="L59">        return this;</span>
+    }
+
+    protected List&lt;Expectation&gt; getExpectations() {
+<span class="fc" id="L63">        return expectations;</span>
+    }
+
+    public ExpectationBuilder actualValue(Object value) {
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if(value instanceof Value) {</span>
+<span class="fc" id="L68">            this.actualValue = (Value)value;</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">            if (value != null) {</span>
+<span class="fc" id="L70">                this.setActual(this.actualValue.getLocator());</span>
+<span class="fc" id="L71">                this.setFrom(this.actualValue.getContainer());</span>
+            }
+        } else {
+<span class="fc" id="L74">            setActual(value);</span>
+        }
+<span class="fc" id="L76">        return this;</span>
+    }
+
+    public ExpectationBuilder expectedValue(Object value) {
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if(value instanceof Value) {</span>
+<span class="fc" id="L81">            this.expectedValue = (Value)value;</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">            if (value != null) {</span>
+<span class="fc" id="L83">                this.setExpected(this.expectedValue.getLocator());</span>
+<span class="fc" id="L84">                this.setFromExpected(this.expectedValue.getContainer());</span>
+            }
+        } else {
+<span class="nc" id="L87">            setExpected(value);</span>
+        }
+<span class="fc" id="L89">        return this;</span>
+    }
+
+    public ExpectationBuilder timeout(long timeoutMS){
+<span class="nc" id="L93">        this.timeoutMS = timeoutMS;</span>
+<span class="nc" id="L94">        return this;</span>
+    }
+
+    public ExpectationBuilder period(long period){
+<span class="nc" id="L98">        this.period = period;</span>
+<span class="nc" id="L99">        return this;</span>
+    }
+
+    public Object getFrom() {
+<span class="nc" id="L103">        return from;</span>
+    }
+
+    public ExpectationBuilder setFrom(Object from) {
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if(actualValue == null){</span>
+<span class="nc" id="L108">            actualValue = new Value().from(from);</span>
+        }
+<span class="fc" id="L110">        this.from = from;</span>
+<span class="fc" id="L111">        return this;</span>
+    }
+
+    public Object getFromExpected() {
+<span class="nc" id="L115">        return fromExpected;</span>
+    }
+
+    public ExpectationBuilder setFromExpected(Object fromExpected) {
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        if(expectedValue == null){</span>
+<span class="nc" id="L120">            expectedValue = new Value().from(fromExpected);</span>
+        }
+<span class="fc" id="L122">        this.fromExpected = fromExpected;</span>
+<span class="fc" id="L123">        return this;</span>
+    }
+
+    public Object getActual() {
+<span class="fc" id="L127">        Object a = actual;</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        if (from != null) {</span>
+<span class="pc bpc" id="L129" title="2 of 4 branches missed.">            if (!(&quot;&quot; + actual).contains(&quot;*&quot;) &amp;&amp; !(&quot;&quot; + actual).contains(&quot;+&quot;)) {</span>
+<span class="nc" id="L130">                a = new Get(actual).from(from);</span>
+            } else {
+<span class="fc" id="L132">                a = from;</span>
+            }
+        }
+<span class="fc" id="L135">        return a;</span>
+    }
+
+    public ExpectationBuilder setActual(Object actual) {
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        if(actualValue == null){</span>
+<span class="fc" id="L140">            actualValue = new Value(actual);</span>
+        }
+<span class="fc" id="L142">        this.actual = actual;</span>
+<span class="fc" id="L143">        return this;</span>
+    }
+
+    public Object getExpected() {
+<span class="fc" id="L147">        return expected;</span>
+    }
+
+    public ExpectationBuilder setExpected(Object expected) {
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        if(expectedValue == null){</span>
+<span class="fc" id="L152">            expectedValue = new Value(expected);</span>
+        }
+<span class="fc" id="L154">        this.expected = expected;</span>
+<span class="fc" id="L155">        return this;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

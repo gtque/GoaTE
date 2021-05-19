@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>BleatBoxDefault.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.logging</a> &gt; <span class="el_source">BleatBoxDefault.java</span></div><h1>BleatBoxDefault.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.logging;
+
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+
+import org.slf4j.Marker;
+
+import com.thegoate.annotations.IsDefault;
+
+/**
+ * Simple default BleatBox implementation that logs
+ * to basic slf4j levels.
+ * Created by Eric Angeli on 6/5/2017.
+ */
+@Bleat
+@IsDefault
+public class BleatBoxDefault extends BleatBoxBase {
+
+	public BleatBoxDefault(Class logger) {
+<span class="fc" id="L47">		super(logger);</span>
+<span class="fc" id="L48">	}</span>
+
+	protected String formatted(String title, String message) {
+<span class="fc" id="L51">		return format(&quot;%s:%s&quot;, ofNullable(title).orElse(&quot;&quot;), message);</span>
+	}
+
+	@Override
+	public void debug(String message) {
+<span class="fc" id="L56">		debug((String) null, message);</span>
+<span class="fc" id="L57">	}</span>
+
+	@Override
+	public void debug(String format, Object arg) {
+<span class="nc" id="L61">		LOG.debug(format, arg);</span>
+<span class="nc" id="L62">	}</span>
+
+	@Override
+	public void debug(String format, Object arg1, Object arg2) {
+<span class="nc" id="L66">		LOG.debug(format, arg1, arg2);</span>
+<span class="nc" id="L67">	}</span>
+
+	@Override
+	public void debug(String format, Object... arguments) {
+<span class="nc" id="L71">		LOG.debug(format, arguments);</span>
+<span class="nc" id="L72">	}</span>
+
+	@Override
+	public void debug(String title, String message) {
+<span class="fc" id="L76">		LOG.debug(formatted(title, message));</span>
+<span class="fc" id="L77">	}</span>
+
+	@Override
+	public void debug(String message, Throwable t) {
+<span class="fc" id="L81">		debug((String) null, message, t);</span>
+<span class="fc" id="L82">	}</span>
+
+	@Override
+	public boolean isDebugEnabled(Marker marker) {
+<span class="nc" id="L86">		return false;</span>
+	}
+
+	@Override
+	public void debug(Marker marker, String msg) {
+<span class="nc" id="L91">		LOG.debug(marker, msg);</span>
+<span class="nc" id="L92">	}</span>
+
+	@Override
+	public void debug(Marker marker, String format, Object arg) {
+<span class="nc" id="L96">		LOG.debug(marker, format, arg);</span>
+<span class="nc" id="L97">	}</span>
+
+	@Override
+	public void debug(Marker marker, String format, Object arg1, Object arg2) {
+<span class="nc" id="L101">		LOG.debug(marker, format, arg1, arg2);</span>
+<span class="nc" id="L102">	}</span>
+
+	@Override
+	public void debug(Marker marker, String format, Object... arguments) {
+<span class="nc" id="L106">		LOG.debug(marker, format, arguments);</span>
+<span class="nc" id="L107">	}</span>
+
+	@Override
+	public void debug(Marker marker, String msg, Throwable t) {
+<span class="nc" id="L111">		LOG.debug(marker, msg, t);</span>
+<span class="nc" id="L112">	}</span>
+
+	@Override
+	public boolean isInfoEnabled() {
+<span class="nc" id="L116">		return false;</span>
+	}
+
+	@Override
+	public void debug(String title, String message, Throwable t) {
+<span class="fc" id="L121">		LOG.debug(formatted(title, message), t);</span>
+<span class="fc" id="L122">	}</span>
+
+	@Override
+	public void info(String message) {
+<span class="fc" id="L126">		info((String) null, message);</span>
+<span class="fc" id="L127">	}</span>
+
+	@Override
+	public void info(String format, Object arg) {
+<span class="nc" id="L131">		LOG.info(format, arg);</span>
+<span class="nc" id="L132">	}</span>
+
+	@Override
+	public void info(String format, Object arg1, Object arg2) {
+<span class="nc" id="L136">		LOG.info(format, arg1, arg2);</span>
+<span class="nc" id="L137">	}</span>
+
+	@Override
+	public void info(String format, Object... arguments) {
+<span class="nc" id="L141">		LOG.info(format, arguments);</span>
+<span class="nc" id="L142">	}</span>
+
+	@Override
+	public void info(String title, String message) {
+<span class="fc" id="L146">		LOG.info(formatted(title, message));</span>
+<span class="fc" id="L147">	}</span>
+
+	@Override
+	public void info(String message, Throwable t) {
+<span class="fc" id="L151">		info((String) null, message, t);</span>
+<span class="fc" id="L152">	}</span>
+
+	@Override
+	public boolean isInfoEnabled(Marker marker) {
+<span class="nc" id="L156">		return false;</span>
+	}
+
+	@Override
+	public void info(Marker marker, String msg) {
+<span class="nc" id="L161">		LOG.info(marker, msg);</span>
+<span class="nc" id="L162">	}</span>
+
+	@Override
+	public void info(Marker marker, String format, Object arg) {
+<span class="nc" id="L166">		LOG.info(marker, format, arg);</span>
+<span class="nc" id="L167">	}</span>
+
+	@Override
+	public void info(Marker marker, String format, Object arg1, Object arg2) {
+<span class="nc" id="L171">		LOG.info(marker, format, arg1, arg2);</span>
+<span class="nc" id="L172">	}</span>
+
+	@Override
+	public void info(Marker marker, String format, Object... arguments) {
+<span class="nc" id="L176">		LOG.info(marker, format, arguments);</span>
+<span class="nc" id="L177">	}</span>
+
+	@Override
+	public void info(Marker marker, String msg, Throwable t) {
+<span class="nc" id="L181">		LOG.info(marker, msg, t);</span>
+<span class="nc" id="L182">	}</span>
+
+	@Override
+	public boolean isWarnEnabled() {
+<span class="nc" id="L186">		return false;</span>
+	}
+
+	@Override
+	public void info(String title, String message, Throwable t) {
+<span class="fc" id="L191">		LOG.info(formatted(title, message), t);</span>
+<span class="fc" id="L192">	}</span>
+
+	@Override
+	public void warn(String message) {
+<span class="fc" id="L196">		warn((String) null, message);</span>
+<span class="fc" id="L197">	}</span>
+
+	@Override
+	public void warn(String format, Object arg) {
+<span class="nc" id="L201">		LOG.warn(format, arg);</span>
+<span class="nc" id="L202">	}</span>
+
+	@Override
+	public void warn(String format, Object... arguments) {
+<span class="nc" id="L206">		LOG.warn(format, arguments);</span>
+<span class="nc" id="L207">	}</span>
+
+	@Override
+	public void warn(String format, Object arg1, Object arg2) {
+<span class="nc" id="L211">		LOG.warn(format, arg1, arg2);</span>
+<span class="nc" id="L212">	}</span>
+
+	@Override
+	public void warn(String title, String message) {
+<span class="fc" id="L216">		LOG.warn(formatted(title, message));</span>
+<span class="fc" id="L217">	}</span>
+
+	@Override
+	public void warn(String message, Throwable t) {
+<span class="fc" id="L221">		warn((String) null, message, t);</span>
+<span class="fc" id="L222">	}</span>
+
+	@Override
+	public boolean isWarnEnabled(Marker marker) {
+<span class="nc" id="L226">		return false;</span>
+	}
+
+	@Override
+	public void warn(Marker marker, String msg) {
+<span class="nc" id="L231">		LOG.warn(marker, msg);</span>
+<span class="nc" id="L232">	}</span>
+
+	@Override
+	public void warn(Marker marker, String format, Object arg) {
+<span class="nc" id="L236">		LOG.warn(marker, format, arg);</span>
+<span class="nc" id="L237">	}</span>
+
+	@Override
+	public void warn(Marker marker, String format, Object arg1, Object arg2) {
+<span class="nc" id="L241">		LOG.warn(marker, format, arg1, arg2);</span>
+<span class="nc" id="L242">	}</span>
+
+	@Override
+	public void warn(Marker marker, String format, Object... arguments) {
+<span class="nc" id="L246">		LOG.warn(marker, format, arguments);</span>
+<span class="nc" id="L247">	}</span>
+
+	@Override
+	public void warn(Marker marker, String msg, Throwable t) {
+<span class="nc" id="L251">		LOG.warn(marker, msg, t);</span>
+<span class="nc" id="L252">	}</span>
+
+	@Override
+	public boolean isErrorEnabled() {
+<span class="nc" id="L256">		return false;</span>
+	}
+
+	@Override
+	public void warn(String title, String message, Throwable t) {
+<span class="fc" id="L261">		LOG.warn(formatted(title, message), t);</span>
+<span class="fc" id="L262">	}</span>
+
+	@Override
+	public void error(String message) {
+<span class="fc" id="L266">		error((String) null, message);</span>
+<span class="fc" id="L267">	}</span>
+
+	@Override
+	public void error(String format, Object arg) {
+<span class="nc" id="L271">		LOG.error(format, arg);</span>
+<span class="nc" id="L272">	}</span>
+
+	@Override
+	public void error(String format, Object arg1, Object arg2) {
+<span class="nc" id="L276">		LOG.error(format, arg1, arg2);</span>
+<span class="nc" id="L277">	}</span>
+
+	@Override
+	public void error(String format, Object... arguments) {
+<span class="nc" id="L281">		LOG.error(format, arguments);</span>
+<span class="nc" id="L282">	}</span>
+
+	@Override
+	public void error(String title, String message) {
+<span class="fc" id="L286">		LOG.error(formatted(title, message));</span>
+<span class="fc" id="L287">	}</span>
+
+	@Override
+	public void error(String message, Throwable t) {
+<span class="fc" id="L291">		error((String) null, message, t);</span>
+<span class="fc" id="L292">	}</span>
+
+	@Override
+	public boolean isErrorEnabled(Marker marker) {
+<span class="nc" id="L296">		return false;</span>
+	}
+
+	@Override
+	public void error(Marker marker, String msg) {
+<span class="nc" id="L301">		LOG.error(marker, msg);</span>
+<span class="nc" id="L302">	}</span>
+
+	@Override
+	public void error(Marker marker, String format, Object arg) {
+<span class="nc" id="L306">		LOG.error(marker, format, arg);</span>
+<span class="nc" id="L307">	}</span>
+
+	@Override
+	public void error(Marker marker, String format, Object arg1, Object arg2) {
+<span class="nc" id="L311">		LOG.error(marker, format, arg1, arg2);</span>
+<span class="nc" id="L312">	}</span>
+
+	@Override
+	public void error(Marker marker, String format, Object... arguments) {
+<span class="nc" id="L316">		LOG.error(marker, format, arguments);</span>
+<span class="nc" id="L317">	}</span>
+
+	@Override
+	public void error(Marker marker, String msg, Throwable t) {
+<span class="nc" id="L321">		LOG.error(marker, msg, t);</span>
+<span class="nc" id="L322">	}</span>
+
+	@Override
+	public void error(String title, String message, Throwable t) {
+<span class="fc" id="L326">		LOG.error(formatted(title, message), t);</span>
+<span class="fc" id="L327">	}</span>
+
+	@Override
+	public String getName() {
+<span class="nc" id="L331">		return null;</span>
+	}
+
+	@Override
+	public boolean isTraceEnabled() {
+<span class="nc" id="L336">		return false;</span>
+	}
+
+	@Override
+	public void trace(String message) {
+<span class="fc" id="L341">		trace((String) null, message);</span>
+<span class="fc" id="L342">	}</span>
+
+	@Override
+	public void trace(String format, Object arg) {
+<span class="nc" id="L346">		LOG.trace(format, arg);</span>
+<span class="nc" id="L347">	}</span>
+
+	@Override
+	public void trace(String format, Object arg1, Object arg2) {
+<span class="nc" id="L351">		LOG.trace(format, arg1, arg2);</span>
+<span class="nc" id="L352">	}</span>
+
+	@Override
+	public void trace(String format, Object... arguments) {
+<span class="nc" id="L356">		LOG.trace(format, arguments);</span>
+<span class="nc" id="L357">	}</span>
+
+	@Override
+	public void trace(String title, String message) {
+<span class="fc" id="L361">		LOG.trace(formatted(title, message));</span>
+<span class="fc" id="L362">	}</span>
+
+	@Override
+	public void trace(String message, Throwable t) {
+<span class="fc" id="L366">		trace((String) null, message, t);</span>
+<span class="fc" id="L367">	}</span>
+
+	@Override
+	public boolean isTraceEnabled(Marker marker) {
+<span class="nc" id="L371">		return false;</span>
+	}
+
+	@Override
+	public void trace(Marker marker, String msg) {
+<span class="nc" id="L376">		LOG.trace(marker, msg);</span>
+<span class="nc" id="L377">	}</span>
+
+	@Override
+	public void trace(Marker marker, String format, Object arg) {
+<span class="nc" id="L381">		LOG.trace(marker, format, arg);</span>
+<span class="nc" id="L382">	}</span>
+
+	@Override
+	public void trace(Marker marker, String format, Object arg1, Object arg2) {
+<span class="nc" id="L386">		LOG.trace(marker, format, arg1, arg2);</span>
+<span class="nc" id="L387">	}</span>
+
+	@Override
+	public void trace(Marker marker, String format, Object... argArray) {
+<span class="nc" id="L391">		LOG.trace(marker, format, argArray);</span>
+<span class="nc" id="L392">	}</span>
+
+	@Override
+	public void trace(Marker marker, String msg, Throwable t) {
+<span class="nc" id="L396">		LOG.trace(marker, msg, t);</span>
+<span class="nc" id="L397">	}</span>
+
+	@Override
+	public boolean isDebugEnabled() {
+<span class="nc" id="L401">		return false;</span>
+	}
+
+	@Override
+	public void trace(String title, String message, Throwable t) {
+<span class="fc" id="L406">		LOG.trace(formatted(title, message), t);</span>
+<span class="fc" id="L407">	}</span>
+
+	@Override
+	public void pass(String message) {
+<span class="fc" id="L411">		pass(null, message);</span>
+<span class="fc" id="L412">	}</span>
+
+	@Override
+	public void pass(String title, String message) {
+<span class="fc" id="L416">		info(title, message);</span>
+<span class="fc" id="L417">	}</span>
+
+	@Override
+	public void pass(String message, Throwable t) {
+<span class="fc" id="L421">		pass(null, message, t);</span>
+<span class="fc" id="L422">	}</span>
+
+	@Override
+	public void pass(String title, String message, Throwable t) {
+<span class="fc" id="L426">		info(title, message, t);</span>
+<span class="fc" id="L427">	}</span>
+
+	@Override
+	public void pass(String format, Object arg) {
+<span class="nc" id="L431">		info(format, arg);</span>
+<span class="nc" id="L432">	}</span>
+
+	@Override
+	public void pass(String format, Object arg1, Object arg2) {
+<span class="nc" id="L436">		info(format, arg1, arg2);</span>
+<span class="nc" id="L437">	}</span>
+
+	@Override
+	public void pass(String format, Object... arguments) {
+<span class="nc" id="L441">		info(format, arguments);</span>
+<span class="nc" id="L442">	}</span>
+
+	@Override
+	public void fail(String message) {
+<span class="fc" id="L446">		fail(null, message);</span>
+<span class="fc" id="L447">	}</span>
+
+	@Override
+	public void fail(String title, String message) {
+<span class="fc" id="L451">		error(title, message);</span>
+<span class="fc" id="L452">	}</span>
+
+	@Override
+	public void fail(String message, Throwable t) {
+<span class="fc" id="L456">		fail(null, message, t);</span>
+<span class="fc" id="L457">	}</span>
+
+	@Override
+	public void fail(String title, String message, Throwable t) {
+<span class="fc" id="L461">		error(title, message, t);</span>
+<span class="fc" id="L462">	}</span>
+
+	@Override
+	public void fail(String format, Object arg) {
+<span class="nc" id="L466">		error(format, arg);</span>
+<span class="nc" id="L467">	}</span>
+
+	@Override
+	public void fail(String format, Object arg1, Object arg2) {
+<span class="nc" id="L471">		error(format, arg1, arg2);</span>
+<span class="nc" id="L472">	}</span>
+
+	@Override
+	public void fail(String format, Object... arguments) {
+<span class="nc" id="L476">		error(format, arguments);</span>
+<span class="nc" id="L477">	}</span>
+
+	@Override
+	public void fatal(String message) {
+<span class="fc" id="L481">		fatal(null, message);</span>
+<span class="fc" id="L482">	}</span>
+
+	@Override
+	public void fatal(String title, String message) {
+<span class="fc" id="L486">		error((String) null, message);</span>
+<span class="fc" id="L487">	}</span>
+
+	@Override
+	public void fatal(String message, Throwable t) {
+<span class="fc" id="L491">		fatal(null, message, t);</span>
+<span class="fc" id="L492">	}</span>
+
+	@Override
+	public void fatal(String title, String message, Throwable t) {
+<span class="fc" id="L496">		error(title, message, t);</span>
+<span class="fc" id="L497">	}</span>
+
+	@Override
+	public void fatal(String format, Object arg) {
+<span class="nc" id="L501">		error(format, arg);</span>
+<span class="nc" id="L502">	}</span>
+
+	@Override
+	public void fatal(String format, Object arg1, Object arg2) {
+<span class="nc" id="L506">		error(format, arg1, arg2);</span>
+<span class="nc" id="L507">	}</span>
+
+	@Override
+	public void fatal(String format, Object... arguments) {
+<span class="nc" id="L511">		error(format, arguments);</span>
+<span class="nc" id="L512">	}</span>
+
+	@Override
+	public void skip(String message) {
+<span class="fc" id="L516">		skip(null, message);</span>
+<span class="fc" id="L517">	}</span>
+
+	@Override
+	public void skip(String title, String message) {
+<span class="fc" id="L521">		info(title, message);</span>
+<span class="fc" id="L522">	}</span>
+
+	@Override
+	public void skip(String message, Throwable t) {
+<span class="fc" id="L526">		skip(null, message, t);</span>
+<span class="fc" id="L527">	}</span>
+
+	@Override
+	public void skip(String title, String message, Throwable t) {
+<span class="fc" id="L531">		info(title, message, t);</span>
+<span class="fc" id="L532">	}</span>
+
+	@Override
+	public void skip(String format, Object arg) {
+<span class="nc" id="L536">		info(format, arg);</span>
+<span class="nc" id="L537">	}</span>
+
+	@Override
+	public void skip(String format, Object arg1, Object arg2) {
+<span class="nc" id="L541">		info(format, arg1, arg2);</span>
+<span class="nc" id="L542">	}</span>
+
+	@Override
+	public void skip(String format, Object... arguments) {
+<span class="nc" id="L546">		info(format, arguments);</span>
+<span class="nc" id="L547">	}</span>
+
+	@Override
+	public void unknown(String message) {
+<span class="fc" id="L551">		unknown(null, message);</span>
+<span class="fc" id="L552">	}</span>
+
+	@Override
+	public void unknown(String title, String message) {
+<span class="fc" id="L556">		info(title, message);</span>
+<span class="fc" id="L557">	}</span>
+
+	@Override
+	public void unknown(String message, Throwable t) {
+<span class="fc" id="L561">		unknown(null, message, t);</span>
+<span class="fc" id="L562">	}</span>
+
+	@Override
+	public void unknown(String title, String message, Throwable t) {
+<span class="fc" id="L566">		info(title, message, t);</span>
+<span class="fc" id="L567">	}</span>
+
+	@Override
+	public void unknown(String format, Object arg) {
+<span class="nc" id="L571">		info(format, arg);</span>
+<span class="nc" id="L572">	}</span>
+
+	@Override
+	public void unknown(String format, Object arg1, Object arg2) {
+<span class="nc" id="L576">		info(format, arg1, arg2);</span>
+<span class="nc" id="L577">	}</span>
+
+	@Override
+	public void unknown(String format, Object... arguments) {
+<span class="nc" id="L581">		info(format, arguments);</span>
+<span class="nc" id="L582">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

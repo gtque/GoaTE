@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RestCall.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.rest</a> &gt; <span class="el_source">RestCall.java</span></div><h1>RestCall.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.rest;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.rest.staff.ApiEmployee;
+import com.thegoate.staff.GoateJob;
+
+import java.lang.reflect.InvocationTargetException;
+
+import static com.thegoate.rest.Rest.typeSeparator;
+
+/**
+ * Wrapper for programmatically using the REST framework in GoaTE.
+ * Created by Eric Angeli on 11/8/2018.
+ */
+<span class="fc" id="L44">public class RestCall&lt;T&gt; {</span>
+<span class="fc" id="L45">    BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+    public static final String ENABLE_LOG = &quot;_goate_rest_log_enabled_&quot;;
+<span class="fc" id="L47">    protected Goate definition = new Goate();</span>
+
+    public RestCall&lt;T&gt; disableLog(){
+<span class="nc" id="L50">        definition.put(ENABLE_LOG, false);</span>
+<span class="nc" id="L51">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; enableLog(){
+<span class="nc" id="L55">        definition.put(RestCall.ENABLE_LOG, true);</span>
+<span class="nc" id="L56">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; clear(){
+<span class="nc" id="L60">        definition = new Goate();</span>
+<span class="nc" id="L61">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; baseURL(String url) {
+<span class="fc" id="L65">        definition.put(&quot;base url&quot;, url);</span>
+<span class="fc" id="L66">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; security(String security) {
+<span class="nc" id="L70">        definition.put(&quot;security&quot;, security);</span>
+<span class="nc" id="L71">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; timeout(int timeout) {
+<span class="nc" id="L75">        definition.put(&quot;rest.timeout&quot;, timeout);</span>
+<span class="nc" id="L76">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; customParam(String key, String param) {
+<span class="nc" id="L80">        definition.put(&quot;custom params.##&quot;, key + &quot;:=&quot; + param);</span>
+<span class="nc" id="L81">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; multipart(String key, Object param, String contentType){
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if(contentType!=null){</span>
+<span class="fc" id="L86">            key += typeSeparator + contentType;</span>
+        }
+<span class="fc" id="L88">        return multipart(key, param);</span>
+    }
+
+    public RestCall&lt;T&gt; multipart(String key, Object param) {
+<span class="fc" id="L92">        definition.put(&quot;multipart##&quot;, key + &quot;:=o::_goate_mp-&quot; + paramObjectName(param));</span>
+<span class="fc" id="L93">        definition.put(&quot;_goate_mp-&quot;+paramObjectName(param), param);</span>
+<span class="fc" id="L94">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; formParam(String key, String param) {
+<span class="nc" id="L98">        definition.put(&quot;form params.##&quot;, key + &quot;:=&quot; + param);</span>
+<span class="nc" id="L99">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; pathParam(String key, String param) {
+<span class="nc" id="L103">        definition.put(&quot;path params.##&quot;, key + &quot;:=&quot; + param);</span>
+<span class="nc" id="L104">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; queryParam(String key, String param) {
+<span class="fc" id="L108">        definition.put(&quot;query params.##&quot;, key + &quot;:=&quot; + param);</span>
+<span class="fc" id="L109">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; queryParam(String key, Object param) {
+<span class="fc" id="L113">        definition.put(&quot;query params.##&quot;, key + &quot;:=o::_goate_qp-&quot;+paramObjectName(param));</span>
+<span class="fc" id="L114">        definition.put(&quot;_goate_qp-&quot; + paramObjectName(param), param);</span>
+<span class="fc" id="L115">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; urlParam(String key, String param) {
+<span class="nc" id="L119">        definition.put(&quot;url params.##&quot;, key + &quot;:=&quot; + param);</span>
+<span class="nc" id="L120">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; header(String key, String param) {
+<span class="nc" id="L124">        definition.put(&quot;headers.##&quot;, key + &quot;:=&quot; + param);</span>
+<span class="nc" id="L125">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; body(Object body) {
+<span class="nc" id="L129">        definition.put(&quot;body&quot;, body);</span>
+<span class="nc" id="L130">        return this;</span>
+    }
+
+    public RestCall&lt;T&gt; configure(Object config) {
+<span class="nc" id="L134">        definition.put(&quot;config&quot;, config);</span>
+<span class="nc" id="L135">        return this;</span>
+    }
+
+    public T get(String endpoint) {
+<span class="fc" id="L139">        definition.put(&quot;end point&quot;, endpoint);</span>
+<span class="fc" id="L140">        return execute(&quot;get&quot;);</span>
+    }
+
+    public T put(String endpoint) {
+<span class="nc" id="L144">        definition.put(&quot;end point&quot;, endpoint);</span>
+<span class="nc" id="L145">        return execute(&quot;put&quot;);</span>
+    }
+
+    public T post(String endpoint) {
+<span class="fc" id="L149">        definition.put(&quot;end point&quot;, endpoint);</span>
+<span class="fc" id="L150">        return execute(&quot;post&quot;);</span>
+    }
+
+    public T patch(String endpoint) {
+<span class="fc" id="L154">        definition.put(&quot;end point&quot;, endpoint);</span>
+<span class="fc" id="L155">        return execute(&quot;patch&quot;);</span>
+    }
+
+    public T delete(String endpoint) {
+<span class="nc" id="L159">        definition.put(&quot;end point&quot;, endpoint);</span>
+<span class="nc" id="L160">        return execute(&quot;delete&quot;);</span>
+    }
+
+    public T head(String endpoint) {
+<span class="nc" id="L164">        definition.put(&quot;end point&quot;, endpoint);</span>
+<span class="nc" id="L165">        return execute(&quot;head&quot;);</span>
+    }
+
+    protected String paramObjectName(Object param){
+<span class="fc" id="L169">        String name = &quot;&quot; + param;</span>
+<span class="fc" id="L170">        return name.replace(&quot;,&quot;,&quot;;&quot;);</span>
+    }
+
+    private T execute(String method) {
+<span class="fc" id="L174">        definition.put(&quot;method&quot;, method);</span>
+<span class="fc" id="L175">        AnnotationFactory af = new AnnotationFactory();</span>
+<span class="fc" id="L176">        T result = null;</span>
+        try {
+<span class="fc" id="L178">            ApiEmployee&lt;T&gt; worker = (ApiEmployee) af.annotatedWith(GoateJob.class).find(method).using(&quot;jobs&quot;).build();</span>
+<span class="fc" id="L179">            worker.init(definition);</span>
+<span class="fc" id="L180">            result = worker.work();</span>
+<span class="nc" id="L181">        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {</span>
+<span class="nc" id="L182">            LOG.error(&quot;Barn API Init&quot;, &quot;problem finding something to execute a &quot; + method + &quot;\nmake sure you have an implementation library included.&quot;, e);</span>
+<span class="fc" id="L183">        }</span>
+<span class="fc" id="L184">        return result;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<center>
+	<div class="center" id="content">
+		<div id="page">
+			<div id="welcome">
+				<div class="big_title">What is GoaTE?</div>
+				<p>
+					GoaTE is the Greates of All Test Engines. It is a layer above frameworks that seeks to make using different frameworks easier and interchangable, while providing some extra frameworks for things that I find lacking in other testing frameworks.
+				</p>
+				<p>
+					This page will hopefully provide answers to your questions. And even a few answers to questions you never asked. Perhaps some friendly (and some not so friendly) tutorials. Plus a dictionary and encylcopedia of words in the DSL and tagged utiltilies provided by GoaTE.
+				</p>
+				<p>
+					The best place to get started is with the tutorials. Hopefully they provide a decent enough walkthrough and examples to get you're GoaTE working.
+				</p>
+			</div>
+			<div id="description">
+				<p class="big_title">Why is GoaTE?</p>
+				<p>GoaTE is framework designed to help facilate better tests by providing an interface(s) that you write tests against that wrap other commonly used testing libraries.
+				Additionally it provides a simple DSL layer in the form of the GoaTE data collection that provides a mechanism for defining more dynamic data. The DSL is designed to easably extended and is intended to be used for making statically typed data driven tests a bit more dynamic.
+				GoaTE also provides a few other frameworks of its own. This includes "expectations" that are designed to work the "employees" and static data. Expectatoins are asyncrhonously executed and can be defined to retry for a given period until successful. Employees define a standard interface for defining objects that execute a task and return a result.
+				</p>
+				<p>Testing is also a bit different from production development and often has slightly different use cases for logging and serializing/deserializing data.
+				GoaTE provides its own logging interface geared more towards the types of logging used in testing. It is designed to work natively with SLFJ and can be extended to add additional logging support, such as support for ExtentReports.
+				Testing activities usually have to deal with multiple different sources of data. The serialization/deserialization support provided in GoaTE allows for a single Object to be mapped to multiple sources that have different key names.
+				</p>
+			</div>
+			<div id="outline">
+				<p class="big_title">How is GoaTE?</p>
+				<p>GoaTE is written as one big project made up of different modules. The main module is called "kernel". You can use as many our as few of the modules as you want.
+				</p>
+				<p class="little_title">com.thegoate:</p>
+				<files>forms/home/modules</files>
+			</div>
+			<div id="author">
+				<p class="big_title">Who is GoaTE</p>
+				<p>The cliche answer is: You are. I are. We are.</p>
+				<p>The actual answer is: Eric is. GoaTE has evolved over the years (since about 2011) before becoming the GoaTE you see now.</p>
+			</div>
+		</div>
+		<file>forms/home/mainright.xml</file>
+	</div>
+</center>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<q>
+	<dt class="question">What does GoaTE do?</dt>
+	<dd class="answer">GoaTE does several things. It started as a way to introduce a customizable DSL for test data. It has evolved to also provide a standard interface that can be used to provide wrappers around common test frameworks. It also introduces a few patterns, such as employees and expectations, to improve and add some pretty sweet functionality (like retries with timeouts for validations).</dd>
+</q>

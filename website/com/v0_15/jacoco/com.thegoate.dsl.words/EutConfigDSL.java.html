@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>EutConfigDSL.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.dsl.words</a> &gt; <span class="el_source">EutConfigDSL.java</span></div><h1>EutConfigDSL.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.dsl.words;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.data.PropertyFileDL;
+import com.thegoate.dsl.DSL;
+import com.thegoate.dsl.GoateDSL;
+import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.fill.FillString;
+
+import java.io.File;
+import java.util.List;
+
+/**
+ * Checks for a properties file in a folder called eut
+ * whith a file name using the pattern eut.properties, where env is set or passed as a system property or environment
+ * variable where eut is replaced with the name of the environment under test.&lt;br&gt;
+ * example: -Deut=local&lt;br&gt;
+ *      then in the resource directory:&lt;br&gt;
+ *          resources/eut/local.properties&lt;br&gt;
+ * You can override the properties file by setting the same parameter in your run data.&lt;br&gt;
+ * To reference something in the eut properties use: eut::name,default
+ * &lt;br&gt;where name is the name of the property and default is a default value to use if not found.
+ * &lt;br&gt;default is not required and may be left off.
+ *&lt;p&gt;&lt;br&gt; The eut folder location may be configured by adding a file called eut.config, this file must be in the eut folder &quot; +
+ &quot;&lt;br&gt;     but you may configure a different default name, a name pattern, file extension, and a location for the eut properties.&quot; +
+ &quot;&lt;br&gt;     example eut/eut.config (default is the default properties file, including the path, to load if no profile or eut is specified):&quot;+
+ &quot;&lt;br&gt;default=config&quot;+
+ &quot;&lt;br&gt;pattern=config-${profile}&quot;+
+ &quot;&lt;br&gt;extension=properties&quot;+
+ &quot;&lt;br&gt;location=setup&lt;/p&gt;
+ * Created by gtque on 5/19/2017.
+ */
+@GoateDSL(word = &quot;eut&quot;)
+@GoateDescription(description = &quot;Returns the value of the specified property in the defined eut properties file.&quot; +
+        &quot;\n The eut can be specified by setting a system or environment variable called eut.&quot; +
+        &quot;\n The corresponding  property must be in the eut folder and be named &lt;system/environment variable&gt;.properties.&quot; +
+        &quot;\n The eut folder location may be configured by adding a file called eut.config, this file must be in the eut folder &quot; +
+        &quot;\n     but you may configure a different default name, a name pattern, file extension, and a location for the eut properties.&quot; +
+        &quot;\n     example eut/eut.config (default is the default properties file, including the path, to load if no profile or eut is specified):&quot;+
+        &quot;\ndefault=eut/local.properties&quot;+
+        &quot;\npattern=${profile}&quot;+
+        &quot;\nextension=properties&quot;+
+        &quot;\nlocation=eut&quot; +
+        &quot;\ndefault.profile=localdev&quot;,
+    parameters = {&quot;The name of the property&quot;,&quot;Optional default value.&quot;})
+public class EutConfigDSL extends DSL {
+    public EutConfigDSL(Object value) {
+<span class="fc" id="L76">        super(value);</span>
+<span class="fc" id="L77">    }</span>
+<span class="fc" id="L78">    protected static Goate eut = new Goate();</span>
+<span class="fc" id="L79">    protected static volatile boolean loaded = false;</span>
+<span class="fc" id="L80">    protected String path = &quot;eut&quot;;</span>
+<span class="fc" id="L81">    protected String defaultPropeties = &quot;eut/local.properties&quot;;</span>
+<span class="fc" id="L82">    protected String fileName = &quot;${eut}&quot;;</span>
+<span class="fc" id="L83">    protected String extension = &quot;properties&quot;;</span>
+
+    public static void clear(){
+<span class="fc" id="L86">        loaded = false;</span>
+<span class="fc" id="L87">        eut = new Goate();</span>
+<span class="fc" id="L88">    }</span>
+
+    public static String eut(String key){
+<span class="nc" id="L91">        return eut(key,null);</span>
+    }
+
+    public static String eut(String key, String defaultValue) {
+<span class="fc" id="L95">        return eut(key, defaultValue, new Goate());</span>
+    }
+
+    public static &lt;T&gt; T eut(String key, Object defaultValue, Class&lt;T&gt; type){
+<span class="fc" id="L99">        return eut(key, defaultValue, type, new Goate());</span>
+    }
+
+    public static String eut(String key, String defaultValue, Goate data) {
+<span class="fc" id="L103">        return eut(key, defaultValue, String.class, data);</span>
+    }
+    public static &lt;T&gt; T eut(String key, Object defaultValue, Class&lt;T&gt; type, Goate data){
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        EutConfigDSL eut = new EutConfigDSL(&quot;eut::&quot;+key+(defaultValue==null?&quot;&quot;:(&quot;,&quot;+(&quot;&quot;+defaultValue).replace(&quot;,&quot;,&quot;\\,&quot;))));</span>
+<span class="fc" id="L107">        return new Goate().get(&quot;chet&quot;, eut.evaluate(data), type);</span>
+    }
+
+    @Override
+    public Object evaluate(Goate data) {
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        if(data.get(&quot;_goate_:eutConfig&quot;)!=null){</span>
+<span class="fc" id="L113">            eut = data.get(&quot;_goate_:eutConfig&quot;, eut, Goate.class);</span>
+        }
+<span class="fc" id="L115">        eut.put(&quot;_init_&quot;, true);</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if(!loaded) {</span>
+<span class="fc" id="L117">            loaded = true;</span>
+<span class="fc" id="L118">            List&lt;Goate&gt; configs = new PropertyFileDL().file(&quot;eut/eut.config&quot;).load();</span>
+<span class="fc" id="L119">            Goate config = new Goate();</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">            if(configs.size()&gt;0){</span>
+<span class="fc" id="L121">                config = configs.get(0);</span>
+            }
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            if(data.get(&quot;eut&quot;, data.get(&quot;profile&quot;,config.get(&quot;default.profile&quot;, null)))==null){</span>
+<span class="fc" id="L124">                LOG.debug(&quot;eut&quot;, &quot;No profile found, will default to default properties.&quot;);</span>
+            }
+<span class="fc" id="L126">            path = config.get(&quot;location&quot;, path, String.class);</span>
+<span class="fc" id="L127">            extension = config.get(&quot;extension&quot;, extension, String.class);</span>
+<span class="fc" id="L128">            defaultPropeties = config.get(&quot;default&quot;, defaultPropeties, String.class);</span>
+<span class="fc" id="L129">            fileName = config.get(&quot;pattern&quot;, fileName, String.class);</span>
+<span class="fc" id="L130">            String eutProfile = &quot;&quot;+new FillString(fileName).with(data);//&quot;&quot; + data.get(&quot;eut&quot;, data.get(&quot;profile&quot;,&quot;local&quot;));</span>
+<span class="fc" id="L131">            String file = path+&quot;/&quot;+eutProfile+&quot;.&quot;+extension;</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">            if(!new File(GoateUtils.getFilePath(file)).exists()){</span>
+<span class="fc" id="L133">                file = defaultPropeties;</span>
+            }
+<span class="fc" id="L135">            List&lt;Goate&gt; d = new PropertyFileDL().file(file).load();</span>
+<span class="pc bpc" id="L136" title="2 of 4 branches missed.">            if(d!=null&amp;&amp;d.size()&gt;0){</span>
+<span class="fc" id="L137">                eut = d.get(0);</span>
+<span class="fc" id="L138">                data.put(&quot;_goate_:eutConfig&quot;, eut);</span>
+            }
+        }
+<span class="fc" id="L141">        String key = &quot;&quot;+get(1,data);</span>
+<span class="fc" id="L142">        Object def = get(2,data);</span>
+<span class="pc bpc" id="L143" title="1 of 4 branches missed.">        return data.get(key, eut!=null?(eut.get(key)==null?def:eut.get(key)):def);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

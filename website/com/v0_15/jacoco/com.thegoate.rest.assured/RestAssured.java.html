@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RestAssured.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.rest.assured</a> &gt; <span class="el_source">RestAssured.java</span></div><h1>RestAssured.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.rest.assured;
+
+import com.github.dzieciou.testing.curl.CurlLoggingRestAssuredConfigFactory;
+import com.github.dzieciou.testing.curl.Options;
+import com.github.dzieciou.testing.curl.Platform;
+import com.thegoate.Goate;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.rest.Rest;
+import com.thegoate.rest.RestSpec;
+import com.thegoate.rest.annotation.GoateRest;
+
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.LogConfig;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.config.SSLConfig;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.config.EncoderConfig.encoderConfig;
+import static io.restassured.config.HeaderConfig.headerConfig;
+import static io.restassured.config.HttpClientConfig.httpClientConfig;
+
+/**
+ * REST Assured implementation.
+ * Created by Eric Angeli on 5/16/2017.
+ */
+@GoateRest
+@IsDefault
+public class RestAssured extends Rest implements RASpec {
+<span class="pc" id="L63">    RequestSpecification specification = null;</span>
+<span class="pc" id="L64">    Response response = null;</span>
+
+<span class="fc" id="L66">    public RestAssured() {</span>
+<span class="fc" id="L67">        this.specification = RestAssured.init(given(), this);</span>
+<span class="fc" id="L68">    }</span>
+
+<span class="nc" id="L70">    public RestAssured(RequestSpecification specification) {</span>
+<span class="nc" id="L71">        this.specification = RestAssured.init(specification, this);</span>
+<span class="nc" id="L72">    }</span>
+
+    public static RequestSpecification init(RequestSpecification specification, RASpec spec) {
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        specification = specification == null ? given() : specification;</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        RestAssuredConfig rac = spec.getConfig() == null?new RestAssuredConfig():(RestAssuredConfig)spec.getConfig();</span>
+<span class="fc" id="L77">        PrintStream streamer = getPrintStream(spec.getLog());</span>
+<span class="fc" id="L78">        LogConfig lc = new LogConfig(streamer, true);</span>
+<span class="fc" id="L79">        SSLConfig sslc = new SSLConfig().allowAllHostnames().relaxedHTTPSValidation();</span>
+<span class="fc" id="L80">        rac = rac.sslConfig(sslc);</span>
+<span class="fc" id="L81">        rac = rac.logConfig(lc);</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if (spec.getHeaders().keys().toArray().length &gt; 0) {</span>
+<span class="nc" id="L83">            rac = rac.headerConfig(headerConfig()</span>
+<span class="nc" id="L84">                    .overwriteHeadersWithName(&quot;Content-Type&quot;, spec.getHeaders().keysArray()));</span>
+        } else {
+<span class="fc" id="L86">            rac = rac.headerConfig(headerConfig()</span>
+<span class="fc" id="L87">                    .overwriteHeadersWithName(&quot;Content-Type&quot;));</span>
+        }
+<span class="fc" id="L89">        int timeout = spec.getTimeout();</span>
+<span class="fc" id="L90">        rac = rac.httpClient(httpClientConfig().setParam(&quot;CONNECTION_MANAGER_TIMEOUT&quot;, timeout * 1000));</span>
+<span class="fc" id="L91">        rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));</span>
+<span class="fc" id="L92">        Options options = Options.builder().targetPlatform(Platform.UNIX).build();</span>
+<span class="fc" id="L93">        rac = CurlLoggingRestAssuredConfigFactory.updateConfig(rac, options);</span>
+<span class="fc" id="L94">        return specification.config(rac);</span>
+    }
+
+    public static RequestSpecification build(RASpec spec) {
+<span class="fc" id="L98">        RequestSpecification mySpec = spec.getSpec();</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">        if (mySpec != null) {</span>
+<span class="fc" id="L100">            mySpec.baseUri(spec.getBaseURL());</span>
+<span class="fc" id="L101">            setHeaders(mySpec, spec.getHeaders());</span>
+<span class="fc" id="L102">            setURLParameters(mySpec, spec.getURLParameters());</span>
+<span class="fc" id="L103">            setQueryParameters(mySpec, spec.getQueryParameters());</span>
+<span class="fc" id="L104">            setPathParameters(mySpec, spec.getPathParameters());</span>
+<span class="fc" id="L105">            setBody(mySpec, spec.getBody());</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">            if (spec.doLog()) {</span>
+<span class="fc" id="L107">                mySpec.log().all();</span>
+<span class="fc" id="L108">                spec.getLog().flush();</span>
+            }
+//            keeping this as a reference in case I need to expose it for some reason.
+//            io.restassured.RestAssured.urlEncodingEnabled = false;
+
+        }
+<span class="fc" id="L114">        return mySpec;</span>
+    }
+
+    @Override
+    public RestSpec config() {
+<span class="fc" id="L119">        init(specification, this);</span>
+<span class="fc" id="L120">        return this;</span>
+    }
+
+    @Override
+    public BleatBox getLog() {
+<span class="fc" id="L125">        return LOG;</span>
+    }
+
+    /**
+     * COPIED FROM STACKOVERFLOW.
+     * This high-jacks the stream writer to write to our custom logger implementation.
+     * This will always write to info. Writing the response to the logger is not controlled by the logging level,
+     * but by a separate setting.
+     *
+     * @param log The instance of the log implementation to use.
+     * @return printStream
+     */
+    public static PrintStream getPrintStream(BleatBox log) {
+        PrintStream stream;
+<span class="fc" id="L139">        OutputStream output = new OutputStream() {</span>
+<span class="fc" id="L140">            BleatBox logger = log;</span>
+<span class="fc" id="L141">            private StringBuilder myStringBuilder = new StringBuilder();</span>
+
+            @Override
+            public void write(int b) throws IOException {
+<span class="fc" id="L145">                this.myStringBuilder.append((char) b);</span>
+<span class="fc" id="L146">            }</span>
+
+            /**
+             * @see java.io.OutputStream#flush()
+             */
+            @Override
+            public void flush() {
+<span class="fc" id="L153">                logger.infoBuffer(&quot;RestAssured Response&quot;, this.myStringBuilder.toString());</span>
+<span class="fc" id="L154">                myStringBuilder = new StringBuilder();</span>
+<span class="fc" id="L155">            }</span>
+        };
+<span class="fc" id="L157">        stream = new PrintStream(output, true);  // true: autoflush must be set!</span>
+<span class="fc" id="L158">        return stream;</span>
+    }
+
+    protected static void setHeaders(RequestSpecification spec, Goate headers) {
+<span class="pc bpc" id="L162" title="2 of 4 branches missed.">        if (headers != null &amp;&amp; spec != null) {</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">            for (String key : headers.keys()) {</span>
+<span class="nc" id="L164">                spec.header(key, headers.get(key));</span>
+<span class="nc" id="L165">            }</span>
+        }
+<span class="fc" id="L167">    }</span>
+
+    protected static void setURLParameters(RequestSpecification spec, Goate params) {
+<span class="pc bpc" id="L170" title="2 of 4 branches missed.">        if (params != null &amp;&amp; spec != null) {</span>
+//            spec.params(params.data());
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">            for (String key : params.keys()) {</span>
+<span class="nc" id="L173">                spec.param(key, params.get(key));</span>
+<span class="nc" id="L174">            }</span>
+        }
+<span class="fc" id="L176">    }</span>
+
+    protected static void setQueryParameters(RequestSpecification spec, Goate params) {
+<span class="pc bpc" id="L179" title="2 of 4 branches missed.">        if (params != null &amp;&amp; spec != null) {</span>
+//            spec.queryParams(params.data());
+<span class="fc bfc" id="L181" title="All 2 branches covered.">            for (String key : params.keys()) {</span>
+<span class="fc" id="L182">                spec.queryParam(key, params.get(key));</span>
+<span class="fc" id="L183">            }</span>
+        }
+<span class="fc" id="L185">    }</span>
+
+    protected static void setPathParameters(RequestSpecification spec, Goate params) {
+<span class="pc bpc" id="L188" title="2 of 4 branches missed.">        if (params != null &amp;&amp; spec != null) {</span>
+//            spec.pathParams(params.data());
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">            for (String key : params.keys()) {</span>
+<span class="nc" id="L191">                spec.pathParam(key, params.get(key));</span>
+<span class="nc" id="L192">            }</span>
+        }
+<span class="fc" id="L194">    }</span>
+
+    protected static void setBody(RequestSpecification spec, Goate body) {
+<span class="pc bpc" id="L197" title="2 of 4 branches missed.">        if (spec != null &amp;&amp; body != null) {</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">            for (String key : body.keys()) {</span>
+<span class="fc" id="L199">                Goate b = (Goate) body.get(key);</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">                if (b != null) {</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">                    for (String id : b.keys()) {</span>
+<span class="fc" id="L202">                        String[] keyParts = id.split(typeSeparator);</span>
+<span class="fc" id="L203">                        String type = null;</span>
+<span class="fc" id="L204">                        String idkey = keyParts[0];</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">                        if(keyParts.length&gt;1){</span>
+<span class="fc" id="L206">                            type = keyParts[1];</span>
+                        }
+<span class="pc bpc" id="L208" title="2 of 4 branches missed.">                        if (key.equals(BODY.urlencoded.name()) || key.equals(BODY.form.name())) {</span>
+<span class="nc" id="L209">                            spec.formParam(idkey, b.get(id));</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">                        } else if (key.startsWith(BODY.multipart.name())) {</span>
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">                            if (idkey.equals(MP_ID_NOT_SET)) {</span>
+<span class="nc" id="L212">                                spec.multiPart((File) b.get(id));</span>
+                            } else {
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">                                if (b.get(id) instanceof File) {</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">                                    if(type!=null) {</span>
+<span class="fc" id="L216">                                        spec.multiPart(idkey, (File) b.get(id), type);</span>
+                                    } else {
+<span class="fc" id="L218">                                        spec.multiPart(idkey, (File) b.get(id));</span>
+                                    }
+<span class="nc bnc" id="L220" title="All 2 branches missed.">                                } else if (b.get(id) instanceof String) {</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">                                    if(type!=null) {</span>
+<span class="nc" id="L222">                                        spec.multiPart(idkey, &quot;&quot; + b.get(id), type);</span>
+                                    } else {
+<span class="nc" id="L224">                                        spec.multiPart(idkey, &quot;&quot; + b.get(id));</span>
+                                    }
+                                } else {
+<span class="nc bnc" id="L227" title="All 2 branches missed.">                                    if(type!=null){</span>
+<span class="nc" id="L228">                                        spec.multiPart(idkey, b.get(id), type);</span>
+                                    } else {
+<span class="nc" id="L230">                                        spec.multiPart(idkey, b.get(id));</span>
+                                    }
+                                }
+                            }
+                        } else {
+<span class="nc" id="L235">                            spec.body(b.get(id));</span>
+                        }
+<span class="fc" id="L237">                    }</span>
+                }
+<span class="fc" id="L239">            }</span>
+        }
+<span class="fc" id="L241">    }</span>
+
+    @Override
+    public Object response() {
+<span class="nc" id="L245">        return response;</span>
+    }
+
+    @Override
+    public RestSpec processCustomData(String key, Object value) {
+<span class="nc" id="L250">        return this;</span>
+    }
+
+    @Override
+    public RestSpec logSpec() {
+<span class="nc bnc" id="L255" title="All 2 branches missed.">        if (specification != null) {</span>
+<span class="nc" id="L256">            specification.log().all();</span>
+        }
+<span class="nc" id="L258">        return this;</span>
+    }
+
+    @Override
+    /**
+     * This is a null operation for the base RestAssured class.
+     */
+    public RestSpec processCustomData(Enum key, Object value) {
+<span class="nc" id="L266">        return this;</span>
+    }
+
+    @Override
+    public Object get(String endpoint) {
+<span class="fc" id="L271">        specification = RestAssured.build(this);</span>
+<span class="fc" id="L272">        response = specification.get(endpoint);</span>
+<span class="fc" id="L273">        log(response);</span>
+<span class="fc" id="L274">        return response;</span>
+    }
+
+    @Override
+    public Object put(String endpoint) {
+<span class="nc" id="L279">        specification = RestAssured.build(this);</span>
+<span class="nc" id="L280">        response = specification.put(endpoint);</span>
+<span class="nc" id="L281">        log(response);</span>
+<span class="nc" id="L282">        return response;</span>
+    }
+
+    @Override
+    public Object post(String endpoint) {
+<span class="fc" id="L287">        specification = RestAssured.build(this);</span>
+<span class="fc" id="L288">        response = specification.post(endpoint);</span>
+<span class="fc" id="L289">        log(response);</span>
+<span class="fc" id="L290">        return response;</span>
+    }
+
+    @Override
+    public Object delete(String endpoint) {
+<span class="nc" id="L295">        specification = RestAssured.build(this);</span>
+<span class="nc" id="L296">        response = specification.delete(endpoint);</span>
+<span class="nc" id="L297">        log(response);</span>
+<span class="nc" id="L298">        return response;</span>
+    }
+
+    @Override
+    public Object patch(String endpoint) {
+<span class="fc" id="L303">        specification = RestAssured.build(this);</span>
+<span class="fc" id="L304">        response = specification.patch(endpoint);</span>
+<span class="fc" id="L305">        log(response);</span>
+<span class="fc" id="L306">        return response;</span>
+    }
+
+    @Override
+    public Object head(String endpoint) {
+<span class="nc" id="L311">        specification = RestAssured.build(this);</span>
+<span class="nc" id="L312">        response = specification.head(endpoint);</span>
+<span class="nc" id="L313">        log(response);</span>
+<span class="nc" id="L314">        return response;</span>
+    }
+
+    protected void log(Response response) {
+<span class="pc bpc" id="L318" title="1 of 2 branches missed.">        if (doLog()) {</span>
+<span class="fc" id="L319">            LOG.debug(&quot;RestAssured&quot;, &quot;response follows&quot;);</span>
+<span class="fc" id="L320">            response.then().log().all();</span>
+<span class="fc" id="L321">            LOG.flush();</span>
+        }
+<span class="fc" id="L323">    }</span>
+
+    @Override
+    public RequestSpecification getSpec() {
+<span class="fc" id="L327">        specification = RestAssured.init(given(), this);</span>
+<span class="fc" id="L328">        return specification;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

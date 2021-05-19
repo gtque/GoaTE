@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GoateEncyclopedia.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.info</a> &gt; <span class="el_source">GoateEncyclopedia.java</span></div><h1>GoateEncyclopedia.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.info;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.annotations.GoateDescription;
+
+/**
+ * Simple app for reading the dictionary.
+ * Useful when IDE support is not available.
+ * Created by Eric Angeli on 2/19/2018.
+ */
+<span class="fc" id="L38">public class GoateEncyclopedia {</span>
+<span class="fc" id="L39">    private Goate encyclopedia = null;</span>
+
+    /**
+     * Builds the index.
+     * Looks for anything annotated with Info and adds it to the index.
+     * The last instance of a word wins, ie there will only be one version of a word in the dictionary
+     * which may produce unexpected results if more than one uses the same word.
+     * @return the compiled encyclopedia describing all of Goate.
+     */
+    public GoateEncyclopedia buildIndex() {
+        try {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">            if (encyclopedia == null) {</span>
+<span class="fc" id="L51">                new AnnotationFactory().doDefault().annotatedWith(Info.class).buildDirectory();</span>
+<span class="fc" id="L52">                encyclopedia = new Goate();</span>
+            }
+<span class="fc" id="L54">            AnnotationFactory.directory.get(Info.class.getCanonicalName()).forEach((key, value) -&gt; {</span>
+<span class="fc" id="L55">                Goate index = new Goate();</span>
+<span class="fc" id="L56">                index.put(&quot;_class&quot;, value);</span>
+<span class="fc" id="L57">                Info info = (Info)value.getAnnotation(Info.class);</span>
+<span class="fc" id="L58">                GoateDescription description = (GoateDescription)value.getAnnotation(GoateDescription.class);</span>
+<span class="fc" id="L59">                String desc = &quot;NOT SET, PLEASE ADD @GoateDescription&quot;;</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                if(description!=null){</span>
+<span class="fc" id="L61">                    desc = description.description();</span>
+                }
+<span class="fc" id="L63">                index.put(&quot;_description&quot;, desc);</span>
+<span class="fc" id="L64">                index.put(&quot;_classifier&quot;, info.classifier());</span>
+<span class="fc" id="L65">                index.put(&quot;_tags&quot;, info.tags());</span>
+<span class="fc" id="L66">                index.put(&quot;_tags_string&quot;, tags(info.tags()));</span>
+<span class="fc" id="L67">                index.put(&quot;_sub_topics&quot;, new Goate());</span>
+<span class="fc" id="L68">                encyclopedia.put(key, index);</span>
+<span class="fc" id="L69">            });</span>
+<span class="nc" id="L70">        } catch (Throwable e) {</span>
+<span class="nc" id="L71">            System.out.println(&quot;Problem initializing encyclopedia: &quot; + e.getMessage());</span>
+<span class="nc" id="L72">            e.printStackTrace();</span>
+<span class="fc" id="L73">        }</span>
+<span class="fc" id="L74">        return this;</span>
+    }
+
+    private String tags(String[] tags){
+<span class="fc" id="L78">        StringBuilder tag_string = new StringBuilder(&quot;{&quot;);</span>
+<span class="fc" id="L79">        boolean first = true;</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        for(String tag:tags){</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            if(!first){</span>
+<span class="nc" id="L82">                tag_string.append(&quot;, &quot;);</span>
+            }
+<span class="nc" id="L84">            tag_string.append(tag);</span>
+<span class="nc" id="L85">            first = false;</span>
+        }
+<span class="fc" id="L87">        return tag_string.append(&quot;}&quot;).toString();</span>
+    }
+
+    public Goate getEncyclopedia(){
+<span class="fc" id="L91">        return this.encyclopedia;</span>
+    }
+
+    public static void main(String[] args){
+        //Map&lt;String, Class&gt; dictionary = new TreeMap&lt;&gt;(new Interpreter(new Goate()).getDictionary());
+<span class="fc" id="L96">        GoateEncyclopedia ged = new GoateEncyclopedia();</span>
+<span class="fc" id="L97">        ged.buildIndex();</span>
+<span class="fc" id="L98">        StringBuilder book = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L99">        Goate encyclopedia = ged.getEncyclopedia();</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        for(String key:encyclopedia.keys()){</span>
+<span class="fc" id="L101">            Goate volume = encyclopedia.get(key, null, Goate.class);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">            if(volume!=null){</span>
+<span class="fc" id="L103">                book.append(volume.get(&quot;_class&quot;,String.class, Class.class).getSimpleName())</span>
+<span class="fc" id="L104">                        .append(&quot;: \n&quot;)</span>
+<span class="fc" id="L105">                        .append(&quot;\tdescription: &quot;).append(volume.get(&quot;_description&quot;,&quot;UNDEFINED&quot;, String.class)).append(&quot;\n&quot;)</span>
+<span class="fc" id="L106">                        .append(&quot;\trelated topics: &quot;).append(volume.get(&quot;_tags_string&quot;,&quot;{}&quot;, String.class)).append(&quot;\n&quot;)</span>
+<span class="fc" id="L107">                        .append(&quot;\tmethod of look up: &quot;).append(volume.get(&quot;_classifier&quot;,&quot;&quot;, String.class)).append(&quot;\n&quot;)</span>
+<span class="fc" id="L108">                        .append(&quot;\t&quot;).append(key).append(&quot;\n&quot;);</span>
+                //need to process sub_topics here, they should be looked up and built, probably similar to dictionary.
+            }
+<span class="fc" id="L111">        }</span>
+<span class="fc" id="L112">        System.out.print(book.toString());</span>
+<span class="fc" id="L113">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

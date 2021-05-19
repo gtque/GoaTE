@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>StepsExecutor.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.barn.staff</a> &gt; <span class="el_source">StepsExecutor.java</span></div><h1>StepsExecutor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.barn.staff;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.GoateJob;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.NotFound;
+import com.thegoate.utils.togoate.ToGoate;
+
+import java.lang.reflect.InvocationTargetException;
+
+/**
+ * Executes the described steps.
+ * Created by Eric Angeli on 6/28/2017.
+ */
+public class StepsExecutor {
+<span class="fc" id="L46">    BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+<span class="fc" id="L47">    boolean ordered = false;</span>
+<span class="fc" id="L48">    boolean override = true;//default to true, then you specify, using an array, what you want to come from the step definition.</span>
+<span class="fc" id="L49">    Goate data = new Goate();</span>
+
+<span class="fc" id="L51">    public StepsExecutor(Goate data) {</span>
+<span class="fc" id="L52">        this.data = data;</span>
+<span class="fc" id="L53">    }</span>
+
+    public StepsExecutor ordered(boolean ordered) {
+<span class="fc" id="L56">        this.ordered = ordered;</span>
+<span class="fc" id="L57">        return this;</span>
+    }
+
+    public StepsExecutor ordered() {
+<span class="nc" id="L61">        return ordered(true);</span>
+    }
+
+    public StepsExecutor notOrdered() {
+<span class="fc" id="L65">        return ordered(false);</span>
+    }
+
+    public StepsExecutor override(boolean override){
+<span class="nc" id="L69">        this.override = override;</span>
+<span class="nc" id="L70">        return this;</span>
+    }
+
+    public StepsExecutor overrideAll(){
+<span class="nc" id="L74">        return override(false);//this uses negative logic, so false here means the data in the step wins.</span>
+    }
+
+    public StepsExecutor doNotOverrideAll(){
+<span class="nc" id="L78">        return override(true);//this means the data from the parent wins.</span>
+    }
+
+    public Goate doSteps(String steps) {
+<span class="fc" id="L82">        Goate result = new Goate();</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (steps != null) {</span>
+<span class="fc" id="L84">            Goate sup = new ToGoate(steps).convert();</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">            if (sup != null) {</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">                for (int i = 0; i &lt; Integer.MAX_VALUE; i++) {</span>
+<span class="fc" id="L87">                    Goate d = findStep(i, sup);//new ToGoate(sup.get(&quot;&quot; + i, null)).convert();</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">                    if (d != null) {</span>
+<span class="fc" id="L89">                        Object r = doWork(d);</span>
+<span class="fc" id="L90">                        result.put(&quot;##&quot;, r);</span>
+                    } else {
+                        break;
+                    }
+                }
+            }
+<span class="fc" id="L96">        } else {</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            if (data.get(&quot;job&quot;) != null) {</span>
+<span class="fc" id="L98">                result.put(&quot;##&quot;, doWork(data));</span>
+            }
+        }
+<span class="fc" id="L101">        return result;</span>
+    }
+
+    protected Object doWork(Goate d) {
+<span class="fc" id="L105">        Object result = null;</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (d != null) {</span>
+<span class="fc" id="L107">            String type = &quot;&quot; + d.get(&quot;job&quot;, &quot;api&quot;);</span>
+<span class="fc" id="L108">            AnnotationFactory af = new AnnotationFactory();</span>
+            try {
+<span class="fc" id="L110">                Employee worker = (Employee) af.annotatedWith(GoateJob.class).find(type).using(&quot;jobs&quot;).build();</span>
+<span class="fc" id="L111">                Goate scrubbed = worker.scrub(data);//scrubb required fields</span>
+<span class="fc" id="L112">                Goate fullData = new Goate().merge(d, override);</span>
+<span class="fc" id="L113">                fullData.merge(scrubbed, override);//merge the parent data with the step data based on the selected override scheme.</span>
+<span class="fc" id="L114">                Object overrides = fullData.get(&quot;override&quot;, &quot;[]&quot;);//process the override values.</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">                for (int i = 0; i &lt; Integer.MAX_VALUE; i++) {</span>
+<span class="fc" id="L116">                    Object key = new Get(&quot;&quot;+i).from(overrides);</span>
+<span class="pc bpc" id="L117" title="2 of 4 branches missed.">                    if (key != null &amp;&amp; !(key instanceof NotFound)) {</span>
+<span class="nc" id="L118">                        fullData.put(&quot;&quot; + key, d.get(&quot;&quot; + key, &quot;null::&quot;));</span>
+                    }else{
+                        break;
+                    }
+                }
+                //this is to undo the scrubbed data.
+<span class="fc" id="L124">                Object imports = fullData.get(&quot;import&quot;, &quot;[]&quot;);//process the import values.</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">                for (int i = 0; i &lt; Integer.MAX_VALUE; i++) {</span>
+<span class="fc" id="L126">                    Object key = new Get(&quot;&quot;+i).from(imports);</span>
+<span class="pc bpc" id="L127" title="2 of 4 branches missed.">                    if (key != null &amp;&amp; !(key instanceof NotFound)) {</span>
+<span class="nc" id="L128">                        fullData.put(&quot;&quot; + key, data.get(&quot;&quot; + key, &quot;null::&quot;));</span>
+                    }else{
+                        break;
+                    }
+                }
+<span class="fc" id="L133">                worker.init(fullData);</span>
+<span class="fc" id="L134">                result = worker.work();</span>
+<span class="fc" id="L135">                fullData.put(&quot;_job_result&quot;, result);</span>
+<span class="fc" id="L136">                Object carryover = fullData.get(&quot;carryover&quot;, &quot;[]&quot;);//process the override values.</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">                for (int i = 0; i &lt; Integer.MAX_VALUE; i++) {</span>
+<span class="fc" id="L138">                    Object key = new Get(&quot;&quot;+i).from(carryover);</span>
+<span class="pc bpc" id="L139" title="2 of 4 branches missed.">                    if (key != null &amp;&amp; !(key instanceof NotFound)) {</span>
+<span class="nc" id="L140">                        String aKey = &quot;&quot;+key;</span>
+<span class="nc" id="L141">                        String bKey = aKey;</span>
+<span class="nc" id="L142">                        String cKey = aKey;</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">                        if(aKey.contains(&quot;:=&quot;)){</span>
+<span class="nc" id="L144">                            bKey = bKey.substring(bKey.indexOf(&quot;:=&quot;)+2);</span>
+<span class="nc" id="L145">                            aKey = aKey.substring(0,aKey.indexOf(&quot;:=&quot;));</span>
+<span class="nc" id="L146">                            cKey = bKey;</span>
+                        }else{
+<span class="nc" id="L148">                            bKey = &quot;null::&quot;;</span>
+                        }
+<span class="nc" id="L150">                        data.put(&quot;&quot; + aKey, fullData.get(cKey, bKey));</span>
+                    }else{
+                        break;
+                    }
+                }
+<span class="nc" id="L155">            } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {</span>
+<span class="nc" id="L156">                LOG.error(&quot;Step doWork&quot;,&quot;problem finding something to execute a &quot; + type + &quot;\nmake sure you have an implementation library included.&quot;, e);</span>
+<span class="fc" id="L157">            }</span>
+        }
+<span class="fc" id="L159">        return result;</span>
+    }
+
+    protected Goate findStep(int index, Goate sup) {
+<span class="fc" id="L163">        Goate found = null;</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">        if (ordered) {</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">            for (int i = 0; i &lt; Integer.MAX_VALUE; i++) {</span>
+<span class="nc" id="L166">                Object suppa = sup.get(&quot;&quot; + i, null);</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">                if(suppa != null) {</span>
+<span class="nc" id="L168">                    Goate d = new ToGoate(suppa).convert();</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">                    if (d != null) {</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                        if ((&quot;&quot; + d.get(&quot;#&quot;)).equals(&quot;&quot; + index)) {</span>
+<span class="nc" id="L171">                            found = d;</span>
+<span class="nc" id="L172">                            found.put(&quot;parent&quot;, data);</span>
+<span class="nc" id="L173">                            break;</span>
+                        }
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+        } else {
+<span class="fc" id="L183">            Object f = sup.get(&quot;&quot; + index, null);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">            if(f!=null) {</span>
+<span class="fc" id="L185">                found = new ToGoate(f).convert();</span>
+            }
+        }
+<span class="fc" id="L188">        return found;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

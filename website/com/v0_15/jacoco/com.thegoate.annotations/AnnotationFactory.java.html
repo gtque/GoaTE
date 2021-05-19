@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>AnnotationFactory.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.annotations</a> &gt; <span class="el_source">AnnotationFactory.java</span></div><h1>AnnotationFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.annotations;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.GoateReflection;
+import org.atteo.classindex.ClassIndex;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Simple factory that can be used to lookup classes that are annotated.
+ * Created by gtque on 4/24/2017.
+ */
+public class AnnotationFactory {
+
+<span class="fc" id="L49">    protected static final BleatBox LOG = BleatFactory.getLogger(AnnotationFactory.class);</span>
+
+<span class="fc" id="L51">    public static volatile Map&lt;String, Map&lt;String, Class&gt;&gt; directory = new ConcurrentHashMap&lt;&gt;();</span>
+
+<span class="fc" id="L53">    public AnnotationFactory() {</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (directory == null) {</span>
+<span class="fc" id="L55">            directory = new ConcurrentHashMap&lt;&gt;();</span>
+        }
+<span class="fc" id="L57">    }</span>
+
+    Object id;
+    String methodId;
+<span class="fc" id="L61">    Constructor constructor = null;</span>
+<span class="fc" id="L62">    Object[] constructorArgs = new Object[0];</span>
+<span class="fc" id="L63">    Method check = null;</span>
+    Class&lt;? extends java.lang.annotation.Annotation&gt; annotation;
+    Class&lt;? extends java.lang.annotation.Annotation&gt; methodAnnotation;
+<span class="fc" id="L66">    boolean setDefault = false;</span>
+<span class="fc" id="L67">    String checkName = null;</span>
+
+    public AnnotationFactory clear() {
+<span class="fc" id="L70">        id = null;</span>
+<span class="fc" id="L71">        methodId = null;</span>
+<span class="fc" id="L72">        constructorArgs = new Object[0];</span>
+<span class="fc" id="L73">        constructor = null;</span>
+<span class="fc" id="L74">        check = null;</span>
+<span class="fc" id="L75">        annotation = null;</span>
+<span class="fc" id="L76">        methodAnnotation = null;</span>
+<span class="fc" id="L77">        setDefault = false;</span>
+<span class="fc" id="L78">        return this;</span>
+    }
+
+    public AnnotationFactory doDefault() {
+<span class="fc" id="L82">        setDefault = true;</span>
+<span class="fc" id="L83">        return this;</span>
+    }
+
+    public AnnotationFactory findByMethod(String id) {
+<span class="fc" id="L87">        this.methodId = id;</span>
+<span class="fc" id="L88">        return this;</span>
+    }
+
+    public AnnotationFactory find(Object id) {
+<span class="fc" id="L92">        this.id = id;</span>
+<span class="fc" id="L93">        return this;</span>
+    }
+
+    public AnnotationFactory buildUsing(Constructor constructor) {
+<span class="nc" id="L97">        this.constructor = constructor;</span>
+<span class="nc" id="L98">        return this;</span>
+    }
+
+    public AnnotationFactory using(String check) {
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (annotation != null) {</span>
+            try {
+<span class="fc" id="L104">                using(annotation.getMethod(check));</span>
+<span class="nc" id="L105">            } catch (NoSuchMethodException e) {</span>
+<span class="nc" id="L106">                LOG.error(&quot;could not find the identifying method: &quot; + check);</span>
+<span class="fc" id="L107">            }</span>
+        }
+<span class="fc" id="L109">        this.checkName = check;</span>
+<span class="fc" id="L110">        return this;</span>
+    }
+
+    public AnnotationFactory using(Method check) {
+<span class="fc" id="L114">        this.check = check;</span>
+<span class="fc" id="L115">        return this;</span>
+    }
+
+    public AnnotationFactory annotatedWith(Class&lt;? extends java.lang.annotation.Annotation&gt; annotation) {
+<span class="fc" id="L119">        this.annotation = annotation;</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">        if (checkName != null) {</span>
+<span class="nc" id="L121">            using(checkName);</span>
+        }
+<span class="fc" id="L123">        return this;</span>
+    }
+
+    public Map&lt;String, Class&gt; getDirectory(String dir) {
+<span class="fc" id="L127">        return getDirectory(dir, null, null);</span>
+    }
+
+    public Map&lt;String, Class&gt; getDirectory(String dir, String id, Method identifier) {
+<span class="fc" id="L131">        buildDirectory();</span>
+<span class="fc" id="L132">        Map&lt;String, Class&gt; unfiltered = directory.get(dir);</span>
+<span class="fc" id="L133">        Map&lt;String, Class&gt; filtered = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L134" title="All 4 branches covered.">        if (id != null &amp;&amp; identifier != null) {</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">            for (String key : unfiltered.keySet()) {</span>
+                try {
+<span class="fc" id="L137">                    Class temp = unfiltered.get(key);</span>
+<span class="fc" id="L138">                    Annotation service = temp.getAnnotation(annotation);</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">                    if (identifier != null) {</span>
+<span class="fc" id="L140">                        Object theCheck = identifier.invoke(service);</span>
+<span class="pc bpc" id="L141" title="1 of 4 branches missed.">                        if (theCheck != null &amp;&amp; theCheck.equals(id)) {</span>
+<span class="fc" id="L142">                            filtered.put(key, temp);</span>
+                        }
+                    }
+<span class="nc" id="L145">                } catch (Exception e) {</span>
+<span class="nc" id="L146">                    LOG.error(&quot;Problem checking the class: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L147">                }</span>
+<span class="fc" id="L148">            }</span>
+        }
+<span class="fc bfc" id="L150" title="All 4 branches covered.">        return (id != null &amp;&amp; identifier != null) ? filtered : unfiltered;</span>
+    }
+
+    public AnnotationFactory methodAnnotatedWith(Class&lt;? extends java.lang.annotation.Annotation&gt; annotation) {
+<span class="fc" id="L154">        this.methodAnnotation = annotation;</span>
+<span class="fc" id="L155">        return this;</span>
+    }
+
+    public AnnotationFactory constructorArgs(Object[] args) {
+<span class="fc" id="L159">        this.constructorArgs = args;</span>
+<span class="fc" id="L160">        return this;</span>
+    }
+
+    public Class lookUp() {
+<span class="fc" id="L164">        buildDirectory();</span>
+<span class="fc" id="L165">        Class c = null;</span>
+<span class="fc" id="L166">        LOG.debug(&quot;looking for &quot; + annotation.getName());</span>
+<span class="fc" id="L167">        String theClass = &quot;&quot;+id;</span>
+        try {
+<span class="fc" id="L169">            c = directory.get(annotation.getCanonicalName()).get(theClass);</span>
+<span class="nc" id="L170">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L171">            LOG.error(&quot;could not get the class: &quot; + theClass + &quot;; &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L172">        }</span>
+<span class="fc" id="L173">        return c;</span>
+    }
+
+    public Object build() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+<span class="fc" id="L177">        buildDirectory();</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        Class c = methodId == null ? lookUp() : lookUpByAnnotatedMethod();</span>
+<span class="fc" id="L179">        return build(c);</span>
+    }
+
+    /**
+     * The listings for each annotation is generated only one time, the first time they are looked up.
+     *
+     * @return The instance of itself, syntactic sugar for stringing calls together.
+     */
+    public synchronized AnnotationFactory buildDirectory() {
+<span class="fc bfc" id="L188" title="All 2 branches covered.">        if (!directory.containsKey(annotation.getCanonicalName())) {</span>
+<span class="fc" id="L189">            directory.put(annotation.getCanonicalName(), new ConcurrentHashMap&lt;&gt;());</span>
+        }
+<span class="fc" id="L191">        Map&lt;String, Class&gt; listing = directory.get(annotation.getCanonicalName());</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        if (listing.size() == 0) {</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">            if(LOG!=null) {</span>
+<span class="fc" id="L194">                LOG.debug(&quot;Building Directory &quot;+annotation.getCanonicalName(), &quot;the listing was empty, trying to build it.&quot;);</span>
+            }
+<span class="fc" id="L196">            Iterable&lt;Class&lt;?&gt;&gt; klasses = ClassIndex.getAnnotated(annotation);</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">            for (Class&lt;?&gt; klass : klasses) {</span>
+<span class="fc" id="L198">                String theClass = klass.getCanonicalName();</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">                if(LOG!=null) {</span>
+<span class="fc" id="L200">                    LOG.debug(&quot;Adding to directory&quot;, theClass);</span>
+                }
+                try {
+<span class="fc" id="L203">                    Class temp = Class.forName(theClass);</span>
+<span class="fc" id="L204">                    Annotation service = temp.getAnnotation(annotation);</span>
+<span class="fc" id="L205">                    String aid = theClass;</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                    if (check != null) {</span>
+<span class="fc" id="L207">                        Object theCheck = check.invoke(service);</span>
+<span class="pc bpc" id="L208" title="1 of 4 branches missed.">                        if (theCheck != null &amp;&amp; theCheck.getClass().isArray()) {</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">                            for (Object aido : (Object[]) theCheck) {</span>
+<span class="fc" id="L210">                                listing.put(&quot;&quot; + aido, klass.forName(theClass));</span>
+                            }
+                        } else {
+<span class="fc" id="L213">                            listing.put(&quot;&quot; + theCheck, klass.forName(theClass));</span>
+                        }
+<span class="fc" id="L215">                    } else {</span>
+<span class="fc" id="L216">                        listing.put(temp.getCanonicalName(), klass.forName(theClass));//default to using the full class name.</span>
+                    }
+<span class="fc bfc" id="L218" title="All 2 branches covered.">                    if (setDefault) {</span>
+<span class="fc" id="L219">                        Annotation def = temp.getAnnotation(IsDefault.class);</span>
+<span class="fc bfc" id="L220" title="All 2 branches covered.">                        if (def != null) {</span>
+<span class="fc" id="L221">                            listing.put(&quot;default&quot;, temp);</span>
+                        }
+                    }
+<span class="nc" id="L224">                } catch (ClassNotFoundException | NullPointerException | IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc" id="L225">                    LOG.error(&quot;could not get the class: &quot; + theClass + &quot;; &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L226">                } catch (NoClassDefFoundError ncdfe) {</span>
+<span class="nc" id="L227">                    LOG.error(&quot;Build Directory&quot;, &quot;This shouldn't have happened, but a class in the list was not found.&quot; + ncdfe.getMessage(), ncdfe);</span>
+<span class="pc" id="L228">                }</span>
+<span class="fc" id="L229">            }</span>
+        }
+<span class="fc" id="L231">        return this;</span>
+    }
+
+    public AnnotationFactory constructor(Constructor constructor) {
+<span class="fc" id="L235">        this.constructor = constructor;</span>
+<span class="fc" id="L236">        return this;</span>
+    }
+
+    public Object build(Class klass) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+<span class="fc" id="L240">        Object o = null;</span>
+<span class="fc bfc" id="L241" title="All 2 branches covered.">        if (klass != null) {</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">            if (constructorArgs != null) {</span>
+<span class="fc" id="L243">                Object[] ca = constructorArgs;</span>
+<span class="pc bpc" id="L244" title="1 of 2 branches missed.">                if (constructor == null) {</span>
+<span class="fc" id="L245">                    constructor = new GoateReflection().findConstructor(klass.getConstructors(), constructorArgs);</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">                    if(constructor == null){</span>
+//                        LOG.debug(&quot;Build Class&quot;, &quot;didn't find specific constructor, checking for default constructor&quot;);
+<span class="fc" id="L248">                        constructor = new GoateReflection().findConstructor(klass.getConstructors(), new Object[0]);</span>
+<span class="fc" id="L249">                        ca = new Object[0];</span>
+                    }
+                }
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">                if (constructor != null) {</span>
+                    try {
+//                        if(ca!=null) {
+<span class="fc" id="L255">                            o = constructor.newInstance(ca);</span>
+//                        } else {
+//                            o = constructor.newInstance();
+//                        }
+<span class="fc" id="L259">                    }catch(IllegalAccessException | InstantiationException | InvocationTargetException e){</span>
+<span class="fc" id="L260">                        LOG.debug(&quot;Building Class&quot;, &quot;Problem instantiating a new instances: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L261">                        throw e;</span>
+<span class="fc" id="L262">                    }</span>
+                } else {
+<span class="nc" id="L264">                    LOG.info(&quot;Building Class&quot;, &quot;Could not find the constructor, wil check for a default constructor...&quot;);</span>
+
+                }
+<span class="fc" id="L267">            } else {</span>
+<span class="fc" id="L268">                o = klass.newInstance();</span>
+            }
+        } else {
+<span class="fc" id="L271">            LOG.debug(&quot;Building Class&quot;, &quot;The class was not specified, definitely could not build it.&quot;);</span>
+        }
+<span class="fc" id="L273">        return o;</span>
+    }
+
+    public Class lookUpByAnnotatedMethod() {
+<span class="fc" id="L277">        buildDirectory();</span>
+<span class="fc" id="L278">        LOG.debug(&quot;Look Up Annotated Method&quot;, &quot;Trying to look up an annotated method: &quot; + methodId);</span>
+<span class="fc" id="L279">        Class klass = null;</span>
+<span class="fc" id="L280">        Map&lt;String, Class&gt; listings = directory.get(annotation.getCanonicalName());</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        for (String theClass : listings.keySet()) {</span>
+<span class="fc" id="L282">            LOG.debug(&quot;Checking Class&quot;, theClass);</span>
+<span class="fc" id="L283">            List&lt;Method&gt; methods = new GoateReflection().getDeclaredMethods(listings.get(theClass));</span>
+<span class="fc" id="L284">            LOG.debug(&quot;Methods to check (&quot;+methods.size()+&quot;)&quot;, methods.toString());</span>
+<span class="fc bfc" id="L285" title="All 2 branches covered.">            for (Method m : methods) {</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">                if (m.isAnnotationPresent(methodAnnotation)) {</span>
+<span class="fc bfc" id="L287" title="All 2 branches covered.">                    for (Method am : methodAnnotation.getDeclaredMethods()) {</span>
+<span class="fc" id="L288">                        Annotation dam = m.getAnnotation(methodAnnotation);</span>
+                        try {
+<span class="fc" id="L290">                            LOG.debug(&quot;Checking Method&quot;, am.getName());</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">                            if (methodId.equals(am.invoke(dam))) {</span>
+<span class="fc" id="L292">                                klass = listings.get(theClass);</span>
+<span class="fc" id="L293">                                break;</span>
+                            }
+<span class="nc" id="L295">                        } catch (IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc" id="L296">                            LOG.debug(&quot;Look Up Annotated Method&quot;, &quot;Problem accessing method: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L297">                        }</span>
+                    }
+<span class="fc bfc" id="L299" title="All 2 branches covered.">                    if (klass != null) {</span>
+<span class="fc" id="L300">                        break;</span>
+                    }
+                }
+<span class="fc" id="L303">            }</span>
+<span class="fc" id="L304">        }</span>
+<span class="fc" id="L305">        return klass;</span>
+    }
+
+    public Method getMethod() {
+<span class="fc" id="L309">        buildDirectory();</span>
+<span class="fc" id="L310">        Map&lt;String, Class&gt; listings = directory.get(annotation.getCanonicalName());</span>
+<span class="fc" id="L311">        Method method = null;</span>
+<span class="fc bfc" id="L312" title="All 2 branches covered.">        for (String theClass : listings.keySet()) {</span>
+<span class="fc" id="L313">            List&lt;Method&gt; methods = new GoateReflection().getDeclaredMethods(listings.get(theClass));</span>
+<span class="fc bfc" id="L314" title="All 2 branches covered.">            for (Method m : methods) {</span>
+<span class="pc bpc" id="L315" title="1 of 2 branches missed.">                if (m.isAnnotationPresent(methodAnnotation)) {</span>
+<span class="fc bfc" id="L316" title="All 2 branches covered.">                    for (Method am : methodAnnotation.getDeclaredMethods()) {</span>
+<span class="fc" id="L317">                        Annotation dam = m.getAnnotation(methodAnnotation);</span>
+                        try {
+<span class="fc bfc" id="L319" title="All 2 branches covered.">                            if (methodId.equals(am.invoke(dam))) {</span>
+<span class="fc" id="L320">                                method = m;</span>
+<span class="fc" id="L321">                                break;</span>
+                            }
+<span class="nc" id="L323">                        } catch (IllegalAccessException e) {</span>
+<span class="nc" id="L324">                            e.printStackTrace();</span>
+<span class="nc" id="L325">                        } catch (InvocationTargetException e) {</span>
+<span class="nc" id="L326">                            e.printStackTrace();</span>
+<span class="pc" id="L327">                        }</span>
+                    }
+<span class="fc bfc" id="L329" title="All 2 branches covered.">                    if (method != null) {</span>
+<span class="fc" id="L330">                        break;</span>
+                    }
+                }
+<span class="fc" id="L333">            }</span>
+<span class="fc" id="L334">        }</span>
+<span class="fc" id="L335">        return method;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

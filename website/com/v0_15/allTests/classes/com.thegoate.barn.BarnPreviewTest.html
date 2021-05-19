@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class com.thegoate.barn.BarnPreviewTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class com.thegoate.barn.BarnPreviewTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.thegoate.barn.html">com.thegoate.barn</a> &gt; BarnPreviewTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.152s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">barnJobPreview</td>
+<td class="success">0.059s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">barnPreview</td>
+<td class="success">0.093s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>21:45:18.211 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:checking path: C:\code\dev\GoaTE\modules\barn/testcases/apis/simplejob.json
+21:45:18.212 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file did not exist, checking resources: /testcases/apis/simplejob.json
+21:45:18.224 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:modified path to look in: C:/code/dev/GoaTE/modules/barn/build/resources/test/testcases/apis/simplejob.json
+21:45:18.224 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file path: C:\code\dev\GoaTE\modules\barn\build\resources\test\testcases\apis\simplejob.json
+21:45:18.227 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:checking path: C:\code\dev\GoaTE\modules\barn/testcases/apis/subjob.json
+21:45:18.227 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file did not exist, checking resources: /testcases/apis/subjob.json
+21:45:18.228 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:modified path to look in: C:/code/dev/GoaTE/modules/barn/build/resources/test/testcases/apis/subjob.json
+21:45:18.228 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file path: C:\code\dev\GoaTE\modules\barn\build\resources\test\testcases\apis\subjob.json
+{
+   &quot;_root&quot;: &quot;testcases/apis&quot;,
+   &quot;extends&quot;: [&quot;subjob.json&quot;],
+   &quot;groups&quot;: &quot;simple,extendsarray&quot;,
+   &quot;setup&quot;: [{
+      &quot;import&quot;: [
+         &quot;loan id&quot;,
+         &quot;loan effective date&quot;
+      ],
+      &quot;job&quot;: &quot;set sold date&quot;,
+      &quot;sold date&quot;: &quot;&quot;,
+      &quot;loanId&quot;: &quot;o::loan id&quot;
+   }],
+   &quot;job&quot;: &quot;hello_world&quot;,
+   &quot;Scenario&quot;: &quot;test loading setup and overloading job.&quot;
+}
+21:45:18.280 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:checking path: C:\code\dev\GoaTE\modules\barn/testcases/apis/simple.json
+21:45:18.280 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file did not exist, checking resources: /testcases/apis/simple.json
+21:45:18.281 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:modified path to look in: C:/code/dev/GoaTE/modules/barn/build/resources/test/testcases/apis/simple.json
+21:45:18.281 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file path: C:\code\dev\GoaTE\modules\barn\build\resources\test\testcases\apis\simple.json
+21:45:18.283 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:checking path: C:\code\dev\GoaTE\modules\barn/testcases/apis/base.json
+21:45:18.284 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file did not exist, checking resources: /testcases/apis/base.json
+21:45:18.285 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:modified path to look in: C:/code/dev/GoaTE/modules/barn/build/resources/test/testcases/apis/base.json
+21:45:18.285 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file path: C:\code\dev\GoaTE\modules\barn\build\resources\test\testcases\apis\base.json
+21:45:18.287 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:checking path: C:\code\dev\GoaTE\modules\barn/testcases/apis/parent.json
+21:45:18.288 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file did not exist, checking resources: /testcases/apis/parent.json
+21:45:18.289 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:modified path to look in: C:/code/dev/GoaTE/modules/barn/build/resources/test/testcases/apis/parent.json
+21:45:18.295 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file path: C:\code\dev\GoaTE\modules\barn\build\resources\test\testcases\apis\parent.json
+21:45:18.298 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:checking path: C:\code\dev\GoaTE\modules\barn/testcases/apis/cleanup.json
+21:45:18.299 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file did not exist, checking resources: /testcases/apis/cleanup.json
+21:45:18.300 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:modified path to look in: C:/code/dev/GoaTE/modules/barn/build/resources/test/testcases/apis/cleanup.json
+21:45:18.300 [TestNG-tests-1] DEBUG com.thegoate.utils.GoateUtils - Goate File Util:file path: C:\code\dev\GoaTE\modules\barn\build\resources\test\testcases\apis\cleanup.json
+{
+   &quot;form params&quot;: [],
+   &quot;headers&quot;: [],
+   &quot;end point&quot;: &quot;&quot;,
+   &quot;method&quot;: &quot;get&quot;,
+   &quot;groups&quot;: &quot;simple,extendsarray,base&quot;,
+   &quot;custom params&quot;: [],
+   &quot;base url&quot;: &quot;https://www.google.com&quot;,
+   &quot;Scenario&quot;: &quot;get google, but first yahoo, and clean up with msn&quot;,
+   &quot;_root&quot;: &quot;testcases/apis&quot;,
+   &quot;expect&quot;: [
+      &quot;get result&gt;a.*.xyz,==,hello&quot;,
+      &quot;get result&gt;status code,==,200&quot;
+   ],
+   &quot;security&quot;: &quot;none&quot;,
+   &quot;extends&quot;: [
+      &quot;base.json&quot;,
+      &quot;cleanup.json&quot;
+   ],
+   &quot;cleanup&quot;: [{
+      &quot;end point&quot;: &quot;&quot;,
+      &quot;security&quot;: &quot;none&quot;,
+      &quot;method&quot;: &quot;get&quot;,
+      &quot;job&quot;: &quot;api&quot;,
+      &quot;base url&quot;: &quot;https://www.msn.com/&quot;
+   }],
+   &quot;multipart&quot;: [],
+   &quot;setup&quot;: [{
+      &quot;end point&quot;: &quot;&quot;,
+      &quot;security&quot;: &quot;none&quot;,
+      &quot;method&quot;: &quot;get&quot;,
+      &quot;job&quot;: &quot;api&quot;,
+      &quot;base url&quot;: &quot;https://yahoo.com&quot;
+   }],
+   &quot;job&quot;: &quot;api&quot;,
+   &quot;query params&quot;: []
+}
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.0.1</a> at Feb 18, 2021 9:47:41 PM</p>
+</div>
+</div>
+</body>
+</html>

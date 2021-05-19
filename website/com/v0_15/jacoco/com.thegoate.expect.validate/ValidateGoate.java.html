@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ValidateGoate.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.expect.validate</a> &gt; <span class="el_source">ValidateGoate.java</span></div><h1>ValidateGoate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.expect.validate;
+
+import com.thegoate.Goate;
+import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.utils.get.NotFound;
+
+import java.util.List;
+
+import static com.thegoate.expect.Expectation.EmployeeWorkResult;
+
+/**
+ * Validators don't care about type.
+ * There must be at least one comparator for each operator the Validator supports.
+ * Created by Eric Angeli on 3/20/2019.
+ */
+@Validator(operators = {&quot;&quot;})
+public class ValidateGoate extends Validate{
+<span class="fc" id="L45">    protected boolean doNotSkipIndexCheck = true;</span>
+<span class="fc" id="L46">    public ValidateGoate(){super();}</span>
+    public ValidateGoate(Goate exp, String key, Object from, Object fromExpected, Object rtrn, long cachePeriod, Goate data) {
+<span class="fc" id="L48">        super(exp, key, from, fromExpected, rtrn, cachePeriod, data);</span>
+<span class="fc" id="L49">    }</span>
+
+    public static Validate using(String operator){
+<span class="nc" id="L52">        Validate vlad = new ValidateGoate();</span>
+<span class="nc" id="L53">        return vlad.setOperator(operator);</span>
+    }
+
+    public static Validate using(CompareUtility compare){
+<span class="nc" id="L57">        return using(compare.getClass());</span>
+    }
+
+    public static Validate using(Class compare){
+<span class="nc" id="L61">        CompareUtil op = getOp(compare);</span>
+<span class="nc" id="L62">        return using(op.operator());</span>
+    }
+
+    protected boolean check(Goate exp, String key, Goate fromData){
+<span class="fc" id="L66">        boolean result = true;</span>
+//            Object val = null;
+<span class="fc" id="L68">        String filterPattern = &quot;&quot; + exp.get(&quot;actual&quot;);</span>
+<span class="fc" id="L69">        String ofp = filterPattern;</span>
+<span class="fc" id="L70">        int extraIndex = filterPattern.indexOf(&quot;&gt;&quot;);</span>
+<span class="fc" id="L71">        String filterExtra = &quot;&quot;;</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (extraIndex &gt; 0) {</span>
+<span class="nc" id="L73">            filterExtra = filterPattern.substring(extraIndex);</span>
+<span class="nc" id="L74">            filterPattern = filterPattern.substring(0, extraIndex);</span>
+        }
+
+<span class="fc" id="L77">        filterPattern = filterPattern.replaceAll(&quot;\\[\\*[0-9]*,*[0-9]\\]&quot;, &quot;*&quot;).replace(&quot;+&quot;, &quot;*&quot;).replace(&quot;*&quot;, &quot;[0-9]*&quot;).replace(&quot;([0-9])[0-9]&quot;, &quot;([0-9])&quot;).replace(&quot;.&quot;, &quot;\\.&quot;).replace(&quot;\\\\.&quot;, &quot;\\.&quot;);</span>
+<span class="fc" id="L78">        Goate filteredData = fromData.filterStrict(filterPattern);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (exp.get(&quot;operator&quot;).equals(&quot;isPresent&quot;)) {</span>
+<span class="fc" id="L80">            LOG.info(&quot;Validate&quot;, &quot;It is strongly encourage that you use the ValidatePresence validator when checking isPresent.&quot;);</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">            if (filteredData.size() == 0) {</span>
+<span class="fc" id="L82">                filteredData.put(&quot;&quot; + exp.get(&quot;actual&quot;), new NotFound(filterPattern));</span>
+            }
+        }
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (filteredData.size() == 0) {</span>
+<span class="pc bpc" id="L86" title="3 of 6 branches missed.">            if (exp.get(&quot;actual&quot;) instanceof String &amp;&amp; (((String) exp.get(&quot;actual&quot;)).equalsIgnoreCase(&quot;return&quot;) || ((String) exp.get(&quot;actual&quot;)).equalsIgnoreCase(EmployeeWorkResult))) {</span>
+<span class="nc" id="L87">                filteredData.put(&quot;&quot; + exp.get(&quot;actual&quot;), fromData);</span>
+            }
+        }
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if(!evalComparisons(filteredData, filterExtra)){</span>
+<span class="fc" id="L91">            result = false;</span>
+        }
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        if(doNotSkipIndexCheck) {</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            if (!evalWildcardIndex(ofp, fromData)) {</span>
+<span class="fc" id="L95">                result = false;</span>
+            }
+        }
+<span class="fc" id="L98">        return result;</span>
+    }
+
+    protected boolean evalComparisons(Goate filteredData, String filterExtra){
+<span class="fc" id="L102">        boolean result = true;</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        for (String vkey : filteredData.keys()) {</span>
+<span class="fc" id="L104">            Goate ev = new Goate().merge(getExp(), true);</span>
+<span class="fc" id="L105">            ev.put(&quot;actual&quot;, vkey + filterExtra);</span>
+<span class="fc" id="L106">            Object val = getActualValue(filteredData, vkey + filterExtra);//.get(vkey);</span>
+<span class="fc" id="L107">            ev.put(&quot;actual_value&quot;, val);</span>
+<span class="fc" id="L108">            Object expV = getExpectedValue(ev.get(&quot;expected&quot;), vkey);</span>
+<span class="fc" id="L109">            ev.put(&quot;expected_value&quot;, expV);</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">            LOG.info(&quot;Expect&quot;, new StringBuilder(&quot;evaluating:&quot;).append(vkey).append(&quot;(&quot;).append(val).append(&quot;) &quot;).append(ev.get(&quot;operator&quot;)).append((ev.get(&quot;expected&quot;) == null ? &quot;&quot; : &quot; &quot; + ev.get(&quot;expected&quot;))).append(&quot;\n&quot;).toString());</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">            if (!compare(val, expV, ev)) {</span>
+<span class="fc" id="L112">                result = false;</span>
+            }
+<span class="fc" id="L114">        }</span>
+<span class="fc" id="L115">        return result;</span>
+    }
+    protected boolean evalWildcardIndex(String filterPattern, Goate fromData) {
+<span class="fc" id="L118">        List&lt;String&gt; indexChecks = buildIndexChecks(filterPattern);</span>
+<span class="fc" id="L119">        boolean result = true;</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        for (String checks : indexChecks) {</span>
+<span class="fc" id="L121">            String[] check = checks.split(&quot;,&quot;);</span>
+<span class="fc" id="L122">            Goate cev = new Goate();</span>
+<span class="fc" id="L123">            String og_check = check[0].replace(starReplacement, &quot;*&quot;).replace(&quot;.&quot;, &quot;\\.&quot;).replace(plusReplacement, &quot;+&quot;);</span>
+<span class="fc" id="L124">            check[0] = check[0].replace(starReplacement, &quot;*&quot;).replace(&quot;.&quot;, &quot;\\.&quot;).replace(plusReplacement, &quot;*&quot;);</span>
+<span class="fc" id="L125">            cev.put(&quot;actual&quot;, check[0] + &quot;.size()&quot;);</span>
+<span class="fc" id="L126">            cev.put(&quot;operator&quot;, check[1]);</span>
+<span class="fc" id="L127">            cev.put(&quot;expected&quot;, check[2]);</span>
+<span class="fc" id="L128">            String[] plusCheck = check[0].split(&quot;\\[0-9\\]\\+&quot;);</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">            String plusNext = plusCheck.length &gt; 1 ? plusCheck[1] : &quot;&quot;;</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">            if (plusNext.startsWith(&quot;.&quot;)) {</span>
+<span class="nc" id="L131">                plusNext = plusNext.substring(1);</span>
+            }
+<span class="fc bfc" id="L133" title="All 2 branches covered.">            if (plusNext.startsWith(&quot;\\\\.&quot;)) {</span>
+<span class="fc" id="L134">                plusNext = plusNext.replaceFirst(&quot;\\\\\\\\.&quot;, &quot;&quot;);</span>
+            }
+<span class="fc bfc" id="L136" title="All 2 branches covered.">            if (plusNext.startsWith(&quot;\\.&quot;)) {</span>
+<span class="fc" id="L137">                plusNext = plusNext.replaceFirst(&quot;\\\\\\.&quot;, &quot;&quot;);</span>
+            }
+<span class="fc" id="L139">            String[] pnc = plusNext.split(&quot;\\\\.&quot;);</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">            if (check[1].equals(&quot;==&quot;)) {</span>
+<span class="fc" id="L141">                Goate subset = fromData.filterStrict((plusCheck[0] + &quot;[0-9]+&quot;).replace(&quot;*&quot;, &quot;[0-9]*&quot;).replace(&quot;\\\\&quot;,&quot;\\&quot;).replace(&quot;([0-9])[0-9]&quot;,&quot;([0-9])&quot;).replace(&quot;\\.[0-9]+&quot;, &quot;&quot;));</span>
+                //find expected total size
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">                int totalSize = Integer.parseInt(&quot;&quot; + check[2]) * (subset.size() &gt; 0 ? subset.size() : 1);</span>
+                //find actual total size
+<span class="fc" id="L145">                int actualSize = fromData.filterStrict((plusCheck[0] + &quot;[0-9]+&quot;).replace(&quot;*&quot;, &quot;[0-9]*&quot;).replace(&quot;*&quot;, &quot;[0-9]*&quot;).replace(&quot;\\\\&quot;,&quot;\\&quot;).replace(&quot;([0-9])[0-9]&quot;,&quot;([0-9])&quot;)).size();</span>
+<span class="fc" id="L146">                cev.put(&quot;actual_value&quot;, actualSize)</span>
+<span class="fc" id="L147">                        .put(&quot;expected_value&quot;, totalSize);</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">                if (!compare(actualSize, totalSize, cev)) {</span>
+<span class="fc" id="L149">                    result = false;</span>
+                }
+<span class="fc" id="L151">            } else {</span>
+                //find how many are present
+<span class="fc bfc" id="L153" title="All 2 branches covered.">                Goate plusFirstFilter = fromData.filterStrict((plusCheck[0] + &quot;[0-9]+&quot; + (plusCheck.length &gt; 1 ? &quot;\\.&quot; + pnc[0] : &quot;&quot;)).replace(&quot;*&quot;, &quot;[0-9]*&quot;).replace(&quot;\\\\&quot;,&quot;\\&quot;).replace(&quot;([0-9])[0-9]&quot;,&quot;([0-9])&quot;));</span>
+                //find how many should be present
+<span class="fc" id="L155">                int plusSecondFilterSize = calculatedMinimumSize(fromData, plusCheck, og_check);//plusSecondFilter.size()==0?1:plusSecondFilter.size();</span>
+<span class="fc" id="L156">                cev.put(&quot;actual_value&quot;, plusFirstFilter.size())</span>
+<span class="fc" id="L157">                        .put(&quot;expected_value&quot;, plusSecondFilterSize);</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">                if (!compare(plusFirstFilter.size(), plusSecondFilterSize, cev)) {//fromData.filterStrict(check[0].replace(&quot;*&quot;, &quot;[0-9]*&quot;)).size(), i, cev)) {</span>
+<span class="fc" id="L159">                    result = false;</span>
+                }
+            }
+<span class="fc" id="L162">        }</span>
+<span class="fc" id="L163">        return result;</span>
+    }
+
+    protected int calculatedMinimumSize(Goate fromData, String[] plusCheck, String check){
+<span class="fc" id="L167">        int minSize = 1;</span>
+<span class="fc" id="L168">        Goate plusSecondFilter = fromData.filterStrict((plusCheck[0] + &quot;[0-9]+&quot;).replace(&quot;*&quot;, &quot;[0-9]*&quot;).replace(&quot;\\\\&quot;,&quot;\\&quot;).replace(&quot;([0-9])[0-9]&quot;,&quot;([0-9])&quot;));</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">        if(starBefore(check)){</span>
+<span class="fc" id="L170">            minSize = plusSecondFilter.size();//fromData.filterStrict((plusCheck[0].substring(0,plusCheck[0].length()-2)).replace(&quot;*&quot;, &quot;[0-9]*&quot;).replace(&quot;\\\\&quot;,&quot;\\&quot;).replace(&quot;([0-9])[0-9]&quot;,&quot;([0-9])&quot;)).size();</span>
+        } else {
+<span class="fc bfc" id="L172" title="All 2 branches covered.">            if (plusSecondFilter.size() == 0) {</span>
+<span class="fc" id="L173">                minSize = check.split(&quot;\\+&quot;).length;</span>
+            } else {
+<span class="fc" id="L175">                minSize = plusSecondFilter.size();</span>
+            }
+        }
+<span class="fc" id="L178">        return minSize;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

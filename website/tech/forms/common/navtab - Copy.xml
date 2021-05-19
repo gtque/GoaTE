@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<navtab>
+	<div class="tab">
+		<div class="left">
+			<div class="top">
+			</div>
+			<div class="center">
+			</div>
+			<div class="left_bottom">
+			</div>
+		</div>
+		<div class="center" onclick="_onclick_">
+			<nothtml type="_getphpvar">_label</nothtml>
+		</div>
+		<div class="right">
+			<div class="top">
+			</div>
+			<div class="center">
+			</div>
+			<div class="bottom">
+			</div>
+		</div>
+	</div>
+</navtab>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ApiEmployee.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.rest.staff</a> &gt; <span class="el_source">ApiEmployee.java</span></div><h1>ApiEmployee.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.rest.staff;
+
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.rest.RestCall;
+import com.thegoate.rest.RestSpec;
+import com.thegoate.rest.annotation.GoateRest;
+import com.thegoate.staff.Employee;
+
+import java.lang.reflect.InvocationTargetException;
+
+/**
+ * Defines the base API employee.&lt;br&gt;
+ * Adds the functionality for extracting and setting
+ * the data and looking up the right Rest wrapper implementation.
+ * Created by Eric Angeli on 5/17/2017.
+ */
+<span class="fc" id="L43">public abstract class ApiEmployee&lt;T&gt; extends Employee&lt;T&gt; {</span>
+<span class="fc" id="L44">    RestSpec rest = null;</span>
+
+    public void logRequest(){
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        if(rest!=null){</span>
+<span class="nc" id="L48">            rest.logSpec();</span>
+        }
+<span class="nc" id="L50">    }</span>
+
+    @Override
+    public Employee init() {
+<span class="fc" id="L54">        String security = &quot;&quot; + definition.get(&quot;security&quot;, &quot;none&quot;);</span>
+        try {
+<span class="fc" id="L56">            rest = findAndBuildRestSpec(security);</span>
+<span class="nc" id="L57">        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {</span>
+<span class="nc" id="L58">            LOG.error(&quot;failed to find a valid rest implementation for : &quot; + security +&quot;\n&quot;+e.getMessage());</span>
+<span class="fc" id="L59">        }</span>
+<span class="fc" id="L60">        return this;</span>
+    }
+
+    protected RestSpec findAndBuildRestSpec(String security) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+<span class="fc" id="L64">        RestSpec spec = null;</span>
+<span class="fc" id="L65">        AnnotationFactory af = new AnnotationFactory();</span>
+<span class="fc" id="L66">        spec = (RestSpec)af.annotatedWith(GoateRest.class).find(security).using(&quot;security&quot;).build();</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if(spec!=null) {</span>
+<span class="fc" id="L68">            spec.baseURL(definition.get(&quot;base url&quot;, null, true, String.class));</span>
+<span class="fc" id="L69">            spec.headers(definition.filterAndSplitKeyValuePairs(&quot;headers.&quot;));</span>
+<span class="fc" id="L70">            spec.urlParams(definition.filterAndSplitKeyValuePairs(&quot;url params.&quot;));</span>
+<span class="fc" id="L71">            spec.queryParams(definition.filterAndSplitKeyValuePairs(&quot;query params.&quot;));</span>
+<span class="fc" id="L72">            spec.pathParams(definition.filterAndSplitKeyValuePairs(&quot;path params.&quot;));</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">            if(definition.get(&quot;body&quot;)!=null) {</span>
+<span class="nc" id="L74">                spec.body(definition.get(&quot;body&quot;));</span>
+            }
+<span class="fc" id="L76">            spec.formData(definition.filterAndSplitKeyValuePairs(&quot;form params.&quot;));</span>
+<span class="fc" id="L77">            spec.multipartData(definition.filterAndSplitKeyValuePairs(&quot;multipart&quot;));</span>
+<span class="fc" id="L78">            spec.customData(definition.filterAndSplitKeyValuePairs(&quot;custom params.&quot;));</span>
+<span class="fc" id="L79">            spec.timeout(Integer.parseInt(&quot;&quot;+definition.get(&quot;rest.timeout&quot;,15)));</span>
+<span class="fc" id="L80">            spec.configure(definition.get(&quot;config&quot;, null));</span>
+<span class="fc" id="L81">            spec.config();</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">            if(definition.get(RestCall.ENABLE_LOG, true, Boolean.class)){</span>
+<span class="fc" id="L83">                spec.enableLog();</span>
+            } else {
+<span class="nc" id="L85">                spec.disableLog();</span>
+            }
+        }
+<span class="fc" id="L88">        return spec;</span>
+    }
+
+    @Override
+    public String[] detailedScrub(){
+<span class="fc" id="L93">        String[] scrub = {&quot;base url&quot;, &quot;end point&quot;, &quot;method&quot;, &quot;headers&quot;, &quot;url params&quot;, &quot;query params&quot;, &quot;path params&quot;, &quot;body&quot;, &quot;form params&quot;, &quot;multipart&quot;, &quot;custom params&quot;, &quot;security&quot;};</span>
+<span class="fc" id="L94">        return scrub;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

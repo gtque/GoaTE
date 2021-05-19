@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>DeSerializer.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.utils.fill.serialize</a> &gt; <span class="el_source">DeSerializer.java</span></div><h1>DeSerializer.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.utils.fill.serialize;
+
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.GoateReflection;
+
+import java.lang.reflect.Field;
+import java.util.Map;
+
+/**
+ * Remember: GoaTE is intended for testing purposes, as such unsafe
+ * methods, reflection, and access may be used or altered. Use in production code at your own risk.
+ * Created by Eric Angeli on 6/26/2018.
+ */
+<span class="fc" id="L42">public class DeSerializer extends Cereal{</span>
+<span class="fc" id="L43">    private BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+    private Goate data;
+    private Class dataSource;
+    private Class genericType;
+
+    public &lt;T&gt; T build(Class&lt;T&gt; type){
+<span class="fc" id="L49">        Object o = null;</span>
+        try {
+<span class="fc" id="L51">            o = buildInstance(type);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">            if (data == null) {</span>
+<span class="nc" id="L53">                LOG.debug(&quot;Build Pojo&quot;, &quot;The data was null, the pojo will be initialized but empty (unless defaults are set)&quot;);</span>
+            } else {
+<span class="fc bfc" id="L55" title="All 2 branches covered.">                if(dataSource == null){</span>
+<span class="fc" id="L56">                    LOG.debug(&quot;Build Pojo&quot;, &quot;The data source was not specified, defaulting to default&quot;);</span>
+<span class="fc" id="L57">                    dataSource = DefaultSource.class;</span>
+                }
+<span class="fc" id="L59">                GoateReflection gr = new GoateReflection();</span>
+<span class="fc" id="L60">                Map&lt;String, Field&gt; fields = gr.findFields(type);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">                for(Map.Entry&lt;String, Field&gt; field:fields.entrySet()){</span>
+<span class="fc" id="L62">                    GoateSource gs = findGoateSource(field.getValue(), dataSource);</span>
+<span class="fc" id="L63">                    String fieldKey = field.getKey();</span>
+<span class="fc" id="L64">                    boolean flatten = false;</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">                    if(gs!=null){</span>
+<span class="fc" id="L66">                        fieldKey = gs.key();</span>
+<span class="fc" id="L67">                        flatten = gs.flatten();</span>
+                    }
+<span class="fc bfc" id="L69" title="All 2 branches covered.">                    Object value = fieldKey.isEmpty()?data:data.get(fieldKey);</span>
+<span class="fc" id="L70">                    boolean acc = field.getValue().isAccessible();</span>
+<span class="fc" id="L71">                    field.getValue().setAccessible(true);</span>
+                    try {
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                        if(value!=null</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">                                ||data.filter(fieldKey+&quot;\\.&quot;).size()&gt;0</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">                                ||data.getStrict(fieldKey)!=null</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                                ||field.getValue().getType().getAnnotation(GoatePojo.class)!=null) {</span>
+<span class="fc" id="L77">                            Goate d = new Goate().merge(data,false);</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                            if(!flatten){</span>
+<span class="fc" id="L79">                                d = data.filter(fieldKey.replace(&quot;##&quot;, &quot;[0-9]*&quot;));</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">                                if(!fieldKey.isEmpty()){</span>
+<span class="fc" id="L81">                                    d = d.scrubKeys(fieldKey+&quot;\\.&quot;);</span>
+                                }
+                            } else {
+<span class="nc" id="L84">                                d = data.filterStrict(fieldKey.replace(&quot;##&quot;,&quot;[0-9]*&quot;));</span>
+                            }
+<span class="fc" id="L86">                            field.getValue().set(o, new Cast(d, dataSource).container(o).field(field.getValue()).cast(value,field.getValue().getType()));</span>
+                        }
+<span class="nc" id="L88">                    } catch (Exception e) {</span>
+<span class="nc" id="L89">                        LOG.error(&quot;Build Pojo&quot;, &quot;Failed to set field: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L90">                    }</span>
+<span class="fc" id="L91">                    field.getValue().setAccessible(acc);</span>
+<span class="fc" id="L92">                }</span>
+            }
+<span class="nc" id="L94">        } catch (IllegalAccessException | InstantiationException e) {</span>
+<span class="nc" id="L95">            LOG.error(&quot;Build Pojo&quot;, &quot;Failed to build the pojo: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L96">        }</span>
+<span class="fc" id="L97">        return (T)o;</span>
+    }
+
+    private Object buildInstance(Class type) throws IllegalAccessException, InstantiationException {
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if(type==null){</span>
+<span class="nc" id="L102">            LOG.error(&quot;Build Pojo&quot;, &quot;Can't build the pojo if you don't tell me what to build.&quot;);</span>
+<span class="nc" id="L103">            throw new RuntimeException(&quot;The pojo class was not specified.&quot;);</span>
+        }
+<span class="fc" id="L105">        Object o = type.newInstance();</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        if(o instanceof TypeT){</span>
+<span class="fc" id="L107">            ((TypeT)o).setGoateType(genericType);</span>
+        }
+<span class="fc" id="L109">        return o;</span>
+    }
+
+    public DeSerializer data(Goate data){
+<span class="fc" id="L113">        this.data = data;</span>
+<span class="fc" id="L114">        return this;</span>
+    }
+
+    public DeSerializer T(Class type){
+<span class="fc" id="L118">        return genericType(type);</span>
+    }
+    public DeSerializer genericType(Class type){
+<span class="fc" id="L121">        this.genericType = type;</span>
+<span class="fc" id="L122">        return this;</span>
+    }
+
+    public DeSerializer data(Map&lt;String, ?&gt; data){
+<span class="fc" id="L126">        return data(new Goate(data));</span>
+    }
+
+    public DeSerializer from(Class dataSource){
+<span class="fc" id="L130">        this.dataSource = dataSource;</span>
+<span class="fc" id="L131">        return this;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

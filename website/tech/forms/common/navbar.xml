@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<navbar>
+	<div id="navbar">
+		<div id="nav">
+			<font ID="QuickSiteMain_f1" FACE="Helvetica, Arial, sans-serif" CLASS="size12 Helvetica12">
+				<nothtml type="tab" class="tab">
+					<layout>forms/common/navtab.xml</layout>
+					<on_tab on="on_tab" off="tab">
+						<condition>
+							<block>
+								<value1 type="_getphpvar">form</value1>
+								<operator>equals</operator>
+								<value2 type="value">home</value2>
+							</block>
+							<block type="or">
+								<value1 type="_getphpvar">theform</value1>
+								<operator>equals</operator>
+								<value2 type="value"></value2>
+							</block>
+						</condition>
+					</on_tab>
+					<label>Home</label>
+					<action type="href" call="tabClickPage" id="_onclick_">
+						<parameter>/</parameter>
+					</action>
+				</nothtml>
+				<nothtml type="tab" class="tab">
+					<layout>forms/common/navtab.xml</layout>
+					<on_tab on="on_tab" off="tab">
+						<condition>
+							<block>
+								<value1 type="_getphpvar">form</value1>
+								<operator>equals</operator>
+								<value2 type="value">tutorials</value2>
+							</block>
+						</condition>
+					</on_tab>
+					<label>Tutorials</label>
+					<action type="href" call="tabClickPage" id="_onclick_">
+						<parameter>_flow_path_/flow.php/tutorials</parameter>
+					</action>
+				</nothtml>
+				<nothtml type="tab" class="tab">
+					<layout>forms/common/navtab.xml</layout>
+					<on_tab on="on_tab" off="tab">
+						<condition>
+							<block>
+								<value1 type="_getphpvar">form</value1>
+								<operator>equals</operator>
+								<value2 type="value">faq</value2>
+							</block>
+						</condition>
+					</on_tab>
+					<label>FAQ</label>
+					<action type="href" call="tabClickPage" id="_onclick_">
+						<parameter>_flow_path_/flow.php/faq</parameter>
+					</action>
+				</nothtml>
+				<nothtml type="tab" class="tab">
+					<layout>forms/common/navtab.xml</layout>
+					<on_tab on="on_tab" off="tab">
+						<condition>
+							<block>
+								<value1 type="_getphpvar">form</value1>
+								<operator>equals</operator>
+								<value2 type="value">docs</value2>
+							</block>
+						</condition>
+					</on_tab>
+					<label>Doc</label>
+					<action type="href" call="tabClickPage" id="_onclick_">
+						<parameter>_flow_path_/flow.php/docs</parameter>
+					</action>
+				</nothtml>
+				<div class="language_choice">
+					<label for="language">language</label>
+					<select name="language" id="language">
+						<option value="java">Java</option>
+					</select>
+				</div>
+			</font>
+		</div>
+	</div>
+</navbar>

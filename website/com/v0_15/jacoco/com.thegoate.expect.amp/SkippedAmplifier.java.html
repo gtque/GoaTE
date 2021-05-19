@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SkippedAmplifier.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.expect.amp</a> &gt; <span class="el_source">SkippedAmplifier.java</span></div><h1>SkippedAmplifier.java</h1><pre class="source lang-java linenums">package com.thegoate.expect.amp;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.expect.ExpectThreadExecuter;
+import com.thegoate.expect.Expectation;
+import com.thegoate.logging.volume.amp.GoateAmplifier;
+
+import java.util.List;
+
+@GoateAmplifier(type = SkippedChannel.class)
+@IsDefault(forType = true)
+public class SkippedAmplifier extends StatusAmplifier {
+
+    public SkippedAmplifier(Object message) {
+<span class="fc" id="L16">        super(message);</span>
+<span class="fc" id="L17">    }</span>
+
+    @Override
+    protected void setStatus() {
+<span class="fc" id="L21">    }</span>
+
+    @Override
+    protected void logVolume(Goate p) {
+<span class="fc" id="L25">        super.logVolume(p);</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">        if (p.get(&quot;failure message&quot;, null) == null) {</span>
+<span class="fc" id="L27">            p.drop(&quot;failure message&quot;);</span>
+        }
+<span class="fc" id="L29">    }</span>
+
+    @Override
+    protected String amplify() {
+<span class="fc" id="L33">        StringBuilder full = new StringBuilder();</span>
+<span class="fc" id="L34">        StringBuilder ss = new StringBuilder();</span>
+<span class="fc" id="L35">        boolean skipped = false;</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        for (Goate exp : ev.skipped()) {</span>
+<span class="fc" id="L37">            logVolume(exp);</span>
+<span class="fc" id="L38">            skipped = true;</span>
+<span class="fc" id="L39">            ss.append(expectSeparator);</span>
+<span class="fc" id="L40">            ss.append(exp.toString(&quot;\t&quot;, &quot;&quot;));</span>
+<span class="fc" id="L41">        }</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (skipped) {</span>
+<span class="fc" id="L43">            ss.append(expectSeparator);</span>
+            //LOG.error(&quot;\nfailed (skipped):&quot; + ss.toString());
+<span class="fc" id="L45">            full.append(&quot;\nfailed (skipped)&quot;).append(ss);</span>
+        }
+
+<span class="fc" id="L48">        return full.toString();</span>
+    }
+
+
+    @Override
+    public boolean isType(Object check) {
+<span class="fc" id="L54">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

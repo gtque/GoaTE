@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>DSL.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.dsl</a> &gt; <span class="el_source">DSL.java</span></div><h1>DSL.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.dsl;
+
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * The base definition for a new word in the DSL.&lt;br&gt;
+ * Words should extend DSL and be annotated with the {@literal @}GoateDSL annotation&lt;br&gt;
+ * When referencing the word it should be terminated with double colons (::)&lt;br&gt;
+ * Parameters for the word should come after :: and be comma (,) separated.
+ * Created by gtque on 4/20/2017.
+ */
+public abstract class DSL {
+<span class="pc" id="L44">    protected final BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+    protected List&lt;String&gt; definition;
+    protected Object value;
+<span class="pc" id="L47">    protected String key = &quot;&quot;;</span>
+
+<span class="nc" id="L49">    public DSL(){}</span>
+
+<span class="fc" id="L51">    public DSL(Object value){</span>
+<span class="fc" id="L52">        define(value);</span>
+<span class="fc" id="L53">    }</span>
+
+    public DSL source(String key){
+<span class="fc" id="L56">        this.key = key;</span>
+<span class="fc" id="L57">        return this;</span>
+    }
+
+    public String type(){
+<span class="nc" id="L61">        String type = &quot;undefined&quot;;</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if(definition!=null){</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            if(definition.size()&gt;0){</span>
+<span class="nc" id="L64">                type = definition.get(0);</span>
+            }
+        }
+<span class="nc" id="L67">        return type;</span>
+    }
+
+    protected Object get(int index, Goate data){
+<span class="fc" id="L71">        Object o = null;</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if(definition.size()&gt;index) {</span>
+<span class="fc" id="L73">            o = data.processDSL(definition.get(index));</span>
+        }
+<span class="fc" id="L75">        return o;</span>
+    }
+
+
+    public List&lt;String&gt; define(Object value){
+<span class="fc" id="L80">        this.value = value;</span>
+<span class="fc" id="L81">        definition = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L82">        String v = &quot;&quot; + value;</span>
+<span class="fc" id="L83">        definition.add(v.substring(0,v.indexOf(&quot;::&quot;)));</span>
+<span class="fc" id="L84">        v = v.substring(v.indexOf(&quot;::&quot;)+2);</span>
+<span class="fc" id="L85">        v = v.replace(&quot;\\,&quot;,&quot;(comma_goate_yall)&quot;);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if(!v.isEmpty()) {</span>
+<span class="fc" id="L87">            String[] def = (v).split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">            for (String d : def) {</span>
+<span class="fc" id="L89">                definition.add(d.replace(&quot;(comma_goate_yall)&quot;, &quot;,&quot;));</span>
+            }
+        }
+<span class="fc" id="L92">        return definition;</span>
+    }
+
+    public abstract Object evaluate(Goate data);
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

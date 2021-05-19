@@ -1,0 +1,14 @@
+<title title="GoaTE Tech!">
+	<script type = "text/javascript" src = "_flow_path_/flow/api/htmlapi/javascript/include.js">
+	</script>
+	<script type = "text/javascript" src = "_flow_path_/flow/api/htmlapi/javascript/include_htmlapi.js" jsfunction="include_htmlapi">
+	</script>
+	<script type="text/javascript">
+			var definedPath = "_flow_path_";
+			doInclude(definedPath);		
+	</script>
+	<link rel="stylesheet" type="text/css" media="screen,projection" href="_flow_path_/style/font.css"/>
+	<link rel="stylesheet" type="text/css" media="screen,projection" href="_flow_path_/style/goate.css" class=""/>
+	<link rel="shortcut icon" href="http://www.goate.tech/style/images/thp_goate_16by16.png" type='image/x-icon'/>-->
+	<link rel="icon" href="http://www.goate.tech/style/images/thp_goate_16by16.png" type='image/x-icon'/>-->
+</title>

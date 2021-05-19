@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Rest.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.rest</a> &gt; <span class="el_source">Rest.java</span></div><h1>Rest.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.rest;
+
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+
+
+/**
+ * Base RestSpec class for doing restful api calls.
+ * Created by Eric Angeli on 5/16/2017.
+ */
+<span class="fc" id="L38">public abstract class Rest implements RestSpec {</span>
+<span class="fc" id="L39">    protected final BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+
+    public static final String typeSeparator = &quot;&lt;type&gt;&quot;;
+
+<span class="fc" id="L43">    protected Goate headers = new Goate();</span>
+<span class="fc" id="L44">    protected Goate queryParams = new Goate();</span>
+<span class="fc" id="L45">    protected Goate urlParams = new Goate();</span>
+<span class="fc" id="L46">    protected Goate pathParams = new Goate();</span>
+<span class="fc" id="L47">    protected Goate body = new Goate();</span>
+<span class="fc" id="L48">    protected Goate custom = new Goate();</span>
+<span class="fc" id="L49">    protected Object config = null;</span>
+<span class="fc" id="L50">    protected String baseURL = &quot;&quot;;//this should include the port if different from default.</span>
+<span class="fc" id="L51">    protected int timeout = 15;</span>
+<span class="fc" id="L52">    protected boolean logAll = true;</span>
+    public static final String MP_ID_NOT_SET = &quot;_mp_id_not_set&quot;;
+<span class="pc" id="L54">    public enum BODY {</span>
+<span class="fc" id="L55">        form, urlencoded, raw, binary, multipart</span>
+    }
+
+<span class="fc" id="L58">    BODY bodyFormat = BODY.raw;</span>
+
+    @Override
+    public boolean doLog(){
+<span class="fc" id="L62">        return logAll;</span>
+    }
+
+    @Override
+    public String getBaseURL(){
+<span class="fc" id="L67">        return baseURL;</span>
+    }
+
+    @Override
+    public RestSpec baseUri(String uri){
+<span class="nc" id="L72">        return baseURL(uri);</span>
+    }
+
+    @Override
+    public RestSpec baseURL(String url){
+<span class="fc" id="L77">        this.baseURL = url;</span>
+<span class="fc" id="L78">        return this;</span>
+    }
+
+    @Override
+    public RestSpec enableLog() {
+<span class="fc" id="L83">        this.logAll = true;</span>
+<span class="fc" id="L84">        return this;</span>
+    }
+
+    @Override
+    public RestSpec disableLog() {
+<span class="nc" id="L89">        this.logAll = false;</span>
+<span class="nc" id="L90">        return this;</span>
+    }
+
+    @Override
+    public RestSpec headers(Goate data) {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if(data!=null) {</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">            for (String key : data.keys()) {</span>
+<span class="nc" id="L97">                header(key, data.get(key));</span>
+<span class="nc" id="L98">            }</span>
+        }
+<span class="fc" id="L100">        return this;</span>
+    }
+
+    @Override
+    public RestSpec header(String key, Object value) {
+<span class="nc" id="L105">        headers.put(key, value);</span>
+<span class="nc" id="L106">        return this;</span>
+    }
+
+    @Override
+    public RestSpec queryParams(Goate data) {
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if(data!=null) {</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            for (String key : data.keys()) {</span>
+<span class="fc" id="L113">                queryParam(key, data.get(key));</span>
+<span class="fc" id="L114">            }</span>
+        }
+<span class="fc" id="L116">        return this;</span>
+    }
+
+    @Override
+    public RestSpec queryParam(String key, Object value) {
+<span class="fc" id="L121">        queryParams.put(key, value);</span>
+<span class="fc" id="L122">        return this;</span>
+    }
+
+    @Override
+    public RestSpec urlParams(Goate data) {
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        if(data!=null) {</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">            for (String key : data.keys()) {</span>
+<span class="nc" id="L129">                urlParam(key, data.get(key));</span>
+<span class="nc" id="L130">            }</span>
+        }
+<span class="fc" id="L132">        return this;</span>
+    }
+
+    @Override
+    public RestSpec urlParam(String key, Object value) {
+<span class="nc" id="L137">        urlParams.put(key, value);</span>
+<span class="nc" id="L138">        return this;</span>
+    }
+
+    @Override
+    public RestSpec pathParams(Goate data) {
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        if(data!=null) {</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">            for (String key : data.keys()) {</span>
+<span class="nc" id="L145">                pathParam(key, data.get(key));</span>
+<span class="nc" id="L146">            }</span>
+        }
+<span class="fc" id="L148">        return this;</span>
+    }
+
+    @Override
+    public RestSpec pathParam(String key, Object value) {
+<span class="nc" id="L153">        pathParams.put(key, value);</span>
+<span class="nc" id="L154">        return this;</span>
+    }
+
+    @Override
+    public RestSpec bodyAsFormData() {
+<span class="nc" id="L159">        bodyFormat = BODY.form;</span>
+<span class="nc" id="L160">        return this;</span>
+    }
+
+    @Override
+    public RestSpec bodyAsFormUrlencodedData() {
+<span class="nc" id="L165">        bodyFormat = BODY.urlencoded;</span>
+<span class="nc" id="L166">        return this;</span>
+    }
+
+    @Override
+    public RestSpec bodyAsRawData() {
+<span class="nc" id="L171">        bodyFormat = BODY.raw;</span>
+<span class="nc" id="L172">        return this;</span>
+    }
+
+    @Override
+    public RestSpec bodyAsMultipartFormData() {
+<span class="nc" id="L177">        bodyFormat = BODY.multipart;</span>
+<span class="nc" id="L178">        return this;</span>
+    }
+
+    @Override
+    public RestSpec bodyAsBinaryData() {
+<span class="nc" id="L183">        bodyFormat = BODY.binary;</span>
+<span class="nc" id="L184">        return this;</span>
+    }
+
+    @Override
+    public RestSpec formData(Goate data) {
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">        if(data!=null) {</span>
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">            for (String key : data.keys()) {</span>
+<span class="nc" id="L191">                formData(key, data.get(key));</span>
+<span class="nc" id="L192">            }</span>
+        }
+<span class="fc" id="L194">        return this;</span>
+    }
+
+    @Override
+    public RestSpec formData(String key, Object value) {
+<span class="nc" id="L199">        bodyFormat = BODY.form;</span>
+<span class="nc" id="L200">        return body(bodyFormat, key, value);</span>
+    }
+
+    @Override
+    public RestSpec formUrlencodedData(String key, Object value) {
+<span class="nc" id="L205">        bodyFormat = BODY.urlencoded;</span>
+<span class="nc" id="L206">        return body(bodyFormat, key, value);</span>
+    }
+
+    @Override
+    public RestSpec binaryBody(Object value) {
+<span class="nc" id="L211">        bodyFormat = BODY.binary;</span>
+<span class="nc" id="L212">        return body(value);</span>
+    }
+
+    @Override
+    public RestSpec rawBody(Object value) {
+<span class="nc" id="L217">        bodyFormat = BODY.raw;</span>
+<span class="nc" id="L218">        return body(value);</span>
+    }
+
+    @Override
+    public RestSpec multipartData(Goate data) {
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">        if(data!=null) {</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">            for (String key : data.keys()) {</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">                multipartFormData(key.isEmpty()?(MP_ID_NOT_SET+&quot;##&quot;):key, data.get(key));</span>
+<span class="fc" id="L226">            }</span>
+        }
+<span class="fc" id="L228">        return this;</span>
+    }
+
+    @Override
+    public RestSpec multipartFormData(Object value) {
+<span class="nc" id="L233">        return multipartFormData(MP_ID_NOT_SET+&quot;##&quot;, value);</span>
+    }
+
+    @Override
+    public RestSpec multipartFormData(String key, Object value) {
+<span class="fc" id="L238">        return multipartFormData(key, value, null);</span>
+    }
+
+    @Override
+    public RestSpec multipartFormData(String key, Object value, String contentType){
+<span class="fc" id="L243">        bodyFormat = BODY.multipart;</span>
+        //&gt;=contentType
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">        if(contentType!=null){</span>
+<span class="nc" id="L246">            key = typeSeparator+contentType;</span>
+        }
+<span class="fc" id="L248">        return body(bodyFormat, key, value);</span>
+    }
+
+    @Override
+    public RestSpec customData(Goate data){
+<span class="pc bpc" id="L253" title="1 of 2 branches missed.">        if(data!=null) {</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">            for (String key : data.keys()) {</span>
+<span class="nc" id="L255">                String keyC = &quot;&quot;+data.get(&quot;_cust_key:&quot;+key,key);</span>
+<span class="nc" id="L256">                custom.put(keyC,data.get(key));</span>
+<span class="nc" id="L257">                processCustomData(keyC, data.get(key));</span>
+<span class="nc" id="L258">            }</span>
+        }
+<span class="fc" id="L260">        return this;</span>
+    }
+
+    @Override
+    public RestSpec customData(Enum key, Object value) {
+<span class="nc" id="L265">        custom.put(key.name(), value);</span>
+<span class="nc" id="L266">        return processCustomData(key, value);</span>
+    }
+
+    @Override
+    public RestSpec binaryBodyData(Object value) {
+<span class="nc" id="L271">        bodyFormat = BODY.binary;</span>
+<span class="nc" id="L272">        return body(value);</span>
+    }
+
+    @Override
+    public RestSpec body(Object value) {
+<span class="nc" id="L277">        return body(bodyFormat, &quot;body&quot;, value);</span>
+    }
+
+    @Override
+    public RestSpec body(Enum type, String key, Object value) {
+<span class="fc" id="L282">        body.get(type.name(), new Goate(), false, Goate.class).put(key, value);</span>
+<span class="fc" id="L283">        return this;</span>
+    }
+
+    @Override
+    public Goate getQueryParameters(){
+<span class="fc" id="L288">        return queryParams;</span>
+    }
+
+    @Override
+    public Goate getURLParameters(){
+<span class="fc" id="L293">        return urlParams;</span>
+    }
+
+    @Override
+    public Goate getPathParameters(){
+<span class="fc" id="L298">        return pathParams;</span>
+    }
+
+    @Override
+    public Goate getHeaders(){
+<span class="fc" id="L303">        return headers;</span>
+    }
+
+    @Override
+    public Goate getBody(){
+<span class="fc" id="L308">        return body;</span>
+    }
+
+    @Override
+    public RestSpec timeout(int timeoutSeconds){
+<span class="fc" id="L313">        this.timeout = timeoutSeconds;</span>
+<span class="fc" id="L314">        return this;</span>
+    }
+
+
+    @Override
+    public RestSpec configure(Object config) {
+<span class="fc" id="L320">        this.config = config;</span>
+<span class="fc" id="L321">        return this;</span>
+    }
+
+    @Override
+    public Object getConfig(){
+<span class="fc" id="L326">        return this.config;</span>
+    }
+
+    @Override
+    public int getTimeout(){
+<span class="fc" id="L331">        return timeout;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

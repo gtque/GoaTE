@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.thegoate.json.staff.html">com.thegoate.json.staff</a> &gt; GetJsonByMoreThanOneFieldValue</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">5</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.081s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrayContains:(0)</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrayDoesNotContains:(0)</td>
+<td class="success">0.069s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrays:(0)</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:nestedArrayFind:(0)</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:twoFieldValues:(0)</td>
+<td class="success">0.008s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>[INFO] 2021-02-18 21:45:30,788 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrayContains:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:45:30,789 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:45:30,789 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:45:30,791 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual([{'a':true,'b':3.14159'}]) contains [{'b':1.159','a':false, 'c':42}, {'b':3.14159','a':true, 'c':42}]
+
+[DEBUG] 2021-02-18 21:45:30,793 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.json.utils.compare.tools.CompareJsonContains
+[DEBUG] 2021-02-18 21:45:30,794 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.bool.CompareBooleanEqualTo
+[DEBUG] 2021-02-18 21:45:30,794 com.thegoate.json.utils.compare.tools.CompareJsonContains: :a: the objects values were not equal. true != false
+[DEBUG] 2021-02-18 21:45:30,795 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,795 com.thegoate.json.utils.compare.tools.CompareJsonContains: :b: the objects values were not equal. 3.14159' != 1.159'
+[DEBUG] 2021-02-18 21:45:30,796 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.bool.CompareBooleanEqualTo
+[DEBUG] 2021-02-18 21:45:30,797 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,797 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,797 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,798 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,798 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,798 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:45:30,807 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:[...]
+	expected:[...]
+	expected_value:[...]
+	from:actual:[...]
+	operator:contains
+--------------------
+
+[INFO] 2021-02-18 21:45:30,808 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Shut Down:
+*****************************************************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrayContains:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:45:30,810 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrayDoesNotContains:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:45:30,811 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:45:30,812 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:45:30,814 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual([{'a':false,'b':3.14159'}]) contains [{'b':1.159','a':false, 'c':42}, {'b':3.14159','a':true, 'c':42}]
+
+[DEBUG] 2021-02-18 21:45:30,815 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.json.utils.compare.tools.CompareJsonContains
+[DEBUG] 2021-02-18 21:45:30,816 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.bool.CompareBooleanEqualTo
+[DEBUG] 2021-02-18 21:45:30,817 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,818 com.thegoate.json.utils.compare.tools.CompareJsonContains: :b: the objects values were not equal. 3.14159' != 1.159'
+[DEBUG] 2021-02-18 21:45:30,818 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.bool.CompareBooleanEqualTo
+[DEBUG] 2021-02-18 21:45:30,818 com.thegoate.json.utils.compare.tools.CompareJsonContains: :a: the objects values were not equal. false != true
+[DEBUG] 2021-02-18 21:45:30,819 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,820 com.thegoate.json.utils.compare.tools.CompareJsonContains: :the object was not found in the other array.
+[DEBUG] 2021-02-18 21:45:30,820 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,820 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,871 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,871 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,871 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[WARN] 2021-02-18 21:45:30,871 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: :failures detected...
+[INFO] 2021-02-18 21:45:30,879 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: :Failed as expected.
+[INFO] 2021-02-18 21:45:30,879 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Evaluate:Expectations have already been evaluated and will not be re-evaluated.
+[INFO] 2021-02-18 21:45:30,880 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Shut Down:
+*****************************************************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrayDoesNotContains:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:45:30,881 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrays:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:45:30,882 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:45:30,883 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:45:30,885 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual([{'a':true,'b':3.14159'}]) == [{'b':3.14159','a':true}]
+
+[DEBUG] 2021-02-18 21:45:30,885 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.json.utils.compare.tools.CompareJsonEqualTo
+[DEBUG] 2021-02-18 21:45:30,886 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.bool.CompareBooleanEqualTo
+[DEBUG] 2021-02-18 21:45:30,887 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,888 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.bool.CompareBooleanEqualTo
+[DEBUG] 2021-02-18 21:45:30,888 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,888 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,888 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,889 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,889 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,890 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:45:30,891 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:[...]
+	expected:[...]
+	expected_value:[...]
+	from:actual:[...]
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:45:30,892 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Shut Down:
+*****************************************************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:compareJsonArrays:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:45:30,893 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:nestedArrayFind:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:45:30,897 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,897 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:45:30,898 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:45:30,900 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:udfValue(2018-08-06) isNull false
+
+[DEBUG] 2021-02-18 21:45:30,901 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.IsNull
+[DEBUG] 2021-02-18 21:45:30,901 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,901 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,901 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,901 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,902 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:45:30,903 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Status:
+passed:
+--------------------
+	actual:udfValue
+	actual_value:2018-08-06
+	expected:false
+	expected_value:false
+	from:{...}
+	operator:isNull
+--------------------
+
+[INFO] 2021-02-18 21:45:30,903 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Shut Down:
+*****************************************************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:nestedArrayFind:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:45:30,904 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:twoFieldValues:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:45:30,908 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,909 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.l.CompareLongEqualTo
+[DEBUG] 2021-02-18 21:45:30,910 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,911 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.l.CompareLongEqualTo
+[DEBUG] 2021-02-18 21:45:30,911 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: found:{&quot;aggregations&quot;:[{&quot;aggregateFunctionType&quot;:&quot;SUM&quot;,&quot;property&quot;:&quot;currentAmount&quot;,&quot;value&quot;:&quot;34146.06&quot;},{&quot;aggregateFunctionType&quot;:&quot;COUNT&quot;,&quot;property&quot;:&quot;loan.id&quot;,&quot;value&quot;:&quot;4&quot;}],&quot;groupKey&quot;:{&quot;customer.id&quot;:&quot;43&quot;,&quot;accountGroupType.id&quot;:&quot;2AF986116F61278EE0530100007FEBF7&quot;}}
+[DEBUG] 2021-02-18 21:45:30,913 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:45:30,914 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:45:30,916 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:aggregations([{&quot;aggregateFunctionType&quot;:&quot;SUM&quot;,&quot;property&quot;:&quot;currentAmount&quot;,&quot;value&quot;:&quot;34146.06&quot;},{&quot;aggregateFunctionType&quot;:&quot;COUNT&quot;,&quot;property&quot;:&quot;loan.id&quot;,&quot;value&quot;:&quot;4&quot;}]) == [
+            {
+                &quot;aggregateFunctionType&quot;: &quot;SUM&quot;,
+                &quot;property&quot;: &quot;currentAmount&quot;,
+                &quot;value&quot;: &quot;34146.06&quot;
+            },
+            {
+                &quot;aggregateFunctionType&quot;: &quot;COUNT&quot;,
+                &quot;property&quot;: &quot;loan.id&quot;,
+                &quot;value&quot;: &quot;4&quot;
+            }
+        ]
+
+[DEBUG] 2021-02-18 21:45:30,917 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.json.utils.compare.tools.CompareJsonEqualTo
+[DEBUG] 2021-02-18 21:45:30,918 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,918 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,920 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.f.CompareFloatEqualTo
+[DEBUG] 2021-02-18 21:45:30,921 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,922 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :aggregateFunctionType: the objects values were not equal. COUNT != SUM
+[DEBUG] 2021-02-18 21:45:30,923 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,924 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :property: the objects values were not equal. loan.id != currentAmount
+[DEBUG] 2021-02-18 21:45:30,925 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.l.CompareLongEqualTo
+[DEBUG] 2021-02-18 21:45:30,927 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.f.CompareFloatEqualTo
+[DEBUG] 2021-02-18 21:45:30,927 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :value: the objects values were not equal. 4 != 34146.06
+[DEBUG] 2021-02-18 21:45:30,929 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,930 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,931 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.l.CompareLongEqualTo
+[DEBUG] 2021-02-18 21:45:30,932 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,933 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,933 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.f.CompareFloatEqualTo
+[DEBUG] 2021-02-18 21:45:30,934 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,935 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :aggregateFunctionType: the objects values were not equal. COUNT != SUM
+[DEBUG] 2021-02-18 21:45:30,935 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,936 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :property: the objects values were not equal. loan.id != currentAmount
+[DEBUG] 2021-02-18 21:45:30,937 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.l.CompareLongEqualTo
+[DEBUG] 2021-02-18 21:45:30,938 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.f.CompareFloatEqualTo
+[DEBUG] 2021-02-18 21:45:30,938 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :value: the objects values were not equal. 4 != 34146.06
+[DEBUG] 2021-02-18 21:45:30,938 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,939 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,940 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.l.CompareLongEqualTo
+[DEBUG] 2021-02-18 21:45:30,940 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,940 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,940 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,940 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,940 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:45:30,941 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Status:
+passed:
+--------------------
+	actual:aggregations
+	actual_value:[...]
+	expected:[...]
+	expected_value:[...]
+	from:{...}
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:45:30,942 com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue: Shut Down:
+*****************************************************************
+*	com.thegoate.json.staff.GetJsonByMoreThanOneFieldValue:twoFieldValues:(0)	*
+
+***************************Finished Up***************************
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.0.1</a> at Feb 18, 2021 9:47:41 PM</p>
+</div>
+</div>
+</body>
+</html>

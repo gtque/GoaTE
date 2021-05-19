@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Serializer.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.utils.fill.serialize</a> &gt; <span class="el_source">Serializer.java</span></div><h1>Serializer.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.utils.fill.serialize;
+
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.fill.serialize.to.SerializeTo;
+import com.thegoate.utils.togoate.ToGoate;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Remember: GoaTE is intended for testing purposes, as such unsafe
+ * methods, reflection, and access may be used or altered. Use in production code at your own risk.
+ * Created by Eric Angeli on 6/26/2018.
+ */
+public class Serializer&lt;T, S, U&gt; extends Cereal {
+    private T pojo;
+    private S source;
+    private U cereal;
+<span class="pc" id="L52">    private boolean serializeNested = true;</span>
+<span class="pc" id="L53">    private boolean alwaysSerializeGoatePojo = false;</span>
+
+<span class="nc" id="L55">    public Serializer(T pojo, S source, U cereal) {</span>
+<span class="nc" id="L56">        this.pojo = pojo;</span>
+<span class="nc" id="L57">        this.source = source;</span>
+<span class="nc" id="L58">        this.cereal = cereal;</span>
+<span class="nc" id="L59">    }</span>
+
+<span class="fc" id="L61">    public Serializer(T pojo, S source) {</span>
+<span class="fc" id="L62">        this.pojo = pojo;</span>
+<span class="fc" id="L63">        this.source = source;</span>
+<span class="fc" id="L64">    }</span>
+
+    public void setPojo(T pojo) {
+<span class="nc" id="L67">        this.pojo = pojo;</span>
+<span class="nc" id="L68">    }</span>
+
+    public T getPojo() {
+<span class="nc" id="L71">        return pojo;</span>
+    }
+
+    public void setSource(S source) {
+<span class="nc" id="L75">        this.source = source;</span>
+<span class="nc" id="L76">    }</span>
+
+    public S getSource() {
+<span class="nc" id="L79">        return source;</span>
+    }
+
+    public Serializer doSerializeNested(){
+<span class="nc" id="L83">        this.serializeNested = true;</span>
+<span class="nc" id="L84">        return this;</span>
+    }
+
+    public Serializer skipSerializingObjects(){
+<span class="fc" id="L88">        this.serializeNested = false;</span>
+<span class="fc" id="L89">        return this;</span>
+    }
+
+    public Serializer alwaysSerializeGoatePojos(){
+<span class="nc" id="L93">        this.alwaysSerializeGoatePojo = true;</span>
+<span class="nc" id="L94">        return this;</span>
+    }
+
+    public Serializer skipSerializingGoatePojos(){
+<span class="fc" id="L98">        this.alwaysSerializeGoatePojo = false;</span>
+<span class="fc" id="L99">        return this;</span>
+    }
+    public Goate toGoate() {
+<span class="fc" id="L102">        Goate data = new Goate();</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        for (Map.Entry&lt;String, Object&gt; entry : toMap(HashMap.class).entrySet()) {</span>
+<span class="fc" id="L104">            data.put(entry.getKey(), entry.getValue());</span>
+<span class="fc" id="L105">        }</span>
+<span class="fc" id="L106">        return data;</span>
+    }
+
+    public U to(SerializeTo serializer){
+<span class="fc" id="L110">        return (U)serializer.source((Class)source).cereal(pojo.getClass()).serialize(pojo);</span>
+    }
+
+    public Map&lt;String, Object&gt; toMap(Class mapType) {
+<span class="fc" id="L114">        Map&lt;String, Object&gt; data = null;</span>
+        try {
+<span class="fc" id="L116">            data = (Map) mapType.newInstance();</span>
+<span class="nc" id="L117">        } catch (IllegalAccessException | InstantiationException e) {</span>
+<span class="nc" id="L118">            LOG.error(&quot;Serialze Pojo&quot;, &quot;The mapType could not be initialized: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L119">        } catch (ClassCastException e) {</span>
+<span class="nc" id="L120">            LOG.error(&quot;Serialze Pojo&quot;, &quot;The mapType was not a valid map type: &quot; + e.getMessage(), e);</span>
+<span class="pc" id="L121">        }</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (data != null) {</span>
+<span class="fc" id="L123">            GoateReflection gr = new GoateReflection();</span>
+<span class="fc" id="L124">            Map&lt;String, Field&gt; fields = gr.findFields(pojo.getClass());</span>
+            try {
+<span class="fc bfc" id="L126" title="All 2 branches covered.">                for (Map.Entry&lt;String, Field&gt; field : fields.entrySet()) {</span>
+<span class="fc" id="L127">                    GoateSource gs = findGoateSource(field.getValue(), (Class) source);</span>
+<span class="fc" id="L128">                    String fieldKey = field.getKey();</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">                    if (gs != null) {</span>
+<span class="fc" id="L130">                        fieldKey = gs.key();</span>
+                    }
+<span class="fc" id="L132">                    boolean acc = field.getValue().isAccessible();</span>
+<span class="fc" id="L133">                    field.getValue().setAccessible(true);</span>
+                    try {
+<span class="fc" id="L135">                        Object o = field.getValue().get(pojo);</span>
+<span class="pc bpc" id="L136" title="1 of 4 branches missed.">                        if(gs != null &amp;&amp; gs.serializeTo() != GoateSource.class){</span>
+<span class="nc" id="L137">                            o = doCast(o, gs.serializeTo());</span>
+                        }
+<span class="fc bfc" id="L139" title="All 2 branches covered.">                        if (o != null) {</span>
+<span class="fc" id="L140">                            Class type = field.getValue().getType();</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">                            if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {</span>
+<span class="fc bfc" id="L142" title="All 4 branches covered.">                                if (checkNotPrimitive(type)&amp;&amp;doSerialize(pojo.getClass())) {</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">                                    if(!type.equals(pojo.getClass())) {</span>
+<span class="fc" id="L144">                                        addMap(data, o, fieldKey);</span>
+                                    }
+                                } else {
+<span class="fc" id="L147">                                    data.put(fieldKey, o);</span>
+                                }
+                            }
+                        }
+<span class="nc" id="L151">                    } catch (IllegalAccessException | InstantiationException e) {</span>
+<span class="nc" id="L152">                        LOG.error(&quot;Serialize Pojo&quot;, &quot;Failed to get field: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L153">                    }</span>
+<span class="fc" id="L154">                    field.getValue().setAccessible(acc);</span>
+<span class="fc" id="L155">                }</span>
+<span class="nc" id="L156">            } catch (ClassCastException e) {</span>
+<span class="nc" id="L157">                LOG.error(&quot;Serialze Pojo&quot;, &quot;The source, second constructor parameter, must be a Class (ie Something.class)&quot;);</span>
+<span class="fc" id="L158">            }</span>
+        }
+<span class="fc" id="L160">        return data;</span>
+    }
+
+    private boolean doSerialize(Class pojoType){
+<span class="fc" id="L164">        boolean serialize = true;</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        if(!serializeNested){</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">            if(alwaysSerializeGoatePojo){</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">                if(pojoType.getAnnotation(GoatePojo.class)==null){</span>
+<span class="nc" id="L168">                    serialize = false;</span>
+                }
+            } else {
+<span class="fc" id="L171">                serialize = false;</span>
+            }
+        }
+<span class="fc" id="L174">        return serialize;</span>
+    }
+
+    private void addMap(Map&lt;String, Object&gt; data, Object o, String baseKey) {
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        if (o instanceof List) {</span>
+<span class="fc" id="L179">            data.put(baseKey, o);//ToDo: figure out how to put the correct thing here...</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">            for (int i = 0; i &lt; ((List) o).size(); i++) {</span>
+<span class="fc" id="L181">                Object io = ((List) o).get(i);</span>
+<span class="fc" id="L182">                process(data,io,baseKey + &quot;.&quot; + i );</span>
+            }
+<span class="fc bfc" id="L184" title="All 2 branches covered.">        } else if (o.getClass().isArray()) {</span>
+<span class="fc" id="L185">            data.put(baseKey, o);</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">            for (int i = 0; i &lt; Array.getLength(o); i++) {</span>
+<span class="fc" id="L187">                Object io = Array.get(o, i);</span>
+<span class="fc" id="L188">                process(data,io,baseKey + &quot;.&quot; + i );</span>
+            }
+<span class="fc bfc" id="L190" title="All 2 branches covered.">        } else if (o instanceof Map) {</span>
+<span class="fc" id="L191">            int i = 0;</span>
+<span class="fc" id="L192">            data.put(baseKey, o);</span>
+<span class="fc" id="L193">            Iterator keys = ((Map) o).keySet().iterator();</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">            while (keys.hasNext()) {</span>
+<span class="fc" id="L195">                Object keyValue = keys.next();</span>
+<span class="fc" id="L196">                Object io = ((Map) o).get(keyValue);</span>
+<span class="fc" id="L197">                process(data,io,baseKey + &quot;.&quot; + i + &quot;.value&quot;);</span>
+//                if (io.getClass().getAnnotation(GoatePojo.class) != null) {
+//                    addMap(data, io, baseKey + &quot;.&quot; + i + &quot;.value&quot;);
+//                } else {
+//                    data.put(baseKey + &quot;.&quot; + i + &quot;.value&quot;, io);
+//                }
+<span class="fc" id="L203">                data.put(baseKey + &quot;.&quot; + i + &quot;.key&quot;, keyValue);</span>
+<span class="fc" id="L204">                data.put(baseKey + &quot;.&quot; + i + &quot;.class&quot;, io.getClass().getName());</span>
+<span class="fc" id="L205">            }</span>
+<span class="fc" id="L206">        } else {</span>
+<span class="fc" id="L207">            Map&lt;String, Object&gt; innerD = new Serializer(o, source).toMap(HashMap.class);</span>
+<span class="fc" id="L208">            data.put(baseKey, innerD);</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">            for (Map.Entry&lt;String, Object&gt; entry : innerD.entrySet()) {</span>
+<span class="fc" id="L210">                data.put(baseKey + &quot;.&quot;+entry.getKey(), entry.getValue());</span>
+<span class="fc" id="L211">            }</span>
+        }
+<span class="fc" id="L213">    }</span>
+
+    private void process(Map&lt;String, Object&gt; data, Object io, String baseKey){
+<span class="fc" id="L216">        Class type = io.getClass();</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">        if(checkNotPrimitive(type)){//if (io.getClass().getAnnotation(GoatePojo.class) != null) {</span>
+<span class="fc" id="L218">            addMap(data, io, baseKey);</span>
+        } else {
+<span class="fc" id="L220">            data.put(baseKey, io);</span>
+        }
+<span class="fc" id="L222">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>
