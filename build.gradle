@@ -143,8 +143,8 @@ subprojects {
         testImplementation 'ch.qos.logback:logback-access:1.2.3'
         testImplementation 'ch.qos.logback:logback-core:1.2.3'
         testImplementation 'org.codehaus.janino:janino:3.1.3'
-        annotationProcessor 'org.atteo.classindex:classindex:3.10'
-        testAnnotationProcessor 'org.atteo.classindex:classindex:3.10'
+        annotationProcessor 'org.atteo.classindex:classindex:3.11'
+        testAnnotationProcessor 'org.atteo.classindex:classindex:3.11'
     }
 
     jar.archiveBaseName = projectName
