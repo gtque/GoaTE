@@ -103,8 +103,8 @@ public class CSVTest extends TestNGEngineMethodDL {
         assertEquals(sheet2.get("a", 2), "42");
         assertEquals(sheet2.get("c", 2), "42");
         assertEquals(sheet2.get(3, 3), "true");
-        assertEquals(sheet2.get(3, 0), "");
-        assertEquals(sheet2.get("c", 3), "");
+        assertEquals(sheet2.get(3, 0), null);
+        assertEquals(sheet2.get("c", 3), null);
     }
 
     @Test(groups = {"unit"})
@@ -199,6 +199,16 @@ public class CSVTest extends TestNGEngineMethodDL {
         expect(Expectation.build()
                 .actual(data)
                 .isEqualTo(jdata));
+    }
+
+    @Test(groups = {"unit"})
+    public void mapCsvToJsonKeysMissingNullFields() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map_missing_fields_because_they_were_null.csv")), true);
+        Goate data = new SpreadSheetToGoate(parser).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map_missing_fields_because_they_were_null.json")).convert();
+        expect(Expectation.build()
+            .actual(data)
+            .isEqualTo(jdata));
     }
 
     @Test(groups = {"unit"})

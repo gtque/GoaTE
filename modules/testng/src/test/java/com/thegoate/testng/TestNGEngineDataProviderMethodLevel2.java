@@ -33,6 +33,7 @@ import com.thegoate.data.StaticDL;
 import com.thegoate.expect.Expectation;
 import com.thegoate.testng.test.DataContainer;
 
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -43,6 +44,10 @@ import static org.testng.Assert.assertEquals;
  */
 public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
 
+    @BeforeSuite
+    public void beforeSuite(){
+        LOG.debug("I ran before the suite.");
+    }
     public TestNGEngineDataProviderMethodLevel2() {
         super();
     }
@@ -57,6 +62,7 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
      */
     @GoateDLP(name = "sample2")
     public Goate[] dlp() {
+        LOG.debug("i'm the sample2 dlp.");
         Goate[] d = new Goate[2];
         d[0] = new Goate().put("dl##", new StaticDL().add("a", "x").add("Scenario", "use method provider 1."))
                 .put("dl##", new StaticDL().add("a", "x").add("Scenario", "use method provider 2."));

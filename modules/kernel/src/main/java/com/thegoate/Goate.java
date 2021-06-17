@@ -128,6 +128,10 @@ public class Goate implements HealthMonitor, Diary {
 	}
 
 	public Goate put(String key, Object value) {
+		return put(key, value, true);
+	}
+
+	public Goate put(String key, Object value, boolean includeNull){
 		if (data == null) {
 			data = new ConcurrentHashMap<>();
 		}
@@ -138,12 +142,14 @@ public class Goate implements HealthMonitor, Diary {
 			}
 		}
 		//        if(value!=null) {
-		if (key.contains("##")) {
-			key = buildKey(key);
+		if(value!=null || includeNull) {
+			if (key.contains("##")) {
+				key = buildKey(key);
+			}
+			data.put(key, value == null ? "null::" : value);//can't put null in a map, so wrap in the null dsl.
+			//        }
+			stale = true;
 		}
-		data.put(key, value == null ? "null::" : value);//can't put null in a map, so wrap in the null dsl.
-		//        }
-		stale = true;
 		return this;
 	}
 

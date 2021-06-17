@@ -101,7 +101,12 @@ public class CSVSheet extends SheetUtils {
                             if (firstRowIsHeader) {
                                 id = headers.get(sheetName).get(count);
                             }
-                            theRow.put(id, value);
+                            if(value instanceof String){
+                                if(((String) value).isEmpty()){
+                                    value = null;
+                                }
+                            }
+                            theRow.put(id, value, false);
                         }
                         count++;
                     }

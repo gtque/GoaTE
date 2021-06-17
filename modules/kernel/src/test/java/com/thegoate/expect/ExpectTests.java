@@ -56,6 +56,8 @@ import com.thegoate.utils.togoate.ToGoate;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.thegoate.dsl.words.LoadFile.fileAsAString;
@@ -2001,6 +2003,16 @@ public class ExpectTests extends TestNGEngineMethodDL {
 			.isEqualTo(j2));
 
 	}
+
+    @Test(groups = {"unit"})
+    public void simpleLocalDateTests() {
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        LocalDate d1 = LocalDate.parse("01/01/2021", dateFormat);
+        LocalDate d2 = LocalDate.parse("12/01/2020", dateFormat);
+        expect(Expectation.build()
+            .actual(d1)
+            .isLessThan(d2));
+    }
 
     @Test
     public void errorLog() {
