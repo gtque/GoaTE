@@ -71,7 +71,7 @@ public class BarnDataLoader extends DataLoader {
             Object barn = new Get(file).from("file::");
             Goate rd = loadBarn(barn, file.getName());
             if (rd != null) {
-                if(checkGroups(rd)) {
+                if (checkGroups(rd)) {
                     data.add(modelData(rd.scrub("extends")));//scrub(rd));
                 } else {
                     StringBuilder sb = new StringBuilder();
@@ -131,21 +131,31 @@ public class BarnDataLoader extends DataLoader {
                     if (ext.contains("${")) {
                         ext = "" + new Fill(ext).with(parameters);
                     }
-                    extension.merge(extend(new ToGoate(new GetFileAsString(theRoot + ext).explode().from("file::")).autoIncrement(false).convert(), new Goate(), theRoot), false);
+                    Goate extG = extend(new ToGoate(new GetFileAsString(theRoot + ext).explode().from("file::")).autoIncrement(false).convert(), new Goate(), theRoot);
+                    if (extG.get("groups") != null) {
+                        if (!groupsE.isEmpty()) {
+                            groupsE += ",";
+                        }
+                        groupsE += "" + extG.get("groups");
+                    }
+                    extension.merge(extG, false);
+//                    if(!groupsE.isEmpty()){
+//                        extension.put("groups", groupsE);
+//                    }
                 }
             }
             if (rd.get("expect") != null) {
                 extension.scrub(".+_expect");
             }
             rd.merge(extension, false);
-            groupsE = extension.get("groups", "", String.class);
+//            groupsE = extension.get("groups", "", String.class);
         }
-        if(!groups.isEmpty()){
-            if(!groupsE.isEmpty()){
-                groups += ","+groupsE;
+        if (!groups.isEmpty()) {
+            if (!groupsE.isEmpty()) {
+                groups += "," + groupsE;
             }
         } else {
-            groups = groupsE;
+            groups += groupsE;
         }
         rd.put("groups", groups);
         return rd;
@@ -157,6 +167,7 @@ public class BarnDataLoader extends DataLoader {
             String extensions = "" + rd.get("extends");
             if (new GetJsonField("").isType(extensions)) {
                 Goate exts = new ToGoate(extensions).convert();
+                exts.drop("");
                 result = new String[exts.size()];
                 int index = 0;
                 for (String ext : exts.keys()) {

@@ -44,7 +44,7 @@ public class BarnPreviewTest {
         BarnPreviewEmployee bpe = new BarnPreviewEmployee();
         String preview = "" + bpe.init(d).work();
         System.out.println(preview);
-        String expected = "simple,extendsarray,base";
+        String expected = "simple,extendsarray,base,cleanup,sub";
         assertEquals(new ToGoate(preview).convert().get("groups"), expected);
     }
 

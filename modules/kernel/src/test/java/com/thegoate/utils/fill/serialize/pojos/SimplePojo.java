@@ -28,6 +28,7 @@ package com.thegoate.utils.fill.serialize.pojos;
 
 import com.thegoate.utils.fill.serialize.GoatePojo;
 import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.IgnoreOnCompare;
 import com.thegoate.utils.fill.serialize.Kid;
 
 import java.math.BigDecimal;
@@ -62,6 +63,9 @@ public class SimplePojo extends Kid {
 
     //    @GoateSource(expected = SimpleSource.class, key = "floaty mcfloatface")
     private float f = 4f;
+
+    @IgnoreOnCompare
+    private String ignoreMe = "found them";
 
     public String getFieldName() {
         return fieldName;
@@ -133,5 +137,13 @@ public class SimplePojo extends Kid {
 
     public void setF(float f) {
         this.f = f;
+    }
+
+    public String getIgnoreMe() {
+        return ignoreMe;
+    }
+
+    public void setIgnoreMe(String ignoreMe) {
+        this.ignoreMe = ignoreMe;
     }
 }

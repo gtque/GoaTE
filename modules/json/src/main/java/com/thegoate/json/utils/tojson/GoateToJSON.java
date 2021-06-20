@@ -74,6 +74,8 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
         String json = "{}";
         String result = "";
         if (takeActionOn != null && takeActionOn.size() > 0) {
+            json = takeActionOn.get("", json, String.class);
+            takeActionOn.drop("");
             for (String key : filteredKeys(takeActionOn.keys())) {
                 try {
                     String dKey = key;

@@ -2011,7 +2011,7 @@ public class ExpectTests extends TestNGEngineMethodDL {
         LocalDate d2 = LocalDate.parse("12/01/2020", dateFormat);
         expect(Expectation.build()
             .actual(d1)
-            .isLessThan(d2));
+            .isGreaterThan(d2));
     }
 
     @Test

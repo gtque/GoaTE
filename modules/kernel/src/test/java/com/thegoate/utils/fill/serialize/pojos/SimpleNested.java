@@ -41,6 +41,12 @@ public class SimpleNested {
 
     private LocalDate ld;
 
+    private String something = "anything";
+
+    private String nothing;
+
+    @GoateSource(source=Cheese.class, key="droid")
+    private int droid = 42;
 
     public SimpleInt getInnerField() {
         return innerField;
@@ -56,5 +62,21 @@ public class SimpleNested {
 
     public void setLd(LocalDate ld) {
         this.ld = ld;
+    }
+
+    public String getSomething() {
+        return something;
+    }
+
+    public void setSomething(String something) {
+        this.something = something;
+    }
+
+    public String getNothing() {
+        return nothing;
+    }
+
+    public void setNothing(String nothing) {
+        this.nothing = nothing;
     }
 }

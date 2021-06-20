@@ -32,11 +32,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
@@ -48,6 +44,8 @@ import com.thegoate.utils.fill.serialize.GoateIgnore;
  * Created by gtque on 4/24/2017.
  */
 public class GoateReflection {
+
+//	BleatBox LOG = BleatFactory.getLogger(getClass());
 
 	public Constructor findConstructor(Class theClass, Object[] args) {
 		return findConstructor(theClass.getConstructors(), args);
@@ -106,6 +104,13 @@ public class GoateReflection {
 			}
 		}
 		return p;
+	}
+
+	public boolean isCollectionOrMap(Field field) {
+		return Collection.class.isAssignableFrom(field.getType())
+				|| Set.class.isAssignableFrom(field.getType())
+				|| Map.class.isAssignableFrom(field.getType())
+				|| field.getType().isArray();
 	}
 
 	public boolean isPrimitiveOrNumerical(Object o) {
@@ -330,6 +335,20 @@ public class GoateReflection {
 		}
 	}
 
+	public Object getFieldValue(Object owner, Field field){
+		Object value = null;
+		if(owner != null){
+			boolean access = field.isAccessible();
+			try{
+				field.setAccessible(true);
+				value = field.get(owner);
+			} catch (IllegalAccessException e) {
+//				LOG.debug("Get Field Value", "failed to get value: " + e.getMessage());
+			}
+			field.setAccessible(access);
+		}
+		return value;
+	}
 	public Method findMethod(Object theClass, String methodName) {
 		Optional<Method> first = getAllMethods(theClass.getClass()).stream().filter(m -> m.getName().equals(methodName)).findFirst();
 		return first.isPresent() ? first.get() : null;

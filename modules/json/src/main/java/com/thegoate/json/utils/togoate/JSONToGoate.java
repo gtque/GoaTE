@@ -84,6 +84,7 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
             if(takeActionOn instanceof JSONObject){
                 find((JSONObject) takeActionOn, "");
             }else if(takeActionOn instanceof JSONArray){
+                result.put("", "[]");
                 find((JSONArray) takeActionOn, "");
             }else{
                 LOG.warn("Conjert JSON to Goate","It does not appear as though the takeActionOn is json.");
@@ -109,6 +110,7 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
     }
 
     protected void find(JSONArray json, String currentPath){
+//        result.put(currentPath, json);
         for(int key = 0; key<json.length(); key++){
             Object o = json.get(key);
             put(o, currentPath, ""+key);

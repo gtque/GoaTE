@@ -27,17 +27,19 @@
 package com.thegoate.json.utils.fill.serialize.to;
 
 import com.thegoate.Goate;
+import com.thegoate.Sponge;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.SerializerSponge;
 import com.thegoate.utils.fill.serialize.to.SerializeTo;
-import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Eric Angeli on 4/2/2019.
@@ -47,13 +49,52 @@ public class JsonString extends SerializeTo {
     @Override
     public Object serialize(Object pojo) {
         this.original = pojo;
-        return (mapFields("", cereal, new JSONObject(pojo).toString(4)));
+        return new GoateToJSON(mapFields("", cereal, toJson(pojo))).convert();
+    }
+
+    private Object toJson(Object pojo) {
+        Object json = null;
+        if (pojo != null) {
+            if (pojo instanceof List) {
+                json = new JSONArray((List) pojo).toString(4);
+            } else if (pojo instanceof Set) {
+                json = new JSONArray((Set) pojo).toString(4);
+            } else if (pojo.getClass().isArray()) {
+                json = new JSONArray(Arrays.asList(pojo)).toString(4);
+            } else {
+                json = new JSONObject(pojo).toString(4);
+            }
+        }
+        return json;
+    }
+
+    //    @Override
+    public Object mapFields1(String base, Class cereal, Object so) {
+        Goate value;
+        if (!(so instanceof Goate)) {
+            value = new ToGoate(so).convert();
+        } else {
+            value = (Goate) so;
+        }
+        return new GoateToJSON(value).convert();
     }
 
     @Override
-    public Object mapFields(String base, Class cereal, Object so){
+    protected void scrub(Goate value) {
+        for (String key : value.keys()) {
+            Object v = value.get(key);
+            if (v instanceof JSONObject) {
+                value.put(key, new JSONObject());
+            } else if (v instanceof JSONArray) {
+                value.put(key, new JSONArray());
+            }
+        }
+    }
+
+    //    @Override
+    public Object mapFields3(String base, Class cereal, Object so) {
         Goate value;
-        if(!(so instanceof Goate)){
+        if (!(so instanceof Goate)) {
             value = new ToGoate(so).convert();
         } else {
             value = (Goate) so;
@@ -69,7 +110,7 @@ public class JsonString extends SerializeTo {
                 altKey = gs.key();
             }
 
-            if(gs != null && gs.serializeTo() != GoateSource.class){
+            if (gs != null && gs.serializeTo() != GoateSource.class) {
                 boolean acc = field.getValue().isAccessible();
                 field.getValue().setAccessible(true);
                 try {
@@ -81,29 +122,29 @@ public class JsonString extends SerializeTo {
                 }
             }
 
-            if(!fieldKey.equals(altKey)) {
-                value.scrubSubKeys(base + "(\\.*[0-9]*\\.*)*"+fieldKey+".*", fieldKey, altKey);
+            if (!fieldKey.equals(altKey)) {
+                value.scrubSubKeys(base + "(\\.*[0-9]*\\.*)*" + fieldKey + ".*", fieldKey, altKey);
                 fieldKey = altKey;
 //                value = value.replace("\""+fieldKey+"\"","\""+altKey+"\"");
             }
-            if(!gr.isPrimitive(field.getValue().getType())){
+            if (value.filter(fieldKey + ".\\.*").size() > 0) {//if(!gr.isPrimitive(field.getValue().getType())){
                 //have to drop the high level entry, otherwise nested fields may not be scrubbed properly.
-                dropHighLevelGoateEntry(value, base + "(\\.*[0-9]*\\.*)*"+fieldKey);
-                mapFields(base + "(\\.*[0-9]*\\.*)*"+fieldKey, field.getValue().getType(), value);
+                dropHighLevelGoateEntry(value, base + "(\\.*[0-9]*\\.*)*" + fieldKey);
+                value.merge((Goate) mapFields(base + "(\\.*[0-9]*\\.*)*" + fieldKey, field.getValue().getType(), value), false);
             }
         }
-        return new GoateToJSON(value).convert();
+        return value;
     }
 
-    private void dropHighLevelGoateEntry(Goate value, String pattern){
+    private void dropHighLevelGoateEntry(Goate value, String pattern) {
         Goate filtered = value.filterStrict(pattern);
-        for(String key:filtered.keys()){
+        for (String key : filtered.keys()) {
             value.drop(key);
         }
     }
 
-    public Object mapFields2(String base, Class cereal, Object so){
-        String value = ""+ so;
+    public Object mapFields2(String base, Class cereal, Object so) {
+        String value = "" + so;
         GoateReflection gr = new GoateReflection();
         Map<String, Field> fields = gr.findFields(cereal);
         for (Map.Entry<String, Field> field : fields.entrySet()) {
@@ -114,11 +155,11 @@ public class JsonString extends SerializeTo {
                 altKey = gs.key();
             }
 
-            if(!fieldKey.equals(altKey)) {
-                value = value.replace("\""+fieldKey+"\"","\""+altKey+"\"");
+            if (!fieldKey.equals(altKey)) {
+                value = value.replace("\"" + fieldKey + "\"", "\"" + altKey + "\"");
             }
-            if(!gr.isPrimitive(field.getValue().getType())){
-                value = ""+mapFields2(base, field.getValue().getType(), value);
+            if (!gr.isPrimitive(field.getValue().getType())) {
+                value = "" + mapFields2(base, field.getValue().getType(), value);
             }
         }
         return value;

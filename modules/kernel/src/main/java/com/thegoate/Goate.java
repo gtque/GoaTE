@@ -204,7 +204,10 @@ public class Goate implements HealthMonitor, Diary {
 	}
 
 	public <T> T get(String key, Object def, boolean dsl, Class<T> type) {
-		Object value = System.getProperty(key);
+		Object value = null;
+		if(key != null && !key.isEmpty()){
+			value = System.getProperty(key);
+		}
 		if (filterOnKey(key)) {
 			value = filter(key.replace("##", "[0-9]*"));
 		} else {
@@ -214,7 +217,9 @@ public class Goate implements HealthMonitor, Diary {
 					value = data.get(key);
 				}
 				if (value == null) {
-					value = System.getenv(key);
+					if(key != null && !key.isEmpty()) {
+						value = System.getenv(key);
+					}
 					if (value == null) {
 						if(ghosts.contains(key)){
 							if (ghosted.containsKey(key)) {
@@ -421,6 +426,7 @@ public class Goate implements HealthMonitor, Diary {
 		return scrubSubKeys(pattern, subkey, new Sponge() {
 			@Override
 			public String soap(String dirty) {
+
 				return sponge;
 			}
 		});
@@ -432,14 +438,16 @@ public class Goate implements HealthMonitor, Diary {
 		if (data != null) {
 			for (Map.Entry<String, Object> entry : data.entrySet()) {
 				if (entry.getKey().matches(pattern)) {
-					scrubbed.add(entry.getKey());
 					String soap;
 					if (subkey == null) {
 						soap = entry.getKey().replaceFirst(pattern, sponge.soap(entry.getKey()));
 					} else {
 						soap = entry.getKey().replaceFirst(subkey, sponge.soap(entry.getKey()));
 					}
-					this.put(soap, entry.getValue());
+					if(soap != null && !soap.equals(entry.getKey())) {
+						scrubbed.add(entry.getKey());
+						this.put(soap, entry.getValue());
+					}
 					not_scrubbed.add(soap);
 				}
 			}
