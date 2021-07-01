@@ -46,6 +46,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.thegoate.Goate;
 import com.thegoate.utils.GoateUtils;
 
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
+
 /**
  * Provides support for excel files (xls and xlsx)
  * Created by Eric Angeli on 9/14/2017.
@@ -106,8 +108,10 @@ public class ExcelSheet extends SheetUtils {
 									value = null;
 								}
 							}
-							if (value.isEmpty()) {
-								value = null;
+							if(eut("sheet.load.emptyAsNull", true, Boolean.class)) {
+								if (value.isEmpty()) {
+									value = null;
+								}
 							}
 							if (value != null) {
 								theRow.put(id, value, false);

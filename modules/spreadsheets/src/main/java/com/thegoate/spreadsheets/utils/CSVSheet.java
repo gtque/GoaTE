@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
+
 /**
  * Provides support for csv files and is the default.
  * Opens using RFC4180
@@ -101,9 +103,11 @@ public class CSVSheet extends SheetUtils {
                             if (firstRowIsHeader) {
                                 id = headers.get(sheetName).get(count);
                             }
-                            if(value instanceof String){
-                                if(((String) value).isEmpty()){
-                                    value = null;
+                            if(eut("sheet.load.emptyAsNull", true, Boolean.class)) {
+                                if (value instanceof String) {
+                                    if (((String) value).isEmpty()) {
+                                        value = null;
+                                    }
                                 }
                             }
                             theRow.put(id, value, false);
