@@ -46,8 +46,10 @@ import java.util.*;
 public abstract class SerializeTo extends Cereal {
     protected Class cereal;
     protected Class source;
+    protected boolean asSourced = true;
     protected Object original;
     protected Map<String, Class> castList = new HashMap<>();
+    protected List<String> exclude = new ArrayList<>();
 
     public SerializeTo source(Class source) {
         this.source = source;
@@ -59,20 +61,13 @@ public abstract class SerializeTo extends Cereal {
         return this;
     }
 
-    protected GoateSource findSource(Field field) {
-        GoateSource[] gs = field.getAnnotationsByType(GoateSource.class);
-        for (GoateSource fieldSource : gs) {
-            if (fieldSource.source().equals(this.source)) {
-                return fieldSource;
-            }
-        }
-        return null;
+    public SerializeTo asSourced(boolean asSourced) {
+        this.asSourced = asSourced;
+        return this;
     }
-
 
     protected Map<String, String> buildMappings(Object object, String currentPath, String currentPathMapping) {
         Map<String, String> mappings = new HashMap<>();
-        GoateReflection gr = new GoateReflection();
         Object type = object;
         Object collectionType = null;
 //        String path = "";
@@ -130,13 +125,18 @@ public abstract class SerializeTo extends Cereal {
         GoateReflection gr = new GoateReflection();
         Map<String, Field> fields = gr.findFields(type);
         for (Map.Entry<String, Field> field : fields.entrySet()) {
-            GoateSource gs = findSource(field.getValue());
+            GoateSource gs = findGoateSource(field.getValue(), this.source);
             String cp = (currentPath.isEmpty() ? "" : (currentPath + "\\."));
             String cpm = (currentPathMapping.isEmpty() ? "" : (currentPathMapping + "."));
             if (gs != null) {
                 mappings.put(cp + field.getKey(), cpm + gs.key());
                 if (gs.serializeTo() != GoateSource.class) {
                     castList.put(cpm + gs.key(), gs.serializeTo());
+                }
+                if (asSourced) {
+                    if (gs.skipInModel()) {
+                        exclude.add(cpm + gs.key());
+                    }
                 }
             } else if (!cp.equals(cpm)) {
                 mappings.put(cp + field.getKey(), cpm + field.getKey());
@@ -160,21 +160,21 @@ public abstract class SerializeTo extends Cereal {
     }
 
     public Object mapFields(String base, Class cereal, Object so) {
-        Goate value;
+        final Goate[] value = new Goate[1];
         if (!(so instanceof Goate)) {
-            value = new ToGoate(so).convert();
+            value[0] = new ToGoate(so).convert();
         } else {
-            value = (Goate) so;
+            value[0] = (Goate) so;
         }
-        scrub(value);
+        scrub(value[0]);
         Map<String, String> mappings = buildMappings(original, "", "");
         for (Map.Entry<String, String> mapping : mappings.entrySet()) {
-            value = value.scrubSubKeys(mapping.getKey(), null, getSponge(mapping.getValue()));
+            value[0] = value[0].scrubSubKeys(mapping.getKey(), null, getSponge(mapping.getValue()));
             if (castList.containsKey(mapping.getValue())) {
-                for (String key : value.filter(mapping.getValue().replaceAll("\\.\\.", "_double_dots_23458ncakk0")
+                for (String key : value[0].filter(mapping.getValue().replaceAll("\\.\\.", "_double_dots_23458ncakk0")
                         .replaceAll("\\.", "\\.").replaceAll("_double_dots_23458ncakk0", "\\..")).keys()) {
                     try {
-                        value.put(key, doCast(value.get(key), castList.get(mapping.getValue())));
+                        value[0].put(key, doCast(value[0].get(key), castList.get(mapping.getValue())));
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();
                         LOG.error("Problem serializing", "failed to serialize (" + mapping.getValue() + ") to: " + castList.get(mapping.getValue()));
@@ -182,7 +182,10 @@ public abstract class SerializeTo extends Cereal {
                 }
             }
         }
-        return value;
+        if (exclude.size() > 0) {
+            exclude.stream().forEach(exclusion -> value[0] = value[0].filterExclude(exclusion));
+        }
+        return value[0];
     }
 
     private Sponge getSponge(String mapping) {

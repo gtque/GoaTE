@@ -31,7 +31,6 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.togoate.ToGoate;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 /**
@@ -60,35 +59,6 @@ public class Cereal {
                     break;
                 }
             }
-        }
-        if(gs == null && dataSource.equals(DefaultSource.class)){
-//            gs = new GoateSource(){
-//
-//                @Override
-//                public Class<? extends Annotation> annotationType() {
-//                    return null;
-//                }
-//
-//                @Override
-//                public Class source() {
-//                    return DefaultSource.class;
-//                }
-//
-//                @Override
-//                public String key() {
-//                    return null;
-//                }
-//
-//                @Override
-//                public boolean flatten() {
-//                    return false;
-//                }
-//
-//                @Override
-//                public Class serializeTo() {
-//                    return null;
-//                }
-//            };
         }
         return gs;
     }

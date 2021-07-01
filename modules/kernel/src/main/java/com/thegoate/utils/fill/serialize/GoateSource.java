@@ -47,4 +47,5 @@ public @interface GoateSource {
     String key();
     boolean flatten() default false;
     Class serializeTo() default GoateSource.class;
+    boolean skipInModel() default false;
 }

@@ -61,6 +61,12 @@ public class FillJsonTests extends TestNGEngineMethodDL {
                         .add("r.2.0", "a")
                         .add("operator", "==")
                         .add("expected", true))
+                .put("dl##", new StaticDL().add("Scenario", "fill with null")
+                        .add("json1", "{\"nullify\":42}")
+                        .add("json2", "{\"nullify\":null}")
+                        .add("nullify", "null::")
+                        .add("operator", "==")
+                        .add("expected", true))
                 .put("dl##", new StaticDL().add("Scenario", "json array")
                         .add("json1", "[\n" +
                                 "  {\n" +

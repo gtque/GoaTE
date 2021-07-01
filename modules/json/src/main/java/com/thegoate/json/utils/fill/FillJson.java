@@ -141,14 +141,17 @@ public class FillJson extends JsonUtil implements FillUtility {
     private Object getValue(String keyPattern, Goate data){
         Object value = data.get(keyPattern);
         if(value==null){
-            String kp = data.keys().parallelStream().filter(k -> {
-                if(keyPattern.matches(k)){
-                    return true;
+            value = data.getStrict(keyPattern);
+            if(value == null) {
+                String kp = data.keys().parallelStream().filter(k -> {
+                    if (keyPattern.matches(k)) {
+                        return true;
+                    }
+                    return false;
+                }).collect(Collectors.joining(","));
+                if (!kp.isEmpty()) {
+                    value = data.get(kp);
                 }
-                return false;
-            }).collect(Collectors.joining(","));
-            if(!kp.isEmpty()) {
-                value = data.get(kp);
             }
         }
         return value;

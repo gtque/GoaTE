@@ -46,7 +46,7 @@ import com.thegoate.utils.get.NotFound;
  * Created by gtque on 5/4/2017.
  */
 @UtilCache
-public abstract class UnknownUtilType implements Utility {
+public abstract class UnknownUtilType<T extends UnknownUtilType> implements Utility {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate health = new Goate();
     protected Goate data = null;
@@ -55,6 +55,7 @@ public abstract class UnknownUtilType implements Utility {
     protected boolean resetCache = false;
     protected boolean useCache = false;
     protected boolean nameIsHash = false;
+    protected Class declaredType = null;
 
     public UnknownUtilType() {
         UtilCache uc = getClass().getAnnotation(UtilCache.class);
@@ -63,6 +64,11 @@ public abstract class UnknownUtilType implements Utility {
             resetCache = uc.clear();
             useCache = uc.useCache();
         }
+    }
+
+    public T type(Class type) {
+        this.declaredType = type;
+        return (T)this;
     }
 
     @Override
@@ -126,7 +132,7 @@ public abstract class UnknownUtilType implements Utility {
      * @return the utility that was found.
      */
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier, String isType) {
-        return buildUtil(obj, util, val, id, identifier, isType, NotFound.class);
+        return buildUtil(obj, util, val, id, identifier, isType, declaredType==null?NotFound.class:declaredType);
     }
 
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier, String isType, Class type) {
@@ -211,12 +217,12 @@ public abstract class UnknownUtilType implements Utility {
         return def;
     }
 
-    protected boolean isDefault(Class c, Class def){
+    protected boolean isDefault(Class c, Class def) {
         IsDefault d = (IsDefault) c.getAnnotation(IsDefault.class);
         return d != null && !d.forType() && def == null;
     }
 
-    protected Object getUtility(Class c, Class[] _def, AnnotationFactory af, String isType, Class type, Object[] checkArgs){
+    protected Object getUtility(Class c, Class[] _def, AnnotationFactory af, String isType, Class type, Object[] checkArgs) {
         Object utility = null;
         Class[] types = {Object.class};
         Method check = null;
@@ -257,8 +263,8 @@ public abstract class UnknownUtilType implements Utility {
         return utility;
     }
 
-    protected boolean checkUtility(Class c, Class[] _def, Object[] _util, String isType, AnnotationFactory af, Class type, Object[] checkArgs){
-        if(_util[0] == null) {
+    protected boolean checkUtility(Class c, Class[] _def, Object[] _util, String isType, AnnotationFactory af, Class type, Object[] checkArgs) {
+        if (_util[0] == null) {
             if (isDefault(c, _def[0])) {
                 _def[0] = getDefault(isType, c);
             } else {
@@ -284,57 +290,57 @@ public abstract class UnknownUtilType implements Utility {
             utility = _util[0];
             def = _def[0];
             /**
-            for (String key : utils.keySet()) {
-                Class c = Object.class;
-                try {
-                    c = utils.get(key);
-                    IsDefault d = (IsDefault) c.getAnnotation(IsDefault.class);
-                    Class[] types = {Object.class};
-                    Method check = null;
-                    if (d != null && !d.forType() && def == null) {
-                        try {
-                            check = c.getMethod(isType, types);
-                        } catch (NoSuchMethodException nsme) {
-                            LOG.debug("Unknown Util", "No type method: " + isType);
-                        }
-                        if (check != null) {
-                            def = c;
-                        }
-                    } else {
-                        if (type != null && type.equals(NotFound.class)) {
-                            try {
-                                check = c.getMethod(isType, types);
-                            } catch (NoSuchMethodException nsme) {
-                                LOG.debug("Unknown Util", "No type method: " + isType);
-                            }
-                            Object u = af.constructor(null).build(c);
-                            if (check != null && Boolean.parseBoolean("" + check.invoke(u, checkArgs))) {
-                                if (d != null && d.forType()) {
-                                    def = c;
-                                } else {
-                                    utility = u;
-                                    break;
-                                }
-                            } else {
-                                LOG.debug("Util Look up by type", "not: " + c.getName());
-                            }
-                        } else {
-                            if (checkType(c, type)) {
-                                if (d != null && d.forType()) {
-                                    def = c;
-                                } else {
-                                    utility = af.constructor(null).build(c);
-                                    break;
-                                }
-                            } else {
-                                LOG.debug("Util Look up by checkType", "not: " + c.getName());
-                            }
-                        }
-                    }
-                } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                    LOG.debug("The class (" + c.getName() + ") did not have isType, cannot determine if that class is the correct type. " + e.getMessage(), e);
-                }
-            }/**/
+             for (String key : utils.keySet()) {
+             Class c = Object.class;
+             try {
+             c = utils.get(key);
+             IsDefault d = (IsDefault) c.getAnnotation(IsDefault.class);
+             Class[] types = {Object.class};
+             Method check = null;
+             if (d != null && !d.forType() && def == null) {
+             try {
+             check = c.getMethod(isType, types);
+             } catch (NoSuchMethodException nsme) {
+             LOG.debug("Unknown Util", "No type method: " + isType);
+             }
+             if (check != null) {
+             def = c;
+             }
+             } else {
+             if (type != null && type.equals(NotFound.class)) {
+             try {
+             check = c.getMethod(isType, types);
+             } catch (NoSuchMethodException nsme) {
+             LOG.debug("Unknown Util", "No type method: " + isType);
+             }
+             Object u = af.constructor(null).build(c);
+             if (check != null && Boolean.parseBoolean("" + check.invoke(u, checkArgs))) {
+             if (d != null && d.forType()) {
+             def = c;
+             } else {
+             utility = u;
+             break;
+             }
+             } else {
+             LOG.debug("Util Look up by type", "not: " + c.getName());
+             }
+             } else {
+             if (checkType(c, type)) {
+             if (d != null && d.forType()) {
+             def = c;
+             } else {
+             utility = af.constructor(null).build(c);
+             break;
+             }
+             } else {
+             LOG.debug("Util Look up by checkType", "not: " + c.getName());
+             }
+             }
+             }
+             } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+             LOG.debug("The class (" + c.getName() + ") did not have isType, cannot determine if that class is the correct type. " + e.getMessage(), e);
+             }
+             }/**/
         } else {
             LOG.info("The utility directory was null for some reason: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
         }

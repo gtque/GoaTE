@@ -362,10 +362,34 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
     public void simpleSerializerTest(){
-        SerializeMe pojo = new SerializeMe().setField("hello");
+        SerializeMe pojo = new SerializeMe().setField("hello").setExcluded("fart").setNestedExcluded(new SerializeLevel1().setFirstLevel("jelly beans"));
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = new Serializer<SerializeMe, Class, String>(pojo, DefaultSource.class).to(new JsonString());
+        String json = new Serializer<SerializeMe, Class, String>(pojo, DefaultSource.class).asSourced(true).to(new JsonString());
         expect(Expectation.build().actual(json).isEqualTo("{\"field\":\"hello\"}"));
+    }
+
+    @Test(groups = {"unit"})
+    public void simpleSerializerTestGoateToJson(){
+        SerializeMe pojo = new SerializeMe().setField("hello").setExcluded("fart").setNestedExcluded(new SerializeLevel1().setFirstLevel("jelly beans"));
+//        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
+        Goate json = new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).asSourced(true).toGoate();
+        expect(Expectation.build().actual(new GoateToJSON(json).convert()).isEqualTo("{\"field\":\"hello\"}"));
+    }
+
+    @Test(groups = {"unit"})
+    public void simpleSerializerTestGoateToJsonGeneric(){
+        SerializeMe pojo = new SerializeMe().setField("hello").setExcluded("fart").setNestedExcluded(new SerializeLevel1().setFirstLevel("jelly beans"));
+//        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
+        String json = new Serializer<SerializeMe, Class, String>(pojo, DefaultSource.class).asSourced(true).to(JSONObject.class);
+        expect(Expectation.build().actual(json).isEqualTo("{\"field\":\"hello\"}"));
+    }
+
+    @Test(groups = {"unit"})
+    public void simpleSerializerTestNullField(){
+        SerializeMe pojo = new SerializeMe();
+//        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
+        String json = new Serializer<SerializeMe, Class, String>(pojo, DefaultSource.class).includeNulls().asSourced(true).to(JSONObject.class);
+        expect(Expectation.build().actual(json).isEqualTo("{\"field\":null, \"nested\":null, \"list\":null, \"map\":null}"));
     }
 
     @Test(groups = {"unit"})

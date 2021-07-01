@@ -31,6 +31,7 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.fill.serialize.to.SerializeTo;
+import com.thegoate.utils.to.To;
 import com.thegoate.utils.togoate.ToGoate;
 
 import java.lang.reflect.Array;
@@ -51,6 +52,8 @@ public class Serializer<T, S, U> extends Cereal {
     private U cereal;
     private boolean serializeNested = true;
     private boolean alwaysSerializeGoatePojo = false;
+    private boolean asSourced = true;
+    private boolean includeNulls = false;
 
     public Serializer(T pojo, S source, U cereal) {
         this.pojo = pojo;
@@ -79,25 +82,40 @@ public class Serializer<T, S, U> extends Cereal {
         return source;
     }
 
-    public Serializer doSerializeNested(){
+    public Serializer<T,S,U> doSerializeNested() {
         this.serializeNested = true;
         return this;
     }
 
-    public Serializer skipSerializingObjects(){
+    public Serializer<T,S,U> asSourced(boolean asSourced) {
+        this.asSourced = asSourced;
+        return this;
+    }
+
+    public Serializer<T,S,U> includeNulls() {
+        this.includeNulls = true;
+        return this;
+    }
+
+    public Serializer<T,S,U> excludeNulls() {
+        this.includeNulls = false;
+        return this;
+    }
+    public Serializer<T,S,U> skipSerializingObjects() {
         this.serializeNested = false;
         return this;
     }
 
-    public Serializer alwaysSerializeGoatePojos(){
+    public Serializer<T,S,U> alwaysSerializeGoatePojos() {
         this.alwaysSerializeGoatePojo = true;
         return this;
     }
 
-    public Serializer skipSerializingGoatePojos(){
+    public Serializer<T,S,U> skipSerializingGoatePojos() {
         this.alwaysSerializeGoatePojo = false;
         return this;
     }
+
     public Goate toGoate() {
         Goate data = new Goate();
         for (Map.Entry<String, Object> entry : toMap(HashMap.class).entrySet()) {
@@ -106,8 +124,12 @@ public class Serializer<T, S, U> extends Cereal {
         return data;
     }
 
-    public U to(SerializeTo serializer){
-        return (U)serializer.source((Class)source).cereal(pojo.getClass()).serialize(pojo);
+    public U to(SerializeTo serializer) {
+        return (U) serializer.source((Class) source).cereal(pojo.getClass()).asSourced(asSourced).serialize(pojo);
+    }
+
+    public U to(Class goateTo){
+        return (U) new To(toGoate()).type(goateTo).convert();
     }
 
     public Map<String, Object> toMap(Class mapType) {
@@ -115,9 +137,9 @@ public class Serializer<T, S, U> extends Cereal {
         try {
             data = (Map) mapType.newInstance();
         } catch (IllegalAccessException | InstantiationException e) {
-            LOG.error("Serialze Pojo", "The mapType could not be initialized: " + e.getMessage(), e);
+            LOG.error("Serialize Pojo", "The mapType could not be initialized: " + e.getMessage(), e);
         } catch (ClassCastException e) {
-            LOG.error("Serialze Pojo", "The mapType was not a valid map type: " + e.getMessage(), e);
+            LOG.error("Serialize Pojo", "The mapType was not a valid map type: " + e.getMessage(), e);
         }
         if (data != null) {
             GoateReflection gr = new GoateReflection();
@@ -126,45 +148,55 @@ public class Serializer<T, S, U> extends Cereal {
                 for (Map.Entry<String, Field> field : fields.entrySet()) {
                     GoateSource gs = findGoateSource(field.getValue(), (Class) source);
                     String fieldKey = field.getKey();
+                    boolean exclude = false;
                     if (gs != null) {
                         fieldKey = gs.key();
-                    }
-                    boolean acc = field.getValue().isAccessible();
-                    field.getValue().setAccessible(true);
-                    try {
-                        Object o = field.getValue().get(pojo);
-                        if(gs != null && gs.serializeTo() != GoateSource.class){
-                            o = doCast(o, gs.serializeTo());
+                        if(asSourced){
+                            exclude = gs.skipInModel();
                         }
-                        if (o != null) {
-                            Class type = field.getValue().getType();
-                            if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {
-                                if (checkNotPrimitive(type)&&doSerialize(pojo.getClass())) {
-                                    if(!type.equals(pojo.getClass())) {
-                                        addMap(data, o, fieldKey);
-                                    }
-                                } else {
-                                    data.put(fieldKey, o);
-                                }
+                    }
+                    if(exclude) {
+                        LOG.debug("Excluding", fieldKey);
+                    } else {
+                        boolean acc = field.getValue().isAccessible();
+                        field.getValue().setAccessible(true);
+                        try {
+                            Object o = field.getValue().get(pojo);
+                            if (gs != null && gs.serializeTo() != GoateSource.class) {
+                                o = doCast(o, gs.serializeTo());
                             }
+                            if (o != null) {
+                                Class type = field.getValue().getType();
+                                if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {
+                                    if (checkNotPrimitive(type) && doSerialize(pojo.getClass())) {
+                                        if (!type.equals(pojo.getClass())) {
+                                            addMap(data, o, fieldKey);
+                                        }
+                                    } else {
+                                        data.put(fieldKey, o);
+                                    }
+                                }
+                            } else if(includeNulls) {
+                                data.put(fieldKey, "null::");
+                            }
+                        } catch (IllegalAccessException | InstantiationException e) {
+                            LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
                         }
-                    } catch (IllegalAccessException | InstantiationException e) {
-                        LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
+                        field.getValue().setAccessible(acc);
                     }
-                    field.getValue().setAccessible(acc);
                 }
             } catch (ClassCastException e) {
-                LOG.error("Serialze Pojo", "The source, second constructor parameter, must be a Class (ie Something.class)");
+                LOG.error("Serialize Pojo", "The source, second constructor parameter, must be a Class (ie Something.class)");
             }
         }
         return data;
     }
 
-    private boolean doSerialize(Class pojoType){
+    private boolean doSerialize(Class pojoType) {
         boolean serialize = true;
-        if(!serializeNested){
-            if(alwaysSerializeGoatePojo){
-                if(pojoType.getAnnotation(GoatePojo.class)==null){
+        if (!serializeNested) {
+            if (alwaysSerializeGoatePojo) {
+                if (pojoType.getAnnotation(GoatePojo.class) == null) {
                     serialize = false;
                 }
             } else {
@@ -179,13 +211,13 @@ public class Serializer<T, S, U> extends Cereal {
             data.put(baseKey, o);//ToDo: figure out how to put the correct thing here...
             for (int i = 0; i < ((List) o).size(); i++) {
                 Object io = ((List) o).get(i);
-                process(data,io,baseKey + "." + i );
+                process(data, io, baseKey + "." + i);
             }
         } else if (o.getClass().isArray()) {
             data.put(baseKey, o);
             for (int i = 0; i < Array.getLength(o); i++) {
                 Object io = Array.get(o, i);
-                process(data,io,baseKey + "." + i );
+                process(data, io, baseKey + "." + i);
             }
         } else if (o instanceof Map) {
             int i = 0;
@@ -194,7 +226,7 @@ public class Serializer<T, S, U> extends Cereal {
             while (keys.hasNext()) {
                 Object keyValue = keys.next();
                 Object io = ((Map) o).get(keyValue);
-                process(data,io,baseKey + "." + i + ".value");
+                process(data, io, baseKey + "." + i + ".value");
 //                if (io.getClass().getAnnotation(GoatePojo.class) != null) {
 //                    addMap(data, io, baseKey + "." + i + ".value");
 //                } else {
@@ -207,14 +239,14 @@ public class Serializer<T, S, U> extends Cereal {
             Map<String, Object> innerD = new Serializer(o, source).toMap(HashMap.class);
             data.put(baseKey, innerD);
             for (Map.Entry<String, Object> entry : innerD.entrySet()) {
-                data.put(baseKey + "."+entry.getKey(), entry.getValue());
+                data.put(baseKey + "." + entry.getKey(), entry.getValue());
             }
         }
     }
 
-    private void process(Map<String, Object> data, Object io, String baseKey){
+    private void process(Map<String, Object> data, Object io, String baseKey) {
         Class type = io.getClass();
-        if(checkNotPrimitive(type)){//if (io.getClass().getAnnotation(GoatePojo.class) != null) {
+        if (checkNotPrimitive(type)) {//if (io.getClass().getAnnotation(GoatePojo.class) != null) {
             addMap(data, io, baseKey);
         } else {
             data.put(baseKey, io);

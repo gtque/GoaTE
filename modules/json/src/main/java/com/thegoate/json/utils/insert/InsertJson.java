@@ -164,10 +164,10 @@ public class InsertJson implements InsertUtility {
         }
         if (append)
             if (replace)
-                ((JSONObject) jsonObject).put(key, value);
+                ((JSONObject) jsonObject).put(key, value==null?JSONObject.NULL:value);
             else {
                 try {
-                    ((JSONObject) jsonObject).putOnce(key, value);
+                    ((JSONObject) jsonObject).putOnce(key, value==null?JSONObject.NULL:value);
                 } catch (JSONException je) {
                     LOG.warn("key already exists: " + key);
                 }
@@ -253,13 +253,13 @@ public class InsertJson implements InsertUtility {
 //            }
         }
         if (j instanceof JSONArray)
-            ((JSONArray) j).put(value);
+            ((JSONArray) j).put(value==null?JSONObject.NULL:value);
         else if (j instanceof JSONObject) {
             if (replace)
-                ((JSONObject) j).put(key, value);
+                ((JSONObject) j).put(key, value==null?JSONObject.NULL:value);
             else {
                 try {
-                    ((JSONObject) j).putOnce(key, value);
+                    ((JSONObject) j).putOnce(key, value==null?JSONObject.NULL:value);
                 } catch (JSONException je) {
                     LOG.warn("key already exists: " + key);
                 }

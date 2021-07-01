@@ -28,6 +28,8 @@
 package com.thegoate.utils.tolist;
 
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.to.ToUtil;
+import com.thegoate.utils.to.ToUtility;
 
 import java.util.List;
 
@@ -36,7 +38,8 @@ import java.util.List;
  * This will attempt to look up the specific to list utility for the type detected.
  * Created by Eric Angeli on 5/5/2017.
  */
-public class ToList extends UnknownUtilType implements ToListUtility{
+@ToUtil(type = List.class)
+public class ToList extends UnknownUtilType implements ToListUtility, ToUtility<List> {
     ToListUtility tool = null;
     protected Object original = null;
 
@@ -70,6 +73,11 @@ public class ToList extends UnknownUtilType implements ToListUtility{
     public boolean checkType(Class tool, Class type) {
         //        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
         //        return tu.type()!=null?(tu.type() == type):(type == null);
-        return false;
+        return List.class.equals(type);
+    }
+
+    @Override
+    public List convert(){
+        return list();
     }
 }

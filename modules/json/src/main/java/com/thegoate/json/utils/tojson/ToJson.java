@@ -28,13 +28,17 @@
 package com.thegoate.json.utils.tojson;
 
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.to.ToUtil;
+import com.thegoate.utils.to.ToUtility;
+import org.json.JSONObject;
 
 /**
  * The generic convert to json class.
  * This will attempt to look up the specific to json utility for the type detected.
  * Created by Eric Angeli on 5/5/2017.
  */
-public class ToJson extends UnknownUtilType implements ToJsonUtility{
+@ToUtil(type = JSONObject.class)
+public class ToJson extends UnknownUtilType implements ToJsonUtility, ToUtility<String> {
     ToJsonUtility tool = null;
     Object original = null;
 
@@ -77,6 +81,6 @@ public class ToJson extends UnknownUtilType implements ToJsonUtility{
     public boolean checkType(Class tool, Class type) {
         //        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
         //        return tu.type()!=null?(tu.type() == type):(type == null);
-        return false;
+        return JSONObject.class.equals(type);
     }
 }
