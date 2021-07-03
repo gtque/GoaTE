@@ -129,7 +129,12 @@ public class Serializer<T, S, U> extends Cereal {
     }
 
     public U to(Class goateTo){
-        return (U) new To(toGoate()).type(goateTo).convert();
+        try {
+            return (U) doCast(new To(toGoate()).type(goateTo).convert(), goateTo);
+        } catch (Exception e) {
+            LOG.warn("Failed to cast!!!!!!");
+            return null;
+        }
     }
 
     public Map<String, Object> toMap(Class mapType) {

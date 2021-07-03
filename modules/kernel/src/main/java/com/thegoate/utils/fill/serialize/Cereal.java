@@ -49,6 +49,10 @@ public class Cereal {
         return new Cast(new ToGoate(o).convert(), o.getClass()).cast(o, castTo);
     }
 
+    protected Object doCast(Object o, Class klass, Class castTo) throws InstantiationException, IllegalAccessException {
+        return new Cast(new ToGoate(o).convert(), klass).cast(o, castTo);
+    }
+
     public static GoateSource findGoateSource(Field field, Class dataSource){
         GoateSource[] annotations = field.getAnnotationsByType(GoateSource.class);
         GoateSource gs = null;

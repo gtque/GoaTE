@@ -1,0 +1,25 @@
+{
+  "aList": [
+    "",
+    ""
+  ],
+  "aMap": {
+    "0": {
+      "class": "java.lang.String",
+      "value": "",
+      "key": "key"
+    },
+    "key": ""
+  },
+  "aIntArray": [
+    0
+  ],
+  "bMap": {
+    "": true,
+    "0": {
+      "class": "java.lang.Boolean",
+      "value": true,
+      "key": ""
+    }
+  }
+}

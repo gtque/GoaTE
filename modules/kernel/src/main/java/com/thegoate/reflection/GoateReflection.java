@@ -53,9 +53,11 @@ public class GoateReflection {
 
 	public Constructor findConstructor(Constructor<?>[] constructors, Object[] args) {
 		Constructor p = null;
+		Constructor d = null;
 		for (Constructor constructor : constructors) {
 			Class<?>[] ptypes = constructor.getParameterTypes();
 			boolean found = false;
+			boolean notObject = false;
 			if (ptypes.length == args.length) {
 				found = true;
 				for (int i = 0; i < args.length; i++) {
@@ -94,16 +96,24 @@ public class GoateReflection {
 					} else {
 						if (args[i] != null && !ptypes[i].isAssignableFrom(args[i].getClass())) {
 							found = false;
+						} else {
+							if(!ptypes[i].equals(Object.class)){
+								notObject = true;
+							}
 						}
 					}
 				}
 			}
 			if (found) {
-				p = constructor;
-				break;
+				if(notObject) {
+					p = constructor;
+					break;
+				} else {
+					d = constructor;
+				}
 			}
 		}
-		return p;
+		return p==null?d:p;
 	}
 
 	public boolean isCollectionOrMap(Field field) {
@@ -117,6 +127,10 @@ public class GoateReflection {
 		return o != null && (isPrimitive(o.getClass()) || o instanceof Number || primitiveType(o) != null);
 	}
 
+	public boolean isNumber(Object o){
+		return o != null && (isPrimitiveNumber(o.getClass()) || o instanceof Number);
+	}
+
 	public boolean isPrimitive(Class c) {
 		return c.equals(Boolean.class) || c.equals(Boolean.TYPE)
 			|| c.equals(Byte.class) || c.equals(Byte.TYPE)
@@ -126,6 +140,15 @@ public class GoateReflection {
 			|| c.equals(Long.class) || c.equals(Long.TYPE)
 			|| c.equals(Character.class) || c.equals(Character.TYPE)
 			|| c.equals(Short.class) || c.equals(Short.TYPE);
+	}
+
+
+	public boolean isPrimitiveNumber(Class c) {
+		return c.equals(Integer.class) || c.equals(Integer.TYPE)
+				|| c.equals(Double.class) || c.equals(Double.TYPE)
+				|| c.equals(Float.class) || c.equals(Float.TYPE)
+				|| c.equals(Long.class) || c.equals(Long.TYPE)
+				|| c.equals(Short.class) || c.equals(Short.TYPE);
 	}
 
 	public boolean isBooleanType(Class c) {
@@ -361,6 +384,30 @@ public class GoateReflection {
 		} catch (ClassNotFoundException ignored) {
 		}
 		return cls;
+	}
+
+	public Object getDefaultPrimitive(Class klass) {
+		Object o = null;
+		if(klass.equals(String.class)) {
+			o = "";
+		} else if(klass.equals(Byte.class)) {
+			o = new Byte("0");
+		}else if(klass.equals(Short.class)) {
+			o = new Short("0");
+		}else if(klass.equals(Double.class)) {
+			o = 0D;
+		}else if(klass.equals(Float.class)) {
+			o = 0F;
+		}else if(klass.equals(Integer.class)) {
+			o = 0;
+		}else if(klass.equals(Long.class)) {
+			o = 0L;
+		}else if(klass.equals(Character.class)) {
+			o = 'A';
+		}else if(klass.equals(Boolean.class)) {
+			o = true;
+		}
+		return o;
 	}
 
 	public Class primitiveType(Object o) {

@@ -34,7 +34,7 @@ import com.thegoate.expect.test.SimpleObject;
 import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.testng.TestNGEngineMethodDL;
-import com.thegoate.utils.fill.serialize.collections.ListType;
+import com.thegoate.utils.fill.serialize.model.ModelBuilder;
 import com.thegoate.utils.fill.serialize.nullable.primitive.NullableDouble;
 import com.thegoate.utils.fill.serialize.pojos.*;
 import com.thegoate.utils.fill.serialize.pojos.flat.Child1;
@@ -172,13 +172,13 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-    public void serializeAllNullFields(){
+    public void serializeAllNullFields() {
         SimpleNested pojo = new SimpleNested();
         pojo.setSomething(null);
         pojo.setInnerField(null);
         String expected = "{}";
 
-        String actual = ""+new Serializer<>(pojo, DefaultSource.class).to(new JsonString());
+        String actual = "" + new Serializer<>(pojo, DefaultSource.class).to(new JsonString());
         expect(Expectation.build().actual(actual).isEqualTo(expected));
     }
 
@@ -361,7 +361,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-    public void simpleSerializerTest(){
+    public void simpleSerializerTest() {
         SerializeMe pojo = new SerializeMe().setField("hello").setExcluded("fart").setNestedExcluded(new SerializeLevel1().setFirstLevel("jelly beans"));
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
         String json = new Serializer<SerializeMe, Class, String>(pojo, DefaultSource.class).asSourced(true).to(new JsonString());
@@ -369,7 +369,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-    public void simpleSerializerTestGoateToJson(){
+    public void simpleSerializerTestGoateToJson() {
         SerializeMe pojo = new SerializeMe().setField("hello").setExcluded("fart").setNestedExcluded(new SerializeLevel1().setFirstLevel("jelly beans"));
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
         Goate json = new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).asSourced(true).toGoate();
@@ -377,23 +377,23 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-    public void simpleSerializerTestGoateToJsonGeneric(){
+    public void simpleSerializerTestGoateToJsonGeneric() {
         SerializeMe pojo = new SerializeMe().setField("hello").setExcluded("fart").setNestedExcluded(new SerializeLevel1().setFirstLevel("jelly beans"));
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = new Serializer<SerializeMe, Class, String>(pojo, DefaultSource.class).asSourced(true).to(JSONObject.class);
+        String json = ""+new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).asSourced(true).to(JSONObject.class);
         expect(Expectation.build().actual(json).isEqualTo("{\"field\":\"hello\"}"));
     }
 
     @Test(groups = {"unit"})
-    public void simpleSerializerTestNullField(){
+    public void simpleSerializerTestNullField() {
         SerializeMe pojo = new SerializeMe();
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = new Serializer<SerializeMe, Class, String>(pojo, DefaultSource.class).includeNulls().asSourced(true).to(JSONObject.class);
+        String json = ""+new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).includeNulls().asSourced(true).to(JSONObject.class);
         expect(Expectation.build().actual(json).isEqualTo("{\"field\":null, \"nested\":null, \"list\":null, \"map\":null}"));
     }
 
     @Test(groups = {"unit"})
-    public void nestedSerializerTest(){
+    public void nestedSerializerTest() {
         SerializeNested pojo = new SerializeNested();
         List<Cereals> cereals = new ArrayList<>();
         Cereals cereals1 = new Cereals().setId("fruit loops").setBox(new Box().setSize(14));
@@ -409,7 +409,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-    public void nestedSerializerTestRootArray(){
+    public void nestedSerializerTestRootArray() {
         SerializeNested pojo = new SerializeNested();
         List<Cereals> cereals = new ArrayList<>();
         Cereals cereals1 = new Cereals().setId("fruit loops").setBox(new Box().setSize(14));
@@ -420,12 +420,12 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         cereals.add(cereals3);
         pojo.setIds(cereals);
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = ""+new Serializer<>(pojo.getIds(), RootSource.class).to(new JsonString());
+        String json = "" + new Serializer<>(pojo.getIds(), RootSource.class).to(new JsonString());
         expect(Expectation.build().actual(json).isEqualTo(fileAsAString("nested_cereal_root_array.json")));
     }
 
     @Test(groups = {"unit", "serialize"})
-    public void simpleSerializerTestDifferentSource(){
+    public void simpleSerializerTestDifferentSource() {
         List<SerializeLevel1> list = new ArrayList<>();
         list.add(new SerializeLevel1().setFirstLevel("eric"));
         list.add(new SerializeLevel1().setFirstLevel("tracy"));
@@ -678,4 +678,24 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
                 .isEqualTo(nestedParent));
     }
 
+    @Test(groups = {"unit"})
+    public void primitiveModels() {
+        JSONObject jo = new ModelBuilder<APrimitivesPojo, JSONObject>(APrimitivesPojo.class).build(JSONObject.class);
+        String ejson = "{\"bInt\":0,\"aBoolean\":false,\"aChar\":\"\\u0000\",\"bBoolean\":true,\"aInt\":0,\"aString\":\"\",\"bShort\":0,\"aFloat\":0,\"aDouble\":0,\"bDouble\":0,\"bByte\":0,\"aBigInteger\":null,\"bFloat\":0,\"aShort\":0,\"aBigDecimal\":null,\"bChar\":\"A\",\"aByte\":0}";
+        LOG.info("model:\n" + jo);
+        expect(Expectation.build()
+                .actual(jo)
+                .isEqualTo(ejson));
+    }
+
+
+    @Test(groups = {"unit"})
+    public void collectionModels() {
+        JSONObject jo = new ModelBuilder<ACollectionsPojo, JSONObject>(ACollectionsPojo.class).build(JSONObject.class);
+        String ejson = "{\"aList\":[\"\"],\"aMap\":{\"0\":{\"class\":\"java.lang.String\",\"value\":\"\",\"key\":\"key\"},\"key\":\"\"},\"aIntArray\":[0],\"bMap\":{\"\":true,\"0\":{\"class\":\"java.lang.Boolean\",\"value\":true,\"key\":\"\"}}}";
+        LOG.info("model:\n" + jo);
+        expect(Expectation.build()
+                .actual(jo)
+                .isEqualTo(ejson));
+    }
 }

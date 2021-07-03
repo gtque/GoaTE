@@ -145,7 +145,7 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
         try {
             Object og = new GetJsonField(key).from(json);
             String g = ""+og;
-            if (!g.equals("null") && !g.isEmpty() && !g.equals(json) && !(og instanceof NotFound)) {
+            if (!g.equals("null") && !g.equals(json) && !(og instanceof NotFound)) {
                 exists = true;
             }
         } catch (Exception e) {

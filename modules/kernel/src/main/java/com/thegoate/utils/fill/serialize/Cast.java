@@ -142,11 +142,12 @@ public class Cast extends UnknownUtilType {
         Object[] empty = {};
 
         GoateReflection gr = new GoateReflection();
-        args = empty;
-        Constructor constructor = gr.findConstructor(type, empty);
+
+        args = selfie;
+        Constructor constructor = gr.findConstructor(type, selfie);
         if(constructor==null){
-            args = selfie;
-            constructor = gr.findConstructor(type, selfie);
+            args = empty;
+            constructor = gr.findConstructor(type, empty);
             if(constructor==null){
                 args = asString;
                 constructor = gr.findConstructor(type, asString);
