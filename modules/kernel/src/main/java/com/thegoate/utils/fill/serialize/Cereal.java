@@ -69,6 +69,6 @@ public class Cereal {
 
     protected boolean checkNotPrimitive(Class type){
         GoateReflection reflection = new GoateReflection();
-        return !(reflection.isPrimitive(type) || (type.equals(String.class)));
+        return !(reflection.isPrimitive(type) || (type.equals(String.class) || reflection.classIsNumber(type)));
     }
 }

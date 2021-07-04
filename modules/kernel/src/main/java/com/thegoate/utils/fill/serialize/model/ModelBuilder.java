@@ -67,12 +67,12 @@ public class ModelBuilder<M, T> extends Cereal {
                         boolean accessible = field.getValue().isAccessible();
                         field.getValue().setAccessible(true);
                         try {
-                            if (gr.isNumber(value)) {
-                                field.getValue().set(definition, 0);
+                            if (gr.classIsNumber(field.getValue().getType())) {
+                                field.getValue().set(definition, doCast("0", field.getValue().getType()));
                             } else if (gr.isBoolean(value)) {
                                 field.getValue().set(definition, true);
                             } else if (gr.isPrimitiveOrNumerical(value)) {
-                                field.getValue().set(value, "");
+                                field.getValue().set(value, doCast("", field.getValue().getType()));
                             } else if (field.getValue().getType().isArray()) { //check if array before checking if collection.
                                 field.getValue().set(definition, buildArray(field.getValue(), field.getValue().getType()));
                             } else if (gr.isCollectionOrMap(field.getValue())) {
@@ -81,7 +81,7 @@ public class ModelBuilder<M, T> extends Cereal {
                                 Object val = assemble(field.getValue().getType());
                                 field.getValue().set(definition, val);
                             }
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalAccessException | InstantiationException e) {
                             LOG.debug("problem modeling field: " + field.getKey() + ". " + e.getMessage(), e);
                         }
                         field.getValue().setAccessible(accessible);
@@ -108,6 +108,9 @@ public class ModelBuilder<M, T> extends Cereal {
             MapKeyType mapKeyType = field.getAnnotation(MapKeyType.class);
             if (mapKeyType != null) {
                 key = assemble(mapKeyType.type());
+                if(key instanceof String && (key == null || ((String) key).isEmpty())) {
+                    key = "key";
+                }
             }
             MapType MapType = field.getAnnotation(MapType.class);
             if (MapType != null) {

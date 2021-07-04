@@ -131,6 +131,10 @@ public class GoateReflection {
 		return o != null && (isPrimitiveNumber(o.getClass()) || o instanceof Number);
 	}
 
+	public boolean classIsNumber(Class o){
+		return o != null && (isPrimitiveNumber(o) || Number.class.isAssignableFrom(o));
+	}
+
 	public boolean isPrimitive(Class c) {
 		return c.equals(Boolean.class) || c.equals(Boolean.TYPE)
 			|| c.equals(Byte.class) || c.equals(Byte.TYPE)

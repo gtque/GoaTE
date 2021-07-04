@@ -151,7 +151,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         Goate data = new Goate();
         data.put("expanded name", 42);
         data.put("fieldName", "Hello, world!");
-        data.put("big decimal", "3.14159");
+        data.put("big decimal", "3.14159")  ;
         data.put("double D", "42.42");
         data.put("long l", 42L);
         data.put("ignoreMe", "these are not the droids you are looking for.");
@@ -681,7 +681,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     @Test(groups = {"unit"})
     public void primitiveModels() {
         JSONObject jo = new ModelBuilder<APrimitivesPojo, JSONObject>(APrimitivesPojo.class).build(JSONObject.class);
-        String ejson = "{\"bInt\":0,\"aBoolean\":false,\"aChar\":\"\\u0000\",\"bBoolean\":true,\"aInt\":0,\"aString\":\"\",\"bShort\":0,\"aFloat\":0,\"aDouble\":0,\"bDouble\":0,\"bByte\":0,\"aBigInteger\":null,\"bFloat\":0,\"aShort\":0,\"aBigDecimal\":null,\"bChar\":\"A\",\"aByte\":0}";
+        String ejson = "{\"bInt\":0,\"aBoolean\":false,\"aChar\":\"\\u0000\",\"bBoolean\":true,\"aInt\":0,\"aString\":\"\",\"bShort\":0,\"aFloat\":0,\"aDouble\":0,\"bDouble\":0,\"bByte\":0,\"aBigInteger\":0,\"bFloat\":0,\"aShort\":0,\"aBigDecimal\":0,\"bChar\":\"A\",\"aByte\":0}";
         LOG.info("model:\n" + jo);
         expect(Expectation.build()
                 .actual(jo)
@@ -692,7 +692,27 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     @Test(groups = {"unit"})
     public void collectionModels() {
         JSONObject jo = new ModelBuilder<ACollectionsPojo, JSONObject>(ACollectionsPojo.class).build(JSONObject.class);
-        String ejson = "{\"aList\":[\"\"],\"aMap\":{\"0\":{\"class\":\"java.lang.String\",\"value\":\"\",\"key\":\"key\"},\"key\":\"\"},\"aIntArray\":[0],\"bMap\":{\"\":true,\"0\":{\"class\":\"java.lang.Boolean\",\"value\":true,\"key\":\"\"}}}";
+        String ejson = "{\"aList\":[\"\"],\"aMap\":{\"key\":\"\"},\"aIntArray\":[0],\"bMap\":{\"key\":true}}";
+        LOG.info("model:\n" + jo);
+        expect(Expectation.build()
+                .actual(jo)
+                .isEqualTo(ejson));
+    }
+
+    @Test(groups = {"unit"})
+    public void mixedModels() {
+        JSONObject jo = new ModelBuilder<AMixedPojo, JSONObject>(AMixedPojo.class).build(JSONObject.class);
+        String ejson = "{\"nestedList\":[{\"aList\":[\"\"],\"aMap\":{\"key\":\"\"},\"aIntArray\":[0],\"bMap\":{\"key\":true}}],\"nestedPojo\":{\"bInt\":0,\"aBoolean\":false,\"bBoolean\":true,\"aChar\":\"\\u0000\",\"aInt\":0,\"aString\":\"\",\"bShort\":0,\"aFloat\":0,\"aDouble\":0,\"bDouble\":0,\"bByte\":0,\"bFloat\":0,\"aShort\":0,\"bChar\":\"A\",\"aByte\":0,\"aBigInteger\":0,\"aBigDecimal\":0},\"theDate\":null}";
+        LOG.info("model:\n" + jo);
+        expect(Expectation.build()
+                .actual(jo)
+                .isEqualTo(ejson));
+    }
+
+    @Test(groups = {"unit"})
+    public void mixedSourcedModels() {
+        JSONObject jo = new ModelBuilder<AMixedPojo, JSONObject>(AMixedPojo.class).source(ModelBuilder.class).build(JSONObject.class);
+        String ejson = "{\"nestedList\":[{\"aList\":[\"\"],\"aMap\":{\"key\":\"\"},\"aIntArray\":[0],\"bimbap\":{\"key\":true}}],\"nestedPojo\":{\"bInt\":0,\"aBoolean\":false,\"bBoolean\":true,\"aChar\":\"\\u0000\",\"aInt\":0,\"aString\":\"\",\"bShort\":0,\"aFloat\":0,\"aDouble\":0,\"bDouble\":0,\"bByte\":0,\"bFloat\":0,\"aShort\":0,\"bChar\":\"A\",\"aByte\":0,\"aBigInteger\":0,\"Trashbinye\":0},\"theDate\":null}";
         LOG.info("model:\n" + jo);
         expect(Expectation.build()
                 .actual(jo)

@@ -1,6 +1,8 @@
 package com.thegoate.utils.fill.serialize.pojos;
 
+import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.Kid;
+import com.thegoate.utils.fill.serialize.model.ModelBuilder;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,6 +25,7 @@ public class APrimitivesPojo extends Kid {
     char aChar;
     Character bChar;
     BigInteger aBigInteger;
+    @GoateSource(key = "Trashbinye", source = ModelBuilder.class)
     BigDecimal aBigDecimal;
 
 }
