@@ -71,8 +71,9 @@ public class SimplePojo extends Kid {
         return fieldName;
     }
 
-    public void setFieldName(String fieldName) {
+    public SimplePojo setFieldName(String fieldName) {
         this.fieldName = fieldName;
+        return this;
     }
 
     public int getSomeInt() {

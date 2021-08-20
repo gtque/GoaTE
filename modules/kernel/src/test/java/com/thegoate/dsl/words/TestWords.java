@@ -3,7 +3,11 @@ package com.thegoate.dsl.words;
 import com.thegoate.Goate;
 import com.thegoate.expect.Expectation;
 import com.thegoate.testng.TestNGEngineMethodDL;
+import com.thegoate.utils.fill.serialize.pojos.SimplePojo;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Eric Angeli on 11/18/2019.
@@ -62,5 +66,18 @@ public class TestWords extends TestNGEngineMethodDL {
         expect(Expectation.build()
                 .actual(DateTimeShiftDSL.dateTimeShift("uuuu-MM-dd HH:mm:ss", "2009-11-25 00:00:00", -1))
                 .isEqualTo("2009-11-24  00:00:00"));
+    }
+
+    @Test(groups = {"unit"})
+    public void generateListFromCsv() {
+        List<Object> expectedList = new ArrayList<>();
+        expectedList.add("hello");
+        expectedList.add(new SimplePojo().setFieldName("Barb"));
+        Goate d = new Goate()
+                .put("barb", new SimplePojo().setFieldName("Barb"))
+                .put("csv", "list from csv::hello,o::barb");
+        expect(Expectation.build()
+                .actual(d.get("csv"))
+                .isEqualTo(expectedList));
     }
 }

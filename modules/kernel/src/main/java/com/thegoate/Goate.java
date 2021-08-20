@@ -110,6 +110,16 @@ public class Goate implements HealthMonitor, Diary {
 		return new TreeSet<>(data.keySet());
 	}
 
+	public List<String> keysSorted() {
+		List<String> list = new ArrayList<>();
+		Set<String> keys = keys();
+		if(keys!=null){
+			list.addAll(keys);
+			Collections.sort(list);
+		}
+		return list;
+	}
+
 	public String[] keysArray() {
 		String[] keys = new String[data.keySet().size()];
 		int i = 0;

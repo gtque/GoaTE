@@ -214,20 +214,20 @@ public class InsertJson implements InsertUtility {
     private Object insertIn(Object jsonObject) throws Exception {
         String ids[] = in.split("\\.");
         Object j = jsonObject;
+        int aid = -42;
         for (int i = 0; i < ids.length; i++) {//String id:ids) {
             String id = ids[i];
+            String next = (i < ids.length - 1 ? ids[i + 1] : key);
+            boolean isInt = false;
+            try {
+                aid = Integer.parseInt(next);
+                isInt = true;
+            } catch (Exception e) {
+                LOG.debug("Insert JSON", "Looks like it is a json object not a json array.");
+            }
             if(!id.isEmpty()) {
-                String next = (i < ids.length - 1 ? ids[i + 1] : key);
-                int aid = -42;
                 Object j2 = getJson(j, id);
-                if (j2 == null) {
-                    boolean isInt = false;
-                    try {
-                        aid = Integer.parseInt(next);
-                        isInt = true;
-                    } catch (Exception e) {
-                        LOG.debug("Insert JSON", "Looks like it is a json object not a json array.");
-                    }
+                if (j2 == null || j2 == JSONObject.NULL) {
                     if (isInt) {
                         j2 = new JSONArray();
                     } else {
@@ -252,8 +252,19 @@ public class InsertJson implements InsertUtility {
 //                    throw new Exception("Failed to insert: One of the elements in the id was not a JSONArray or JSONObject.");
 //            }
         }
-        if (j instanceof JSONArray)
-            ((JSONArray) j).put(value==null?JSONObject.NULL:value);
+        if (j instanceof JSONArray) {
+            int jLength = ((JSONArray)j).length();
+            if(aid>=jLength){
+                for(int jIndex = jLength; jIndex <= aid; jIndex++){
+                    ((JSONArray) j).put(jIndex, JSONObject.NULL);
+                }
+            }
+            if(aid<0){
+                ((JSONArray) j).put(value == null ? JSONObject.NULL : value);
+            } else {
+                ((JSONArray) j).put(aid, value == null ? JSONObject.NULL : value);
+            }
+        }
         else if (j instanceof JSONObject) {
             if (replace)
                 ((JSONObject) j).put(key, value==null?JSONObject.NULL:value);
@@ -281,6 +292,8 @@ public class InsertJson implements InsertUtility {
                 JSONArray ja = (JSONArray)jsonObject;
                 if (id != null && !id.isEmpty() && ja.length()>Integer.parseInt(id)) {
                     result = ja.get(Integer.parseInt(id));
+                } else {
+                    LOG.debug("exceeded json array size");
                 }
             } catch (Exception e) {
                 //result = jsonObject;

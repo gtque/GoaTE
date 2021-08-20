@@ -67,6 +67,10 @@ public abstract class DSL {
         return type;
     }
 
+    protected int numberOfParameters(){
+        return definition == null ? 0: definition.size();
+    }
+
     protected Object get(int index, Goate data){
         Object o = null;
         if(definition.size()>index) {

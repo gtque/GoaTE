@@ -39,6 +39,8 @@ import com.thegoate.utils.fill.serialize.nullable.primitive.NullableDouble;
 import com.thegoate.utils.fill.serialize.pojos.*;
 import com.thegoate.utils.fill.serialize.pojos.flat.Child1;
 import com.thegoate.utils.fill.serialize.pojos.flat.Parent;
+import com.thegoate.utils.fill.serialize.pojos.list.BigList;
+import com.thegoate.utils.fill.serialize.pojos.list.SimpleContent;
 import com.thegoate.utils.fill.serialize.pojos.nullable.Wrapper;
 import com.thegoate.utils.fill.serialize.pojos.nullable.WrapperDouble;
 import com.thegoate.utils.fill.serialize.pojos.nullable.WrapperPrimitiveDouble;
@@ -151,7 +153,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         Goate data = new Goate();
         data.put("expanded name", 42);
         data.put("fieldName", "Hello, world!");
-        data.put("big decimal", "3.14159")  ;
+        data.put("big decimal", "3.14159");
         data.put("double D", "42.42");
         data.put("long l", 42L);
         data.put("ignoreMe", "these are not the droids you are looking for.");
@@ -380,7 +382,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     public void simpleSerializerTestGoateToJsonGeneric() {
         SerializeMe pojo = new SerializeMe().setField("hello").setExcluded("fart").setNestedExcluded(new SerializeLevel1().setFirstLevel("jelly beans"));
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = ""+new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).asSourced(true).to(JSONObject.class);
+        String json = "" + new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).asSourced(true).to(JSONObject.class);
         expect(Expectation.build().actual(json).isEqualTo("{\"field\":\"hello\"}"));
     }
 
@@ -388,7 +390,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     public void simpleSerializerTestNullField() {
         SerializeMe pojo = new SerializeMe();
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = ""+new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).includeNulls().asSourced(true).to(JSONObject.class);
+        String json = "" + new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).includeNulls().asSourced(true).to(JSONObject.class);
         expect(Expectation.build().actual(json).isEqualTo("{\"field\":null, \"nested\":null, \"list\":null, \"map\":null}"));
     }
 
@@ -717,5 +719,16 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         expect(Expectation.build()
                 .actual(jo)
                 .isEqualTo(ejson));
+    }
+
+    @Test(groups = {"unit"})
+    public void reallyBigList() {
+        BigList big = new BigList();
+        for (int i = 0; i < 100; i++) {
+            big.addContent(new SimpleContent().setCount(i).setName("index"+i));
+        }
+
+        String bigJ = (String) new Serializer<>(big, DefaultSource.class).to(new JsonString());
+        LOG.debug("bigJ: \n"+bigJ);
     }
 }
