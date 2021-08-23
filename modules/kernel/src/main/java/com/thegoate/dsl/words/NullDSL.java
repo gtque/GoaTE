@@ -28,6 +28,7 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 
@@ -36,6 +37,7 @@ import com.thegoate.dsl.GoateDSL;
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "null")
+@GoateDescription(description = "Returns null")
 public class NullDSL extends DSL {
     public NullDSL(Object value) {
         super(value);
