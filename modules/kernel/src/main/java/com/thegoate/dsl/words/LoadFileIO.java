@@ -26,17 +26,21 @@
  */
 package com.thegoate.dsl.words;
 
+import java.io.File;
+
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.utils.get.GetFile;
-
-import java.io.File;
 
 /**
  * Created by Eric Angeli on 7/5/2017.
  */
 @GoateDSL(word = "fileIO")
+@GoateDescription(description = "Loads the file specified by the file path into a file and returns it "
+    + "Note: 2nd parameter only used when providing the key value and test data to read the file path from",
+    parameters = {"String: file path or File: file or Object: file","Goate: data"})
 public class LoadFileIO extends DSL {
 
     public LoadFileIO(Object value){

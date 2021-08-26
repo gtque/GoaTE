@@ -28,6 +28,7 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.dsl.PrimitiveDSL;
 
@@ -36,6 +37,7 @@ import com.thegoate.dsl.PrimitiveDSL;
  * Created by gtque on 9/20/2017.
  */
 @GoateDSL(word = "byte")
+@GoateDescription(description = "Returns the byte representation of the value, assumes default radix.")
 public class ByteDSL extends PrimitiveDSL {
     public ByteDSL(Object value) {
         super(value);
