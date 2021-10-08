@@ -31,8 +31,10 @@ import com.thegoate.data.DataLoader;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
+import org.testng.annotations.Test;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,48 +48,69 @@ public class TestNGRunFactory {
     static final BleatBox LOG = BleatFactory.getLogger(TestNGRunFactory.class);
 
     public static Object[][] loadRuns(Goate runData, Goate constantData, boolean atLeastOneRun, String[] include, String[] exclude) {
+        return loadRuns(null, runData, constantData, atLeastOneRun, include, exclude);
+    }
+
+    public static Object[][] loadRuns(Method method, Goate runData, Goate constantData, boolean atLeastOneRun, String[] include, String[] exclude) {
+        boolean included = true;
+        String excludeMessage = "";
+        if(method != null){
+            String[] groups = method.getAnnotation(Test.class).groups();
+            for(String group:groups){
+                if(group.contains("::")){
+                    included = Boolean.parseBoolean(""+new Goate().get("group", group));
+                    excludeMessage = method.getName() + ">" + group;
+                }
+            }
+        }
+
         List<Goate> runs = new ArrayList<>();
         Goate constants = new Goate();
-        if (runData != null) {
-            for (String key : runData.keys()) {
-                List<Goate> list = ((DataLoader) runData.get(key)).load();
-                runs.addAll(list);
-            }
-        }
-        if (constantData != null) {
-            for (String key : constantData.keys()) {
-                if (key.equals("_goate:method")) {
-                    constants.put(key, constantData.get(key));
-                } else {
-                    constants.merge(((DataLoader) constantData.get(key)).load().get(0), true);
-                    //the last loaded value of the constant wins.
+        Object[][] rawData = {};
+        if(!included) {
+            LOG.debug("test is being excluded: " + excludeMessage);
+        } else {
+            if (runData != null) {
+                for (String key : runData.keys()) {
+                    List<Goate> list = ((DataLoader) runData.get(key)).load();
+                    runs.addAll(list);
                 }
             }
-        }
-        if (runs.size() == 0) {
-            runs.add(null);
-        }
-        if (constants.size() > 0) {
-            for (Goate data : runs) {
-                int i = -42;
-                if (data == null) {
-                    i = runs.indexOf(data);
-                    data = new Goate();
+            if (constantData != null) {
+                for (String key : constantData.keys()) {
+                    if (key.equals("_goate:method")) {
+                        constants.put(key, constantData.get(key));
+                    } else {
+                        constants.merge(((DataLoader) constantData.get(key)).load().get(0), true);
+                        //the last loaded value of the constant wins.
+                    }
                 }
-                data.merge(constants, false);
-                if (i != -42) {
-                    runs.set(i, data);
-                }
-                //a constant can be overloaded by setting it in the run data.
             }
-        }
-        runs = filter(runs);
-        if (runs.size() == 1 && runs.get(0) == null) {
-            runs = new ArrayList<>();
-        }
-        Object[][] rawData = new Object[runs.size()][runs.size() > 0 ? 1 : 0];
-        for (int i = 0; i < rawData.length; i++) {
-            rawData[i][0] = runs.get(i);
+            if (runs.size() == 0) {
+                runs.add(null);
+            }
+            if (constants.size() > 0) {
+                for (Goate data : runs) {
+                    int i = -42;
+                    if (data == null) {
+                        i = runs.indexOf(data);
+                        data = new Goate();
+                    }
+                    data.merge(constants, false);
+                    if (i != -42) {
+                        runs.set(i, data);
+                    }
+                    //a constant can be overloaded by setting it in the run data.
+                }
+            }
+            runs = filter(runs);
+            if (runs.size() == 1 && runs.get(0) == null) {
+                runs = new ArrayList<>();
+            }
+            rawData = new Object[runs.size()][runs.size() > 0 ? 1 : 0];
+            for (int i = 0; i < rawData.length; i++) {
+                rawData[i][0] = runs.get(i);
+            }
         }
         Object[][] empty = {};
         return rawData.length > 0 ? rawData : empty;

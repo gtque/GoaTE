@@ -142,4 +142,38 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
         o[0][0] = new Goate().put("Scenario", "custom data provider").put("truth", true);
         return o;
     }
+
+    @GoateProvider(name = "sample2")
+    @Test(groups = {"unit", "supported since::2021.10.00.00,eut::too.young"}, dataProvider = "methodLoader")
+    public void groupIsExcludedTest(Goate d) {
+        expect(Expectation.build()
+                .actual(false)
+                .isEqualTo(true)
+                .failureMessage("shouldn't have even been executed."));
+    }
+
+    @GoateProvider(name = "sample2")
+    @Test(groups = {"unit", "supported since::2021.10.00.00,eut::same.age"}, dataProvider = "methodLoader")
+    public void groupIsIncludedSameTest(Goate d) {
+        expect(Expectation.build()
+                .actual(true)
+                .isEqualTo(true));
+    }
+
+    @GoateProvider(name = "sample2")
+    @Test(groups = {"unit", "supported since::2021.10.00.00,eut::much.older"}, dataProvider = "methodLoader")
+    public void groupIsIncludedDifferentTest(Goate d) {
+        expect(Expectation.build()
+                .actual(true)
+                .isEqualTo(true));
+    }
+
+    @GoateProvider(name = "sample2")
+    @Test(groups = {"unit", "supported since::2021.10.00.00,eut::just.a.little.older"}, dataProvider = "methodLoader")
+    public void groupIsIncludedJustALittleOlderTest(Goate d) {
+        expect(Expectation.build()
+                .actual(true)
+                .isEqualTo(true));
+    }
+
 }

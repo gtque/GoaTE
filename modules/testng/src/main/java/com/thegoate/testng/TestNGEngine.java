@@ -286,7 +286,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
             xt = context.getCurrentXmlTest();
         }
         initDataLoaders();
-        return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
+        return TestNGRunFactory.loadRuns(method.getConstructorOrMethod().getMethod(), getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
     }
 
     public void initDataLoaders() {

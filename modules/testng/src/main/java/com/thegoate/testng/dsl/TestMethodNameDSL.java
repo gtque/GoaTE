@@ -33,7 +33,7 @@ import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 
 /**
- * returns the class name of the calling class.
+ * returns the method name of the calling method.
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "test.method.name")

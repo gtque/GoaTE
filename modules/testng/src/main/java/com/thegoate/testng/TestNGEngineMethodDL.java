@@ -77,7 +77,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         Goate rdl = new Goate();
         Goate cdl = new Goate();
         buildDataLoaders(rdl, cdl, method);
-        return TestNGRunFactory.loadRuns(rdl, cdl, false,testContext.getIncludedGroups(),testContext.getExcludedGroups());
+        return TestNGRunFactory.loadRuns(method, rdl, cdl, false,testContext.getIncludedGroups(),testContext.getExcludedGroups());
     }
 
     protected void buildDataLoaders(Goate rdl, Goate cdl, Method method) {
