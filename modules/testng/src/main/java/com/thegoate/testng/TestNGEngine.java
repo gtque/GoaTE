@@ -88,6 +88,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     private List<ExpectEvaluator> executedExpectations = new ArrayList<>();
     protected volatile boolean expectationsSet = false;
     protected volatile boolean expectationsNotEvaluated = true;
+    protected volatile boolean expectationsNow = false;
 
     public static Map<String, Integer> number = new ConcurrentHashMap<>();
 
@@ -378,6 +379,54 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
+    public boolean expectNow(Expectation expectation) {
+        return expectNow(expectation, false);
+    }
+
+    @Override
+    public boolean expectNow(Expectation expectation, boolean failImmediately){
+        expect(expectation);
+        return evaluateNow(failImmediately);
+    }
+
+    @Override
+    public boolean expectNow(ExpectationBuilder expectation) {
+        return expectNow(expectation, false);
+    }
+
+    @Override
+    public boolean expectNow(ExpectationBuilder expectation, boolean failImmediately){
+        expect(expectation);
+        return evaluateNow(failImmediately);
+    }
+
+    @Override
+    public boolean expectNow(List<Expectation> expectation) {
+        return expectNow(expectation, false);
+    }
+
+    @Override
+    public boolean expectNow(List<Expectation> expectation, boolean failImmediately){
+        expect(expectation);
+        return evaluateNow(failImmediately);
+    }
+
+    private boolean evaluateNow(boolean failImmediately){
+        boolean result = false;
+        try {
+            evaluate();
+            result = true;
+        } catch (ExpectationError expectationError) {
+            if(failImmediately){
+                throw expectationError;
+            }
+        } finally {
+            expectationsNow = true;
+        }
+        return result;
+    }
+
+    @Override
     public TestNGEngine expect(Expectation expectation) {
         if (etb.isBuilt()) {
             clearExpectations();
@@ -434,9 +483,20 @@ public abstract class TestNGEngine implements ITest, TestNG {
         evaluate(testResult, false);
     }
 
+    protected void clearEvaluated(){
+        executedExpectations = new ArrayList<>();
+    }
+
     public void evaluate(ITestResult testResult, boolean clearAfterRunning) {
         if (etb.isBuilt()) {
             LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
+            if(executedExpectations.size()>0 && expectationsNow){
+                LOG.debug("Evaluate", "but there were expectations that have already been displayed, so I am going to reprint the results");
+                ev = new ExpectEvaluator(executedExpectations);
+                logStatuses(ev, true);
+                assertTrue(ev.fails().size()==0, getFailures(ev));
+            }
+            expectationsNow = false;
         } else {
             expectationsNotEvaluated = false;
             ev = new ExpectEvaluator(etb);
@@ -449,6 +509,10 @@ public abstract class TestNGEngine implements ITest, TestNG {
             if (ev.skipped().size() > 0) {
                 LOG.warn("skipped tests detected...");
                 result = false;
+            }
+            if(testResult != null){
+                ev = new ExpectEvaluator(executedExpectations);
+                result = ev.fails().size()==0;
             }
             logStatuses(ev, clearAfterRunning);
             try {

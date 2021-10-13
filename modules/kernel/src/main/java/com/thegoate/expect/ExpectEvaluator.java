@@ -58,6 +58,18 @@ public class ExpectEvaluator {
         buildExpectations(etb);
     }
 
+    public ExpectEvaluator(List<ExpectEvaluator> evs){
+        if(evs != null && evs.size()>0) {
+            for (ExpectEvaluator ev : evs) {
+                failed.append("\n").append(ev.failed());
+                fails.addAll(ev.fails());
+                passes.addAll(ev.passes());
+                skipped.addAll(ev.skipped());
+                zeroOrMore.addAll(ev.zeroOrMore());
+            }
+        }
+    }
+
     protected void buildExpectations(ExpectationThreadBuilder etb){
         expectations = etb.build();
     }

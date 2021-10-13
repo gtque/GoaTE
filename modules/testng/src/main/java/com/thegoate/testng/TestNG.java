@@ -61,6 +61,12 @@ public interface TestNG {
     Object get(String key, Object def);
     <T>T get(String key, Object def, Class<T> type);
     TestNG put(String key, Object val);
+    boolean expectNow(Expectation expectation);
+    boolean expectNow(ExpectationBuilder expectationBuilder);
+    boolean expectNow(List<Expectation> expectation);
+    boolean expectNow(Expectation expectation, boolean failImmediately);
+    boolean expectNow(ExpectationBuilder expectationBuilder, boolean failImmediately);
+    boolean expectNow(List<Expectation> expectation, boolean failImmediately);
     TestNG expect(Expectation expectation);
     TestNG expect(ExpectationBuilder expectationBuilder);
     TestNG expect(List<Expectation> expectation);

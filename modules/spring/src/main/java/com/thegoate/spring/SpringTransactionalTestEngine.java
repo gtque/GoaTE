@@ -164,6 +164,36 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
+    public boolean expectNow(Expectation expectation) {
+        return expectNow(expectation, false);
+    }
+
+    @Override
+    public boolean expectNow(ExpectationBuilder expectationBuilder) {
+        return expectNow(expectationBuilder, false);
+    }
+
+    @Override
+    public boolean expectNow(List<Expectation> expectation) {
+        return expectNow(expectation, false);
+    }
+
+    @Override
+    public boolean expectNow(Expectation expectation, boolean failImmediately) {
+        return engine.expectNow(expectation, failImmediately);
+    }
+
+    @Override
+    public boolean expectNow(ExpectationBuilder expectationBuilder, boolean failImmediately) {
+        return engine.expectNow(expectationBuilder, failImmediately);
+    }
+
+    @Override
+    public boolean expectNow(List<Expectation> expectation, boolean failImmediately) {
+        return engine.expectNow(expectation, failImmediately);
+    }
+
+    @Override
     public TestNG expect(Expectation expectation) {
         engine.expect(expectation);
         return this;

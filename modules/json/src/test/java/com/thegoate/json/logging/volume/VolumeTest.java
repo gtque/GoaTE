@@ -5,6 +5,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import com.thegoate.json.utils.type.JsonType;
+import com.thegoate.testng.ExpectToFail;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
@@ -107,6 +108,7 @@ public class VolumeTest extends TestNGEngineMethodDL {
 			.actual(sample)
 			.isEqualTo(sample));
 	}
+	@ExpectToFail
 	@Test(groups = {"unit"})
 	public void minVolumeJustInOutputFail() {
 //		GoateUtils.setEnvironment("volume.json.level", Volume.MIN.name());
@@ -124,7 +126,7 @@ public class VolumeTest extends TestNGEngineMethodDL {
 			.actual(passed)
 			.isEqualTo(true));
 	}
-
+	@ExpectToFail
 	@Test(groups = {"unit"})
 	public void maxVolumeJustInOutputFail() {
 //		GoateUtils.setEnvironment("volume.json.level", Volume.MIN.name());
@@ -142,6 +144,7 @@ public class VolumeTest extends TestNGEngineMethodDL {
 			.actual(passed)
 			.isEqualTo(true));
 	}
+	@ExpectToFail
 	@Test(groups = {"unit"})
 	public void minVolumeJustInOutputFailArray() {
 		//GoateUtils.setEnvironment("volume.json.level", Volume.MIN.name());
