@@ -180,6 +180,15 @@ public class AnnotationFactory {
     }
 
     /**
+     * Clear the built directory. Use to force the directory to be rebuilt.
+     * @return
+     */
+    public synchronized AnnotationFactory clearDirectory(){
+        directory.remove(annotation.getCanonicalName());
+        return this;
+    }
+
+    /**
      * The listings for each annotation is generated only one time, the first time they are looked up.
      *
      * @return The instance of itself, syntactic sugar for stringing calls together.

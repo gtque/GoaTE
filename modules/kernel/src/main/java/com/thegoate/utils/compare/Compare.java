@@ -29,12 +29,9 @@ package com.thegoate.utils.compare;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import com.thegoate.reflection.GoateReflection;
-import com.thegoate.utils.ParseDetector;
 import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.UtilCache;
 import com.thegoate.utils.compare.tools.CompareObject;
-import com.thegoate.utils.compare.tools.CompareObjectEqualTo;
 import com.thegoate.utils.type.FindType;
 
 /**
@@ -115,8 +112,13 @@ public class Compare extends UnknownUtilType implements CompareUtility {
 
         try {
             tool = (CompareUtility)buildUtil(actual, CompareUtil.class, actual, ""+operator, CompareUtil.class.getMethod("operator"), type);
+            if(tool == null) {
+                LOG.warn("compare tool", "failed to find the compare utility, clearing the cache and trying one more time.");
+                clearCache(getClass(), CompareUtil.class);
+                tool = (CompareUtility)buildUtil(actual, CompareUtil.class, actual, ""+operator, CompareUtil.class.getMethod("operator"), type);
+            }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            LOG.warn("compare tool", "failed to find the compare utility: " + e.getMessage(), e);
         }
 
         //if tool is still null, this indicates a problem trying to find the

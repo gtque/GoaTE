@@ -30,6 +30,7 @@ package com.thegoate.utils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Optional;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
@@ -68,7 +69,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
 
     public T type(Class type) {
         this.declaredType = type;
-        return (T)this;
+        return (T) this;
     }
 
     @Override
@@ -132,7 +133,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
      * @return the utility that was found.
      */
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier, String isType) {
-        return buildUtil(obj, util, val, id, identifier, isType, declaredType==null?NotFound.class:declaredType);
+        return buildUtil(obj, util, val, id, identifier, isType, declaredType == null ? NotFound.class : declaredType);
     }
 
     protected Object buildUtil(Object obj, Class<? extends java.lang.annotation.Annotation> util, Object val, String id, Method identifier, String isType, Class type) {
@@ -147,16 +148,28 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                     Goate cache = pokedex.get(region, new Goate(), Goate.class);
                     if (cache != null) {
                         cache.put(key(util, obj, id, type), utility.getClass());
+                    } else {
+                        cache = new Goate().put(key(util, obj, id, type), utility.getClass());
+                        pokedex.put(region, cache);
                     }
                 }
+            } else {
+                LOG.warn("buildUtil", "could not find an uncached util implementation." + key(util, obj, id, type));
             }
         }
         return utility;
     }
 
     public static void clearCache(Class<? extends UnknownUtilType> klass) {
+        clearCache(klass, null);
+    }
+
+    public static void clearCache(Class<? extends UnknownUtilType> klass, Class annotation){
         UtilCache uc = klass.getAnnotation(UtilCache.class);
         if (uc.clear()) {
+            if(annotation != null) {
+                new AnnotationFactory().annotatedWith(annotation).clearDirectory();
+            }
             pokedex.put(uc.name(), new Goate());
         }
     }
@@ -187,8 +200,10 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         if (useCache) {
             Goate cache = pokedex.get(region, null, Goate.class);
             if (obj != null && cache != null) {
-                Class c = cache.get(key(util, obj, id, isType), null, Class.class);
+                String _key = key(util, obj, id, isType);
+                Class c = cache.get(_key, null, Class.class);
                 if (c != null) {
+                    LOG.debug("util cache", "found a cached implementation: " + _key);
                     AnnotationFactory af = new AnnotationFactory();
                     af.constructorArgs(args);
                     try {
@@ -196,6 +211,8 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                     } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                         LOG.debug("The class (" + c.getName() + ") could not be build from the util cache for some reason: " + e.getMessage(), e);
                     }
+                } else {
+                    LOG.debug("util cache", "not found in cache: " + _key);
                 }
             }
         }
@@ -263,15 +280,14 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         return utility;
     }
 
-    protected boolean checkUtility(Class c, Class[] _def, Object[] _util, String isType, AnnotationFactory af, Class type, Object[] checkArgs) {
-        if (_util[0] == null) {
-            if (isDefault(c, _def[0])) {
-                _def[0] = getDefault(isType, c);
-            } else {
-                _util[0] = getUtility(c, _def, af, isType, type, checkArgs);
-            }
+    protected boolean checkUtility(Class c, Class[] _def, String isType, AnnotationFactory af, Class type, Object[] checkArgs) {
+        Object util = null;
+        if (isDefault(c, _def[0])) {
+            _def[0] = getDefault(isType, c);
+        } else {
+            util = getUtility(c, _def, af, isType, type, checkArgs);
         }
-        return _util[0] != null;
+        return util != null;
     }
 
     protected Object uncached(Class<? extends java.lang.annotation.Annotation> util, Object[] args, Object[] checkArgs, String id, Method identifier, String isType, Class type) {
@@ -282,12 +298,20 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
         if (utils != null) {
             final Class[] _def = new Class[1];
-            final Object[] _util = new Object[1];
+//            final Object[] _util = new Object[1];
             _def[0] = null;
-            _util[0] = null;
+//            _util[0] = null;
 
-            utils.keySet().stream().filter(key -> checkUtility(utils.get(key), _def, _util, isType, af, type, checkArgs)).findFirst();
-            utility = _util[0];
+            Optional<String> opt = utils.keySet().stream().filter(key -> checkUtility(utils.get(key), _def, isType, af, type, checkArgs)).findFirst();
+            if(opt.isPresent()) {
+                try {
+                    utility = af.constructor(null).build(utils.get(opt.get()));//af.constructor(null).build(c);;
+                } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                    LOG.warn("uncached", "problem building utility: " + e.getMessage(), e);
+                }
+            } else {
+                LOG.debug("uncached", "failed to find the utility");
+            }
             def = _def[0];
             /**
              for (String key : utils.keySet()) {
