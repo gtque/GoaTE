@@ -382,7 +382,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     public void simpleSerializerTestGoateToJsonGeneric() {
         SerializeMe pojo = new SerializeMe().setField("hello").setExcluded("fart").setNestedExcluded(new SerializeLevel1().setFirstLevel("jelly beans"));
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = "" + new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).asSourced(true).to(JSONObject.class);
+        String json = ""+new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).asSourced(true).to(JSONObject.class);
         expect(Expectation.build().actual(json).isEqualTo("{\"field\":\"hello\"}"));
     }
 
@@ -390,7 +390,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
     public void simpleSerializerTestNullField() {
         SerializeMe pojo = new SerializeMe();
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = "" + new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).includeNulls().asSourced(true).to(JSONObject.class);
+        String json = ""+new Serializer<SerializeMe, Class, JSONObject>(pojo, DefaultSource.class).includeNulls().asSourced(true).to(JSONObject.class);
         expect(Expectation.build().actual(json).isEqualTo("{\"field\":null, \"nested\":null, \"list\":null, \"map\":null}"));
     }
 
@@ -730,5 +730,13 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
 
         String bigJ = (String) new Serializer<>(big, DefaultSource.class).to(new JsonString());
         LOG.debug("bigJ: \n"+bigJ);
+    }
+
+    @Test(groups = {"unit"})
+    public void simpleEmbeddedList() {
+        TestFailures body = new TestFailures();
+        body.add("a", 1);
+        String message = "" + new Serializer<>(body, DefaultSource.class).to(new JsonString());
+        LOG.info(message);
     }
 }

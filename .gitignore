@@ -1,7 +1,7 @@
 #################
 ## Eclipse
 #################
-
+*.orig
 *.pydevproject
 .project
 .metadata
@@ -230,3 +230,4 @@ out/*
 **/out
 classes/*
 **/gen/**/*.java
+*.orig
