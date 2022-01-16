@@ -49,8 +49,26 @@ public class WebDriverBuilder {
     Goate dc = new Goate();
 
     public WebDriverBuilder(String browser){
-        this.browser = browser;
+        init(browser);
     }
+
+	public WebDriverBuilder(Browser browser) {
+		init(browser.type());
+	}
+
+	private void init(String browser) {
+		this.browser = browser;
+	}
+	public WebDriverBuilder isRemote(boolean remote) {
+		if(remote) {
+			if(!browser.startsWith("remote:")){
+				browser = "remote:" + browser;
+			}
+		} else {
+			browser = browser.replace("remote:", "");
+		}
+		return this;
+	}
 
     public WebDriverBuilder addCapability(String name, Object value){
         dc.put(name, value);

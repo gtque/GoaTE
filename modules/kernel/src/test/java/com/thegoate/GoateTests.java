@@ -302,4 +302,12 @@ public class GoateTests extends TestNGEngineMethodDL {
         char actual = g.get("actual", 'b', Character.class);
         assertEquals(actual, 'a');
     }
+
+	@Test(groups = {"poc"})
+	public void testMatcher(){
+		String key = "search parameter.0.iMaximumsamMax";
+		Pattern search = Pattern.compile("Max");
+		Matcher m = search.matcher(key);
+		assertEquals(m.find(), true);
+	}
 }

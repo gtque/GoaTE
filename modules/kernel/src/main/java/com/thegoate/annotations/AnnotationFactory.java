@@ -225,9 +225,13 @@ public class AnnotationFactory {
                         listing.put(temp.getCanonicalName(), klass.forName(theClass));//default to using the full class name.
                     }
                     if (setDefault) {
-                        Annotation def = temp.getAnnotation(IsDefault.class);
+                        IsDefault def = (IsDefault) temp.getAnnotation(IsDefault.class);
                         if (def != null) {
-                            listing.put("default", temp);
+							if(def.forType()) {
+								listing.put("default", temp);
+							} else {
+								listing.put("default", temp);
+							}
                         }
                     }
                 } catch (ClassNotFoundException | NullPointerException | IllegalAccessException | InvocationTargetException e) {

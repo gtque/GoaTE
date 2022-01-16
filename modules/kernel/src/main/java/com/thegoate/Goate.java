@@ -106,6 +106,10 @@ public class Goate implements HealthMonitor, Diary {
 		return mapped;
 	}
 
+	public boolean containsKey(String key) {
+		return data.containsKey(key);
+	}
+
 	public Set<String> keys() {
 		return new TreeSet<>(data.keySet());
 	}
