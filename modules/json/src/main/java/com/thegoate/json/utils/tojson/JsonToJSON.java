@@ -36,6 +36,8 @@ import org.json.JSONObject;
 @ToJsonUtil
 public class JsonToJSON extends JsonUtil implements ToJsonUtility{
 
+    boolean isList = false;
+
     public JsonToJSON(Object val) {
         super(val);
     }
@@ -56,6 +58,12 @@ public class JsonToJSON extends JsonUtil implements ToJsonUtility{
     public String convertStrict(){
         strict = true;
         return convert();
+    }
+
+    @Override
+    public ToJsonUtility isList(boolean isList) {
+        this.isList = isList;
+        return this;
     }
 
     @Override

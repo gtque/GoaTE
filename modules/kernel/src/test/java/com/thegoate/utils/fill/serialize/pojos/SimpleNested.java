@@ -79,4 +79,12 @@ public class SimpleNested {
     public void setNothing(String nothing) {
         this.nothing = nothing;
     }
+
+    public int getDroid() {
+        return droid;
+    }
+
+    public void setDroid(int droid) {
+        this.droid = droid;
+    }
 }

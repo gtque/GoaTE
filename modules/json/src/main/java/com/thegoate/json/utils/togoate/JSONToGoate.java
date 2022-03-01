@@ -50,7 +50,7 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
     }
 
     @Override
-    protected void init(Object val){
+    protected void init(Object val) {
         processNested = false;
         super.init(val);
     }
@@ -68,52 +68,55 @@ public class JSONToGoate extends JsonUtil implements ToGoateUtility {
 
     @Override
     public Goate convert() {
-        if(takeActionOn instanceof String){
-            try{
-                    takeActionOn = new JSONObject(""+takeActionOn);
-            }catch(JSONException je){
-                try{
-                    takeActionOn = new JSONArray(""+takeActionOn);
-                }catch (Exception e){
-                    LOG.warn("Conjert JSON to Goate","Failed to convert the string to a JSONObject or JSONArray.\n"+e.getMessage());
+        if (takeActionOn instanceof String) {
+            try {
+                takeActionOn = new JSONObject("" + takeActionOn);
+            } catch (JSONException je) {
+                try {
+                    takeActionOn = new JSONArray("" + takeActionOn);
+                } catch (Exception e) {
+                    LOG.warn("Conjert JSON to Goate", "Failed to convert the string to a JSONObject or JSONArray.\n" + e.getMessage());
                 }
             }
         }
         result = new Goate().autoIncrement(autoIncrement);
-        if(takeActionOn!=null){
-            if(takeActionOn instanceof JSONObject){
+        if (takeActionOn != null) {
+            if (takeActionOn instanceof JSONObject) {
                 find((JSONObject) takeActionOn, "");
-            }else if(takeActionOn instanceof JSONArray){
-                result.put("", "[]");
+            } else if (takeActionOn instanceof JSONArray) {
+//                result.put("", "[]");
                 find((JSONArray) takeActionOn, "");
-            }else{
-                LOG.warn("Conjert JSON to Goate","It does not appear as though the takeActionOn is json.");
+            } else {
+                LOG.warn("Convert JSON to Goate", "It does not appear as though the takeActionOn is json.");
             }
         }
         return result;
     }
 
-    protected void put(Object o, String currentPath, String key){
-        String id = currentPath+(currentPath.length()>0?".":"")+key;
-        result.put(id,o == JSONObject.NULL ? "null::" : o);
-        if(o instanceof JSONObject){
+    protected void put(Object o, String currentPath, String key) {
+        String id = currentPath + (currentPath.length() > 0 ? "." : "") + key;
+        if (!id.isEmpty()) {
+            result.put(id, o == JSONObject.NULL ? "null::" : o);
+        }
+        if (o instanceof JSONObject) {
             find((JSONObject) o, id);
-        }else if(o instanceof JSONArray){
+        } else if (o instanceof JSONArray) {
             find((JSONArray) o, id);
         }
     }
-    protected void find(JSONObject json, String currentPath){
-        for(String key:json.keySet()){
+
+    protected void find(JSONObject json, String currentPath) {
+        for (String key : json.keySet()) {
             Object o = json.get(key);
             put(o, currentPath, key);
         }
     }
 
-    protected void find(JSONArray json, String currentPath){
+    protected void find(JSONArray json, String currentPath) {
 //        result.put(currentPath, json);
-        for(int key = 0; key<json.length(); key++){
+        for (int key = 0; key < json.length(); key++) {
             Object o = json.get(key);
-            put(o, currentPath, ""+key);
+            put(o, currentPath, "" + key);
         }
     }
 }

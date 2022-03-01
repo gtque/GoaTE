@@ -50,6 +50,8 @@ public abstract class SerializeTo extends Cereal {
     protected Object original;
     protected Map<String, Class> castList = new HashMap<>();
     protected List<String> exclude = new ArrayList<>();
+    protected boolean isList = false;
+    protected boolean includeNulls = false;
 
     public SerializeTo source(Class source) {
         this.source = source;
@@ -63,6 +65,11 @@ public abstract class SerializeTo extends Cereal {
 
     public SerializeTo asSourced(boolean asSourced) {
         this.asSourced = asSourced;
+        return this;
+    }
+
+    public SerializeTo nulls(boolean includeNulls) {
+        this.includeNulls = includeNulls;
         return this;
     }
 
@@ -161,6 +168,11 @@ public abstract class SerializeTo extends Cereal {
 
     public Object mapFields(String base, Class cereal, Object so) {
         final Goate[] value = new Goate[1];
+        if (Collection.class.isAssignableFrom(cereal) || cereal.isArray()) {
+            isList = true;
+        } else {
+            isList = false;
+        }
         if (!(so instanceof Goate)) {
             value[0] = new ToGoate(so).convert();
         } else {

@@ -37,6 +37,8 @@ import com.thegoate.dsl.Interpreter;
 import com.thegoate.logging.volume.Diary;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.fill.serialize.Cast;
+import com.thegoate.utils.fill.serialize.DefaultSource;
 import com.thegoate.utils.togoate.ToGoate;
 
 import java.util.*;
@@ -261,7 +263,20 @@ public class Goate implements HealthMonitor, Diary {
 				value = processDSL(key, value);
 			}
 		}
-		return new GoateReflection().isPrimitive(type) ? doCastPrimitive(value, type) : type.cast(value);
+		return doCast(value, type);
+	}
+
+	private <T> T doCast(Object value, Class<T> type){
+		try {
+			return new GoateReflection().isPrimitive(type) ? doCastPrimitive(value, type) : type.cast(value);
+		} catch (ClassCastException cce){
+			try {
+				return new Cast(this, DefaultSource.class).cast(value, type);
+			} catch (IllegalAccessException | InstantiationException e) {
+				//swallow the exception and just try a type.cast again and let that throw an exception.
+			}
+		}
+		return type.cast(null);
 	}
 
 	public <T> T doCastPrimitive(Object value, Class<T> type) {

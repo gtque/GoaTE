@@ -31,6 +31,7 @@ import com.thegoate.Sponge;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.Serializer;
 import com.thegoate.utils.fill.serialize.SerializerSponge;
 import com.thegoate.utils.fill.serialize.to.SerializeTo;
 import com.thegoate.utils.togoate.ToGoate;
@@ -49,7 +50,10 @@ public class JsonString extends SerializeTo {
     @Override
     public Object serialize(Object pojo) {
         this.original = pojo;
-        return new GoateToJSON(mapFields("", cereal, toJson(pojo))).convert();
+        Goate json = new Serializer<>(pojo, source).asSourced(asSourced).nulls(includeNulls).toGoate();
+//        return new GoateToJSON(json).convert();
+        return new GoateToJSON(mapFields("", cereal, json)).isList(isList).convert();
+//        return new GoateToJSON(mapFields("", cereal, toJson(pojo))).convert();
     }
 
     private Object toJson(Object pojo) {

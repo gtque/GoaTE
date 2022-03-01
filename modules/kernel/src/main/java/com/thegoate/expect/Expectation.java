@@ -531,7 +531,7 @@ public class Expectation {
                                 checkers.add(checker);
                             }
                         }
-                        result = playCheckers(checkers);
+                        result = playCheckers(checkers) && result;
                     } catch (Throwable t) {
                         result = false;
                         logFail(t);

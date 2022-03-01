@@ -230,7 +230,9 @@ public class AnnotationFactory {
 							if(def.forType()) {
 								listing.put("default", temp);
 							} else {
-								listing.put("default", temp);
+							    if(!listing.containsKey("default")) {
+                                    listing.put("default", temp);
+                                }
 							}
                         }
                     }

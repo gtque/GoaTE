@@ -36,6 +36,7 @@ import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.togoate.ToGoate;
 
+import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -303,11 +304,41 @@ public class GoateTests extends TestNGEngineMethodDL {
         assertEquals(actual, 'a');
     }
 
-	@Test(groups = {"poc"})
-	public void testMatcher(){
-		String key = "search parameter.0.iMaximumsamMax";
-		Pattern search = Pattern.compile("Max");
-		Matcher m = search.matcher(key);
-		assertEquals(m.find(), true);
-	}
+    @Test(groups = {"poc"})
+    public void testMatcher() {
+        String key = "search parameter.0.iMaximumsamMax";
+        Pattern search = Pattern.compile("Max");
+        Matcher m = search.matcher(key);
+        assertEquals(m.find(), true);
+    }
+
+    @Test(groups = {"unit"})
+    public void castToLong() {
+        Goate g = new Goate().put("actual", "42");
+        long al = g.get("actual", "NaN", Long.class);
+
+        expect(Expectation.build()
+                .actual(al)
+                .isEqualTo(42L));
+    }
+
+    @Test(groups = {"unit"})
+    public void castStringToJson() {
+        Goate g = new Goate().put("actual", "{\"field\":true}");
+        JSONObject al = g.get("actual", "NaN", JSONObject.class);
+
+        expect(Expectation.build()
+                .actual(al)
+                .isEqualTo("{\"field\":true}"));
+    }
+
+    @Test(groups = {"unit"})
+    public void castJsonToString() {
+        Goate g = new Goate().put("actual", new JSONObject().put("field", true));
+        String al = g.get("actual", "NaN", String.class);
+
+        expect(Expectation.build()
+                .actual(al)
+                .isEqualTo("{\"field\":true}"));
+    }
 }

@@ -49,7 +49,8 @@ public class BleatFactory {
         Class def = dir.get("default");
         Class logger = null;
         for(String c:dir.keySet()){
-            if(def!=null&&!def.equals(dir.get(c))){
+            //always treat BleatBoxDefault as a default and don't set it if found even if the found default is something different.
+            if(def!=null&&!def.equals(dir.get(c))&&!c.equals(BleatBoxDefault.class.getCanonicalName())){
                 logger = dir.get(c);
                 break;
             }

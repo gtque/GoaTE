@@ -117,10 +117,14 @@ public class GoateReflection {
 	}
 
 	public boolean isCollectionOrMap(Field field) {
-		return Collection.class.isAssignableFrom(field.getType())
-				|| Set.class.isAssignableFrom(field.getType())
-				|| Map.class.isAssignableFrom(field.getType())
-				|| field.getType().isArray();
+		return isCollectionOrMap(field.getType());
+	}
+
+	public boolean isCollectionOrMap(Class klass) {
+		return Collection.class.isAssignableFrom(klass)
+				|| Set.class.isAssignableFrom(klass)
+				|| Map.class.isAssignableFrom(klass)
+				|| klass.isArray();
 	}
 
 	public boolean isPrimitiveOrNumerical(Object o) {

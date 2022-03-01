@@ -1527,7 +1527,7 @@ public class ExpectTests extends TestNGEngineMethodDL {
                 "]" +
                 "}";
         ContentPojoT<TypePojo> content = new DeSerializer().data(new ToGoate(api1).convert()).T(TypePojo.class).build(ContentPojoT.class);
-        String api1FormattedPT = "" + new Serializer<>(new DeSerializer().data(new ToGoate(api1).convert()).T(TypePojo.class).build(ContentPojoT.class), DefaultSource.class).to(new JsonString());
+        String api1FormattedPT = new Serializer<ContentPojoT, DefaultSource, String>(new DeSerializer().data(new ToGoate(api1).convert()).T(TypePojo.class).build(ContentPojoT.class)).to(new JsonString());
         String api1FormattedP = "" + new Serializer<>(new DeSerializer().data(new ToGoate(api1).convert()).build(ContentPojo.class), DefaultSource.class).to(new JsonString());
         String api2FormattedP = "" + new Serializer<>(new DeSerializer().data(new ToGoate(api2).convert()).from(UDFSource.class).build(ContentPojo.class), DefaultSource.class).to(new JsonString());
         expect(Expectation.build()
@@ -1995,14 +1995,14 @@ public class ExpectTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-	public void jsonListWithIntToDecimal() {
-		String j1 = "{\"a\":[{\"b\":42.00}, {\"b\":314}]}";
-		String j2 = "{\"a\":[{\"b\":314.00}, {\"b\":42}]}";
-		expect(Expectation.build()
-			.actual(j1)
-			.isEqualTo(j2));
+    public void jsonListWithIntToDecimal() {
+        String j1 = "{\"a\":[{\"b\":42.00}, {\"b\":314}]}";
+        String j2 = "{\"a\":[{\"b\":314.00}, {\"b\":42}]}";
+        expect(Expectation.build()
+                .actual(j1)
+                .isEqualTo(j2));
 
-	}
+    }
 
     @Test(groups = {"unit"})
     public void simpleLocalDateTests() {
@@ -2010,12 +2010,53 @@ public class ExpectTests extends TestNGEngineMethodDL {
         LocalDate d1 = LocalDate.parse("01/01/2021", dateFormat);
         LocalDate d2 = LocalDate.parse("12/01/2020", dateFormat);
         expect(Expectation.build()
-            .actual(d1)
-            .isGreaterThan(d2));
+                .actual(d1)
+                .isGreaterThan(d2));
     }
 
     @Test
     public void errorLog() {
         LOG.error("error", new Exception("something witty and inspirational."));
+    }
+
+    @Test(groups = {"unit"})
+    public void valueInCollection() {
+        String actual = "{\"data\":[" +
+                "{\"id\":\"abc\",\"value\":\"123\"}," +
+                "{\"id\":\"bca\",\"value\":\"456\"}," +
+                "{\"id\":\"cab\",\"value\":\"789\"}]}";
+        Goate expected = new Goate()
+                .put("row.##.id", "bca")
+                .put("row.##.id", "cab")
+                .put("row.##.id", "bac")
+                .put("row.##.id", "abc");
+        expect(Expectation.build()
+                .actual("data.*.id").from(actual)
+                .isIn(expected));
+    }
+
+    @ExpectToFail
+    @Test(groups = {"unit"})
+    public void valueNotInCollection() {
+        String actual = "{\"data\":[" +
+                "{\"id\":\"abc2\",\"value\":\"123\"}," +
+                "{\"id\":\"bca\",\"value\":\"456\"}," +
+                "{\"id\":\"cab\",\"value\":\"789\"}]}";
+        Goate expected = new Goate()
+                .put("row.##.id", "bca")
+                .put("row.##.id", "cab")
+                .put("row.##.id", "bac")
+                .put("row.##.id", "abc");
+        expect(Expectation.build()
+                .actual("data.*.id").from(actual)
+                .isIn(expected));
+    }
+
+    @Test(groups = {"unit"})
+    public void expectEvaluateNow(){
+        expect(Expectation.build()
+        .actual(42)
+        .isEqualTo(42));
+        evaluate();
     }
 }

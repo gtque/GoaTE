@@ -3,18 +3,18 @@
     "box": {
       "size": 14
     },
-    "id": "fruit loops"
+    "type": "fruit loops"
   },
   {
     "box": {
       "size": 14
     },
-    "id": "lucky charms"
+    "type": "lucky charms"
   },
   {
     "box": {
       "size": 10
     },
-    "id": "fruit loops"
+    "type": "fruit loops"
   }
 ]

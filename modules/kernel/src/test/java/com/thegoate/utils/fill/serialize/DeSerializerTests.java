@@ -178,7 +178,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         SimpleNested pojo = new SimpleNested();
         pojo.setSomething(null);
         pojo.setInnerField(null);
-        String expected = "{}";
+        String expected = "{\"droid\":42}";
 
         String actual = "" + new Serializer<>(pojo, DefaultSource.class).to(new JsonString());
         expect(Expectation.build().actual(actual).isEqualTo(expected));
@@ -280,11 +280,11 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(pojo.getCp()[1].getMap().get("Peter"), "Parker");
         assertEquals(pojo.getCp()[1].getMap().get("Tony"), "Stark");
         assertTrue(pojo.getCp()[0].getNested().isBool());
-        Goate d = new Serializer<>(pojo, SimpleSource.class).toGoate();
+//        Goate d = new Serializer<>(pojo, SimpleSource.class).veryDetailed().toGoate();
 
-        Map<String, Object> data2 = new Serializer<>(pojo, SimpleSource.class).toMap(HashMap.class);
+//        Map<String, Object> data2 = new Serializer<>(pojo, SimpleSource.class).veryDetailed().toMap(HashMap.class);
 
-        assertTrue(d.size() >= 50);
+//        assertTrue(d.size() >= 50);
 
         NestedPojos pojo2 = new DeSerializer()
                 .data(data)
@@ -312,6 +312,136 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(pojo2.getCp()[1].getMap().get("Peter"), "Parker");
         assertEquals(pojo2.getCp()[1].getMap().get("Tony"), "Stark");
         assertTrue(pojo2.getCp()[0].getNested().isBool());
+    }
+
+    @Test(groups = {"unit", "deserialize"})
+    public void nestedListDeserializeGoateTest() {
+        Goate data = new Goate();
+        int[] nums = {42, 8};
+        int[] expectNums = {42, 8};
+        int[] expectNums2 = {21, 4, 2009};
+        data.put("nestedList.0.numbers", nums);
+        data.put("nestedList.0.numbers2", "i am really an array of ints");
+        data.put("nestedList.0.numbers2.0", 21);
+        data.put("nestedList.0.numbers2.1", 4);
+        data.put("nestedList.0.numbers2.2", 2009);
+        data.put("nestedList.0.list.0", "nuggets");
+        data.put("nestedList.0.list.1.class", "com.thegoate.utils.fill.serialize.pojos.SimplePojo");
+        data.put("nestedList.0.list.1.fieldName", "Paula");
+        data.put("nestedList.0.cp.0.date", "11-24-2009");
+        data.put("nestedList.0.cp.0.nested.expanded name", 42);
+        data.put("nestedList.0.cp.0.nested.fieldName", "Hello, world!");
+        data.put("nestedList.0.cp.0.nested.big decimal", "3.14159");
+        data.put("nestedList.0.cp.0.nested.double D", "42.42");
+        data.put("nestedList.0.cp.0.nested.long l", 42L);
+        data.put("nestedList.0.cp.1.nested map.0.key", "Peter");
+        data.put("nestedList.0.cp.1.nested map.0.value.class", "java.lang.String");
+        data.put("nestedList.0.cp.1.nested map.0.value", "Parker");
+        data.put("nestedList.0.cp.1.nested map.1.key", "Tony");
+        data.put("nestedList.0.cp.1.nested map.1.value", "Stark");
+        data.put("nestedList.0.cp.1.nested map.1.value.class", "java.lang.String");
+        data.put("nestedList.0.map.0.key", "bryan");
+        data.put("nestedList.0.map.0.value", true);
+        data.put("nestedList.0.map.1.key", "tarun");
+        data.put("nestedList.0.map.1.value", false);
+        data.put("nestedList.0.map2.0.key", "bryan");
+        data.put("nestedList.0.map2.0.value.class", "com.thegoate.utils.fill.serialize.pojos.SimplePojo");
+        data.put("nestedList.0.map2.0.value.long l", "long::84");
+        data.put("nestedList.0.map2.1.key", "tarun");
+        data.put("nestedList.0.map2.1.value", true);
+        data.put("nestedList.0.map2.1.value.class", "java.lang.Boolean");
+        //add a second entry same as the first...
+        data.put("nestedList.1.numbers", nums);
+        data.put("nestedList.1.numbers2", "i am really an array of ints");
+        data.put("nestedList.1.numbers2.0", 21);
+        data.put("nestedList.1.numbers2.1", 4);
+        data.put("nestedList.1.numbers2.2", 2009);
+        data.put("nestedList.1.list.0", "nuggets");
+        data.put("nestedList.1.list.1.class", "com.thegoate.utils.fill.serialize.pojos.SimplePojo");
+        data.put("nestedList.1.list.1.fieldName", "Paula");
+        data.put("nestedList.1.cp.0.date", "11-24-2009");
+        data.put("nestedList.1.cp.0.nested.expanded name", 42);
+        data.put("nestedList.1.cp.0.nested.fieldName", "Hello, world!");
+        data.put("nestedList.1.cp.0.nested.big decimal", "3.14159");
+        data.put("nestedList.1.cp.0.nested.double D", "42.42");
+        data.put("nestedList.1.cp.0.nested.long l", 42L);
+        data.put("nestedList.1.cp.1.nested map.0.key", "Peter");
+        data.put("nestedList.1.cp.1.nested map.0.value.class", "java.lang.String");
+        data.put("nestedList.1.cp.1.nested map.0.value", "Parker");
+        data.put("nestedList.1.cp.1.nested map.1.key", "Tony");
+        data.put("nestedList.1.cp.1.nested map.1.value", "Stark");
+        data.put("nestedList.1.cp.1.nested map.1.value.class", "java.lang.String");
+        data.put("nestedList.1.map.0.key", "bryan");
+        data.put("nestedList.1.map.0.value", true);
+        data.put("nestedList.1.map.1.key", "tarun");
+        data.put("nestedList.1.map.1.value", false);
+        data.put("nestedList.1.map2.0.key", "bryan");
+        data.put("nestedList.1.map2.0.value.class", "com.thegoate.utils.fill.serialize.pojos.SimplePojo");
+        data.put("nestedList.1.map2.0.value.long l", "long::84");
+        data.put("nestedList.1.map2.1.key", "tarun");
+        data.put("nestedList.1.map2.1.value", true);
+        data.put("nestedList.1.map2.1.value.class", "java.lang.Boolean");
+
+        NestedPojosList pojo = new DeSerializer()
+                .T(NestedPojos.class)
+                .data(data)
+                .from(SimpleSource.class)
+                .build(NestedPojosList.class);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getNumbers(), expectNums);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getNumbers2(), expectNums2);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getList().get(0), "nuggets");
+        assertEquals(((SimplePojo) ((NestedPojos)pojo.getNestedList().get(0)).getList().get(1)).getFieldName(), "Paula");
+        assertTrue(Boolean.parseBoolean("" + ((NestedPojos)pojo.getNestedList().get(0)).getMap().get("bryan")));
+        assertFalse(Boolean.parseBoolean("" + ((NestedPojos)pojo.getNestedList().get(0)).getMap().get("tarun")));
+        assertEquals(((SimplePojo) (((NestedPojos)pojo.getNestedList().get(0)).getMap2().get("bryan"))).getL(), 84L);
+        assertTrue(Boolean.parseBoolean("" + ((NestedPojos)pojo.getNestedList().get(0)).getMap2().get("tarun")));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getDate(), LocalDate.parse("2009-11-24", formatter));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().getFieldName(), "Hello, world!");
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().getSomeInt(), 42);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().getBigD(), new BigDecimal("3.14159"));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().getD(), new Double("42.42"));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().getC(), 'c');
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().getL(), 42L);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().getaByte(), new Byte("1"));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().getF(), 4F);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[1].getMap().get("Peter"), "Parker");
+        assertEquals(((NestedPojos)pojo.getNestedList().get(0)).getCp()[1].getMap().get("Tony"), "Stark");
+        assertTrue(((NestedPojos)pojo.getNestedList().get(0)).getCp()[0].getNested().isBool());
+//        Goate d = new Serializer<>(pojo, SimpleSource.class).veryDetailed().toGoate();
+
+//        Map<String, Object> data2 = new Serializer<>(pojo, SimpleSource.class).veryDetailed().toMap(HashMap.class);
+
+//        assertTrue(d.size() >= 50);
+
+        NestedPojosList pojo2 = new DeSerializer()
+                .T(NestedPojos.class)
+                .data(data)
+                .from(SimpleSource.class)
+                .build(NestedPojosList.class);
+        String jstring = "" + new Serializer<>(pojo2, Cheese.class).to(new JsonString());
+        System.out.println(jstring);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getNumbers(), ((NestedPojos)pojo2.getNestedList().get(1)).getNumbers());
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getNumbers2(), ((NestedPojos)pojo2.getNestedList().get(1)).getNumbers2());
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getList().get(0), ((NestedPojos)pojo2.getNestedList().get(1)).getList().get(0));
+        assertEquals(((SimplePojo) ((NestedPojos)pojo.getNestedList().get(1)).getList().get(1)).getFieldName(), "Paula");
+        assertTrue(Boolean.parseBoolean("" + ((NestedPojos)pojo.getNestedList().get(1)).getMap().get("bryan")));
+        assertFalse(Boolean.parseBoolean("" + ((NestedPojos)pojo.getNestedList().get(1)).getMap().get("tarun")));
+        assertEquals(((SimplePojo) (((NestedPojos)pojo.getNestedList().get(1)).getMap2().get("bryan"))).getL(), 84L);
+        assertTrue(Boolean.parseBoolean("" + ((NestedPojos)pojo.getNestedList().get(1)).getMap2().get("tarun")));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getDate(), LocalDate.parse("2009-11-24", formatter));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().getFieldName(), "Hello, world!");
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().getSomeInt(), 42);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().getBigD(), new BigDecimal("3.14159"));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().getD(), new Double("42.42"));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().getC(), 'c');
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().getL(), 42L);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().getaByte(), new Byte("1"));
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().getF(), 4F);
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[1].getMap().get("Peter"), "Parker");
+        assertEquals(((NestedPojos)pojo.getNestedList().get(1)).getCp()[1].getMap().get("Tony"), "Stark");
+        assertTrue(((NestedPojos)pojo.getNestedList().get(1)).getCp()[0].getNested().isBool());
     }
 
     @Test(groups = {"unit"})
@@ -406,7 +536,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         cereals.add(cereals3);
         pojo.setIds(cereals);
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = new Serializer<SerializeNested, Class, String>(pojo, DefaultSource.class).to(new JsonString());
+        String json = new Serializer<SerializeNested, DefaultSource, String>(pojo).to(new JsonString());
         expect(Expectation.build().actual(json).isEqualTo(fileAsAString("nested_cereal.json")));
     }
 
@@ -441,7 +571,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
                 .setList(list)
                 .setMap(map);
 //        String json = new GoateToJSON(new Serializer<SerializeMe, Class, Goate>(pojo, DefaultSource.class).toGoate()).convert();//.to(new JsonString());
-        String json = new Serializer<SerializeMe, Class, String>(pojo, SimpleSource.class).to(new JsonString());
+        String json = new Serializer<SerializeMe, Class<SimpleSource>, String>(pojo, SimpleSource.class).to(new JsonString());
         expect(Expectation.build().actual(json).isEqualTo("{\"athan\":\"hello\", \"parent\":{\"guardian\":\"tracy\"}, \"rents\":[{\"guardian\":\"eric\"},{\"guardian\":\"eric\"},{\"guardian\":\"tracy\"}], \"map\":{\"a\":{\"guardian\":\"richard\"}, \"b\":{\"guardian\":\"karen\"}}}"));
     }
 

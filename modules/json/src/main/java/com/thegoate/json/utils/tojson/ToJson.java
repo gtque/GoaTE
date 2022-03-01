@@ -41,6 +41,7 @@ import org.json.JSONObject;
 public class ToJson extends UnknownUtilType implements ToJsonUtility, ToUtility<String> {
     ToJsonUtility tool = null;
     Object original = null;
+    boolean isList = false;
 
     public ToJson(Object o){
         this.original = o;
@@ -52,11 +53,17 @@ public class ToJson extends UnknownUtilType implements ToJsonUtility, ToUtility<
     }
 
     @Override
+    public ToJsonUtility isList(boolean isList) {
+        this.isList = isList;
+        return this;
+    }
+
+    @Override
     public String convert() {
         tool = (ToJsonUtility)buildUtil(original, ToJsonUtil.class);
         String result = "";
         if(tool!=null){
-            result = tool.convert();
+            result = tool.isList(isList).convert();
         }
         if(result==null||result.isEmpty()){
             LOG.info("Failed to convert: " + original);
@@ -69,7 +76,7 @@ public class ToJson extends UnknownUtilType implements ToJsonUtility, ToUtility<
         tool = (ToJsonUtility)buildUtil(original, ToJsonUtil.class);
         String result = "";
         if(tool!=null){
-            result = tool.convertStrict();
+            result = tool.isList(isList).convertStrict();
         }
         if(result==null||result.isEmpty()){
             LOG.info("Failed to convert: " + original);

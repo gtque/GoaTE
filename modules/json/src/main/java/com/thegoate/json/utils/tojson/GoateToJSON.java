@@ -45,6 +45,7 @@ import java.util.Set;
  */
 @ToJsonUtil
 public class GoateToJSON extends GoateUtility implements ToJsonUtility{
+    boolean isList = false;
 
     public GoateToJSON(Object val) {
         super(val);
@@ -70,12 +71,31 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
     }
 
     @Override
+    public ToJsonUtility isList(boolean isList) {
+        this.isList = isList;
+        return this;
+    }
+
+    @Override
     public String convert() {
         String json = "{}";
+        if(isList){
+            json = "[]";
+        }
+        Object ojson = null;
         String result = "";
         if (takeActionOn != null && takeActionOn.size() > 0) {
             json = takeActionOn.get("", json, String.class);
             takeActionOn.drop("");
+
+            Class type;
+            if(isList){
+                ojson = new JSONArray(json);
+                type = JSONArray.class;
+            } else {
+                ojson = new JSONObject(json);
+                type = JSONObject.class;
+            }
             for (String key : filteredKeys(takeActionOn.keys())) {
                 try {
                     String dKey = key;
@@ -98,15 +118,15 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                     }
                     if (exists) {
                         if(!strict) {
-                            json = new FillJson(json).with(new Goate().put(dKey, takeActionOn.get(dKey)));
+                            ojson = new FillJson(ojson).withToJson(new Goate().put(dKey, takeActionOn.get(dKey)), type);
                         } else {
-                            json = new FillJson(json).with(new Goate().put(dKey, takeActionOn.getStrict(dKey)));
+                            ojson = new FillJson(ojson).withToJson(new Goate().put(dKey, takeActionOn.getStrict(dKey)), type);
                         }
                     } else {
                         if(!strict) {
-                            json = ""+new InsertJson(key, takeActionOn.get(dKey)).into(json).in(keyFull).insert();
+                            ojson = ((InsertJson)new InsertJson(key, takeActionOn.get(dKey)).into(ojson).in(keyFull)).insertToJson(type);
                         } else {
-                            json = ""+new InsertJson(key, takeActionOn.getStrict(dKey)).into(json).in(keyFull).insert();
+                            ojson = ((InsertJson)new InsertJson(key, takeActionOn.getStrict(dKey)).into(ojson).in(keyFull)).insertToJson(type);
                         }
                     }
 //                    json = Insert.json(key, to.getObject()).into(json).in(keyFull).insert();
@@ -115,18 +135,27 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                 }
             }
         }
-        return prettyPrint(json);
+        return prettyPrint(ojson);
     }
 
-    protected String prettyPrint(String json){
-        String pretty = json;
-        try{
-            pretty = new JSONObject(json).toString(3);
-        } catch (Exception e){
-            try{
-                pretty = new JSONArray(json).toString(3);
-            } catch(Exception e2) {
-                LOG.warn("Goate To Json", "Failed to pretty print the json", e);
+    protected String prettyPrint(Object json){
+        String pretty = json==null?"{}":"";
+//        try{
+//            pretty = new JSONObject(json).toString(3);
+//        } catch (Exception e){
+//            try{
+//                pretty = new JSONArray(json).toString(3);
+//            } catch(Exception e2) {
+//                LOG.warn("Goate To Json", "Failed to pretty print the json", e);
+//            }
+//        }
+        if(json != null){
+            if(json instanceof JSONObject){
+                pretty = ((JSONObject)json).toString(3);
+            } else if(json instanceof JSONArray){
+                pretty = ((JSONArray)json).toString(3);
+            } else {
+                LOG.warn("Goate To Json", "Failed to pretty print the json");
             }
         }
         return  pretty;

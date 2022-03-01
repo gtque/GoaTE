@@ -45,7 +45,7 @@ public class InsertJson implements InsertUtility {
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     String key = null;
     Object value = null;
-    String original = null;
+    Object original = null;
     String after = null;
     String in = null;
     String before = null;
@@ -66,6 +66,11 @@ public class InsertJson implements InsertUtility {
 
     @Override
     public InsertUtility into(String original) {
+        this.original = original;
+        return this;
+    }
+
+    public InsertJson into(Object original) {
         this.original = original;
         return this;
     }
@@ -142,6 +147,25 @@ public class InsertJson implements InsertUtility {
 
     @Override
     public String insert() throws Exception {
+        boolean isJsonObject = true;
+        if(original instanceof JSONObject || original instanceof JSONArray) {
+            if(original instanceof JSONArray){
+                isJsonObject = false;
+            }
+        } else {
+            if (("" + original).startsWith("[")) {
+                if (append) {
+                    append = false;
+                    in = "";
+                }
+                isJsonObject = false;
+            }
+        }
+        Object jsonObject = insertToJson(Object.class);
+        return isJsonObject?((JSONObject)jsonObject).toString(4):((JSONArray)jsonObject).toString(4);
+    }
+
+    public <T> T insertToJson(Class<T> type) throws Exception{
         if (before == null && after == null && in == null && append == false)
             throw new Exception("Failed to insert: No Location set. You must set \"after\" or \"before\" location.");
         if (original == null)
@@ -152,15 +176,22 @@ public class InsertJson implements InsertUtility {
         //    throw new Exception("Failed to insert: The value cannot be null");
         Object jsonObject;
         boolean isJsonObject = true;
-        if (original.startsWith("{")) {
-            jsonObject = new JSONObject(original);
-        } else {
-            jsonObject = new JSONArray(original);
-            if (append) {
-                append = false;
-                in = "";
+        if(original instanceof JSONObject || original instanceof JSONArray) {
+            if(original instanceof JSONArray){
+                isJsonObject = false;
             }
-            isJsonObject = false;
+            jsonObject = original;
+        } else {
+            if (("" + original).startsWith("{")) {
+                jsonObject = new JSONObject(original);
+            } else {
+                jsonObject = new JSONArray(original);
+                if (append) {
+                    append = false;
+                    in = "";
+                }
+                isJsonObject = false;
+            }
         }
         if (append)
             if (replace)
@@ -178,9 +209,8 @@ public class InsertJson implements InsertUtility {
             jsonObject = insertAfter(jsonObject);
         else if (in != null)
             jsonObject = insertIn(jsonObject);
-        return isJsonObject?((JSONObject)jsonObject).toString(4):((JSONArray)jsonObject).toString(4);
+        return (T)jsonObject;
     }
-
     /**
      * Simply appends the value as order does not matter in json.<br>
      * Unless you are adding to a JSONArray, in which case use "in" instead.
