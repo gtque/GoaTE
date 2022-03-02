@@ -4,7 +4,7 @@ import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.type.FindType;
 import com.thegoate.utils.type.IsType;
 
-import java.util.List;
+import java.lang.reflect.Array;
 
 /**
  * Created by Eric Angeli on 7/6/2020.
@@ -15,10 +15,10 @@ public class ArrayType extends FindType {
 
 	@Override
 	public boolean isType(Object check){
-		return check instanceof List;
+		return check != null && check.getClass().isArray();
 	}
 
 	public Class type(Object check){
-		return List.class;
+		return Array.class;
 	}
 }
