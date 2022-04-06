@@ -32,6 +32,7 @@ import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.data.StaticDL;
 import com.thegoate.expect.builder.ContainsExpectationBuilder;
+import com.thegoate.expect.builder.KidIsEqualIgnoreFieldsBuilder;
 import com.thegoate.expect.builder.ModelIsPresentOptional;
 import com.thegoate.expect.builder.Value;
 import com.thegoate.expect.test.*;
@@ -44,7 +45,6 @@ import com.thegoate.locate.Locate;
 import com.thegoate.reflection.Executioner;
 import com.thegoate.reflection.test.SkipThread;
 import com.thegoate.testng.ExpectToFail;
-import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.fill.serialize.DeSerializer;
@@ -854,10 +854,10 @@ public class ExpectTests extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
     public void conditionalModelIsPresent() {
-        expect(new ModelIsPresentOptional()
+        expect(new ModelIsPresentOptional<ModelIsPresentOptional>()
+                .setActual(response)
                 .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("b"))
                 .addOptionalField(path().match("data").dot().anyNumberZeroOrMore().dot().match("c"))
-                .setActual(response)
                 .setExpected(fullModel));
     }
 
@@ -2053,10 +2053,143 @@ public class ExpectTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
-    public void expectEvaluateNow(){
+    public void expectEvaluateNow() {
         expect(Expectation.build()
-        .actual(42)
-        .isEqualTo(42));
+                .actual(42)
+                .isEqualTo(42));
         evaluate();
+    }
+
+    @Test(groups = {"unit"})
+    public void kidIgnoreFieldsIgnoreString() {
+        List<SimpleObject2> lso1 = new ArrayList<>();
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("42")));
+        SimpleObject so1 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso1);
+
+        List<SimpleObject2> lso2 = new ArrayList<>();
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("42")));
+        SimpleObject so2 = new SimpleObject().setA("goodbye").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso2);
+
+        expect(new KidIsEqualIgnoreFieldsBuilder<KidIsEqualIgnoreFieldsBuilder>()
+                .ignoreField("a")
+                .actualValue(so1)
+                .expectedValue(so2));
+    }
+
+    @Test(groups = {"unit"})
+    public void kidIgnoreFieldsIgnoreBoolean() {
+        List<SimpleObject2> lso1 = new ArrayList<>();
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("42")));
+        SimpleObject so1 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso1);
+
+        List<SimpleObject2> lso2 = new ArrayList<>();
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("42")));
+        SimpleObject so2 = new SimpleObject().setA("hello").setB(false).setNested(new NestedObject().setNo("yes")).setSo2(lso2);
+
+        expect(new KidIsEqualIgnoreFieldsBuilder<KidIsEqualIgnoreFieldsBuilder>()
+                .ignoreField("b")
+                .actualValue(so1)
+                .expectedValue(so2));
+    }
+
+    @Test(groups = {"unit"})
+    public void kidIgnoreFieldsIgnoreList() {
+        List<SimpleObject2> lso1 = new ArrayList<>();
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("42")));
+        SimpleObject so1 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso1);
+
+        List<SimpleObject2> lso2 = new ArrayList<>();
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("6.14159")));
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("84")));
+        SimpleObject so2 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso2);
+
+        expect(new KidIsEqualIgnoreFieldsBuilder<KidIsEqualIgnoreFieldsBuilder>()
+                .ignoreField("so2")
+                .actualValue(so1)
+                .expectedValue(so2));
+    }
+
+    @Test(groups = {"unit"})
+    public void kidIgnoreFieldsIgnoreListNestedField() {
+        List<SimpleObject2> lso1 = new ArrayList<>();
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80));
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("42")).setSomeValue(81));
+        SimpleObject so1 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso1);
+
+        List<SimpleObject2> lso2 = new ArrayList<>();
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("6.14159")).setSomeValue(80));
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("84")).setSomeValue(81));
+        SimpleObject so2 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso2);
+
+        expect(new KidIsEqualIgnoreFieldsBuilder<KidIsEqualIgnoreFieldsBuilder>()
+                .ignoreField("so2.*.bd")
+                .actualValue(so1)
+                .expectedValue(so2));
+    }
+
+    @Test(groups = {"unit"})
+    public void kidIgnoreFieldsIgnoreArrayAndListNestedFields() {
+        List<SimpleObject2> lso1 = new ArrayList<>();
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80));
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("42")).setSomeValue(81));
+        SimpleObject2[] so2A1 = {new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80),new SimpleObject2().setBd(new BigDecimal("4.14159")).setSomeValue(80),new SimpleObject2().setBd(new BigDecimal("5.14159")).setSomeValue(80)};
+        Map<String, Object> nest = new HashMap<>();
+        nest.put("first",new NestedSimpleObject().setA(50D).setB('c'));
+        SimpleObject so1 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes").setMap(nest)).setSo2(lso1).setSo2A(so2A1);
+
+        List<SimpleObject2> lso2 = new ArrayList<>();
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("6.14159")).setSomeValue(80));
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("84")).setSomeValue(81));
+        SimpleObject2[] so2A2 = {new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80),new SimpleObject2().setBd(new BigDecimal("4.14159")).setSomeValue(90),new SimpleObject2().setBd(new BigDecimal("5.14159")).setSomeValue(81)};
+        Map<String, Object> nest2 = new HashMap<>();
+        nest2.put("first",new NestedSimpleObject().setA(50D).setB('z'));
+        SimpleObject so2 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes").setMap(nest2)).setSo2(lso2).setSo2A(so2A2);
+
+        expect(new KidIsEqualIgnoreFieldsBuilder()
+                .ignoreField("so2.*.bd")
+                .ignoreField("so2A.*.someValue")
+                .ignoreField("nested.map.*.b")
+                .actualValue(so1)
+                .expectedValue(so2));
+    }
+
+    @Test(groups = {"unit"})
+    public void kidIgnoreFieldsIgnoreNestedValue() {
+        List<SimpleObject2> lso1 = new ArrayList<>();
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("42")));
+        SimpleObject so1 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso1);
+
+        List<SimpleObject2> lso2 = new ArrayList<>();
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("42")));
+        SimpleObject so2 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("no")).setSo2(lso2);
+
+        expect(new KidIsEqualIgnoreFieldsBuilder()
+                .ignoreField("nested.no")
+                .actualValue(so1)
+                .expectedValue(so2));
+    }
+
+    @Test(groups = {"unit"})
+    public void compareLists() {
+        List<SimpleObject2> lso1 = new ArrayList<>();
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso1.add(new SimpleObject2().setBd(new BigDecimal("42")));
+//        SimpleObject so1 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso1);
+
+        List<SimpleObject2> lso2 = new ArrayList<>();
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("3.14159")));
+        lso2.add(new SimpleObject2().setBd(new BigDecimal("42")));
+//        SimpleObject so2 = new SimpleObject().setA("goodbye").setB(true).setNested(new NestedObject().setNo("yes")).setSo2(lso2);
+
+        expect(Expectation.build()
+                .actual(lso1)
+                .isEqualTo(lso2));
     }
 }

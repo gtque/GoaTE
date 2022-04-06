@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Created by Eric Angeli on 3/26/2019.
  */
-public class ModelIsPresentOptional extends ExpectationBuilder {
+public class ModelIsPresentOptional<Self extends ModelIsPresentOptional> extends ExpectationBuilder<Self> {
 
     //    protected Object requiredModel;
     protected List<String> optionalModel = new ArrayList<>();
@@ -108,12 +108,12 @@ public class ModelIsPresentOptional extends ExpectationBuilder {
                 .validate(new ValidatePresence()));
     }
 
-    public ModelIsPresentOptional addOptionalField(String field) {
+    public Self addOptionalField(String field) {
         optionalModel.add(field);
-        return this;
+        return (Self)this;
     }
 
-    public ModelIsPresentOptional addOptionalField(Locate path) {
+    public Self addOptionalField(Locate path) {
         return addOptionalField(path.toPath());
     }
 }

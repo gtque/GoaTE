@@ -111,7 +111,7 @@ public class ValidateGoate extends Validate{
             ev.put("actual_value", val);
             Object expV = getExpectedValue(ev.get("expected"), vkey);
             ev.put("expected_value", expV);
-            LOG.info("Expect", new StringBuilder("evaluating:").append(vkey).append("(").append(val).append(") ").append(ev.get("operator")).append((ev.get("expected") == null ? "" : " " + ev.get("expected"))).append("\n").toString());
+            LOG.debug("Expect", new StringBuilder("evaluating:").append(vkey).append("(").append(val).append(") ").append(ev.get("operator")).append((ev.get("expected") == null ? "" : " " + ev.get("expected"))).append("\n").toString());
             if (!compare(val, expV, ev)) {
                 result = false;
             }

@@ -8,6 +8,8 @@ public class SimpleObject2 extends Kid {
 
     private BigDecimal bd;
 
+    private int someValue;
+
     public BigDecimal getBd() {
         return bd;
     }
@@ -17,4 +19,12 @@ public class SimpleObject2 extends Kid {
         return this;
     }
 
+    public int getSomeValue() {
+        return someValue;
+    }
+
+    public SimpleObject2 setSomeValue(int someValue) {
+        this.someValue = someValue;
+        return this;
+    }
 }

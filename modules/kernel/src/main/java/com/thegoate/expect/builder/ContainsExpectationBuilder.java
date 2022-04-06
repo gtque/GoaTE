@@ -33,7 +33,7 @@ import com.thegoate.expect.Expectation;
 /**
  * Created by Eric Angeli on 3/26/2019.
  */
-public class ContainsExpectationBuilder extends ExpectationBuilder {
+public class ContainsExpectationBuilder extends ExpectationBuilder<ContainsExpectationBuilder> {
 
     public ContainsExpectationBuilder lookFor(Object value){
         actualValue(value);

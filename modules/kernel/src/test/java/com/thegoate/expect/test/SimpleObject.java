@@ -15,6 +15,7 @@ public class SimpleObject extends Kid {
 	private boolean b;
 	private List<String> c = new ArrayList<>();
 	private List<SimpleObject2> so2;
+	private SimpleObject2[] so2A;
 	private NestedObject nested = null;
 
 	public String getA() {
@@ -64,6 +65,15 @@ public class SimpleObject extends Kid {
 
 	public SimpleObject setSo2(List<SimpleObject2> so2) {
 		this.so2 = so2;
+		return this;
+	}
+
+	public SimpleObject2[] getSo2A() {
+		return so2A;
+	}
+
+	public SimpleObject setSo2A(SimpleObject2[] so2A) {
+		this.so2A = so2A;
 		return this;
 	}
 

@@ -27,6 +27,8 @@
 package com.thegoate.expect.builder;
 
 import com.thegoate.expect.Expectation;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.get.Get;
 
 import java.util.ArrayList;
@@ -35,7 +37,8 @@ import java.util.List;
 /**
  * Created by Eric Angeli on 3/26/2019.
  */
-public abstract class ExpectationBuilder {
+public abstract class ExpectationBuilder<Self extends ExpectationBuilder> {
+    BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Object from;
     protected Object fromExpected;
     protected Object actual;
@@ -54,16 +57,16 @@ public abstract class ExpectationBuilder {
 
     public abstract List<Expectation> build();
 
-    protected ExpectationBuilder expect(Expectation expectation) {
+    protected Self expect(Expectation expectation) {
         expectations.add(expectation.retryTimeout(timeoutMS).retryPeriod(period));
-        return this;
+        return (Self)this;
     }
 
     protected List<Expectation> getExpectations() {
         return expectations;
     }
 
-    public ExpectationBuilder actualValue(Object value) {
+    public Self actualValue(Object value) {
         if(value instanceof Value) {
             this.actualValue = (Value)value;
             if (value != null) {
@@ -73,10 +76,10 @@ public abstract class ExpectationBuilder {
         } else {
             setActual(value);
         }
-        return this;
+        return (Self)this;
     }
 
-    public ExpectationBuilder expectedValue(Object value) {
+    public Self expectedValue(Object value) {
         if(value instanceof Value) {
             this.expectedValue = (Value)value;
             if (value != null) {
@@ -86,41 +89,41 @@ public abstract class ExpectationBuilder {
         } else {
             setExpected(value);
         }
-        return this;
+        return (Self)this;
     }
 
-    public ExpectationBuilder timeout(long timeoutMS){
+    public Self timeout(long timeoutMS){
         this.timeoutMS = timeoutMS;
-        return this;
+        return (Self)this;
     }
 
-    public ExpectationBuilder period(long period){
+    public Self period(long period){
         this.period = period;
-        return this;
+        return (Self)this;
     }
 
     public Object getFrom() {
         return from;
     }
 
-    public ExpectationBuilder setFrom(Object from) {
+    public Self setFrom(Object from) {
         if(actualValue == null){
             actualValue = new Value().from(from);
         }
         this.from = from;
-        return this;
+        return (Self)this;
     }
 
     public Object getFromExpected() {
         return fromExpected;
     }
 
-    public ExpectationBuilder setFromExpected(Object fromExpected) {
+    public Self setFromExpected(Object fromExpected) {
         if(expectedValue == null){
             expectedValue = new Value().from(fromExpected);
         }
         this.fromExpected = fromExpected;
-        return this;
+        return (Self)this;
     }
 
     public Object getActual() {
@@ -135,23 +138,23 @@ public abstract class ExpectationBuilder {
         return a;
     }
 
-    public ExpectationBuilder setActual(Object actual) {
+    public Self setActual(Object actual) {
         if(actualValue == null){
             actualValue = new Value(actual);
         }
         this.actual = actual;
-        return this;
+        return (Self)this;
     }
 
     public Object getExpected() {
         return expected;
     }
 
-    public ExpectationBuilder setExpected(Object expected) {
+    public Self setExpected(Object expected) {
         if(expectedValue == null){
             expectedValue = new Value(expected);
         }
         this.expected = expected;
-        return this;
+        return (Self)this;
     }
 }

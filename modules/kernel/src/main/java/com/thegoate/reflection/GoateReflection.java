@@ -398,21 +398,21 @@ public class GoateReflection {
 		Object o = null;
 		if(klass.equals(String.class)) {
 			o = "";
-		} else if(klass.equals(Byte.class)) {
+		} else if(isByteType(klass)) {
 			o = new Byte("0");
-		}else if(klass.equals(Short.class)) {
+		}else if(isShortType(klass)) {
 			o = new Short("0");
-		}else if(klass.equals(Double.class)) {
+		}else if(isDoubleType(klass)) {
 			o = 0D;
-		}else if(klass.equals(Float.class)) {
+		}else if(isFloatType(klass)) {
 			o = 0F;
-		}else if(klass.equals(Integer.class)) {
+		}else if(isIntegerType(klass)) {
 			o = 0;
-		}else if(klass.equals(Long.class)) {
+		}else if(isLongType(klass)) {
 			o = 0L;
-		}else if(klass.equals(Character.class)) {
+		}else if(isCharacterType(klass)) {
 			o = 'A';
-		}else if(klass.equals(Boolean.class)) {
+		}else if(isBooleanType(klass)) {
 			o = true;
 		}
 		return o;

@@ -154,7 +154,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                     }
                 }
             } else {
-                LOG.warn("buildUtil", "could not find an uncached util implementation." + key(util, obj, id, type));
+                LOG.debug("buildUtil", "could not find an uncached util implementation." + key(util, obj, id, type));
             }
         }
         return utility;
