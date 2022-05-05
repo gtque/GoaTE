@@ -2060,6 +2060,31 @@ public class ExpectTests extends TestNGEngineMethodDL {
         evaluate();
     }
 
+	@Test(groups = {"unit"})
+	public void expectWildCardIndexInListOfPojos(){
+		ListPojo p1 = new ListPojo();
+		List<NestedObject> no = new ArrayList<>();
+		no.add(new NestedObject().setNo("1"));
+		no.add(new NestedObject().setNo("2"));
+		no.add(new NestedObject().setNo("3"));
+		no.add(new NestedObject().setNo("4"));
+		p1.setTheInsideList(no);
+		ListPojo p2 = new ListPojo();
+		List<NestedObject> no2 = new ArrayList<>();
+		no2.add(new NestedObject().setNo("1"));
+		no2.add(new NestedObject().setNo("2"));
+		no2.add(new NestedObject().setNo("3"));
+		no2.add(new NestedObject().setNo("4"));
+		p2.setTheInsideList(no2);
+
+		expect(Expectation.build()
+			.actual("+.no")
+			.from(new Serializer<List<NestedObject>,DefaultSource,String>(p1.getTheInsideList()).to(new JsonString()))
+			.isEqualTo("%.no")
+			.fromExpected(new Serializer<List<NestedObject>,DefaultSource,String>(p2.getTheInsideList()).to(new JsonString())));
+		evaluate();
+	}
+
     @Test(groups = {"unit"})
     public void kidIgnoreFieldsIgnoreString() {
         List<SimpleObject2> lso1 = new ArrayList<>();
