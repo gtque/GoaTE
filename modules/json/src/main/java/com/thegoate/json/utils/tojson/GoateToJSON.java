@@ -101,10 +101,12 @@ public class GoateToJSON extends GoateUtility implements ToJsonUtility{
                     String dKey = key;
                     //key = key.replaceAll("_",".");
                     String keyFull = "";
+                    key = key.replace("\\.", "_&goate_dot&_");
                     if (key.contains(".")) {
                         keyFull = key.substring(0, key.lastIndexOf("."));
                         key = key.substring(key.lastIndexOf(".") + 1);
                     }
+                    key = key.replace("_&goate_dot&_", ".");
                     boolean exists = false;
                     try {
                         if (!keyFull.isEmpty()) {

@@ -28,6 +28,7 @@ package com.thegoate.json.utils.compare.tools;
 
 import static com.thegoate.dsl.words.EutConfigDSL.eut;
 
+import com.thegoate.Goate;
 import com.thegoate.json.JsonUtil;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtility;
@@ -49,6 +50,7 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
     boolean checkingContains = true;
     boolean secondCheck = false;
     boolean onSecondCheck = false;
+    Goate arrayHealth = new Goate();
 
     public CompareJson(Object val) {
         super(val);
@@ -203,54 +205,60 @@ public abstract class CompareJson extends JsonUtil implements CompareUtility {
         int result = 0;
         if (j1.length() != j2.length()) {
             if (!checkingContains&&!secondCheck) {
-                health.put("mismatched##", "json arrays different length: " + j1.length() + " != " + j2.length());
+                arrayHealth.put("mismatched##", "json arrays different length: " + j1.length() + " != " + j2.length());
                 result++;
-                LOG.debug("comparing two arrays of different lengths.");
+                LOG.debug("comparing two arrays of different lengths, but this isn't a contains check so they should be equal.");
             }
         }
-        for (int i = 0; i < j1.length(); i++) {
-            Object o = j1.get(i);
-            boolean found = false;
-            for (int i2 = 0; i2 < j2.length(); i2++) {
-                int r2 = 0;
-                Object o2 = j2.get(i2);
-                if ((o != null && o2 != null)&&(o != JSONObject.NULL && o2 != JSONObject.NULL)) {
-                    if (o instanceof JSONObject) {
-                        if (o2 instanceof JSONObject) {
-                            r2 = compare((JSONObject) o, (JSONObject) o2, baseKey + i + ".", true);
-                        } else {
-                            LOG.debug(i2 + ": the object was a json object, but the other one was not.");
-                            r2++;
-                        }
-                    } else if (o instanceof JSONArray) {
-                        if (o2 instanceof JSONArray) {
-                            r2 = compare((JSONArray) o, (JSONArray) o2, baseKey + i + ".");
-                        } else {
-                            LOG.debug(i2 + ": the object was a json array, but the other one was not.");
-                            r2++;
-                        }
-                    } else if (!new Compare(o).to(o2).using("==").evaluate()) {//o.equals(o2)) {
+        if(result == 0) {
+            for (int i = 0; i < j1.length(); i++) {
+                Object o = j1.get(i);
+                boolean found = false;
+                for (int i2 = 0; i2 < j2.length(); i2++) {
+                    int r2 = 0;
+                    Object o2 = j2.get(i2);
+                    if ((o != null && o2 != null) && (o != JSONObject.NULL && o2 != JSONObject.NULL)) {
+                        if (o instanceof JSONObject) {
+                            if (o2 instanceof JSONObject) {
+                                r2 = compare((JSONObject) o, (JSONObject) o2, baseKey + i + ".", true);
+                            } else {
+                                LOG.debug(i2 + ": the object was a json object, but the other one was not.");
+                                r2++;
+                            }
+                        } else if (o instanceof JSONArray) {
+                            if (o2 instanceof JSONArray) {
+                                r2 = compare((JSONArray) o, (JSONArray) o2, baseKey + i + ".");
+                            } else {
+                                LOG.debug(i2 + ": the object was a json array, but the other one was not.");
+                                r2++;
+                            }
+                        } else if (!new Compare(o).to(o2).using("==").evaluate()) {//o.equals(o2)) {
 //                        if (!CompareNumeric.isNumeric("" + o) || (new CompareNumeric().actual("" + o).notEqualTo("" + o2))) {
-                        LOG.debug(i2 + ": the objects values were not equal. " + o + " != " + o2);
-                        r2++;
+                            LOG.debug(i2 + ": the objects values were not equal. " + o + " != " + o2);
+                            r2++;
 //                        }
+                        }
+                    } else if (o != null || o != JSONObject.NULL) {
+                        LOG.debug(i2 + ": the second object was null.");
+                        r2++;
+                    } else if (o2 != null || o2 != JSONObject.NULL) {
+                        LOG.debug(i2 + ": the object was null.");
+                        r2++;
                     }
-                } else if (o != null || o != JSONObject.NULL) {
-                    LOG.debug(i2 + ": the second object was null.");
-                    r2++;
-                } else if (o2 != null || o2 != JSONObject.NULL) {
-                    LOG.debug(i2 + ": the object was null.");
-                    r2++;
+                    if (r2 == 0) {
+                        found = true;
+                        break;
+                    }
                 }
-                if (r2 == 0) {
-                    found = true;
-                    break;
+                if (!found && !secondCheck) {
+                    health.put("not found##", baseKey + i + ":" + o + ">not in " + (onSecondCheck ? "actual" : "expected"));
+                    if(arrayHealth.size()>0){
+                        health.put("array mismatch##", arrayHealth);
+                    }
+                    arrayHealth = new Goate();
+                    LOG.debug("the object was not found in the other array.");
+                    result++;
                 }
-            }
-            if (!found&&!secondCheck) {
-                health.put("not found##", baseKey + i + ":" + o + ">not in " + (onSecondCheck?"actual":"expected"));
-                LOG.debug("the object was not found in the other array.");
-                result++;
             }
         }
         return result;

@@ -152,10 +152,15 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                         cache = new Goate().put(key(util, obj, id, type), utility.getClass());
                         pokedex.put(region, cache);
                     }
+                } else {
+                    LOG.debug("buildUtil", "seems like cache was not enabled.");
                 }
             } else {
                 LOG.debug("buildUtil", "could not find an uncached util implementation." + key(util, obj, id, type));
             }
+        }
+        if(utility instanceof NotFound){
+            utility = null;
         }
         return utility;
     }

@@ -872,4 +872,22 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         String message = "" + new Serializer<>(body, DefaultSource.class).to(new JsonString());
         LOG.info(message);
     }
+
+    @Test(groups = {"unit"})
+    public void funkyKeyTest() {
+        FunkyKey funky = new FunkyKey();
+        String message = "" + new Serializer<>(funky, FunkyKey.class).to(new JsonString());
+        LOG.info("Funky Key", "\n" + message);
+    }
+
+    @Test(groups = {"unit"})
+    public void usernameSerializationTest() {
+        User user = new User();
+        user.setUserName("barb");
+        String userJ = "" + new Serializer<>(user, DefaultSource.class).to(new JsonString());
+        expect(Expectation.build()
+                .actual("userName")
+                .from(userJ)
+                .isEqualTo(user.getUserName()));
+    }
 }

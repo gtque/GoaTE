@@ -1,13 +1,18 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.data.DataLoader;
+import com.thegoate.data.DataSeriesLoader;
 import com.thegoate.expect.Expectation;
+import com.thegoate.spreadsheets.data.SpreadSheetDL;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.fill.serialize.pojos.SimplePojo;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Created by Eric Angeli on 11/18/2019.
@@ -79,5 +84,15 @@ public class TestWords extends TestNGEngineMethodDL {
         expect(Expectation.build()
                 .actual(d.get("csv"))
                 .isEqualTo(expectedList));
+    }
+
+    @Test(groups = {"unit"})
+    public void concatCurrentTime() {
+        Goate d = new SpreadSheetDL().fileName("data/the_initconcattime.csv").load().get(0);
+        LOG.info("result: " + d.get("value"));
+        expect(Expectation.build()
+                .actual(d.get("value", "", String.class).contains("current time::"))
+                .isEqualTo(false)
+                .failureMessage(d.get("value", "", String.class)));
     }
 }

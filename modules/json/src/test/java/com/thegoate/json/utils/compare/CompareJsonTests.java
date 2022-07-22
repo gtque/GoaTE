@@ -119,4 +119,6 @@ public class CompareJsonTests extends TestNGEngineMethodDL {
 		//LOG.debug("failed message:\n" + ev.failed());
 		//        assertEquals(new Compare(get("json1")).to(get("json2")).using("" + get("operator")).evaluate(), get("expected"));
 	}
+
+
 }

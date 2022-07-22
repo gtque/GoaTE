@@ -189,6 +189,15 @@ public class GoateTests extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
+    public void specialCharacterInPropertyValue() {
+        DataLoader dl = new PropertyFileDL().file("special_characters.prop");
+        Goate data = dl.load().get(0);
+
+        assertEquals(data.size(), 5);
+        assertEquals(data.get("test3"), "d=#4");
+    }
+
+    @Test(groups = {"unit"})
     public void propertyFileDataLoaderFile() {
         System.out.println(System.currentTimeMillis());
         DataLoader dl = new PropertyFileDL().file(new File(GoateUtils.getFilePath("sample.prop")));

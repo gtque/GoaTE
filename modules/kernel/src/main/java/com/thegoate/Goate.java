@@ -221,7 +221,7 @@ public class Goate implements HealthMonitor, Diary {
 
 	public <T> T get(String key, Object def, boolean dsl, Class<T> type) {
 		Object value = null;
-		if(key != null && !key.isEmpty()){
+		if(key != null && !key.isEmpty() && !key.equalsIgnoreCase("username")){
 			value = System.getProperty(key);
 		}
 		if (filterOnKey(key)) {
@@ -233,7 +233,7 @@ public class Goate implements HealthMonitor, Diary {
 					value = data.get(key);
 				}
 				if (value == null) {
-					if(key != null && !key.isEmpty()) {
+					if(key != null && !key.isEmpty() && !key.equalsIgnoreCase("username")) {
 						value = System.getenv(key);
 					}
 					if (value == null) {

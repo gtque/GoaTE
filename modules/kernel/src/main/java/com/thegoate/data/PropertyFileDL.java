@@ -60,10 +60,15 @@ public class PropertyFileDL extends DataLoader {
                         String[] prop = line.split("=");
                         if (prop.length >= 2) {
                             String key = prop[0].trim();
+                            int equalIndex = line.indexOf("=")+1;
+                            String propValue = prop[1];
+                            if(equalIndex < line.length()){
+                                propValue = line.substring(equalIndex);
+                            }
                             if(key.endsWith("##")){
-                                props.put(prop[0].trim(), prop[1].trim());
+                                props.put(prop[0].trim(), propValue.trim());
                             } else {
-                                props.getStrict(prop[0].trim(), prop[1].trim());
+                                props.getStrict(prop[0].trim(), propValue.trim());
                             }
                         }
                     }
