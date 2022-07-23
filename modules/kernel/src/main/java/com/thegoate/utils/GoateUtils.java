@@ -169,7 +169,7 @@ public class GoateUtils {
             /// we obtain the actual environment
             final Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
             final Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-            final boolean environmentAccessibility = theEnvironmentField.isAccessible();
+            final boolean environmentAccessibility = theEnvironmentField.canAccess(null);//isAccessible();
             theEnvironmentField.setAccessible(true);
 
             final Map<K, V> env = (Map<K, V>) theEnvironmentField.get(null);
@@ -186,13 +186,13 @@ public class GoateUtils {
                 // The ProcessEnvironment$Variable is the key of the map
                 final Class<K> variableClass = (Class<K>) Class.forName("java.lang.ProcessEnvironment$Variable");
                 final Method convertToVariable = variableClass.getMethod("valueOf", String.class);
-                final boolean conversionVariableAccessibility = convertToVariable.isAccessible();
+                final boolean conversionVariableAccessibility = convertToVariable.canAccess(null);//.isAccessible();
                 convertToVariable.setAccessible(true);
 
                 // The ProcessEnvironment$Value is the value fo the map
                 final Class<V> valueClass = (Class<V>) Class.forName("java.lang.ProcessEnvironment$Value");
                 final Method convertToValue = valueClass.getMethod("valueOf", String.class);
-                final boolean conversionValueAccessibility = convertToValue.isAccessible();
+                final boolean conversionValueAccessibility = convertToValue.canAccess(null);//.isAccessible();
                 convertToValue.setAccessible(true);
 
                 if (value == null) {
@@ -212,7 +212,7 @@ public class GoateUtils {
 
             // we apply the same to the case insensitive environment
             final Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
-            final boolean insensitiveAccessibility = theCaseInsensitiveEnvironmentField.isAccessible();
+            final boolean insensitiveAccessibility = theCaseInsensitiveEnvironmentField.canAccess(null);//.isAccessible();
             theCaseInsensitiveEnvironmentField.setAccessible(true);
             // Not entirely sure if this needs to be casted to ProcessEnvironment$Variable and $Value as well
             final Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
@@ -234,7 +234,7 @@ public class GoateUtils {
                 List<Field> map = mapFields(filteredClass);
                 for(Field field:map){
                     try {
-                        final boolean fieldAccessibility = field.isAccessible();
+                        final boolean fieldAccessibility = field.canAccess(null);//.isAccessible();
                         field.setAccessible(true);
                         // we obtain the environment
                         final Map<String, String> map2 = (Map<String, String>) field.get(env);

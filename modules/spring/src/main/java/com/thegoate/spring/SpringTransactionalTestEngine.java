@@ -169,7 +169,7 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
-    public boolean expectNow(ExpectationBuilder expectationBuilder) {
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder) {
         return expectNow(expectationBuilder, false);
     }
 
@@ -184,7 +184,7 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
-    public boolean expectNow(ExpectationBuilder expectationBuilder, boolean failImmediately) {
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder, boolean failImmediately) {
         return engine.expectNow(expectationBuilder, failImmediately);
     }
 
@@ -200,7 +200,7 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
-    public TestNG expect(ExpectationBuilder expectationBuilder){
+    public TestNG expect(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder){
         engine.expect(expectationBuilder.build());
         return this;
     }

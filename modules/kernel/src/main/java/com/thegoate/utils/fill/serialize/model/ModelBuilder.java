@@ -64,7 +64,7 @@ public class ModelBuilder<M, T> extends Cereal {
                 for (Map.Entry<String, Field> field : fields.entrySet()) {
                     Object value = gr.getFieldValue(definition, field.getValue());
                     if (value == null) {
-                        boolean accessible = field.getValue().isAccessible();
+                        boolean accessible = field.getValue().canAccess(definition);//.isAccessible();
                         field.getValue().setAccessible(true);
                         try {
                             if (gr.classIsNumber(field.getValue().getType())) {

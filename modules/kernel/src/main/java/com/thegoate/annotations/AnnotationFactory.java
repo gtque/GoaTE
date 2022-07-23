@@ -269,7 +269,7 @@ public class AnnotationFactory {
 //                        if(ca!=null) {
                             o = constructor.newInstance(ca);
 //                        } else {
-//                            o = constructor.newInstance();
+//                            o = constructor.getDeclaredConstructor().newInstance();
 //                        }
                     }catch(IllegalAccessException | InstantiationException | InvocationTargetException e){
                         LOG.debug("Building Class", "Problem instantiating a new instances: " + e.getMessage(), e);
@@ -280,7 +280,11 @@ public class AnnotationFactory {
 
                 }
             } else {
-                o = klass.newInstance();
+                try {
+                    o = klass.getDeclaredConstructor().newInstance();
+                } catch (NoSuchMethodException e) {
+                    LOG.error("Build Class", "Problem instantiating new instance: " + e.getMessage(), e);
+                }
             }
         } else {
             LOG.debug("Building Class", "The class was not specified, definitely could not build it.");

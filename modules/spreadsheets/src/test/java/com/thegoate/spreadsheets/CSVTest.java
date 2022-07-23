@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.thegoate.spreadsheets.utils.CSVSheet;
 import org.testng.annotations.Test;
 
 import com.thegoate.Goate;
@@ -61,215 +62,243 @@ import com.thegoate.utils.get.Get;
  */
 public class CSVTest extends TestNGEngineMethodDL {
 
-	@Test(groups = {"unit"})
-	public void loadCSVWithSpaces() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		SheetUtils sheet = SheetUtils.build("data/foobar/csv/foo2.csv", "the sheet name does not matter.").firstRowIsHeader().trim(true);
-		sheet.load();
-		assertEquals(sheet.get("a", 0), "b");
-	}
+    @Test(groups = {"unit"})
+    public void loadCSVWithSpaces() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        SheetUtils sheet = SheetUtils.build("data/foobar/csv/foo2.csv", "the sheet name does not matter.").firstRowIsHeader().trim(true);
+        sheet.load();
+        assertEquals(sheet.get("a", 0), "b");
+    }
 
-	@Test(groups = {"unit"})
-	public void checkRowSize() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		SheetUtils sheet = SheetUtils.build("single.csv", "the sheet name does not matter.").firstRowIsHeader();
-		sheet.load();
-		expect(Expectation.build()
-			.actual(sheet.headers().size())
-			.isEqualTo(1)
-            .failureMessage("unexpected number of columns"));
+    @Test(groups = {"unit"})
+    public void checkRowSize() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        SheetUtils sheet = SheetUtils.build("single.csv", "the sheet name does not matter.").firstRowIsHeader();
+        sheet.load();
         expect(Expectation.build()
-            .actual(0)
-            .from(sheet.headers())
-            .isEqualTo("a")
-            .failureMessage("expected column was not present"));
-	}
+                .actual(sheet.headers().size())
+                .isEqualTo(1)
+                .failureMessage("unexpected number of columns"));
+        expect(Expectation.build()
+                .actual(0)
+                .from(sheet.headers())
+                .isEqualTo("a")
+                .failureMessage("expected column was not present"));
+    }
 
-	@Test(groups = {"unit"})
-	public void loadSimpleCSV() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
-		sheet.load();
-		assertEquals(sheet.get("a", 0), "b");
-		assertEquals(sheet.get("a", 1), "false");
-		assertEquals(sheet.get(0, 0), "b");
-		assertEquals(sheet.get("c", 0, "e"), "e");
-		assertEquals(sheet.get(2, 1, 3), 3);
-	}
+    @Test(groups = {"unit"})
+    public void loadSimpleCSV() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
+        sheet.load();
+        assertEquals(sheet.get("a", 0), "b");
+        assertEquals(sheet.get("a", 1), "false");
+        assertEquals(sheet.get(0, 0), "b");
+        assertEquals(sheet.get("c", 0, "e"), "e");
+        assertEquals(sheet.get(2, 1, 3), 3);
+    }
 
-	@Test(groups = {"unit"})
-	public void writeSimpleCsv() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
-		sheet.load();
-		int row = sheet.rowCount();
-		assertEquals(sheet.get("a", 0), "b");
-		assertEquals(sheet.get("a", 1), "false");
-		assertEquals(sheet.get(0, 0), "b");
-		assertEquals(sheet.get("c", 0, "e"), "e");
-		assertEquals(sheet.get(2, 1, 3), 3);
-		sheet.set("a", row, 42)
-			.set("c", row, 42)
-			.set("a", row + 2, 42)
-			.set(3, row + 1, true);
-		sheet.newFile("temp/sample2.csv").writeToFile();
-		SheetUtils sheet2 = SheetUtils.build("temp/sample2.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
-		sheet2.load();
-		new Delete().rm("temp/sample2.csv");
-		assertEquals(sheet2.get("c", 0), "e");
-		assertEquals(sheet2.get("a", 0), "b");
-		assertEquals(sheet2.get("a", 1), "false");
-		assertEquals(sheet2.get(0, 0), "b");
-		assertEquals(sheet2.get(2, 1), "3");
-		assertEquals(sheet2.get("a", 2), "42");
-		assertEquals(sheet2.get("c", 2), "42");
-		assertEquals(sheet2.get(3, 3), "true");
-		assertEquals(sheet2.get(3, 0), null);
-		assertEquals(sheet2.get("c", 3), null);
-	}
+    @Test(groups = {"unit"})
+    public void writeSimpleCsvFromScratch() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        SheetUtils sheet = new CSVSheet().firstRowIsHeader();
 
-	@Test(groups = {"unit"})
-	public void loadSimpleCSVNoHeaders() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader();
-		sheet.load();
-		assertEquals(sheet.get(0, 0), "a");
-		assertEquals(sheet.get(1, 1), "42,g");
-		assertEquals(sheet.get("c", 0, "e"), "e");
-		assertEquals(sheet.get(2, 0, 3), 3);
-	}
+        sheet.setHeaderIfNotSet("a").setHeaderIfNotSet("b").setHeaderIfNotSet("c");
+        int row = 0;
+        sheet.set("a", row, 84)
+                .set("c", row, 42)
+                .set("a", row + 1, 42)
+                .set("c", row + 1, true);
+        sheet.newFile("temp/sample3.csv").writeToFile();
+        SheetUtils sheet2 = SheetUtils.build("temp/sample3.csv", "the sheet name does not matter.").firstRowIsHeader();
+        sheet2.load();
+        new Delete().rm("temp/sample3.csv");
+        expect(Expectation.build()
+                .actual(sheet2.get("a", 0))
+                .isEqualTo(84));
+        expect(Expectation.build()
+                .actual(sheet2.get("c", 0))
+                .isEqualTo(42));
+        expect(Expectation.build()
+                .actual(sheet2.get("a", 1))
+                .isEqualTo(42));
+        expect(Expectation.build()
+                .actual(sheet2.get("c", 1))
+                .isEqualTo("true"));
+    }
 
-	@Test(groups = {"unit"})
-	public void getCSVByHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		if (data == null) {
-			data = new Goate();
-		}
-		Goate def = new Goate();
-		data.put(".definition", def);
-		def.put("file", "sample.csv");
-		GetCsvEmployee csv = new GetCsvEmployee();
-		Object parser = csv.init(data).work();
-		Get gp = new Get("get row#0>a");
-		assertEquals(gp.from(parser), "b");
-	}
+    @Test(groups = {"unit"})
+    public void writeSimpleCsv() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
+        sheet.load();
+        int row = sheet.rowCount();
+        assertEquals(sheet.get("a", 0), "b");
+        assertEquals(sheet.get("a", 1), "false");
+        assertEquals(sheet.get(0, 0), "b");
+        assertEquals(sheet.get("c", 0, "e"), "e");
+        assertEquals(sheet.get(2, 1, 3), 3);
+        sheet.set("a", row, 42)
+                .set("c", row, 42)
+                .set("a", row + 2, 42)
+                .set(3, row + 1, true);
+        sheet.newFile("temp/sample2.csv").writeToFile();
+        SheetUtils sheet2 = SheetUtils.build("temp/sample2.csv", "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
+        sheet2.load();
+        new Delete().rm("temp/sample2.csv");
+        assertEquals(sheet2.get("c", 0), "e");
+        assertEquals(sheet2.get("a", 0), "b");
+        assertEquals(sheet2.get("a", 1), "false");
+        assertEquals(sheet2.get(0, 0), "b");
+        assertEquals(sheet2.get(2, 1), "3");
+        assertEquals(sheet2.get("a", 2), "42");
+        assertEquals(sheet2.get("c", 2), "42");
+        assertEquals(sheet2.get(3, 3), "true");
+        assertEquals(sheet2.get(3, 0), null);
+        assertEquals(sheet2.get("c", 3), null);
+    }
 
-	@Test(groups = {"unit"})
-	public void loadCSVByHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		Object parser = LoadCsv.loadCsv("sample.csv", true);
-		Get gp = new Get("get row#0>a");
-		assertEquals(gp.from(parser), "b");
-	}
+    @Test(groups = {"unit"})
+    public void loadSimpleCSVNoHeaders() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        SheetUtils sheet = SheetUtils.build("sample.csv", "the sheet name does not matter.").firstRowIsNotHeader();
+        sheet.load();
+        assertEquals(sheet.get(0, 0), "a");
+        assertEquals(sheet.get(1, 1), "42,g");
+        assertEquals(sheet.get("c", 0, "e"), "e");
+        assertEquals(sheet.get(2, 0, 3), 3);
+    }
 
-	@Test(groups = {"unit"})
-	public void loadSimpleAbstractCSV() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		GoateUtils.setEnvironment("eut", "" + GoateUtils.getProperty("eut", GoateUtils.getProperty("profile", "foobar")));
-		String fileName = ((SpreadSheetAbstractedDL) (new SpreadSheetAbstractedDL().fileName("scenarios/foo.json"))).getFileName();
-		SheetUtils sheet = SheetUtils.build(fileName, "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
-		sheet.load();
-		assertEquals(sheet.get("a", 0), "b");
-		assertEquals(sheet.get("a", 1), "false");
-		assertEquals(sheet.get(0, 0), "b");
-		assertEquals(sheet.get("c", 0, "e"), "e");
-		assertEquals(sheet.get(2, 0, 3), "e");
-	}
+    @Test(groups = {"unit"})
+    public void getCSVByHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        if (data == null) {
+            data = new Goate();
+        }
+        Goate def = new Goate();
+        data.put(".definition", def);
+        def.put("file", "sample.csv");
+        GetCsvEmployee csv = new GetCsvEmployee();
+        Object parser = csv.init(data).work();
+        Get gp = new Get("get row#0>a");
+        assertEquals(gp.from(parser), "b");
+    }
 
-	@Test(groups = {"unit"})
-	public void loadSimpleAbstractCSVNoHeaders() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		GoateUtils.setEnvironment("eut", "" + GoateUtils.getProperty("eut", GoateUtils.getProperty("profile", "foobar")));
-		String fileName = ((SpreadSheetAbstractedDL) (new SpreadSheetAbstractedDL().fileName("scenarios/foo.json"))).getFileName();
-		SheetUtils sheet = SheetUtils.build(fileName, "the sheet name does not matter.").firstRowIsNotHeader();
-		sheet.load();
-		assertEquals(sheet.get(0, 0), "a");
-		assertEquals(sheet.get(1, 1), "42,g");
-		assertEquals(sheet.get("c", 0, "e"), "e");
-		assertEquals(sheet.get(2, 0, 3), 3);
-	}
+    @Test(groups = {"unit"})
+    public void loadCSVByHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        Object parser = LoadCsv.loadCsv("sample.csv", true);
+        Get gp = new Get("get row#0>a");
+        assertEquals(gp.from(parser), "b");
+    }
 
-	@Test(groups = {"unit"})
-	public void CSVAbstractDLTest() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		GoateUtils.setEnvironment("eut", "" + GoateUtils.getProperty("eut", GoateUtils.getProperty("profile", "foobar")));
-		DataLoader dl = new SpreadSheetAbstractedDL().fileName("scenarios/foo.json").firstRowIsHeader(true);
-		List<Goate> dataList = dl.load();
-		assertEquals(dataList.get(0).get("a"), "b");
-		assertEquals(dataList.get(1).get("z"), "42,g");
-		assertEquals(dataList.size(), 2);
-	}
+    @Test(groups = {"unit"})
+    public void loadSimpleAbstractCSV() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", "" + GoateUtils.getProperty("eut", GoateUtils.getProperty("profile", "foobar")));
+        String fileName = ((SpreadSheetAbstractedDL) (new SpreadSheetAbstractedDL().fileName("scenarios/foo.json"))).getFileName();
+        SheetUtils sheet = SheetUtils.build(fileName, "the sheet name does not matter.").firstRowIsNotHeader().firstRowIsHeader();
+        sheet.load();
+        assertEquals(sheet.get("a", 0), "b");
+        assertEquals(sheet.get("a", 1), "false");
+        assertEquals(sheet.get(0, 0), "b");
+        assertEquals(sheet.get("c", 0, "e"), "e");
+        assertEquals(sheet.get(2, 0, 3), "e");
+    }
 
-	@Test(groups = {"unit"})
-	public void CSVAbstractDLTestNoHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		GoateUtils.setEnvironment("eut", "" + GoateUtils.getProperty("eut", GoateUtils.getProperty("profile", "foobar")));
-		DataLoader dl = new SpreadSheetAbstractedDL().fileName("scenarios/foo.json").firstRowIsHeader(false);
-		List<Goate> dataList = dl.load();
-		assertEquals(dataList.get(0).get("0"), "a");
-		assertEquals(dataList.get(1).get("1"), "42,g");
-		assertEquals(dataList.size(), 3);
-	}
+    @Test(groups = {"unit"})
+    public void loadSimpleAbstractCSVNoHeaders() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", "" + GoateUtils.getProperty("eut", GoateUtils.getProperty("profile", "foobar")));
+        String fileName = ((SpreadSheetAbstractedDL) (new SpreadSheetAbstractedDL().fileName("scenarios/foo.json"))).getFileName();
+        SheetUtils sheet = SheetUtils.build(fileName, "the sheet name does not matter.").firstRowIsNotHeader();
+        sheet.load();
+        assertEquals(sheet.get(0, 0), "a");
+        assertEquals(sheet.get(1, 1), "42,g");
+        assertEquals(sheet.get("c", 0, "e"), "e");
+        assertEquals(sheet.get(2, 0, 3), 3);
+    }
 
-	@Test(groups = {"unit"})
-	public void loadCSVByHeaderFromFile() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("sample.csv")), true);
-		Get gp = new Get(nested("get row#0", "a"));
-		assertEquals(gp.from(parser), "b");
-	}
+    @Test(groups = {"unit"})
+    public void CSVAbstractDLTest() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", "" + GoateUtils.getProperty("eut", GoateUtils.getProperty("profile", "foobar")));
+        DataLoader dl = new SpreadSheetAbstractedDL().fileName("scenarios/foo.json").firstRowIsHeader(true);
+        List<Goate> dataList = dl.load();
+        assertEquals(dataList.get(0).get("a"), "b");
+        assertEquals(dataList.get(1).get("z"), "42,g");
+        assertEquals(dataList.size(), 2);
+    }
 
-	@Test(groups = {"unit"})
-	public void mapCsvToJsonKeys() {
-		Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map.csv")), true);
-		Goate data = new SpreadSheetToGoate(parser).convert();
-		Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
-		expect(Expectation.build()
-			.actual(data)
-			.isEqualTo(jdata));
-	}
+    @Test(groups = {"unit"})
+    public void CSVAbstractDLTestNoHeader() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        GoateUtils.setEnvironment("eut", "" + GoateUtils.getProperty("eut", GoateUtils.getProperty("profile", "foobar")));
+        DataLoader dl = new SpreadSheetAbstractedDL().fileName("scenarios/foo.json").firstRowIsHeader(false);
+        List<Goate> dataList = dl.load();
+        assertEquals(dataList.get(0).get("0"), "a");
+        assertEquals(dataList.get(1).get("1"), "42,g");
+        assertEquals(dataList.size(), 3);
+    }
 
-	@Test(groups = {"unit"})
-	public void mapCsvToJsonKeysMissingNullFields() {
-		Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map_missing_fields_because_they_were_null.csv")), true);
-		Goate data = new SpreadSheetToGoate(parser).convert();
-		Goate jdata = new JSONToGoate(fileAsAString("map_missing_fields_because_they_were_null.json")).convert();
-		expect(Expectation.build()
-			.actual(data)
-			.isEqualTo(jdata));
-	}
+    @Test(groups = {"unit"})
+    public void loadCSVByHeaderFromFile() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("sample.csv")), true);
+        Get gp = new Get(nested("get row#0", "a"));
+        assertEquals(gp.from(parser), "b");
+    }
 
-	@Test(groups = {"unit"})
-	public void mapWithDifferentKeysCsvToJsonKeys() {
-		Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
-		Goate data = new SpreadSheetToGoate(parser).mapTo(CSVTOJSON.class).convert();
-		Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
-		expect(Expectation.build()
-			.actual(data)
-			.isEqualTo(jdata));
-	}
+    @Test(groups = {"unit"})
+    public void mapCsvToJsonKeys() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map.csv")), true);
+        Goate data = new SpreadSheetToGoate(parser).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
 
-	@Test(groups = {"unit"})
-	public void mapWithDifferentKeysMapCsvToJsonKeys() {
-		Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
-		Map<String, String> map = new HashMap<>();
-		map.put("a", "nick");
-		map.put("z", "paul");
-		Goate data = new SpreadSheetToGoate(parser).mapTo(map).convert();
-		Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
-		expect(Expectation.build()
-			.actual(data)
-			.isEqualTo(jdata));
-	}
+    @Test(groups = {"unit"})
+    public void mapCsvToJsonKeysMissingNullFields() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map_missing_fields_because_they_were_null.csv")), true);
+        Goate data = new SpreadSheetToGoate(parser).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map_missing_fields_because_they_were_null.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
 
-	@Test(groups = {"unit"})
-	public void mapWithDifferentKeysPojoCsvToJsonKeys() {
-		Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
-		Goate data = new SpreadSheetToGoate(parser).mapToPojo(MapCsvPojo.class, CsvSource.class).convert();
-		Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
-		expect(Expectation.build()
-			.actual(data)
-			.isEqualTo(jdata));
-	}
+    @Test(groups = {"unit"})
+    public void mapWithDifferentKeysCsvToJsonKeys() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
+        Goate data = new SpreadSheetToGoate(parser).mapTo(CSVTOJSON.class).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
 
-	public enum CSVTOJSON {
-		a("nick"), z("paul");
-		String csvValue;
+    @Test(groups = {"unit"})
+    public void mapWithDifferentKeysMapCsvToJsonKeys() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
+        Map<String, String> map = new HashMap<>();
+        map.put("a", "nick");
+        map.put("z", "paul");
+        Goate data = new SpreadSheetToGoate(parser).mapTo(map).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
 
-		CSVTOJSON(String value) {
-			this.csvValue = value;
-		}
+    @Test(groups = {"unit"})
+    public void mapWithDifferentKeysPojoCsvToJsonKeys() {
+        Object parser = LoadCsv.loadCsv(new File(GoateUtils.getFilePath("map2.csv")), true);
+        Goate data = new SpreadSheetToGoate(parser).mapToPojo(MapCsvPojo.class, CsvSource.class).convert();
+        Goate jdata = new JSONToGoate(fileAsAString("map.json")).convert();
+        expect(Expectation.build()
+                .actual(data)
+                .isEqualTo(jdata));
+    }
 
-		public boolean map(String value) {
-			return csvValue.equals(value);
-		}
-	}
+    public enum CSVTOJSON {
+        a("nick"), z("paul");
+        String csvValue;
+
+        CSVTOJSON(String value) {
+            this.csvValue = value;
+        }
+
+        public boolean map(String value) {
+            return csvValue.equals(value);
+        }
+    }
 }

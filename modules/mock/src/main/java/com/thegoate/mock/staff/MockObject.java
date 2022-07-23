@@ -80,7 +80,7 @@ public class MockObject extends Mock {
                     Field fi = fieldMap.get(fieldName);
                     //cheating a bit by forcefully making the field accessible,
                     //but its actual state is reset afterwards.
-                    boolean accessible = fi.isAccessible();
+                    boolean accessible = fi.canAccess(mock);//.isAccessible();
                     fi.setAccessible(true);
                     try {
                         fi.set(mock, value);
@@ -178,7 +178,7 @@ public class MockObject extends Mock {
                             }
                         } else {
                             try {
-                                Class exception = Class.forName("" + theThrows);
+                                Class<? extends Throwable> exception = (Class<? extends Throwable>) Class.forName("" + theThrows);
                                 Mockito.when(fn.invoke(mock, p)).thenThrow(exception);
                             } catch (ClassNotFoundException | IllegalAccessException | InvocationTargetException e) {
                                 LOG.error("Exception setting up the throw for the mock: " + e.getMessage(), e);

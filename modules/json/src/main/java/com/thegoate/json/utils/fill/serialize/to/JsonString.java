@@ -115,7 +115,7 @@ public class JsonString extends SerializeTo {
             }
 
             if (gs != null && gs.serializeTo() != GoateSource.class) {
-                boolean acc = field.getValue().isAccessible();
+                boolean acc = field.getValue().canAccess(original);//.isAccessible()
                 field.getValue().setAccessible(true);
                 try {
                     value.put(field.getKey(), doCast(field.getValue().get(original), gs.serializeTo()));

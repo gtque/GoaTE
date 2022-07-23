@@ -90,7 +90,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
                         .build();
                 if (provider == null) {
                     try {
-                        provider = (DLProvider) Class.forName(gp.name()).newInstance();
+                        provider = (DLProvider) Class.forName(gp.name()).getDeclaredConstructor().newInstance();
                     } catch (Exception e) {
                         LOG.warn("trying to find data loader method provider: " + gp.name());
                     }
@@ -133,12 +133,14 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
             GoateDLP dlp = m.getAnnotation(GoateDLP.class);
             if (m.getName().equals(name) || (dlp != null && dlp.name().equals(name))) {
                 try {
-                    providers = (Goate[]) m.invoke(declaring_class.newInstance());
+                    providers = (Goate[]) m.invoke(declaring_class.getDeclaredConstructor().newInstance());
                     break;
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     LOG.error("Problem defining data loaders for a method: " + name + "\n" + e.getMessage(), e);
                 } catch (InstantiationException e) {
                     LOG.error("Problem defining data loaders for a method, make sure the test class as a default/empty constructor: " + name + "\n" + e.getMessage(), e);
+                } catch (NoSuchMethodException e) {
+                    LOG.error("Defining Data Loaders", "Problem instantiating new instance: " + e.getMessage(), e);
                 }
             }
         }

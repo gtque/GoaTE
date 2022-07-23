@@ -83,7 +83,7 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
             for (Map.Entry<String, Field> field : gr.findFields(getClass()).entrySet()) {
                 IgnoreOnCompare ignore = field.getValue().getAnnotation(IgnoreOnCompare.class);
                 if (ignore == null) {
-                    boolean accessible = field.getValue().isAccessible();
+                    boolean accessible = field.getValue().canAccess(this);//.isAccessible();
                     try {
                         field.getValue().setAccessible(true);
                         Object actual = field.getValue().get(this);
@@ -129,7 +129,7 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
                 sb.append(", ");
             }
             sb.append(field.getKey()).append(":");
-            boolean accessible = field.getValue().isAccessible();
+            boolean accessible = field.getValue().canAccess(this);//.isAccessible();
             Object fieldValue = "Exception: could not get toString";
             try {
                 field.getValue().setAccessible(true);
@@ -164,7 +164,7 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
                     String baseFieldName = fieldName.substring(0, fieldName.indexOf("."));
                     if (fields.containsKey(baseFieldName)) {
                         Field field = fields.get(baseFieldName);
-                        boolean accessible = field.isAccessible();
+                        boolean accessible = field.canAccess(clone);//.isAccessible();
                         field.setAccessible(true);
                         List<String> ignore = new ArrayList<>();
                         ignore.add(fieldName.replaceFirst(baseFieldName + "\\.", "").replaceFirst("\\*\\.", ""));
@@ -202,7 +202,7 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
                                                     Map<String, Field> secondField = gr.findFields(entry.getClass());//entry.setValue(((Kid) entry.getValue()).cloneButIgnore(ignore));
                                                     if(secondField.containsKey(secondBase)){
                                                         Field field2 = secondField.get(secondBase);
-                                                        boolean accessible2 = field2.isAccessible();
+                                                        boolean accessible2 = field2.canAccess(entry);//.isAccessible();
                                                         field2.setAccessible(true);
                                                         if(ignore.get(0).contains(".")){
                                                             Object field2Value = field2.get(entry);
@@ -237,7 +237,7 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
                                                     Map<String, Field> secondField = gr.findFields(entry.getClass());//entry.setValue(((Kid) entry.getValue()).cloneButIgnore(ignore));
                                                     if(secondField.containsKey(secondBase)){
                                                         Field field2 = secondField.get(secondBase);
-                                                        boolean accessible2 = field2.isAccessible();
+                                                        boolean accessible2 = field2.canAccess(entry);//.isAccessible();
                                                         field2.setAccessible(true);
                                                         if(ignore.get(0).contains(".")){
                                                             Object field2Value = field2.get(entry);
@@ -277,7 +277,7 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
                 } else {
                     if (fields.containsKey(fieldName)) {
                         Field field = fields.get(fieldName);
-                        boolean accessible = field.isAccessible();
+                        boolean accessible = field.canAccess(clone);//.isAccessible();
                         field.setAccessible(true);
                         //this is a crude hack, instead of trying to programatically ignore fields, just set the ignored fields to default value.
                         if (gr.isPrimitive(field.getType())) {

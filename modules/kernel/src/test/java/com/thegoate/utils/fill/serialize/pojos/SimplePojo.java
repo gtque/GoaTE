@@ -57,7 +57,7 @@ public class SimplePojo extends Kid {
 
     private char c = 'c';
 
-    private Byte aByte = new Byte("1");
+    private Byte aByte = Byte.parseByte("1");
 
     private boolean bool = true;
 

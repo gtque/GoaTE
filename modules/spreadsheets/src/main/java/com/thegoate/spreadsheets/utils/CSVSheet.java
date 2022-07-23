@@ -86,7 +86,7 @@ public class CSVSheet extends SheetUtils {
         }
         if (in != null) {
             try {
-                Iterable<CSVRecord> records = CSVFormat.RFC4180.withTrim(trimWhiteSpace).parse(in);
+                Iterable<CSVRecord> records = CSVFormat.RFC4180.builder().setTrim(trimWhiteSpace).build().parse(in);
                 boolean headersFound = false;
                 int row = 0;
                 for (CSVRecord record : records) {
@@ -158,7 +158,7 @@ public class CSVSheet extends SheetUtils {
             CSVFormat format = CSVFormat.DEFAULT;
             if(firstRowIsHeader){
                 String[] head = headers().toArray(new String[headers.size()]);
-                format = format.withHeader(head);
+                format = format.builder().setHeader(head).build();//.withHeader(head);
             }
             CSVPrinter printer = new CSVPrinter(writer, format);
             for(int i=0; i<rowCount(); i++){

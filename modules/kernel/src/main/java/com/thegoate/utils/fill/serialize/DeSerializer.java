@@ -32,6 +32,7 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class DeSerializer extends Cereal{
                         flatten = gs.flatten();
                     }
                     Object value = fieldKey.isEmpty()?data:data.get(fieldKey);
-                    boolean acc = field.getValue().isAccessible();
+                    boolean acc = field.getValue().canAccess(o);//.isAccessible();
                     field.getValue().setAccessible(true);
                     try {
                         if(value!=null
@@ -118,7 +119,12 @@ public class DeSerializer extends Cereal{
             LOG.error("Build Pojo", "Can't build the pojo if you don't tell me what to build.");
             throw new RuntimeException("The pojo class was not specified.");
         }
-        Object o = type.newInstance();
+        Object o = null;
+        try {
+            o = type.getDeclaredConstructor().newInstance();
+        } catch (InvocationTargetException | NoSuchMethodException e) {
+            LOG.error("Building Pojo", "Problem instantiating new instance: " + e.getMessage(), e);
+        }
         if(o instanceof TypeT){
             ((TypeT)o).setGoateType(genericType);
         }

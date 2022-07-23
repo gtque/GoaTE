@@ -390,12 +390,12 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public boolean expectNow(ExpectationBuilder expectation) {
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectation) {
         return expectNow(expectation, false);
     }
 
     @Override
-    public boolean expectNow(ExpectationBuilder expectation, boolean failImmediately){
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectation, boolean failImmediately){
         expect(expectation);
         return evaluateNow(failImmediately);
     }
@@ -439,7 +439,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public TestNGEngine expect(ExpectationBuilder expectationBuilder) {
+    public TestNGEngine expect(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder) {
         return expect(expectationBuilder.build());
     }
 

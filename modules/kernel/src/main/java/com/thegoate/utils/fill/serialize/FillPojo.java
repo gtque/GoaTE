@@ -79,7 +79,7 @@ public class FillPojo implements FillUtility{
         GoateReflection gr = new GoateReflection();
         for(Map.Entry<String, Field> e : gr.findFields(fill.getClass()).entrySet()){
             if(data.keys().contains(e.getKey())) {
-                boolean access = e.getValue().isAccessible();
+                boolean access = e.getValue().canAccess(fill);//.isAccessible();
                 e.getValue().setAccessible(true);
                 try {
                     e.getValue().set(fill, data.get(e.getKey()));

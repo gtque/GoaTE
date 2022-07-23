@@ -48,7 +48,7 @@ public class MockTests extends TestNGEngineMethodDL {
         String[] greetings = {"1", "2", "3"};
         mb.object().setClass(Simple1.class)
                 .method("aXb").returnValue(20091124)
-                .method("sayHello").methodParameter("anyClass::java.lang.String", "java.lang.String").returnValues(greetings);
+                .method("sayHello").methodParameter("anyClass::java.lang.String", "java.lang.String").returnValues((Object[])greetings);
         SimpleWrapper sw = new SimpleWrapper();
         sw.sample = (Simple1) mb.build();
         String word = "" + System.nanoTime();
@@ -66,7 +66,7 @@ public class MockTests extends TestNGEngineMethodDL {
         String[] greetings = {"1", "2", "3"};
         mb.object().setClass(Simple1.class)
                 .method("aXb").returnValue(20091124)
-                .method("sayHello").methodParameter("anyString::").returnValues(greetings);
+                .method("sayHello").methodParameter("anyString::").returnValues((Object[])greetings);
         SimpleWrapper sw = new SimpleWrapper();
         sw.sample = (Simple1) mb.build();
         String word = "" + System.nanoTime();
@@ -84,7 +84,7 @@ public class MockTests extends TestNGEngineMethodDL {
         String[] greetings = {"1", "2", "3"};
         mb.object().setClass(Simple1.class)
                 .method("aXb").returnValue(20091124).methodThrows(RuntimeException.class)
-                .method("sayHello").methodParameter("anyString::").returnValues(greetings);
+                .method("sayHello").methodParameter("anyString::").returnValues((Object[])greetings);
         SimpleWrapper sw = new SimpleWrapper();
         sw.sample = (Simple1) mb.build();
         int actual = -42;
@@ -103,7 +103,7 @@ public class MockTests extends TestNGEngineMethodDL {
         String[] greetings = {"1", "2", "3"};
         mb.spy().setClass(Simple1.class)
                 .method("aXb").returnValue(20091124)
-                .method("sayHello").methodParameter("").returnValues(greetings)
+                .method("sayHello").methodParameter("").returnValues((Object[])greetings)
                 .field("greeting", "hello:");
         SimpleWrapper sw = new SimpleWrapper();
         sw.sample = (Simple1) mb.build();

@@ -36,7 +36,7 @@ import com.thegoate.testng.TestNG;
 import com.thegoate.testng.TestNGEngine;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.testng.TestNGEvaluateListener;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.ITest;
 import org.testng.ITestContext;
@@ -187,7 +187,7 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
-    public boolean expectNow(ExpectationBuilder expectationBuilder) {
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder) {
         return expectNow(expectationBuilder, false);
     }
 
@@ -202,7 +202,7 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
-    public boolean expectNow(ExpectationBuilder expectationBuilder, boolean failImmediately) {
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder, boolean failImmediately) {
         return engine.expectNow(expectationBuilder, failImmediately);
     }
 
@@ -218,7 +218,7 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
-    public TestNG expect(ExpectationBuilder expectationBuilder){
+    public TestNG expect(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder){
         engine.expect(expectationBuilder.build());
         return this;
     }

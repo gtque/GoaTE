@@ -28,6 +28,6 @@ import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
     api  d.depends(":kernel", project.internalVersion);
-    api  "org.json:json:20210307"
+    api  "org.json:json:20220320"
     testImplementation d.depends(":testng", project.internalVersion);
 }

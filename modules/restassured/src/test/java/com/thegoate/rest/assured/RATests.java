@@ -266,7 +266,7 @@ public class RATests extends SpringTestEngine {
 		simpleList.add("a");
 		simpleList.add("b");
 		simpleList.add("c");
-		RestCall<Response> rest = new RestCall().queryParam("list", simpleList).baseURL(baseURL());
+		RestCall<Response> rest = new RestCall<Response>().queryParam("list", simpleList).baseURL(baseURL());
 		Response result = rest
 			.get("hello/list");
 		expect(Expectation.build()

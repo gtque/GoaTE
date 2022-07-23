@@ -30,6 +30,7 @@ package com.thegoate.reflection;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
@@ -369,7 +370,7 @@ public class GoateReflection {
 	public Object getFieldValue(Object owner, Field field){
 		Object value = null;
 		if(owner != null){
-			boolean access = field.isAccessible();
+			boolean access = Modifier.isStatic(field.getModifiers())?field.canAccess(null):field.canAccess(owner);//.isAccessible();
 			try{
 				field.setAccessible(true);
 				value = field.get(owner);
@@ -399,9 +400,9 @@ public class GoateReflection {
 		if(klass.equals(String.class)) {
 			o = "";
 		} else if(isByteType(klass)) {
-			o = new Byte("0");
+			o = Byte.parseByte("0");
 		}else if(isShortType(klass)) {
-			o = new Short("0");
+			o = Short.parseShort("0");
 		}else if(isDoubleType(klass)) {
 			o = 0D;
 		}else if(isFloatType(klass)) {

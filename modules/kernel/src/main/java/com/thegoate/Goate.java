@@ -282,21 +282,21 @@ public class Goate implements HealthMonitor, Diary {
 	public <T> T doCastPrimitive(Object value, Class<T> type) {
 		GoateReflection gr = new GoateReflection();
 		if (gr.isBooleanType(type) && gr.isBoolean(value)) {
-			value = new Boolean("" + value);
+			value = Boolean.parseBoolean("" + value);
 		} else if (gr.isByteType(type) && gr.isByte(value)) {
-			value = new Byte("" + value);
+			value = Byte.parseByte("" + value);
 		} else if (gr.isIntegerType(type) && gr.isInteger(value)) {
-			value = new Integer("" + value);
+			value = Integer.parseInt("" + value);
 		} else if (gr.isDoubleType(type) && gr.isDouble(value)) {
-			value = new Double("" + value);
+			value = Double.parseDouble("" + value);
 		} else if (gr.isFloatType(type) && gr.isFloat(value)) {
-			value = new Float("" + value);
+			value = Float.parseFloat("" + value);
 		} else if (gr.isLongType(type) && gr.isLong(value)) {
-			value = new Long("" + value);
+			value = Long.parseLong("" + value);
 		} else if (gr.isCharacterType(type) && gr.isCharacter(value)) {
-			value = new Character(("" + value).charAt(0));
+			value = Character.valueOf(("" + value).charAt(0));
 		} else if (gr.isShortType(type) && gr.isShort(value)) {
-			value = new Short("" + value);
+			value = Short.parseShort("" + value);
 		}
 		return type.cast(value);
 	}

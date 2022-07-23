@@ -36,6 +36,8 @@ import com.thegoate.utils.togoate.ToGoate;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -170,11 +172,13 @@ public class Serializer<T, S, U> extends Cereal {
     public Map<String, Object> toMap(Class mapType) {
         Map<String, Object> data = null;
         try {
-            data = (Map) mapType.newInstance();
+            data = (Map) mapType.getDeclaredConstructor().newInstance();
         } catch (IllegalAccessException | InstantiationException e) {
             LOG.error("Serialize Pojo", "The mapType could not be initialized: " + e.getMessage(), e);
         } catch (ClassCastException e) {
             LOG.error("Serialize Pojo", "The mapType was not a valid map type: " + e.getMessage(), e);
+        } catch (InvocationTargetException | NoSuchMethodException e) {
+            LOG.error("Serialize Pojo", "Problem instantiating new instance: " + e.getMessage(), e);
         }
         if (data != null) {
             GoateReflection gr = new GoateReflection();
@@ -224,31 +228,33 @@ public class Serializer<T, S, U> extends Cereal {
                         if (exclude) {
                             LOG.debug("Excluding", fieldKey);
                         } else {
-                            boolean acc = field.getValue().isAccessible();
-                            field.getValue().setAccessible(true);
-                            try {
-                                Object o = field.getValue().get(pojo);
-                                if (gs != null && gs.serializeTo() != GoateSource.class) {
-                                    o = doCast(o, gs.serializeTo());
-                                }
-                                if (o != null) {
-                                    Class type = field.getValue().getType();
-                                    if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {
-                                        if (checkNotPrimitive(type) && doSerialize(pojo.getClass())) {
-                                            if (!type.equals(pojo.getClass())) {
-                                                addMap(data, o, fieldKey);
-                                            }
-                                        } else {
-                                            data.put(fieldKey, o);
-                                        }
+                            if(!Modifier.isFinal(field.getValue().getModifiers())) {
+                                boolean acc = Modifier.isStatic(field.getValue().getModifiers()) ? field.getValue().canAccess(null) : field.getValue().canAccess(pojo);//.isAccessible();
+                                field.getValue().setAccessible(true);
+                                try {
+                                    Object o = field.getValue().get(pojo);
+                                    if (gs != null && gs.serializeTo() != GoateSource.class) {
+                                        o = doCast(o, gs.serializeTo());
                                     }
-                                } else if (includeNulls) {
-                                    data.put(fieldKey, "null::");
+                                    if (o != null) {
+                                        Class type = field.getValue().getType();
+                                        if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {
+                                            if (checkNotPrimitive(type) && doSerialize(pojo.getClass())) {
+                                                if (!type.equals(pojo.getClass())) {
+                                                    addMap(data, o, fieldKey);
+                                                }
+                                            } else {
+                                                data.put(fieldKey, o);
+                                            }
+                                        }
+                                    } else if (includeNulls) {
+                                        data.put(fieldKey, "null::");
+                                    }
+                                } catch (IllegalAccessException | InstantiationException e) {
+                                    LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
                                 }
-                            } catch (IllegalAccessException | InstantiationException e) {
-                                LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
+                                field.getValue().setAccessible(acc);
                             }
-                            field.getValue().setAccessible(acc);
                         }
                     }
                 } catch (ClassCastException e) {

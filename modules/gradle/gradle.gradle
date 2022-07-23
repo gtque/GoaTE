@@ -35,6 +35,6 @@ dependencies{
 //    api  'org.eclipse.jgit:org.eclipse.jgit:5.3.1.201904271842-r'
     testImplementation d.depends(":kernel", project.internalVersion);
     testImplementation d.depends(":testng", project.internalVersion);
-    testImplementation 'com.google.inject:guice:5.0.1'
+    testImplementation 'com.google.inject:guice:5.1.0'
     testImplementation 'org.mockito:mockito-all:1.10.19'
 }

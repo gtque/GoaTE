@@ -28,6 +28,6 @@ import com.thegoate.gradle.GoateDepends
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
     api  d.depends(":kernel", project.internalVersion);
-    api  "org.testng:testng:7.4.0"
+    api  "org.testng:testng:7.6.1"
     api  "org.apache.commons:commons-lang3:3.12.0"
 }

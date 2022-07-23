@@ -4,6 +4,7 @@ import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
@@ -19,9 +20,9 @@ public class StaticScrubber {
         for(String key:scrubbers.keySet()){
             Class c = scrubbers.get(key);
             try{
-                ResetStatic scrubber = (ResetStatic)c.newInstance();
+                ResetStatic scrubber = (ResetStatic)c.getDeclaredConstructor().newInstance();
                 scrubber.resetStatics();
-            } catch (IllegalAccessException | InstantiationException e) {
+            } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
                 LOG.warn("Failed to scrub: " + c.getCanonicalName() + "\n"+e.getMessage(), e);
             }
         }

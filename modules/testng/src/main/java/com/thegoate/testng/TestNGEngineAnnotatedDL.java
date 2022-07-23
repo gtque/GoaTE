@@ -68,7 +68,7 @@ public class TestNGEngineAnnotatedDL extends TestNGEngine {
                         .build();
                 if(provider==null){
                     try {
-                        provider = (DLProvider) Class.forName(gp.name()).newInstance();
+                        provider = (DLProvider) Class.forName(gp.name()).getDeclaredConstructor().newInstance();
                     }catch(Exception e){
                         LOG.warn("tried to find DLProvider using class name but could not find or instantiate: " + gp.name(), e);
                     }

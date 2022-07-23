@@ -99,7 +99,7 @@ public class RunTask extends DSL {
             Method m = findTask();
             Object[] args = buildArgs(m, task, parameters);
             try {
-                boolean accessible = m.isAccessible();
+                boolean accessible = m.canAccess(owner);//.isAccessible();
                 LOG.debug("class: " + m.getDeclaringClass());
                 LOG.debug("method: " + m.getName());
                 LOG.debug("parameters: " + printArgs(args));

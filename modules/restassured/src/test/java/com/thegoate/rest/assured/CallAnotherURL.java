@@ -44,7 +44,7 @@ public class CallAnotherURL extends Employee<Response> {
     }
 
     @Override
-    protected Employee init() {
+    protected Employee<Response> init() {
         return this;
     }
 

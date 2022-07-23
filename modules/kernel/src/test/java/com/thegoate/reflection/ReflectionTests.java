@@ -55,7 +55,7 @@ public class ReflectionTests {
         for(Method m:methods) {
             LOG.debug(m.getName());
         }
-        assertEquals(methods.size(), 19);
+        assertEquals(methods.size(), 18);
     }
 
     @Test(groups = {"unit"})

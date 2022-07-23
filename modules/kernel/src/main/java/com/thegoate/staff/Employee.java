@@ -39,6 +39,7 @@ import com.thegoate.utils.togoate.ToGoate;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -250,9 +251,9 @@ public abstract class Employee<T> implements Worker<Employee, T> {
         Class recruit = findEmployee(job);
         if (recruit != null) {
             try {
-                employee = (Employee) recruit.newInstance();
+                employee = (Employee) recruit.getDeclaredConstructor().newInstance();
                 employee.setName(job + (id.isEmpty()?"":("#"+id)));
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 slog.error("Problem recruiting the employee: " + e.getMessage(), e);
             }
         }

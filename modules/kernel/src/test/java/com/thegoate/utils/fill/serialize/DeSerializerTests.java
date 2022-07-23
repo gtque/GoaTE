@@ -136,10 +136,10 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(pojo.getFieldName(), "Hello, world!");
         assertEquals(pojo.getSomeInt(), 42);
         assertEquals(pojo.getBigD(), new BigDecimal("3.14159"));
-        assertEquals(pojo.getD(), new Double("42.42"));
+        assertEquals((double)pojo.getD(), Double.parseDouble("42.42"));
         assertEquals(pojo.getC(), 'c');
         assertEquals(pojo.getL(), 42L);
-        assertEquals(pojo.getaByte(), new Byte("1"));
+        assertEquals((byte)pojo.getaByte(), Byte.parseByte("1"));
         assertEquals(pojo.getF(), 4F);
         assertTrue(pojo.isBool());
         pojo.reportHealth("test", "hello");
@@ -162,10 +162,10 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(pojo.getFieldName(), "Hello, world!");
         assertEquals(pojo.getSomeInt(), 42);
         assertEquals(pojo.getBigD(), new BigDecimal("3.14159"));
-        assertEquals(pojo.getD(), new Double("42.42"));
+        assertEquals((double)pojo.getD(), Double.parseDouble("42.42"));
         assertEquals(pojo.getC(), 'c');
         assertEquals(pojo.getL(), 42L);
-        assertEquals(pojo.getaByte(), new Byte("1"));
+        assertEquals((byte)pojo.getaByte(), Byte.parseByte("1"));
         assertEquals(pojo.getF(), 4F);
         assertTrue(pojo.isBool());
         expect(Expectation.build()
@@ -199,10 +199,10 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(pojo.getNested().getFieldName(), "Hello, world!");
         assertEquals(pojo.getNested().getSomeInt(), 42);
         assertEquals(pojo.getNested().getBigD(), new BigDecimal("3.14159"));
-        assertEquals(pojo.getNested().getD(), new Double("42.42"));
+        assertEquals((double)pojo.getNested().getD(), Double.parseDouble("42.42"));
         assertEquals(pojo.getNested().getC(), 'c');
         assertEquals(pojo.getNested().getL(), 42L);
-        assertEquals(pojo.getNested().getaByte(), new Byte("1"));
+        assertEquals((byte)pojo.getNested().getaByte(), Byte.parseByte("1"));
         assertEquals(pojo.getNested().getF(), 4F);
         assertTrue(pojo.getNested().isBool());
     }
@@ -272,10 +272,10 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(pojo.getCp()[0].getNested().getFieldName(), "Hello, world!");
         assertEquals(pojo.getCp()[0].getNested().getSomeInt(), 42);
         assertEquals(pojo.getCp()[0].getNested().getBigD(), new BigDecimal("3.14159"));
-        assertEquals(pojo.getCp()[0].getNested().getD(), new Double("42.42"));
+        assertEquals((double)pojo.getCp()[0].getNested().getD(), Double.parseDouble("42.42"));
         assertEquals(pojo.getCp()[0].getNested().getC(), 'c');
         assertEquals(pojo.getCp()[0].getNested().getL(), 42L);
-        assertEquals(pojo.getCp()[0].getNested().getaByte(), new Byte("1"));
+        assertEquals((byte)pojo.getCp()[0].getNested().getaByte(), Byte.parseByte("1"));
         assertEquals(pojo.getCp()[0].getNested().getF(), 4F);
         assertEquals(pojo.getCp()[1].getMap().get("Peter"), "Parker");
         assertEquals(pojo.getCp()[1].getMap().get("Tony"), "Stark");
@@ -304,10 +304,10 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(pojo2.getCp()[0].getNested().getFieldName(), "Hello, world!");
         assertEquals(pojo2.getCp()[0].getNested().getSomeInt(), 42);
         assertEquals(pojo2.getCp()[0].getNested().getBigD(), new BigDecimal("3.14159"));
-        assertEquals(pojo2.getCp()[0].getNested().getD(), new Double("42.42"));
+        assertEquals((double)pojo2.getCp()[0].getNested().getD(), Double.parseDouble("42.42"));
         assertEquals(pojo2.getCp()[0].getNested().getC(), 'c');
         assertEquals(pojo2.getCp()[0].getNested().getL(), 42L);
-        assertEquals(pojo2.getCp()[0].getNested().getaByte(), new Byte("1"));
+        assertEquals((byte)pojo2.getCp()[0].getNested().getaByte(), Byte.parseByte("1"));
         assertEquals(pojo2.getCp()[0].getNested().getF(), 4F);
         assertEquals(pojo2.getCp()[1].getMap().get("Peter"), "Parker");
         assertEquals(pojo2.getCp()[1].getMap().get("Tony"), "Stark");
@@ -401,10 +401,10 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getFieldName(), "Hello, world!");
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getSomeInt(), 42);
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getBigD(), new BigDecimal("3.14159"));
-        assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getD(), new Double("42.42"));
+        assertEquals((double)((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getD(), Double.parseDouble("42.42"));
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getC(), 'c');
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getL(), 42L);
-        assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getaByte(), new Byte("1"));
+        assertEquals((byte)((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getaByte(), Byte.parseByte("1"));
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getF(), 4F);
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[1].getMap().get("Peter"), "Parker");
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[1].getMap().get("Tony"), "Stark");
@@ -434,10 +434,10 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getFieldName(), "Hello, world!");
         assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getSomeInt(), 42);
         assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getBigD(), new BigDecimal("3.14159"));
-        assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getD(), new Double("42.42"));
+        assertEquals((double)((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getD(), Double.parseDouble("42.42"));
         assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getC(), 'c');
         assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getL(), 42L);
-        assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getaByte(), new Byte("1"));
+        assertEquals((byte)((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getaByte(), Byte.parseByte("1"));
         assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[0].getNested().getF(), 4F);
         assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[1].getMap().get("Peter"), "Parker");
         assertEquals(((NestedPojos) pojo.getNestedList().get(1)).getCp()[1].getMap().get("Tony"), "Stark");
