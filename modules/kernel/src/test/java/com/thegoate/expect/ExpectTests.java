@@ -31,10 +31,7 @@ import com.thegoate.Goate;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.data.StaticDL;
-import com.thegoate.expect.builder.ContainsExpectationBuilder;
-import com.thegoate.expect.builder.KidIsEqualIgnoreFieldsBuilder;
-import com.thegoate.expect.builder.ModelIsPresentOptional;
-import com.thegoate.expect.builder.Value;
+import com.thegoate.expect.builder.*;
 import com.thegoate.expect.test.*;
 import com.thegoate.expect.validate.Validate;
 import com.thegoate.expect.validate.ValidateAbsence;
@@ -2060,30 +2057,30 @@ public class ExpectTests extends TestNGEngineMethodDL {
         evaluate();
     }
 
-	@Test(groups = {"unit"})
-	public void expectWildCardIndexInListOfPojos(){
-		ListPojo p1 = new ListPojo();
-		List<NestedObject> no = new ArrayList<>();
-		no.add(new NestedObject().setNo("1"));
-		no.add(new NestedObject().setNo("2"));
-		no.add(new NestedObject().setNo("3"));
-		no.add(new NestedObject().setNo("4"));
-		p1.setTheInsideList(no);
-		ListPojo p2 = new ListPojo();
-		List<NestedObject> no2 = new ArrayList<>();
-		no2.add(new NestedObject().setNo("1"));
-		no2.add(new NestedObject().setNo("2"));
-		no2.add(new NestedObject().setNo("3"));
-		no2.add(new NestedObject().setNo("4"));
-		p2.setTheInsideList(no2);
+    @Test(groups = {"unit"})
+    public void expectWildCardIndexInListOfPojos() {
+        ListPojo p1 = new ListPojo();
+        List<NestedObject> no = new ArrayList<>();
+        no.add(new NestedObject().setNo("1"));
+        no.add(new NestedObject().setNo("2"));
+        no.add(new NestedObject().setNo("3"));
+        no.add(new NestedObject().setNo("4"));
+        p1.setTheInsideList(no);
+        ListPojo p2 = new ListPojo();
+        List<NestedObject> no2 = new ArrayList<>();
+        no2.add(new NestedObject().setNo("1"));
+        no2.add(new NestedObject().setNo("2"));
+        no2.add(new NestedObject().setNo("3"));
+        no2.add(new NestedObject().setNo("4"));
+        p2.setTheInsideList(no2);
 
-		expect(Expectation.build()
-			.actual("+.no")
-			.from(new Serializer<List<NestedObject>,DefaultSource,String>(p1.getTheInsideList()).to(new JsonString()))
-			.isEqualTo("%.no")
-			.fromExpected(new Serializer<List<NestedObject>,DefaultSource,String>(p2.getTheInsideList()).to(new JsonString())));
-		evaluate();
-	}
+        expect(Expectation.build()
+                .actual("+.no")
+                .from(new Serializer<List<NestedObject>, DefaultSource, String>(p1.getTheInsideList()).to(new JsonString()))
+                .isEqualTo("%.no")
+                .fromExpected(new Serializer<List<NestedObject>, DefaultSource, String>(p2.getTheInsideList()).to(new JsonString())));
+        evaluate();
+    }
 
     @Test(groups = {"unit"})
     public void kidIgnoreFieldsIgnoreString() {
@@ -2162,17 +2159,17 @@ public class ExpectTests extends TestNGEngineMethodDL {
         List<SimpleObject2> lso1 = new ArrayList<>();
         lso1.add(new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80));
         lso1.add(new SimpleObject2().setBd(new BigDecimal("42")).setSomeValue(81));
-        SimpleObject2[] so2A1 = {new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80),new SimpleObject2().setBd(new BigDecimal("4.14159")).setSomeValue(80),new SimpleObject2().setBd(new BigDecimal("5.14159")).setSomeValue(80)};
+        SimpleObject2[] so2A1 = {new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80), new SimpleObject2().setBd(new BigDecimal("4.14159")).setSomeValue(80), new SimpleObject2().setBd(new BigDecimal("5.14159")).setSomeValue(80)};
         Map<String, Object> nest = new HashMap<>();
-        nest.put("first",new NestedSimpleObject().setA(50D).setB('c'));
+        nest.put("first", new NestedSimpleObject().setA(50D).setB('c'));
         SimpleObject so1 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes").setMap(nest)).setSo2(lso1).setSo2A(so2A1);
 
         List<SimpleObject2> lso2 = new ArrayList<>();
         lso2.add(new SimpleObject2().setBd(new BigDecimal("6.14159")).setSomeValue(80));
         lso2.add(new SimpleObject2().setBd(new BigDecimal("84")).setSomeValue(81));
-        SimpleObject2[] so2A2 = {new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80),new SimpleObject2().setBd(new BigDecimal("4.14159")).setSomeValue(90),new SimpleObject2().setBd(new BigDecimal("5.14159")).setSomeValue(81)};
+        SimpleObject2[] so2A2 = {new SimpleObject2().setBd(new BigDecimal("3.14159")).setSomeValue(80), new SimpleObject2().setBd(new BigDecimal("4.14159")).setSomeValue(90), new SimpleObject2().setBd(new BigDecimal("5.14159")).setSomeValue(81)};
         Map<String, Object> nest2 = new HashMap<>();
-        nest2.put("first",new NestedSimpleObject().setA(50D).setB('z'));
+        nest2.put("first", new NestedSimpleObject().setA(50D).setB('z'));
         SimpleObject so2 = new SimpleObject().setA("hello").setB(true).setNested(new NestedObject().setNo("yes").setMap(nest2)).setSo2(lso2).setSo2A(so2A2);
 
         expect(new KidIsEqualIgnoreFieldsBuilder()
@@ -2216,5 +2213,21 @@ public class ExpectTests extends TestNGEngineMethodDL {
         expect(Expectation.build()
                 .actual(lso1)
                 .isEqualTo(lso2));
+    }
+
+    @Test(groups = {"unit"})
+    public void useExpectationBuilder() {
+        ExpectationBuilder builder = new DirectlyPassExpectationBuilder();
+        expect(Expectation.build()
+                .actual(builder.build().size())
+                .isEqualTo(5));
+    }
+
+    @Test(groups = {"unit"})
+    public void passListExpectationBuilder() {
+        ExpectationBuilder builder = new PassAlreadyBuiltListExpectationBuilder();
+        expect(Expectation.build()
+                .actual(builder.build().size())
+                .isEqualTo(5));
     }
 }

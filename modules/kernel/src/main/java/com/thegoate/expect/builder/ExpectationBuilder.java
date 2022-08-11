@@ -62,6 +62,20 @@ public abstract class ExpectationBuilder<Self extends ExpectationBuilder> {
         return (Self)this;
     }
 
+    protected Self expect(ExpectationBuilder builder){
+        if(builder != null){
+            expect(builder.build());
+        }
+        return (Self)this;
+    }
+
+    protected Self expect(List<Expectation> expectations){
+        if(expectations!= null && expectations.size()>0){
+            expectations.parallelStream().forEach(expectation -> expect(expectation));
+        }
+        return (Self)this;
+    }
+
     protected List<Expectation> getExpectations() {
         return expectations;
     }
