@@ -71,7 +71,7 @@ public abstract class ExpectationBuilder<Self extends ExpectationBuilder> {
 
     protected Self expect(List<Expectation> expectations){
         if(expectations!= null && expectations.size()>0){
-            expectations.parallelStream().forEach(expectation -> expect(expectation));
+            expectations.stream().forEach(expectation -> expect(expectation));
         }
         return (Self)this;
     }
