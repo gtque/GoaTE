@@ -358,24 +358,24 @@ public class GoateTests extends TestNGEngineMethodDL {
         }
     }
 
-    @Test(groups = {"unit"})
-    public void filterByValueFromJsonArray() {
-        String json = "{\"collection\":[{\"value\":\"hello\", \"type\":\"MS:GREETING\"},{\"value\":\"James\", \"type\":\"MS:NAME\"},{\"value\":\"howdy\", \"type\":\"MS:GREETING\"},{\"value\":\"George\", \"type\":\"MS:NAME\"}]}";
-        String jsonGreetings = "{\"greetings\":[{\"value\":\"hello\"},{\"value\":\"howdy\"}]}";
-        Goate jGoate = new ToGoate(json).convert();
-        StringBuilder filter = new StringBuilder("(_goate_filter_start").append(System.currentTimeMillis());
-        jGoate.filterByValue("MS:GREETING").scrubKeys(".*", new valueKey())
-                .keys()
-                .stream().forEach(key -> filter.append("|").append(key));
-        filter.append(")");
-        Goate filtered = jGoate.filter(filter.toString());
-        expect(Expectation.build()
-                .actual(filtered.size())
-                .isEqualTo(2));
-        expect(Expectation.build()
-                .actual("greetings.+")
-                .from(jsonGreetings)
-                .expected("collection.%.value")
-        .fromExpected(filtered));
-    }
+//    @Test(groups = {"unit"})
+//    public void filterByValueFromJsonArray() {
+//        String json = "{\"collection\":[{\"value\":\"hello\", \"type\":\"MS:GREETING\"},{\"value\":\"James\", \"type\":\"MS:NAME\"},{\"value\":\"howdy\", \"type\":\"MS:GREETING\"},{\"value\":\"George\", \"type\":\"MS:NAME\"}]}";
+//        String jsonGreetings = "{\"greetings\":[{\"value\":\"hello\"},{\"value\":\"howdy\"}]}";
+//        Goate jGoate = new ToGoate(json).convert();
+//        StringBuilder filter = new StringBuilder("(_goate_filter_start").append(System.currentTimeMillis());
+//        jGoate.filterByValue("MS:GREETING").scrubKeys(".*", new valueKey())
+//                .keys()
+//                .stream().forEach(key -> filter.append("|").append(key));
+//        filter.append(")");
+//        Goate filtered = jGoate.filter(filter.toString());
+//        expect(Expectation.build()
+//                .actual(filtered.size())
+//                .isEqualTo(2));
+//        expect(Expectation.build()
+//                .actual("greetings.+")
+//                .from(jsonGreetings)
+//                .expected("collection.%.value")
+//        .fromExpected(filtered));
+//    }
 }
