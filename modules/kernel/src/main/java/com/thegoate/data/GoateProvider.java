@@ -44,4 +44,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface GoateProvider {
     String name();
     Class container() default GoateNullClass.class;
+    String nickName() default "";
 }

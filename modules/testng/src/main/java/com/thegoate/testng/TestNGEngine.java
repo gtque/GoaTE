@@ -28,6 +28,7 @@ package com.thegoate.testng;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.GhostProtocol;
+import com.thegoate.data.GoateProvider;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationError;
@@ -71,6 +72,7 @@ import static org.testng.Assert.assertTrue;
 public abstract class TestNGEngine implements ITest, TestNG {
 
     private Class testClass = getClass();
+    protected GoateProvider provider = null;
     //    protected volatile boolean dd = false;
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate data = null;
@@ -287,7 +289,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
             xt = context.getCurrentXmlTest();
         }
         initDataLoaders();
-        return TestNGRunFactory.loadRuns(method.getConstructorOrMethod().getMethod(), getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
+        return TestNGRunFactory.loadRuns(method.getConstructorOrMethod().getMethod(), provider, getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
     }
 
     public void initDataLoaders() {

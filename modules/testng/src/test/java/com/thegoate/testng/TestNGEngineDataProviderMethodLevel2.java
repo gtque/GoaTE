@@ -88,45 +88,45 @@ public class TestNGEngineDataProviderMethodLevel2 extends TestNGEngineMethodDL {
     @GoateProvider(name = "sample2")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData(Goate d) throws Exception {
-        assertEquals(data.size(), 3);
+        assertEquals(data.size(), 2);
         assertEquals(get("b"), null);
         assertEquals(get("a"), "x");
         put("c", 3);
         assertEquals(get("c"), 3);
-        assertEquals(data.size(), 4);
+        assertEquals(data.size(), 3);
     }
 
     @GoateProvider(name = "sample3")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData2(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
+        assertEquals(data.size(), 3);
         assertEquals(get("b"), "y");
         assertEquals(get("a"), "x");
         put("c", 3);
         assertEquals(get("c"), 3);
-        assertEquals(data.size(), 5);
+        assertEquals(data.size(), 4);
     }
 
     @GoateProvider(name = "sample4", container = DataContainer.class)
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData4(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
+        assertEquals(data.size(), 3);
         assertEquals(get("b"), "y");
         assertEquals(get("a"), "x");
         put("c", 3);
         assertEquals(get("c"), 3);
-        assertEquals(data.size(), 5);
+        assertEquals(data.size(), 4);
     }
 
     @GoateProvider(name = "mydata2", container = DataContainer.class)
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData5(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
+        assertEquals(data.size(), 3);
         assertEquals(get("b"), "x");
         assertEquals(get("a"), "y");
         put("c", 3);
         assertEquals(get("c"), 3);
-        assertEquals(data.size(), 5);
+        assertEquals(data.size(), 4);
     }
 
     @Test(groups = {"unit"}, dataProvider = "custom_provider")
