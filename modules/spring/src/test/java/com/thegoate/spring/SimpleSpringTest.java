@@ -33,7 +33,7 @@ public class SimpleSpringTest extends SpringTestEngine {
         super();
     }
 
-    @Factory(dataProvider = "dataLoader")
+    @Factory(dataProvider = "springDataLoader")
     public SimpleSpringTest(Goate data){
         super(data);
     }

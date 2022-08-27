@@ -68,14 +68,14 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
-    @DataProvider(name = "dataLoader")
+    @DataProvider(name = "springTransactionalDataLoader")
     public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();
         return engine.dataLoader(method, context);
     }
 
-    @DataProvider(name = "methodLoader")
+    @DataProvider(name = "springTransactionalMethodLoader")
     public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();

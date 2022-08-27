@@ -81,14 +81,14 @@ public class SpringTestEngine extends AbstractTestNGSpringContextTests implement
     }
 
     @Override
-    @DataProvider(name = "dataLoader")
+    @DataProvider(name = "springDataLoader")
     public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();
         return engine.dataLoader(method, context);
     }
 
-    @DataProvider(name = "methodLoader")
+    @DataProvider(name = "springMethodLoader")
     public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();
