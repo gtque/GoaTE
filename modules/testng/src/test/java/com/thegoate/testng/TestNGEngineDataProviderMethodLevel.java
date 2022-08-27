@@ -47,23 +47,27 @@ public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
     @GoateProvider(name = "sample")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
+        LOG.info("data size: " + data.size());
+        LOG.info("data: " + data.toString());
+        assertEquals(data.size(), 3);
         assertEquals(get("b","z"),"y");
         assertEquals(get("a","y"),"x");
         //put("c", 3);
         assertEquals(get("c",3),3);
-        assertEquals(data.size(), 5);
+        assertEquals(data.size(), 4);
     }
 
     @GoateProvider(name = "com.thegoate.testng.test.SampleDLP")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData2(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
+        LOG.info("data size: " + data.size());
+        LOG.info("data: " + data.toString());
+        assertEquals(data.size(), 3);
         assertEquals(get("b"),"y");
         assertEquals(get("a"),"x");
         put("c", 3);
         assertEquals(get("c"),3);
-        assertEquals(data.size(), 5);
+        assertEquals(data.size(), 4);
     }
 
     public int removeDuplicates(int[] nums)

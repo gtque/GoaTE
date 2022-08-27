@@ -52,7 +52,7 @@ public class SimpleMethodDLSpringTest extends SpringTestEngine {
     }
 
     @GoateProvider(name = "sample")
-    @Test(groups = {"unit", "spring"}, dataProvider = "methodLoader")
+    @Test(groups = {"unit", "spring"}, dataProvider = "springMethodLoader")
     public void testMethod1(Goate d){
         expect(Expectation.build().actual(bot).isNull(false));
         assertEquals(bot.autobots(), "roll out");

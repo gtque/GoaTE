@@ -141,23 +141,25 @@ public class GoateReflection {
 	}
 
 	public boolean isPrimitive(Class c) {
-		return c.equals(Boolean.class) || c.equals(Boolean.TYPE)
+        return c != null &&
+                (c.equals(Boolean.class) || c.equals(Boolean.TYPE)
 			|| c.equals(Byte.class) || c.equals(Byte.TYPE)
 			|| c.equals(Integer.class) || c.equals(Integer.TYPE)
 			|| c.equals(Double.class) || c.equals(Double.TYPE)
 			|| c.equals(Float.class) || c.equals(Float.TYPE)
 			|| c.equals(Long.class) || c.equals(Long.TYPE)
 			|| c.equals(Character.class) || c.equals(Character.TYPE)
-			|| c.equals(Short.class) || c.equals(Short.TYPE);
+                        || c.equals(Short.class) || c.equals(Short.TYPE));
 	}
 
 
 	public boolean isPrimitiveNumber(Class c) {
-		return c.equals(Integer.class) || c.equals(Integer.TYPE)
+        return c != null &&
+                (c.equals(Integer.class) || c.equals(Integer.TYPE)
 				|| c.equals(Double.class) || c.equals(Double.TYPE)
 				|| c.equals(Float.class) || c.equals(Float.TYPE)
 				|| c.equals(Long.class) || c.equals(Long.TYPE)
-				|| c.equals(Short.class) || c.equals(Short.TYPE);
+                        || c.equals(Short.class) || c.equals(Short.TYPE));
 	}
 
 	public boolean isBooleanType(Class c) {
@@ -381,6 +383,7 @@ public class GoateReflection {
 		}
 		return value;
 	}
+
 	public Method findMethod(Object theClass, String methodName) {
 		Optional<Method> first = getAllMethods(theClass.getClass()).stream().filter(m -> m.getName().equals(methodName)).findFirst();
 		return first.isPresent() ? first.get() : null;

@@ -37,8 +37,7 @@ import com.thegoate.dsl.Interpreter;
 import com.thegoate.logging.volume.Diary;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
-import com.thegoate.utils.fill.serialize.Cast;
-import com.thegoate.utils.fill.serialize.DefaultSource;
+import com.thegoate.utils.fill.serialize.*;
 import com.thegoate.utils.togoate.ToGoate;
 
 import java.util.*;
@@ -49,7 +48,7 @@ import java.util.stream.Collectors;
  * The manager for the collection of test data.
  * Created by gtque on 4/19/2017.
  */
-public class Goate implements HealthMonitor, Diary {
+public class Goate implements HealthMonitor, Diary, Cloneable {
 
 	public static final String GOATE_VARIABLE_PREFIX = "_goate_(%$#)_";
 	volatile Map<String, Object> data = new ConcurrentHashMap<>();
@@ -663,5 +662,27 @@ public class Goate implements HealthMonitor, Diary {
 	@Override
 	public void writeEntry(String entry) {
 		stale = false;
+	}
+
+	public Object clone(){
+		Goate clone = new Goate();
+		GoateReflection gr = new GoateReflection();
+		for(String key:keys()){
+			Object value = getStrict(key);
+			if(gr.isPrimitive(gr.primitiveType(value))){
+				clone.put(key, value);
+			} else if(value == null) {
+				clone.put(key, "null::");
+			} else {
+				if(value instanceof Nanny) {
+					clone.put(key, new DeSerializer().data(new Serializer<>(value).toGoate()).build(value.getClass()));
+				} else {
+					//if you find yourself here because your cloned data was not as deep as you had hoped
+					//I am sorry, but I only deep copy pojos that extend kid/nanny at the moment.
+					clone.put(key, value);
+				}
+			}
+		}
+		return clone;
 	}
 }
