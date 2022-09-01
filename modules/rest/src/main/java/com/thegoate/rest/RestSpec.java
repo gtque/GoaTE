@@ -105,6 +105,10 @@ public interface RestSpec {
 
     RestSpec logSpec();
 
+    RestSpec urlEncode(boolean encode);
+
+    boolean urlEncode();
+
     Goate getHeaders();
 
     Goate getQueryParameters();

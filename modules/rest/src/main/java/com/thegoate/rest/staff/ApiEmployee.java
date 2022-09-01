@@ -84,6 +84,7 @@ public abstract class ApiEmployee<T> extends Employee<T> {
             } else {
                 spec.disableLog();
             }
+            spec.urlEncode(definition.get("urlEncode", true, Boolean.class));
         }
         return spec;
     }

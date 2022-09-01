@@ -165,6 +165,11 @@ public class RestCall<T> {
         return execute("head");
     }
 
+    public RestCall<T> urlEncode(boolean encode) {
+        definition.put("urlEncode", encode);
+        return this;
+    }
+
     protected String paramObjectName(Object param){
         String name = "" + param;
         return name.replace(",",";");

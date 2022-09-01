@@ -107,6 +107,8 @@ public class RestAssured extends Rest implements RASpec {
                 mySpec.log().all();
                 spec.getLog().flush();
             }
+            //always set urlEncoding, the RASpec implementation should default to true.
+            mySpec.urlEncodingEnabled(spec.urlEncode());
 //            keeping this as a reference in case I need to expose it for some reason.
 //            io.restassured.RestAssured.urlEncodingEnabled = false;
 
