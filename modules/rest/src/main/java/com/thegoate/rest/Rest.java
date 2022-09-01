@@ -50,6 +50,7 @@ public abstract class Rest implements RestSpec {
     protected String baseURL = "";//this should include the port if different from default.
     protected int timeout = 15;
     protected boolean logAll = true;
+    protected boolean urlEncode = true;
     public static final String MP_ID_NOT_SET = "_mp_id_not_set";
     public enum BODY {
         form, urlencoded, raw, binary, multipart
@@ -329,5 +330,16 @@ public abstract class Rest implements RestSpec {
     @Override
     public int getTimeout(){
         return timeout;
+    }
+
+    @Override
+    public RestSpec urlEncode(boolean encode){
+        this.urlEncode = encode;
+        return this;
+    }
+
+    @Override
+    public boolean urlEncode(){
+        return this.urlEncode;
     }
 }
