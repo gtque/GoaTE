@@ -29,6 +29,7 @@ package com.thegoate;
 
 import static com.thegoate.expect.validate.Validate.HEALTH_CHECK;
 import static com.thegoate.logging.volume.VolumeKnob.volume;
+import static java.lang.Thread.currentThread;
 
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.annotations.GhostProtocol;
@@ -56,6 +57,7 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 	public volatile static List<String> ghosts = null;
 	Interpreter dictionary;
 	boolean increment = true;
+	static volatile Map<String, Integer> prettyPrintTabs = new ConcurrentHashMap<>();
 
 	public Goate() {
 		init();
@@ -529,28 +531,55 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 		return this;
 	}
 
-	public String toString() {
-		return toString("", "");
+	private String tabs(int numberOfTabs){
+		StringBuilder tabs = new StringBuilder();
+		for(;numberOfTabs>0;numberOfTabs--){
+			tabs.append("\t");
+		}
+		return tabs.toString();
 	}
 
-	public static volatile int innerGoate = 0;
+	public String toString() {
+		String prepadding = "";
+//		if(prettyPrintTabs.containsKey(currentThread().getName())){
+//			prepadding += prettyPrintTabs.get(currentThread().getName());
+//		}
+		return toString(prepadding, "");
+	}
+
+	//public static volatile int innerGoate = 0;
 
 	public String toString(String prepadding, String postpadding){
+//		if(prettyPrintTabs.containsKey(currentThread().getName())){
+//			prepadding += prettyPrintTabs.get(currentThread().getName());
+//		}
+//		prettyPrintTabs.put(currentThread().getName(),prepadding);
 		return toString(prepadding, postpadding, true);
 	}
 
 	public String toString(String prepadding, String postpadding, boolean newLine) {
 		if(stale) {
+			int tabCount = 0;
+			if(prettyPrintTabs.containsKey(currentThread().getName())){
+				tabCount = prettyPrintTabs.get(currentThread().getName());
+//				prepadding += initial_padding;
+			}
+			String tabs = tabs(tabCount);
+			String tabInnerGoate = tabs(tabCount);
 			StringBuilder sb = new StringBuilder();
-			if (innerGoate > 0) {
+			if (tabCount > 0) {
+//				sb.append("\n").append(prepadding).append(tabInnerGoate).append("Goate[");
+				tabs = tabs(tabCount+1);
 				sb.append("Goate[");
 				if (newLine) {
 					sb.append("\n");
+//					tabCount++;
+//					tabs = tabs(tabCount);
 				}
 			}
 			// parentInner = innerGoate;
-			innerGoate++;
 			boolean appendNewLine = false;
+			prettyPrintTabs.put(currentThread().getName(), tabCount+1);
 			for (String key : keys()) {
 				if (appendNewLine && newLine) {
 					sb.append("\n");
@@ -562,17 +591,19 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 				if (key.startsWith(HEALTH_CHECK)) {
 					message = new Veterinarian((Goate) message);
 					key = key.replace(HEALTH_CHECK, "");
+//					prettyPrintTabs.put(currentThread().getName(), tabCount+2);
 				}
-				sb.append(prepadding).append(key).append(":").append(volume(message)).append(postpadding);
+				sb.append(prepadding).append(tabs).append(key).append(":").append(volume(message)).append(postpadding);
 			}
-			innerGoate--;
-			if (innerGoate > 0) {
+			prettyPrintTabs.put(currentThread().getName(), tabCount);
+			if (tabCount > 0) {
 				if (newLine) {
 					sb.append("\n");
 				}
-				sb.append("]");
+				sb.append(tabInnerGoate).append("]");
 			}
 			entry = sb.toString();
+//			prettyPrintTabs.put(currentThread().getName(),initial_padding);
 		}
 		return entry;
 	}

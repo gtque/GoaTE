@@ -17,7 +17,8 @@ public final class Veterinarian {
 	@Override
 	public String toString(){
 		if(health!=null){
-			return "\n" + health.toString("\t\t", "");
+			String chart = "" + health.toString();
+			return chart;
 		}
 		return null;
 	}

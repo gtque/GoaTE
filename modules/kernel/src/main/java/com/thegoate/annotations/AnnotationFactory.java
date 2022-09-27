@@ -215,6 +215,7 @@ public class AnnotationFactory {
                     if (check != null) {
                         Object theCheck = check.invoke(service);
                         if (theCheck != null && theCheck.getClass().isArray()) {
+                            listing.put("" + theClass, klass.forName(theClass));
                             for (Object aido : (Object[]) theCheck) {
                                 listing.put("" + aido, klass.forName(theClass));
                             }

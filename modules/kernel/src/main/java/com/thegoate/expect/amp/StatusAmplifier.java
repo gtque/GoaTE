@@ -56,7 +56,7 @@ public abstract class StatusAmplifier extends BasicAmplifier {
             p.drop("stack");
         }
         if (p.get("actual") != null && p.get("actual") instanceof String) {
-            if (p.get("actual", "", String.class).equals(p.get("from"))) {
+            if (p.get("actual", "", String.class).equals(p.get("from"))||p.get("actual", "", String.class).equals("actual")) {
                 p.drop("from");
             }
             p.put("actual", p.get("actual", "", String.class).replace(GOATE_VARIABLE_PREFIX, ""));

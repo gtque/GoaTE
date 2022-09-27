@@ -3,8 +3,11 @@ package com.thegoate.dsl.words;
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.data.DataSeriesLoader;
+import com.thegoate.dsl.words.employee.SimpleEmployee;
 import com.thegoate.expect.Expectation;
 import com.thegoate.spreadsheets.data.SpreadSheetDL;
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.NoOp;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.fill.serialize.pojos.SimplePojo;
 import org.testng.annotations.Test;
@@ -12,6 +15,8 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.thegoate.dsl.words.EmployeeDSL.employee;
+import static com.thegoate.dsl.words.HireDSL.hire;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -94,5 +99,41 @@ public class TestWords extends TestNGEngineMethodDL {
                 .actual(d.get("value", "", String.class).contains("current time::"))
                 .isEqualTo(false)
                 .failureMessage(d.get("value", "", String.class)));
+    }
+
+    @Test(groups = {"unit"})
+    public void hire42ByJob() {
+        int result = (Integer) new Goate().put("employee", "hire::return 42")
+                .get("employee", new NoOp(), Employee.class).build().work();
+        expect(Expectation.build()
+                .actual(result)
+                .isEqualTo(42));
+    }
+
+    @Test(groups = {"unit"})
+    public void hire42ByClass() {
+        int result = (Integer) new Goate().put("employee", hire(SimpleEmployee.class.getName()))
+                .get("employee", new NoOp(), Employee.class).build().work();
+        expect(Expectation.build()
+                .actual(result)
+                .isEqualTo(42));
+    }
+
+    @Test(groups = {"unit"})
+    public void employee42ByJob() {
+        int result = (Integer) new Goate().put("employee", "employee::return 42")
+                .get("employee", new NoOp(), Employee.class).build().work();
+        expect(Expectation.build()
+                .actual(result)
+                .isEqualTo(42));
+    }
+
+    @Test(groups = {"unit"})
+    public void employee42ByClass() {
+        int result = (Integer) new Goate().put("employee", employee(SimpleEmployee.class.getName()))
+                .get("employee", new NoOp(), Employee.class).build().work();
+        expect(Expectation.build()
+                .actual(result)
+                .isEqualTo(42));
     }
 }

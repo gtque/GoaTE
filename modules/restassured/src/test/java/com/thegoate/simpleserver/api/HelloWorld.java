@@ -44,6 +44,24 @@ import java.util.List;
 @RequestMapping("/hello")
 public class HelloWorld {
 
+	@GetMapping("/test/{name}/hello")
+	public String testPathParam(@PathVariable String name){
+		String greeting = "{\"error\":\"nemo\"}";
+		if(name != null && !name.isEmpty()){
+			greeting = "{\"greeting\":\"hello, "+name+"\"}";
+		}
+		return greeting;
+	}
+
+	@PostMapping("/test/{name}/hey")
+	public String testHeyPathParam(@PathVariable String name){
+		String greeting = "{\"error\":\"nemo\"}";
+		if(name != null && !name.isEmpty()){
+			greeting = "{\"greeting\":\"hello, "+name+"\"}";
+		}
+		return greeting;
+	}
+
 	@PutMapping("/world")
 	public String putWorld() {
 		return getWorld();
