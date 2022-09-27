@@ -400,4 +400,29 @@ public class RATests extends SpringTestEngine {
 			.isPresent(true));
 		//	}
 	}
+
+    @Test(groups = {"unit"})
+    public void pathParametersTestHello() {
+        Object rest = new RestCall<>()
+                .baseURL(baseURL())
+				.urlEncode(false)
+                .get("test//hello");
+//        expect(Expectation.build()
+//                .actual("error")
+//                .from(rest)
+//                .isEqualTo("nemo"));
+    }
+
+	@Test(groups = {"unit"})
+	public void pathParametersTestHey() {
+		Object rest = new RestCall<>()
+				.baseURL(baseURL())
+				.urlEncode(false)
+				.pathParam("name", "empty::")
+				.post("test/{name}/hey");
+//		expect(Expectation.build()
+//				.actual("error")
+//				.from(rest)
+//				.isEqualTo("nemo"));
+	}
 }

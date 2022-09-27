@@ -2230,4 +2230,11 @@ public class ExpectTests extends TestNGEngineMethodDL {
                 .actual(builder.build().size())
                 .isEqualTo(5));
     }
+
+    @Test(groups = {"unit"})
+    public void intToDecimal() {
+        expect(Expectation.build()
+                .actual("42")
+                .isEqualTo(42.0));
+    }
 }

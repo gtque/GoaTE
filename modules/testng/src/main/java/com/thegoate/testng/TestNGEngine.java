@@ -558,7 +558,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     public void logStatuses(ExpectEvaluator ev, boolean logFailuresDefault) {
-        Goate.innerGoate = -1;
+        //Goate.innerGoate = -1;
         try {
             String passes = new PassAmplifier(null)
                     .muteFrom(eut("expect.mute", muteFrom, Boolean.class))
@@ -595,7 +595,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
             t.printStackTrace();
             throw t;
         }
-        Goate.innerGoate = 0;
+//        Goate.innerGoate = 0;
     }
 
     @Override
