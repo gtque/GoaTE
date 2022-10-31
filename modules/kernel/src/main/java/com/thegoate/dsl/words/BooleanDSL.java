@@ -38,7 +38,7 @@ import com.thegoate.dsl.PrimitiveDSL;
  */
 @GoateDSL(word = "boolean")
 @GoateDescription(description = "Returns the boolean representation of the value.")
-public class BooleanDSL extends PrimitiveDSL {
+public class BooleanDSL extends PrimitiveDSL<Boolean> {
     public BooleanDSL(Object value) {
         super(value);
     }
@@ -49,7 +49,7 @@ public class BooleanDSL extends PrimitiveDSL {
     }
 
     @Override
-    public Object evaluate(Goate data) {
+    public Boolean evaluate(Goate data) {
         String value = "" + get(1,data);
         return Boolean.parseBoolean(value);
     }

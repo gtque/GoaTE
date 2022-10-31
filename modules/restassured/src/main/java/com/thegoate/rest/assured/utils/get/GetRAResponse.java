@@ -101,6 +101,8 @@ public class GetRAResponse extends GetTool implements ResetStatic {
                 result = r.header(selector.toString().substring("header".length()).trim());
             } else if (selector.toString().startsWith("cookie")) {
                 result = r.cookie(selector.toString().substring("cookie".length()).trim());
+            } else if (selector.toString().startsWith("detailedCookies")) {//this has to be checked before detailedCookie
+                result = r.detailedCookies();
             } else if (selector.toString().startsWith("detailedCookie")) {
                 result = r.detailedCookie(selector.toString().substring("detailedCookie".length()).trim());
             } else if (selector.toString().startsWith("body as input stream") || selector.toString().startsWith("input stream")) {

@@ -30,7 +30,7 @@ package com.thegoate.dsl;
 /**
  * Created by gtque on 4/21/2017.
  */
-public abstract class PrimitiveDSL extends DSL {
+public abstract class PrimitiveDSL<T> extends DSL<T> {
     public PrimitiveDSL(Object value) {
         super(value);
     }

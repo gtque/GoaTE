@@ -36,7 +36,7 @@ buildscript {
     dependencies {
 //        classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
         classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.42.0"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.43.0"
         classpath 'com.thegoate:gradle:0.15.8.202104300242'
     }
 }
@@ -146,7 +146,7 @@ subprojects {
         testImplementation 'ch.qos.logback:logback-classic:1.2.11'
         testImplementation 'ch.qos.logback:logback-access:1.2.11'
         testImplementation 'ch.qos.logback:logback-core:1.2.11'
-        testImplementation 'org.codehaus.janino:janino:3.1.7'
+        testImplementation 'org.codehaus.janino:janino:3.1.8'
         annotationProcessor 'org.atteo.classindex:classindex:3.11'
         testAnnotationProcessor 'org.atteo.classindex:classindex:3.11'
     }

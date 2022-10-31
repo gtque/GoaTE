@@ -136,4 +136,28 @@ public class TestWords extends TestNGEngineMethodDL {
                 .actual(result)
                 .isEqualTo(42));
     }
+
+    @Test(groups = {"unit"})
+    public void notTrue() {
+        boolean result = new Goate().get("value", "not::true", Boolean.class);
+        expect(Expectation.build()
+                .actual(result)
+                .isEqualTo(false));
+    }
+
+    @Test(groups = {"unit"})
+    public void notFalse() {
+        boolean result = new Goate().get("value", "not::false", Boolean.class);
+        expect(Expectation.build()
+                .actual(result)
+                .isEqualTo(true));
+    }
+
+    @Test(groups = {"unit"})
+    public void notFalseNotBoolean() {
+        boolean result = new Goate().get("value", "not::truth", Boolean.class);
+        expect(Expectation.build()
+                .actual(result)
+                .isEqualTo(true));
+    }
 }

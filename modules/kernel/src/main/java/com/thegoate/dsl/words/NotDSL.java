@@ -24,16 +24,33 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-import com.thegoate.gradle.GoateDepends;
-dependencies{
-    GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
-    api  d.depends(":kernel", project.internalVersion);
-    api  'org.apache.poi:poi:5.2.3';
-    api  "org.apache.poi:poi-scratchpad:5.2.3"
-    api  "org.apache.poi:poi-excelant:5.2.3"
-    api  "org.apache.poi:poi-ooxml:5.2.3"
-    api  'org.apache.commons:commons-csv:1.9.0';
-	api  "org.apache.xmlbeans:xmlbeans:5.1.1";
-    testImplementation d.depends(":json", project.internalVersion);
-    testImplementation d.depends(":testng", project.internalVersion);
+
+package com.thegoate.dsl.words;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.dsl.GoateDSL;
+import com.thegoate.dsl.PrimitiveDSL;
+
+/**
+ * Returns the not (aka inverse) boolean representation of the value.
+ * Created by gtque on 10/24/2022.
+ */
+@GoateDSL(word = "not")
+@GoateDescription(description = "Returns the boolean representation of the value.")
+public class NotDSL extends PrimitiveDSL<Boolean> {
+    public NotDSL(Object value) {
+        super(value);
+    }
+
+    @Override
+    public Class classType() {
+        return Boolean.TYPE;
+    }
+
+    @Override
+    public Boolean evaluate(Goate data) {
+        String value = "" + get(1,data);
+        return !Boolean.parseBoolean(value);
+    }
 }

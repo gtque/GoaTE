@@ -40,6 +40,7 @@ public abstract class Rest implements RestSpec {
 
     public static final String typeSeparator = "<type>";
 
+    protected Goate cookies = new Goate();
     protected Goate headers = new Goate();
     protected Goate queryParams = new Goate();
     protected Goate urlParams = new Goate();
@@ -104,6 +105,22 @@ public abstract class Rest implements RestSpec {
     @Override
     public RestSpec header(String key, Object value) {
         headers.put(key, value);
+        return this;
+    }
+
+    @Override
+    public RestSpec cookies(Goate data) {
+        if(data!=null) {
+            for (String key : data.keys()) {
+                cookie(key, data.get(key));
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public RestSpec cookie(String key, Object value) {
+        cookies.put(key, value);
         return this;
     }
 
@@ -302,6 +319,11 @@ public abstract class Rest implements RestSpec {
     @Override
     public Goate getHeaders(){
         return headers;
+    }
+
+    @Override
+    public Goate getCookies(){
+        return cookies;
     }
 
     @Override
