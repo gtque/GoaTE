@@ -45,6 +45,10 @@ public interface RestSpec {
 
     RestSpec header(String key, Object value);
 
+    RestSpec cookies(Goate data);
+
+    RestSpec cookie(String key, Object value);
+
     RestSpec queryParams(Goate data);
 
     RestSpec queryParam(String key, Object value);
@@ -110,6 +114,8 @@ public interface RestSpec {
     boolean urlEncode();
 
     Goate getHeaders();
+
+    Goate getCookies();
 
     Goate getQueryParameters();
 

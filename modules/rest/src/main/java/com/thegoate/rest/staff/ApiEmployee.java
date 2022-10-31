@@ -67,6 +67,7 @@ public abstract class ApiEmployee<T> extends Employee<T> {
         if(spec!=null) {
             spec.baseURL(definition.get("base url", null, true, String.class));
             spec.headers(definition.filterAndSplitKeyValuePairs("headers."));
+            spec.cookies(definition.filterAndSplitKeyValuePairs("cookies."));
             spec.urlParams(definition.filterAndSplitKeyValuePairs("url params."));
             spec.queryParams(definition.filterAndSplitKeyValuePairs("query params."));
             spec.pathParams(definition.filterAndSplitKeyValuePairs("path params."));

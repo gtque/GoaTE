@@ -35,11 +35,11 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
-
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.LogConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
+import io.restassured.http.Cookie;
+import io.restassured.http.Cookies;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -73,7 +73,7 @@ public class RestAssured extends Rest implements RASpec {
 
     public static RequestSpecification init(RequestSpecification specification, RASpec spec) {
         specification = specification == null ? given() : specification;
-        RestAssuredConfig rac = spec.getConfig() == null?new RestAssuredConfig():(RestAssuredConfig)spec.getConfig();
+        RestAssuredConfig rac = spec.getConfig() == null ? new RestAssuredConfig() : (RestAssuredConfig) spec.getConfig();
         PrintStream streamer = getPrintStream(spec.getLog());
         LogConfig lc = new LogConfig(streamer, true);
         SSLConfig sslc = new SSLConfig().allowAllHostnames().relaxedHTTPSValidation();
@@ -103,6 +103,7 @@ public class RestAssured extends Rest implements RASpec {
             setQueryParameters(mySpec, spec.getQueryParameters());
             setPathParameters(mySpec, spec.getPathParameters());
             setBody(mySpec, spec.getBody());
+            setCookies(mySpec, spec.getCookies());
             if (spec.doLog()) {
                 mySpec.log().all();
                 spec.getLog().flush();
@@ -168,6 +169,21 @@ public class RestAssured extends Rest implements RASpec {
         }
     }
 
+    protected static void setCookies(RequestSpecification spec, Goate cookies) {
+        if (cookies != null && spec != null) {
+            for (String key : cookies.keys()) {
+                Object cookie = cookies.get(key);
+                if (cookie instanceof Cookies) {
+                    spec.cookies((Cookies) cookie);
+                } else if (cookie instanceof Cookie) {
+                    spec.cookie((Cookie) cookie);
+                } else {
+                    spec.cookie(key, cookies.get(key));
+                }
+            }
+        }
+    }
+
     protected static void setURLParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
 //            spec.params(params.data());
@@ -204,7 +220,7 @@ public class RestAssured extends Rest implements RASpec {
                         String[] keyParts = id.split(typeSeparator);
                         String type = null;
                         String idkey = keyParts[0];
-                        if(keyParts.length>1){
+                        if (keyParts.length > 1) {
                             type = keyParts[1];
                         }
                         if (key.equals(BODY.urlencoded.name()) || key.equals(BODY.form.name())) {
@@ -214,19 +230,19 @@ public class RestAssured extends Rest implements RASpec {
                                 spec.multiPart((File) b.get(id));
                             } else {
                                 if (b.get(id) instanceof File) {
-                                    if(type!=null) {
+                                    if (type != null) {
                                         spec.multiPart(idkey, (File) b.get(id), type);
                                     } else {
                                         spec.multiPart(idkey, (File) b.get(id));
                                     }
                                 } else if (b.get(id) instanceof String) {
-                                    if(type!=null) {
+                                    if (type != null) {
                                         spec.multiPart(idkey, "" + b.get(id), type);
                                     } else {
                                         spec.multiPart(idkey, "" + b.get(id));
                                     }
                                 } else {
-                                    if(type!=null){
+                                    if (type != null) {
                                         spec.multiPart(idkey, b.get(id), type);
                                     } else {
                                         spec.multiPart(idkey, b.get(id));

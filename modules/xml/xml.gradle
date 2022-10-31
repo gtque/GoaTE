@@ -28,6 +28,6 @@ import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
     api  d.depends(":kernel", project.internalVersion);
-    api  "org.jsoup:jsoup:1.13.1";
+    api  "org.jsoup:jsoup:1.15.3";
     testImplementation d.depends(":testng", project.internalVersion);
 }

@@ -35,6 +35,7 @@ import com.thegoate.staff.GoateJob;
 
 import java.lang.reflect.InvocationTargetException;
 
+import static com.thegoate.Goate.GOATE_VARIABLE_PREFIX;
 import static com.thegoate.rest.Rest.typeSeparator;
 
 /**
@@ -122,6 +123,16 @@ public class RestCall<T> {
 
     public RestCall<T> header(String key, String param) {
         definition.put("headers.##", key + ":=" + param);
+        return this;
+    }
+
+    public RestCall<T> cookie(String key, String cookie) {
+        definition.put("cookies.##", key + ":=" + cookie);
+        return this;
+    }
+
+    public RestCall<T> cookies(Object cookieCollection) {
+        definition.put("cookies.##", GOATE_VARIABLE_PREFIX + "cookies:=" + cookieCollection);
         return this;
     }
 

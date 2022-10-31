@@ -36,6 +36,7 @@ import com.thegoate.utils.togoate.ToGoate;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -189,9 +190,9 @@ public class Serializer<T, S, U> extends Cereal {
                     }
                     Iterator it = collection.iterator();
                     int count = 0;
-                    while(it.hasNext()){
+                    while (it.hasNext()) {
                         Object o = it.next();
-                        if(o!=null) {
+                        if (o != null) {
                             Class type = o.getClass();
                             if (checkNotPrimitive(type) && doSerialize(pojo.getClass())) {
                                 if (!type.equals(pojo.getClass())) {
@@ -200,13 +201,13 @@ public class Serializer<T, S, U> extends Cereal {
                             } else {
                                 data.put("" + count, o);
                             }
-                        } else if(includeNulls){
+                        } else if (includeNulls) {
                             data.put("" + count, "null::");
                         }
                         count++;
                     }
                 } else if (Map.class.isAssignableFrom(klass)) {
-                    Map<?,?> map = (Map)pojo;
+                    Map<?, ?> map = (Map) pojo;
                 }
             } else {
                 Map<String, Field> fields = gr.findFields(pojo.getClass());
@@ -236,7 +237,12 @@ public class Serializer<T, S, U> extends Cereal {
                                     if (!java.lang.reflect.Modifier.isStatic(field.getValue().getModifiers())) {
                                         if (checkNotPrimitive(type) && doSerialize(pojo.getClass())) {
                                             if (!type.equals(pojo.getClass())) {
-                                                addMap(data, o, fieldKey);
+                                                Class serializeFormat = getFormat(field.getValue());
+                                                if (serializeFormat != null) {
+                                                    data.put(fieldKey, doFormat(o, serializeFormat));
+                                                } else {
+                                                    addMap(data, o, fieldKey);
+                                                }
                                             }
                                         } else {
                                             data.put(fieldKey, o);
@@ -257,6 +263,18 @@ public class Serializer<T, S, U> extends Cereal {
             }
         }
         return data;
+    }
+
+    private Class getFormat(Field field) {
+        Class formatter = null;
+        if (field.getType() == LocalDate.class) {
+            formatter = LocalDate.class;
+        }
+        return formatter;
+    }
+
+    private Object doFormat(Object o, Class formatter) {
+        return "" + o;//just return as string for now.
     }
 
     private boolean doSerialize(Class pojoType) {

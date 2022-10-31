@@ -890,4 +890,13 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
                 .from(userJ)
                 .isEqualTo(user.getUserName()));
     }
+
+    @Test(groups = {"unit"})
+    public void localDateSerialize() {
+        JustLocalDate ld = new JustLocalDate().setTheDate(LocalDate.of(2009, 11, 24));
+        Object act = new Serializer<>(ld).to(new JsonString());
+        expect(Expectation.build()
+                .actual(act)
+                .isEqualTo("{\"theDate\":\"2009-11-24\"}"));
+    }
 }

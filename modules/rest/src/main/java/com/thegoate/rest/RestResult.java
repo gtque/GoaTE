@@ -42,7 +42,7 @@ public class RestResult {
     public static final String inputStream = "input stream";
     public static final String content = "_goate rest result content";
     public static final String byteArray = "_goate rest result asByteArray";
-
+    public static final String detailedCookies = "detailedCookies";
     public static final String header(String header) {
         return "header " + header;
     }

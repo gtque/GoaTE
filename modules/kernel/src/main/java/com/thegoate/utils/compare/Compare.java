@@ -41,7 +41,7 @@ import com.thegoate.utils.type.FindType;
 @UtilCache(name = "compare", useCache = true)
 public class Compare extends UnknownUtilType implements CompareUtility {
     final BleatBox LOG = BleatFactory.getLogger(getClass());
-    CompareUtility tool = null;
+//    CompareUtility tool = null;
     Object actual = null;
     Object operator = null;
     Object expected = null;
@@ -71,7 +71,8 @@ public class Compare extends UnknownUtilType implements CompareUtility {
 
     @Override
     public Goate healthCheck() {
-        return new Goate().merge(health, false).merge(tool != null ? tool.healthCheck() : new Goate(), false);
+        //return new Goate().merge(health, false).merge(tool != null ? tool.healthCheck() : new Goate(), false);
+        return new Goate().merge(health, false);
     }
 
     @Override
@@ -83,26 +84,31 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     @Override
     public boolean evaluate() {
         boolean result = false;
+        CompareUtility tool = lookupTool();
         try {
-            if (lookupTool()) {
+            if (tool != null) {
                 result = tool.evaluate();//step into evaluate here to debug the comparator implementation
             }
             if (!result) {
-                CompareUtil toolAnnotation = tool.getClass().getAnnotation(CompareUtil.class);
-                health.put("compare tool", new Goate()
-                        .put("name", tool.getClass().getSimpleName())
-                        .put("operator", toolAnnotation.operator())
-                        .put("type", toolAnnotation.type().getSimpleName()));
+                if(tool != null) {
+                    CompareUtil toolAnnotation = tool.getClass().getAnnotation(CompareUtil.class);
+                    health.put("compare tool", new Goate()
+                            .put("name", tool.getClass().getSimpleName())
+                            .put("operator", toolAnnotation.operator())
+                            .put("type", toolAnnotation.type().getSimpleName()));
+                }
             }
+            health.merge(tool != null ? tool.healthCheck() : new Goate(), false);
         } catch (Exception e) {
             LOG.debug("Compare", "Failed to compare: " + e.getMessage(), e);
         }
         return result;
     }
 
-    protected boolean lookupTool() {
+    protected CompareUtility lookupTool() {
         Object act = actual;
         Object exp = expected;
+        CompareUtility tool = null;
         Class type = new FindType().type(act);
         health.put("actual_type", type!=null?type.getSimpleName():"actual type not detected");
         Class etype = new FindType().type(exp);
@@ -130,13 +136,12 @@ public class Compare extends UnknownUtilType implements CompareUtility {
         //if tool is still null, this indicates a problem trying to find the
         //right comparator. Either nothing was found or there was no default.
         // if tool is null, re-run debug and step into buildtool above.
-        boolean result = true;
         if (tool == null) {
-            result = false;
+            LOG.warn("Compare Tool", "failed to find the proper compare tool");
             health.put("Tool Not Found", "Could not find \"" + operator + "\" for: " + actual + ", of type: " + type.getName());
+            health.put("tool", tool);
         } else {
             if (compareNumeric && tool instanceof CompareObject) {
-                result = false;
                 health.put("Tool Not Found", "Expecting to compare a numeric, but did not find an implementation for the numeric type: \"" + operator + "\" for: " + actual.getClass());
             } else {
                 LOG.debug("Compare", "Found comparator: " + tool.getClass());
@@ -146,7 +151,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
                 tool.actual(actual).to(expected).using(operator);
             }
         }
-        return result;
+        return tool;
     }
 
     protected CompareUtility buildTool(Object checkFor) {
@@ -164,10 +169,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     }
 
     public CompareUtility getTool() {
-        if (tool == null) {
-            tool = buildTool(actual);
-        }
-        return tool;
+        return buildTool(actual);
     }
 
     @Override
