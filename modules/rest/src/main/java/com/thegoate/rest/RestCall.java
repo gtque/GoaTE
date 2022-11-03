@@ -132,7 +132,9 @@ public class RestCall<T> {
     }
 
     public RestCall<T> cookies(Object cookieCollection) {
-        definition.put("cookies.##", GOATE_VARIABLE_PREFIX + "cookies:=" + cookieCollection);
+		String cookieId = GOATE_VARIABLE_PREFIX + System.currentTimeMillis();
+        definition.put("cookies.##", GOATE_VARIABLE_PREFIX + "cookies:=o::" + cookieId);
+		definition.put(cookieId, cookieCollection);
         return this;
     }
 

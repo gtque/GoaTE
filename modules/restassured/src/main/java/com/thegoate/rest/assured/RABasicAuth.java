@@ -30,6 +30,8 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.RestAuthBasicUserPW;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
+
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
