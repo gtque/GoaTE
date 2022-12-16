@@ -490,20 +490,20 @@ public class CompareTests extends TestNGEngineMethodDL {
                 .isEqualTo(a2));
     }
 
-	@ExpectToFail
-	@Test(groups = {"unit"})
-	public void zeroNotEqual() {
-		expect(Expectation.build()
-			.setId("isequalto")
-			.actual(0)
-			.isEqualTo(0)
-			.failureMessage("this should pass, because they are equal."));
-		expect(Expectation.build()
-			.setId("isgreaterthan")
-			.actual(0)
-			.isGreaterThan(0)
-			.failureMessage("this should fail, because they arent equal."));
-	}
+    @ExpectToFail
+    @Test(groups = {"unit"})
+    public void zeroNotEqual() {
+        expect(Expectation.build()
+                .setId("isequalto")
+                .actual(0)
+                .isEqualTo(0)
+                .failureMessage("this should pass, because they are equal."));
+        expect(Expectation.build()
+                .setId("isgreaterthan")
+                .actual(0)
+                .isGreaterThan(0)
+                .failureMessage("this should fail, because they arent equal."));
+    }
 
     @Test(groups = {"unit"})
     public void checkArrayIgnoreOrder() {
@@ -512,5 +512,12 @@ public class CompareTests extends TestNGEngineMethodDL {
         expect(Expectation.build()
                 .actual(a1)
                 .isEqualToIgnoreOrder(a2));
+    }
+
+    @Test(groups = {"unit"})
+    public void dateIsNotNull() {
+        expect(Expectation.build()
+                .actual("2019-01-01")
+                .isNotEqualTo(null));
     }
 }
