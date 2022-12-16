@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Goate.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate</a> &gt; <span class="el_source">Goate.java</span></div><h1>Goate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate;
+
+import static com.thegoate.expect.validate.Validate.HEALTH_CHECK;
+import static com.thegoate.logging.volume.VolumeKnob.volume;
+
+import com.thegoate.dsl.Interpreter;
+import com.thegoate.logging.volume.Diary;
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.togoate.ToGoate;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+/**
+ * The manager for the collection of test data.
+ * Created by gtque on 4/19/2017.
+ */
+public class Goate implements HealthMonitor, Diary {
+
+	public static final String GOATE_VARIABLE_PREFIX = &quot;_goate_(%$#)_&quot;;
+<span class="fc" id="L50">	Map&lt;String, Object&gt; data = new ConcurrentHashMap&lt;&gt;();</span>
+	Interpreter dictionary;
+<span class="fc" id="L52">	boolean increment = true;</span>
+
+<span class="fc" id="L54">	public Goate() {</span>
+<span class="fc" id="L55">		init();</span>
+<span class="fc" id="L56">	}</span>
+
+<span class="fc" id="L58">	public Goate(Map&lt;String, ?&gt; initialData) {</span>
+<span class="fc" id="L59">		init();</span>
+<span class="fc" id="L60">		putMap(initialData);</span>
+<span class="fc" id="L61">	}</span>
+
+	protected void init() {
+<span class="fc" id="L64">		dictionary = new Interpreter(this);</span>
+<span class="fc" id="L65">	}</span>
+
+	public Goate autoIncrement(boolean increment) {
+<span class="fc" id="L68">		this.increment = increment;</span>
+<span class="fc" id="L69">		return this;</span>
+	}
+
+	public int size() {
+<span class="fc" id="L73">		int size = 0;</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">		if (data != null) {</span>
+<span class="fc" id="L75">			size = data.size();</span>
+		}
+<span class="fc" id="L77">		return size;</span>
+	}
+
+	public Map&lt;String, Object&gt; data() {
+<span class="nc" id="L81">		Map&lt;String, Object&gt; mapped = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">		for (String key : keys()) {</span>
+<span class="nc" id="L83">			mapped.put(key, get(key));</span>
+<span class="nc" id="L84">		}</span>
+<span class="nc" id="L85">		stale = true;</span>
+<span class="nc" id="L86">		return mapped;</span>
+	}
+
+	public Set&lt;String&gt; keys() {
+<span class="fc" id="L90">		return new TreeSet&lt;&gt;(data.keySet());</span>
+	}
+
+	public String[] keysArray() {
+<span class="nc" id="L94">		String[] keys = new String[data.keySet().size()];</span>
+<span class="nc" id="L95">		int i = 0;</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">		for (String key : data.keySet()) {</span>
+<span class="nc" id="L97">			keys[i] = key;</span>
+<span class="nc" id="L98">			i++;</span>
+<span class="nc" id="L99">		}</span>
+<span class="nc" id="L100">		return keys;</span>
+	}
+
+	public Goate putMap(Map&lt;?,?&gt; map){
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">		if(map != null) {</span>
+<span class="fc" id="L105">			map.entrySet().parallelStream().forEach(e -&gt; put(&quot;&quot; + e.getKey(), e.getValue()));</span>
+		}
+<span class="fc" id="L107">		return this;</span>
+	}
+
+	public Goate put(String key, Object value) {
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">		if (data == null) {</span>
+<span class="nc" id="L112">			data = new ConcurrentHashMap&lt;&gt;();</span>
+		}
+		//        if(value!=null) {
+<span class="fc bfc" id="L115" title="All 2 branches covered.">		if (key.contains(&quot;##&quot;)) {</span>
+<span class="fc" id="L116">			key = buildKey(key);</span>
+		}
+<span class="fc bfc" id="L118" title="All 2 branches covered.">		data.put(key, value == null ? &quot;null::&quot; : value);//can't put null in a map, so wrap in the null dsl.</span>
+		//        }
+<span class="fc" id="L120">		stale = true;</span>
+<span class="fc" id="L121">		return this;</span>
+	}
+
+	public boolean filterOnKey(String key) {
+<span class="fc" id="L125">		return key.contains(&quot;##&quot;);</span>
+	}
+
+	public String buildKey(String key) {
+<span class="fc" id="L129">		String fullKey = key;</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">		if (increment) {</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">			while (fullKey.contains(&quot;##&quot;)) {</span>
+<span class="fc" id="L132">				Goate billy = filter(fullKey.substring(0, fullKey.indexOf(&quot;##&quot;)) + &quot;[0-9]+&quot;);</span>
+<span class="fc" id="L133">				fullKey = fullKey.replaceFirst(&quot;##&quot;, &quot;&quot; + billy.size());</span>
+<span class="fc" id="L134">			}</span>
+		} else {
+<span class="nc" id="L136">			fullKey = key.replace(&quot;##&quot;, &quot;&quot; + System.nanoTime());</span>
+		}
+<span class="fc" id="L138">		return fullKey;</span>
+	}
+
+	public Object getStrict(String key) {
+<span class="fc" id="L142">		return get(key, null, false);</span>
+	}
+
+	public Object getStrict(String key, Object def) {
+<span class="fc" id="L146">		return get(key, def, false);</span>
+	}
+	public Object get(int index) {
+<span class="nc" id="L149">		Iterator&lt;String&gt; keys = data.keySet().iterator();</span>
+<span class="nc" id="L150">		String key = &quot;&quot;;</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">		while (index &gt;= 0) {</span>
+<span class="nc" id="L152">			key = keys.next();</span>
+<span class="nc" id="L153">			index--;</span>
+		}
+<span class="nc" id="L155">		return data.get(key);</span>
+	}
+
+	public Object get(String key) {
+<span class="fc" id="L159">		return get(key, null, true);</span>
+	}
+
+	public Object get(String key, Object def) {
+<span class="fc" id="L163">		return get(key, def, true);</span>
+	}
+
+	public Object get(String key, Object def, boolean dsl) {
+<span class="fc" id="L167">		return get(key, def, dsl, Object.class);</span>
+	}
+
+	public &lt;T&gt; T get(String key, Object def, Class&lt;T&gt; type) {
+<span class="fc" id="L171">		return get(key, def, true, type);</span>
+	}
+
+	public &lt;T&gt; T get(String key, Object def, boolean dsl, Class&lt;T&gt; type) {
+<span class="fc" id="L175">		Object value = System.getProperty(key);</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">		if (filterOnKey(key)) {</span>
+<span class="fc" id="L177">			value = filter(key.replace(&quot;##&quot;, &quot;[0-9]*&quot;));</span>
+		} else {
+<span class="pc bpc" id="L179" title="1 of 2 branches missed.">			if (value == null) {</span>
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">				if (key.equals(&quot;username&quot;)) {//username is a special key name, in most cases we want to use the one set in the collection</span>
+					//so it is checked first, and then if it is null it, check using the normal flow.
+<span class="nc" id="L182">					value = data.get(key);</span>
+				}
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">				if (value == null) {</span>
+<span class="fc" id="L185">					value = System.getenv(key);</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">					if (value == null) {</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">						if (data.containsKey(key)) {</span>
+<span class="fc" id="L188">							value = data.get(key);</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">						} else if (def != null) {</span>
+<span class="fc" id="L190">							data.put(key, def);</span>
+<span class="fc" id="L191">							stale = true;</span>
+<span class="fc" id="L192">							value = def;</span>
+						}
+					}
+				}
+			}
+<span class="pc bpc" id="L197" title="1 of 4 branches missed.">			if (value == null &amp;&amp; !data.containsKey(key)) {</span>
+<span class="fc" id="L198">				value = def;</span>
+			}
+<span class="fc bfc" id="L200" title="All 4 branches covered.">			if (value != null &amp;&amp; dsl) {</span>
+<span class="fc" id="L201">				value = processDSL(key, value);</span>
+			}
+		}
+<span class="fc bfc" id="L204" title="All 2 branches covered.">		return new GoateReflection().isPrimitive(type) ? doCastPrimitive(value, type) : type.cast(value);</span>
+	}
+
+	public &lt;T&gt; T doCastPrimitive(Object value, Class&lt;T&gt; type) {
+<span class="fc" id="L208">		GoateReflection gr = new GoateReflection();</span>
+<span class="pc bpc" id="L209" title="1 of 4 branches missed.">		if (gr.isBooleanType(type) &amp;&amp; gr.isBoolean(value)) {</span>
+<span class="fc" id="L210">			value = new Boolean(&quot;&quot; + value);</span>
+<span class="pc bpc" id="L211" title="1 of 4 branches missed.">		} else if (gr.isByteType(type) &amp;&amp; gr.isByte(value)) {</span>
+<span class="fc" id="L212">			value = new Byte(&quot;&quot; + value);</span>
+<span class="pc bpc" id="L213" title="1 of 4 branches missed.">		} else if (gr.isIntegerType(type) &amp;&amp; gr.isInteger(value)) {</span>
+<span class="fc" id="L214">			value = new Integer(&quot;&quot; + value);</span>
+<span class="pc bpc" id="L215" title="1 of 4 branches missed.">		} else if (gr.isDoubleType(type) &amp;&amp; gr.isDouble(value)) {</span>
+<span class="fc" id="L216">			value = new Double(&quot;&quot; + value);</span>
+<span class="pc bpc" id="L217" title="1 of 4 branches missed.">		} else if (gr.isFloatType(type) &amp;&amp; gr.isFloat(value)) {</span>
+<span class="fc" id="L218">			value = new Float(&quot;&quot; + value);</span>
+<span class="pc bpc" id="L219" title="1 of 4 branches missed.">		} else if (gr.isLongType(type) &amp;&amp; gr.isLong(value)) {</span>
+<span class="fc" id="L220">			value = new Long(&quot;&quot; + value);</span>
+<span class="pc bpc" id="L221" title="1 of 4 branches missed.">		} else if (gr.isCharacterType(type) &amp;&amp; gr.isCharacter(value)) {</span>
+<span class="fc" id="L222">			value = new Character((&quot;&quot; + value).charAt(0));</span>
+<span class="pc bpc" id="L223" title="2 of 4 branches missed.">		} else if (gr.isShortType(type) &amp;&amp; gr.isShort(value)) {</span>
+<span class="fc" id="L224">			value = new Short(&quot;&quot; + value);</span>
+		}
+<span class="fc" id="L226">		return type.cast(value);</span>
+	}
+
+	public Object processDSL(Object value) {
+<span class="fc" id="L230">		return processDSL(&quot;&quot;, value);</span>
+	}
+
+	public Object processDSL(String key, Object value) {
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">		if (value != null) {</span>
+<span class="fc" id="L235">			String check = &quot;&quot; + value;</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">			if (check.contains(&quot;::&quot;)) {</span>
+<span class="fc" id="L237">				check = check.substring(0, check.indexOf(&quot;::&quot;));</span>
+			} else {
+<span class="fc" id="L239">				check = null;</span>
+			}
+<span class="fc bfc" id="L241" title="All 2 branches covered.">			if (check != null) {</span>
+<span class="fc" id="L242">				value = dictionary.translate(key, check, value);</span>
+			}
+		}
+<span class="fc" id="L245">		return value;</span>
+	}
+
+	public Goate drop(String key) {
+<span class="fc" id="L249">		data.remove(key);</span>
+<span class="fc" id="L250">		stale = true;</span>
+<span class="fc" id="L251">		return this;</span>
+	}
+
+	public Goate scrub(String pattern) {
+<span class="fc" id="L255">		Goate scrub = filter(pattern);</span>
+<span class="pc bpc" id="L256" title="1 of 2 branches missed.">		if (scrub != null) {</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">			for (String key : scrub.keys()) {</span>
+<span class="fc" id="L258">				drop(key);</span>
+<span class="fc" id="L259">			}</span>
+		}
+<span class="fc" id="L261">		stale = true;</span>
+<span class="fc" id="L262">		return this;</span>
+	}
+
+	public String findKeyIgnoreCase(String find) {
+<span class="fc" id="L266">		String key = find;</span>
+<span class="fc" id="L267">		Optional&lt;String&gt; found = keys().parallelStream().filter(k -&gt; k.equalsIgnoreCase(find)).findFirst();</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">		if (found.isPresent()) {</span>
+<span class="fc" id="L269">			key = found.get();</span>
+		}
+<span class="fc" id="L271">		return key;</span>
+	}
+
+	/**
+	 * Simple filter, matches if key starts with the given pattern.
+	 *
+	 * @param pattern The pattern to match
+	 * @return A Goate collection containing matching elements.
+	 */
+	public Goate filter(String pattern) {
+<span class="fc" id="L281">		return filterStrict(pattern + &quot;.*&quot;);</span>
+	}
+
+	/**
+	 * Simple filter, matches if key matches the given pattern
+	 *
+	 * @param pattern The pattern to match
+	 * @return A Goate collection containing matching elements.
+	 */
+	public Goate filterStrict(String pattern) {
+<span class="fc" id="L291">		Goate filtered = new Goate();</span>
+<span class="fc" id="L292">		StringBuilder keyList = new StringBuilder();</span>
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">		if (data != null) {</span>
+<span class="fc bfc" id="L294" title="All 2 branches covered.">			for (String key : keys()) {</span>
+				//                keyList.append(&quot;-!&quot;).append(key).append(&quot;!-&quot;);
+<span class="fc bfc" id="L296" title="All 2 branches covered.">				if (key.matches(pattern)) {</span>
+<span class="fc" id="L297">					filtered.put(key, getStrict(key));</span>
+				}
+<span class="fc" id="L299">			}</span>
+			//            StringBuilder goatePattern = new StringBuilder();
+			//            int countEnding = pattern.endsWith(&quot;)&quot;)?1:0;
+			//            int lastCurlyOpen = pattern.lastIndexOf(&quot;{&quot;);
+			//            int lastCurlyClose = pattern.lastIndexOf(&quot;}&quot;);
+			//            if((countEnding == 1 &amp;&amp; lastCurlyClose!=pattern.length()-2)||lastCurlyOpen&lt;0){
+			//                lastCurlyOpen = pattern.length();
+			//            }
+			//
+			//            goatePattern.append(pattern).insert(countEnding,&quot;(-!&quot;).insert(lastCurlyOpen+3,&quot;!-)&quot;);
+			//            Pattern p = Pattern.compile(goatePattern.toString());
+			//            Matcher m = p.matcher(keyList.toString());
+			//            while (m.find()) {
+			//                String key = m.group().replace(&quot;-!&quot;,&quot;&quot;).replace(&quot;!-&quot;,&quot;&quot;);
+			//                filtered.put(key, getStrict(key));
+			//                //m = p.matcher(pattern);
+			//            }
+		}
+<span class="fc" id="L317">		return filtered;</span>
+	}
+
+	/**
+	 * Simple filter, matches if key does start with the given pattern; ie excludes anything matching the pattern
+	 *
+	 * @param pattern The pattern to match
+	 * @return A Goate collection containing matching elements.
+	 */
+	public Goate filterExclude(String pattern) {
+<span class="fc" id="L327">		Goate filtered = new Goate();</span>
+<span class="pc bpc" id="L328" title="1 of 2 branches missed.">		if (data != null) {</span>
+<span class="fc bfc" id="L329" title="All 2 branches covered.">			for (String key : keys()) {</span>
+<span class="fc bfc" id="L330" title="All 2 branches covered.">				if (!key.matches(pattern + &quot;.*&quot;)) {</span>
+<span class="fc" id="L331">					filtered.put(key, getStrict(key));</span>
+				}
+<span class="fc" id="L333">			}</span>
+		}
+<span class="fc" id="L335">		return filtered;</span>
+	}
+
+	public Goate filterByValue(Object value){
+<span class="fc" id="L339">		Goate filtered = new Goate();</span>
+<span class="pc bpc" id="L340" title="1 of 2 branches missed.">		if(data != null){</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">			for (String key : keys()) {</span>
+<span class="fc bfc" id="L342" title="All 2 branches covered.">				if (new Compare(get(key)).using(&quot;==&quot;).to(value).evaluate()) {</span>
+<span class="fc" id="L343">					filtered.put(key, get(key));</span>
+				}
+<span class="fc" id="L345">			}</span>
+		}
+<span class="fc" id="L347">		return filtered;</span>
+	}
+
+	public Goate filterExcludeByValue(Object value){
+<span class="fc" id="L351">		Goate filtered = new Goate();</span>
+<span class="pc bpc" id="L352" title="1 of 2 branches missed.">		if(data != null){</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">			for (String key : keys()) {</span>
+<span class="fc bfc" id="L354" title="All 2 branches covered.">				if (new Compare(get(key)).using(&quot;!=&quot;).to(value).evaluate()) {</span>
+<span class="fc" id="L355">					filtered.put(key, get(key));</span>
+				}
+<span class="fc" id="L357">			}</span>
+		}
+<span class="fc" id="L359">		return filtered;</span>
+	}
+
+	public Goate scrubKeys(String pattern) {
+<span class="fc" id="L363">		return scrubKeys(pattern, &quot;&quot;);</span>
+	}
+
+	public Goate scrubKeys(String pattern, String sponge) {
+<span class="fc" id="L367">		return scrubSubKeys(&quot;.*&quot;, pattern, sponge);</span>
+	}
+
+	public Goate scrubKeys(String pattern, Sponge sponge) {
+<span class="nc" id="L371">		return scrubSubKeys(&quot;.*&quot;, pattern, sponge);</span>
+	}
+
+	public Goate scrubSubKeys(String pattern, String subkey, String sponge) {
+		//        Goate scrubbed = new Goate();
+<span class="fc" id="L376">		return scrubSubKeys(pattern, subkey, new Sponge() {</span>
+			@Override
+			public String soap(String dirty) {
+<span class="fc" id="L379">				return sponge;</span>
+			}
+		});
+	}
+
+	public Goate scrubSubKeys(String pattern, String subkey, Sponge sponge) {
+<span class="fc" id="L385">		List&lt;String&gt; scrubbed = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L386">		List&lt;String&gt; not_scrubbed = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L387" title="1 of 2 branches missed.">		if (data != null) {</span>
+<span class="fc bfc" id="L388" title="All 2 branches covered.">			for (Map.Entry&lt;String, Object&gt; entry : data.entrySet()) {</span>
+<span class="fc bfc" id="L389" title="All 2 branches covered.">				if (entry.getKey().matches(pattern)) {</span>
+<span class="fc" id="L390">					scrubbed.add(entry.getKey());</span>
+					String soap;
+<span class="pc bpc" id="L392" title="1 of 2 branches missed.">					if (subkey == null) {</span>
+<span class="nc" id="L393">						soap = entry.getKey().replaceFirst(pattern, sponge.soap(entry.getKey()));</span>
+					} else {
+<span class="fc" id="L395">						soap = entry.getKey().replaceFirst(subkey, sponge.soap(entry.getKey()));</span>
+					}
+<span class="fc" id="L397">					this.put(soap, entry.getValue());</span>
+<span class="fc" id="L398">					not_scrubbed.add(soap);</span>
+				}
+<span class="fc" id="L400">			}</span>
+<span class="fc" id="L401">			scrubbed.parallelStream()</span>
+<span class="fc bfc" id="L402" title="All 2 branches covered.">				.filter(scrub -&gt; !not_scrubbed.contains(scrub))</span>
+<span class="fc" id="L403">				.collect(Collectors.toList())</span>
+<span class="fc" id="L404">				.parallelStream().forEach(scrub -&gt; drop(scrub));</span>
+		}
+<span class="fc" id="L406">		stale = true;</span>
+<span class="fc" id="L407">		return this;</span>
+	}
+
+	public Goate filterAndSplitKeyValuePairs(String filter) {
+<span class="fc" id="L411">		return filterAndSplitKeyValuePairs(filter, &quot;:=&quot;);</span>
+	}
+
+	public Goate filterAndSplitKeyValuePairs(String filter, String split) {
+<span class="fc" id="L415">		Goate filtered = new Goate();</span>
+<span class="pc bpc" id="L416" title="1 of 2 branches missed.">		if (data != null) {</span>
+<span class="fc" id="L417">			Goate info = filter(filter);</span>
+<span class="fc bfc" id="L418" title="All 2 branches covered.">			for (String key : info.keys()) {</span>
+<span class="fc" id="L419">				Object strictDef = info.getStrict(key);</span>
+<span class="pc bpc" id="L420" title="1 of 2 branches missed.">				String def = &quot;&quot; + (strictDef == null ? &quot;&quot; : strictDef);</span>
+<span class="fc bfc" id="L421" title="All 2 branches covered.">				if (!def.contains(split)) {</span>
+<span class="fc" id="L422">					def = &quot;&quot; + processDSL(def);</span>
+				}
+<span class="fc bfc" id="L424" title="All 2 branches covered.">				if (def.contains(split)) {</span>
+<span class="fc" id="L425">					String k = def.substring(0, def.indexOf(split));</span>
+<span class="fc" id="L426">					String v = def.substring(def.indexOf(split) + split.length());</span>
+<span class="fc" id="L427">					filtered.put(&quot;&quot; + processDSL(k), processDSL(v));</span>
+				}
+<span class="fc" id="L429">			}</span>
+		}
+<span class="fc" id="L431">		return filtered;</span>
+	}
+
+	public Goate merge(Goate merge, boolean replace) {
+<span class="fc bfc" id="L435" title="All 2 branches covered.">		if (merge != null) {</span>
+<span class="fc" id="L436">			Set&lt;String&gt; myKeys = keys();</span>
+<span class="fc bfc" id="L437" title="All 2 branches covered.">			for (String key : merge.keys()) {</span>
+<span class="fc bfc" id="L438" title="All 2 branches covered.">				if (replace) {</span>
+<span class="fc" id="L439">					put(key, merge.getStrict(key));</span>
+				} else {
+<span class="fc bfc" id="L441" title="All 2 branches covered.">					if (!myKeys.contains(key)) {</span>
+<span class="fc" id="L442">						put(key, merge.getStrict(key));</span>
+					}
+				}
+<span class="fc" id="L445">			}</span>
+		}
+<span class="fc" id="L447">		stale = true;</span>
+<span class="fc" id="L448">		return this;</span>
+	}
+
+	public String toString() {
+<span class="fc" id="L452">		return toString(&quot;&quot;, &quot;&quot;);</span>
+	}
+
+<span class="fc" id="L455">	public static volatile int innerGoate = 0;</span>
+
+	public String toString(String prepadding, String postpadding){
+<span class="fc" id="L458">		return toString(prepadding, postpadding, true);</span>
+	}
+
+	public String toString(String prepadding, String postpadding, boolean newLine) {
+<span class="fc bfc" id="L462" title="All 2 branches covered.">		if(stale) {</span>
+<span class="fc" id="L463">			StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L464" title="All 2 branches covered.">			if (innerGoate &gt; 0) {</span>
+<span class="fc" id="L465">				sb.append(&quot;Goate[&quot;);</span>
+<span class="pc bpc" id="L466" title="1 of 2 branches missed.">				if (newLine) {</span>
+<span class="fc" id="L467">					sb.append(&quot;\n&quot;);</span>
+				}
+			}
+			// parentInner = innerGoate;
+<span class="fc" id="L471">			innerGoate++;</span>
+<span class="fc" id="L472">			boolean appendNewLine = false;</span>
+<span class="fc bfc" id="L473" title="All 2 branches covered.">			for (String key : keys()) {</span>
+<span class="pc bpc" id="L474" title="1 of 4 branches missed.">				if (appendNewLine &amp;&amp; newLine) {</span>
+<span class="fc" id="L475">					sb.append(&quot;\n&quot;);</span>
+<span class="pc bpc" id="L476" title="3 of 4 branches missed.">				} else if (appendNewLine &amp;&amp; !newLine) {</span>
+<span class="nc" id="L477">					sb.append(&quot;; &quot;);</span>
+				}
+<span class="fc" id="L479">				appendNewLine = true;</span>
+<span class="fc" id="L480">				Object message = data.get(key);</span>
+<span class="fc bfc" id="L481" title="All 2 branches covered.">				if (key.startsWith(HEALTH_CHECK)) {</span>
+<span class="fc" id="L482">					message = new Veterinarian((Goate) message);</span>
+<span class="fc" id="L483">					key = key.replace(HEALTH_CHECK, &quot;&quot;);</span>
+				}
+<span class="fc" id="L485">				sb.append(prepadding).append(key).append(&quot;:&quot;).append(volume(message)).append(postpadding);</span>
+<span class="fc" id="L486">			}</span>
+<span class="fc" id="L487">			innerGoate--;</span>
+<span class="fc bfc" id="L488" title="All 2 branches covered.">			if (innerGoate &gt; 0) {</span>
+<span class="pc bpc" id="L489" title="1 of 2 branches missed.">				if (newLine) {</span>
+<span class="fc" id="L490">					sb.append(&quot;\n&quot;);</span>
+				}
+<span class="fc" id="L492">				sb.append(&quot;]&quot;);</span>
+			}
+<span class="fc" id="L494">			entry = sb.toString();</span>
+		}
+<span class="fc" id="L496">		return entry;</span>
+	}
+
+	@Override
+	public boolean equals(Object check) {
+<span class="fc bfc" id="L501" title="All 2 branches covered.">		return compare(check) == 0;</span>
+	}
+
+<span class="fc" id="L504">	private Object health = null;</span>
+<span class="fc" id="L505">	private Object keySet = null;</span>
+
+	private Goate keySet() {
+<span class="fc" id="L508">		return (Goate) keySet;</span>
+	}
+
+	public Goate healthCheck() {
+<span class="fc" id="L512">		return (Goate) health;</span>
+	}
+
+	public String pad(String text, String pad){
+<span class="fc" id="L516">		StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L517">		sb.append(&quot;%_goate_start%&quot;);</span>
+<span class="fc" id="L518">		Arrays.stream(text.split(&quot;\n&quot;)).forEach(line -&gt; sb.append(pad).append(line).append(&quot;\n&quot;));</span>
+<span class="fc" id="L519">		return sb.toString().trim().replace(&quot;%_goate_start%&quot;, &quot;&quot;);</span>
+	}
+
+	public int compare(Object check) {
+<span class="fc" id="L523">		boolean resetSet = true;</span>
+		//        if(keySet == null){
+<span class="fc" id="L525">		health = new Goate();</span>
+<span class="fc" id="L526">		keySet = new Goate();</span>
+		//            resetSet = true;
+		//        }
+
+<span class="fc" id="L530">		int result = size();</span>
+<span class="fc bfc" id="L531" title="All 2 branches covered.">		if (!(check instanceof Goate)) {</span>
+<span class="fc" id="L532">			Goate castCheck = new ToGoate(check).convert();</span>
+<span class="pc bpc" id="L533" title="2 of 6 branches missed.">			if (castCheck != null &amp;&amp; !(castCheck.size()==1&amp;&amp;castCheck.keys().contains(&quot;_original_&quot;))) {</span>
+<span class="fc" id="L534">				check = castCheck;</span>
+			}
+		}
+<span class="fc bfc" id="L537" title="All 2 branches covered.">		if (check instanceof Goate) {</span>
+<span class="fc" id="L538">			Goate gCheck = (Goate) check;</span>
+<span class="fc" id="L539">			result = 0;</span>
+<span class="fc bfc" id="L540" title="All 2 branches covered.">			for (String key : keys()) {</span>
+<span class="fc" id="L541">				boolean found = false;</span>
+<span class="fc" id="L542">				Object o = get(key);</span>
+<span class="fc" id="L543">				String keyPattern = key.replaceAll(&quot;[0-9]+&quot;, &quot;[0-9]+&quot;).replace(&quot;.&quot;, &quot;\\.&quot;);</span>
+<span class="fc" id="L544">				Set&lt;String&gt; keySet = keySet().get(keyPattern, null, Set.class);</span>
+<span class="fc bfc" id="L545" title="All 2 branches covered.">				if (keySet == null) {</span>
+<span class="fc" id="L546">					keySet = gCheck.filterStrict(keyPattern).keys();</span>
+<span class="fc" id="L547">					keySet().put(keyPattern, keySet);</span>
+				}
+<span class="fc bfc" id="L549" title="All 2 branches covered.">				for (String checkKey : keySet) {</span>
+<span class="fc bfc" id="L550" title="All 2 branches covered.">					if (new Compare(o).to(gCheck.get(checkKey)).using(&quot;==&quot;).evaluate()) {</span>
+<span class="fc" id="L551">						found = true;</span>
+<span class="fc" id="L552">						break;</span>
+					} else {
+<span class="fc" id="L554">						healthCheck().put(&quot;not equal##&quot;, checkKey + &quot;: &quot; + o + &quot;!=&quot; + gCheck.get(checkKey));</span>
+					}
+<span class="fc" id="L556">				}</span>
+<span class="fc bfc" id="L557" title="All 2 branches covered.">				if (!found) {</span>
+<span class="fc" id="L558">					result++;</span>
+<span class="fc" id="L559">					healthCheck().put(&quot;not found##&quot;, key + &quot;: &quot; + o);</span>
+				}
+<span class="fc" id="L561">			}</span>
+		}
+<span class="pc bpc" id="L563" title="1 of 2 branches missed.">		if (resetSet) {</span>
+<span class="fc" id="L564">			keySet = null;</span>
+		}
+
+<span class="fc" id="L567">		return result;</span>
+	}
+
+<span class="fc" id="L570">	private volatile String entry = &quot;&quot;;</span>
+	private volatile boolean stale;
+
+	@Override
+	public String mostRecentEntry() {
+<span class="fc bfc" id="L575" title="All 2 branches covered.">		if(stale){</span>
+<span class="fc" id="L576">			writeEntry(volume(this, false));</span>
+		}
+<span class="fc" id="L578">		return entry;</span>
+	}
+
+	@Override
+	public void writeEntry(String entry) {
+<span class="fc" id="L583">		stale = false;</span>
+<span class="fc" id="L584">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

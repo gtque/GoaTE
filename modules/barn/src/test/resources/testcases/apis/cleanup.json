@@ -1,13 +1,17 @@
 {
-  "abstract":true,
-  "base url":"https://www.onedatascan.com/",
-  "cleanup":[
+  "abstract": true,
+  "base url": "https://www.onedatascan.com/",
+  "groups": "cleanup",
+  "extends": [
+    "subpar.json"
+  ],
+  "cleanup": [
     {
-      "job":"api",
-      "base url":"https://www.msn.com/",
-      "method":"get",
-      "end point":"",
-      "security":"none"
+      "job": "api",
+      "base url": "https://www.msn.com/",
+      "method": "get",
+      "end point": "",
+      "security": "none"
     }
   ]
 }

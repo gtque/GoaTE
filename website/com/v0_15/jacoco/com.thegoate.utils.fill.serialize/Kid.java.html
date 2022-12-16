@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Kid.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.utils.fill.serialize</a> &gt; <span class="el_source">Kid.java</span></div><h1>Kid.java</h1><pre class="source lang-java linenums">package com.thegoate.utils.fill.serialize;
+
+import com.thegoate.Goate;
+import com.thegoate.HealthMonitor;
+import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.compare.CompareUtility;
+
+import java.lang.reflect.Field;
+import java.util.Map;
+
+/**
+ * Created by Eric Angeli on 7/3/2020.
+ */
+@GoatePojo
+<span class="fc" id="L16">public class Kid implements HealthMonitor,TypeT {</span>
+
+<span class="fc" id="L18">	@GoateIgnore</span>
+	private Class goateType = Object.class;
+
+<span class="fc" id="L21">	@GoateIgnore</span>
+	private Goate health = new Goate();
+
+	public void setGoateType(Class type){
+<span class="fc" id="L25">		this.goateType = type;</span>
+<span class="fc" id="L26">	}</span>
+
+	@Override
+	public Class goateType(){
+<span class="fc" id="L30">		return this.goateType;</span>
+	}
+
+	/**
+	 * Resets the health collection to a new empty one.
+	 */
+	protected void resetHealth(){
+<span class="fc" id="L37">		health = new Goate();</span>
+<span class="fc" id="L38">	}</span>
+
+	public void reportHealth(String id, Object message){
+<span class="fc" id="L41">		health.put(id, message);</span>
+<span class="fc" id="L42">	}</span>
+
+	/**
+	 * This returns and resets the current health report.
+	 * @return Goate collection containing any reported health issues.
+	 */
+	public Goate healthCheck(){
+<span class="fc" id="L49">		Goate report = health;</span>
+<span class="fc" id="L50">		resetHealth();</span>
+<span class="fc" id="L51">		return report;</span>
+	}
+
+	@Override
+	public boolean equals(Object compare){
+<span class="fc" id="L56">		boolean result = true;</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">		if(compare == null) {</span>
+<span class="nc" id="L58">			result = false;</span>
+<span class="nc" id="L59">			reportHealth(getClass().getSimpleName(), &quot;{ initialized instance != null }&quot;);</span>
+		}
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">		if(getClass().isInstance(compare)){</span>
+<span class="fc" id="L62">			GoateReflection gr = new GoateReflection();</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">			for(Map.Entry&lt;String, Field&gt; field:gr.findFields(getClass()).entrySet()){</span>
+<span class="fc" id="L64">				boolean accessible = field.getValue().isAccessible();</span>
+				try {
+<span class="fc" id="L66">					field.getValue().setAccessible(true);</span>
+<span class="fc" id="L67">					Object actual = field.getValue().get(this);</span>
+<span class="fc" id="L68">					Object expected = field.getValue().get(compare);</span>
+<span class="fc" id="L69">					CompareUtility check = new Compare(actual).to(expected).using(&quot;==&quot;);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">					if(!check.evaluate()){</span>
+<span class="fc" id="L71">						result = false;</span>
+<span class="fc" id="L72">						String checkHealth = check.healthCheck().toString(&quot;\t\t&quot;, &quot;&quot;, true);</span>
+<span class="fc" id="L73">						String label = actual.getClass().getSimpleName() + &quot; &quot; + field.getKey();</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">						if(checkHealth.isEmpty()) {</span>
+							//reportHealth(&quot;field mismatch ##&quot;,  label + &quot; {&quot; + actual + &quot; != &quot; + expected + &quot;}&quot;);
+<span class="fc" id="L76">							reportHealth(label, &quot; {&quot; + actual + &quot; != &quot; + expected + &quot;}&quot;);</span>
+						} else {
+							//checkHealth.replace(&quot;%_goate_t_%&quot;, &quot;%_goate_t_%%_goate_t_%&quot;).replace(&quot;\t&quot;,&quot;%_goate_t_%&quot;);
+<span class="fc" id="L79">							checkHealth = check.healthCheck().pad(checkHealth + &quot;\n\t}&quot;, &quot;\t&quot;);</span>
+							//reportHealth(&quot;field mismatch ##&quot;, label + &quot; {\n&quot; + checkHealth);
+<span class="fc" id="L81">							reportHealth(label, &quot; {\n&quot; + checkHealth);</span>
+						}
+					}
+<span class="nc" id="L84">				} catch (Exception e){</span>
+<span class="nc" id="L85">					reportHealth(&quot;field access ##&quot;, &quot;problem accessing field: &quot; + e.getMessage());</span>
+				} finally {
+<span class="pc" id="L87">					field.getValue().setAccessible(accessible);</span>
+<span class="pc" id="L88">				}</span>
+<span class="fc" id="L89">			}</span>
+<span class="fc" id="L90">		} else {</span>
+<span class="nc" id="L91">			result = false;</span>
+		}
+<span class="fc" id="L93">		return result;</span>
+	}
+
+	@Override
+	public String toString(){
+<span class="fc" id="L98">		StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L99">		sb.append(getClass().getSimpleName()).append(&quot;:{&quot;);</span>
+<span class="fc" id="L100">		GoateReflection gr = new GoateReflection();</span>
+<span class="fc" id="L101">		boolean notFirst = false;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">		for(Map.Entry&lt;String, Field&gt; field:gr.findFields(getClass()).entrySet()){</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">			if(notFirst){</span>
+<span class="fc" id="L104">				sb.append(&quot;, &quot;);</span>
+			}
+<span class="fc" id="L106">			sb.append(field.getKey()).append(&quot;:&quot;);</span>
+<span class="fc" id="L107">			boolean accessible = field.getValue().isAccessible();</span>
+<span class="fc" id="L108">			Object fieldValue = &quot;Exception: could not get toString&quot;;</span>
+			try {
+<span class="fc" id="L110">				field.getValue().setAccessible(true);</span>
+<span class="fc" id="L111">				fieldValue = field.getValue().get(this);</span>
+<span class="nc" id="L112">			} catch (IllegalAccessException e) {</span>
+<span class="nc" id="L113">				e.printStackTrace();</span>
+<span class="fc" id="L114">			}</span>
+<span class="fc" id="L115">			sb.append(fieldValue);</span>
+<span class="fc" id="L116">			notFirst = true;</span>
+<span class="fc" id="L117">		}</span>
+<span class="fc" id="L118">		sb.append(&quot;}&quot;);</span>
+<span class="fc" id="L119">		return sb.toString();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

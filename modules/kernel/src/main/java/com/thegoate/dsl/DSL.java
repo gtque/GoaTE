@@ -40,7 +40,7 @@ import java.util.List;
  * Parameters for the word should come after :: and be comma (,) separated.
  * Created by gtque on 4/20/2017.
  */
-public abstract class DSL {
+public abstract class DSL<RETURN_TYPE> {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected List<String> definition;
     protected Object value;
@@ -67,6 +67,10 @@ public abstract class DSL {
         return type;
     }
 
+    protected int numberOfParameters(){
+        return definition == null ? 0: definition.size();
+    }
+
     protected Object get(int index, Goate data){
         Object o = null;
         if(definition.size()>index) {
@@ -83,12 +87,14 @@ public abstract class DSL {
         definition.add(v.substring(0,v.indexOf("::")));
         v = v.substring(v.indexOf("::")+2);
         v = v.replace("\\,","(comma_goate_yall)");
-        String[] def = (v).split(",");
-        for(String d:def){
-            definition.add(d.replace("(comma_goate_yall)",","));
+        if(!v.isEmpty()) {
+            String[] def = (v).split(",");
+            for (String d : def) {
+                definition.add(d.replace("(comma_goate_yall)", ","));
+            }
         }
         return definition;
     }
 
-    public abstract Object evaluate(Goate data);
+    public abstract RETURN_TYPE evaluate(Goate data);
 }

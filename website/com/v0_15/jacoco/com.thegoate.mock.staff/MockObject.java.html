@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MockObject.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.mock.staff</a> &gt; <span class="el_source">MockObject.java</span></div><h1>MockObject.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.mock.staff;
+
+import com.thegoate.Goate;
+import com.thegoate.dsl.Interpreter;
+import com.thegoate.dsl.PrimitiveDSL;
+import com.thegoate.mock.annotations.Mocker;
+import com.thegoate.reflection.GoateReflection;
+import org.mockito.Mockito;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Returns a mocked object using Mockito.
+ * Created by Eric Angeli on 9/20/2017.
+ */
+@Mocker(type = Object.class)
+<span class="fc" id="L47">public class MockObject extends Mock {</span>
+
+<span class="fc" id="L49">    boolean spy = false;</span>
+
+    @Override
+    public Object build() {
+<span class="fc" id="L53">        Object mock = null;</span>
+        try {
+<span class="fc" id="L55">            Class theClass = Class.forName(&quot;&quot; + data.get(&quot;class&quot;, &quot;java.lang.Object&quot;));</span>
+<span class="fc" id="L56">            mock = getObject(theClass);</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">            if (mock != null) {</span>
+<span class="fc" id="L58">                doMockFields(theClass, mock);</span>
+<span class="fc" id="L59">                doMockMethods(theClass, mock);</span>
+            }
+<span class="nc" id="L61">        } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L62">            LOG.error(&quot;Problem setting up the mock: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L63">        }</span>
+<span class="fc" id="L64">        return mock;</span>
+    }
+
+    protected Object getObject(Class theClass) {
+<span class="fc" id="L68">        return Mockito.mock(theClass);</span>
+    }
+
+    protected void doMockFields(Class theClass, Object mock) {
+<span class="fc" id="L72">        Goate fields = data.filter(&quot;fields.&quot;);</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (fields.size() &gt; 0) {</span>
+<span class="fc" id="L74">            Map&lt;String, Field&gt; fieldMap = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L75">            new GoateReflection().findFields(theClass, fieldMap);</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            for (String field : fields.keys()) {</span>
+<span class="fc" id="L77">                String fieldName = &quot;&quot; + field.substring(field.lastIndexOf(&quot;.&quot;) + 1);</span>
+<span class="fc" id="L78">                Object value = data.get(field);</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">                if (fieldMap.containsKey(fieldName)) {</span>
+<span class="fc" id="L80">                    Field fi = fieldMap.get(fieldName);</span>
+                    //cheating a bit by forcefully making the field accessible,
+                    //but its actual state is reset afterwards.
+<span class="fc" id="L83">                    boolean accessible = fi.isAccessible();</span>
+<span class="fc" id="L84">                    fi.setAccessible(true);</span>
+                    try {
+<span class="fc" id="L86">                        fi.set(mock, value);</span>
+<span class="nc" id="L87">                    } catch (IllegalAccessException e) {</span>
+<span class="nc" id="L88">                        LOG.error(&quot;Problem accessing field: &quot; + e, e);</span>
+<span class="fc" id="L89">                    }</span>
+<span class="fc" id="L90">                    fi.setAccessible(accessible);</span>
+                }
+<span class="fc" id="L92">            }</span>
+        }
+<span class="fc" id="L94">    }</span>
+
+    protected String isName(String check) {
+<span class="fc" id="L97">        String result = check;</span>
+        try {
+<span class="nc" id="L99">            int i = Integer.parseInt(check);</span>
+<span class="nc" id="L100">            result = null;</span>
+<span class="fc" id="L101">        } catch (Exception e) {</span>
+<span class="fc" id="L102">            LOG.debug(&quot;assuming &quot; + check + &quot; is the name of the method.&quot;);</span>
+<span class="nc" id="L103">        }</span>
+<span class="fc" id="L104">        return result;</span>
+    }
+
+    public void doMockMethods(Class theClass, Object mock) {
+<span class="fc" id="L108">        Goate methods = data.filter(&quot;methods.&quot;);</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        for (String meth : methods.keys()) {</span>
+<span class="fc bfc" id="L110" title="All 6 branches covered.">            if (!meth.contains(&quot;parameters&quot;) &amp;&amp; !meth.contains(&quot;return&quot;) &amp;&amp; !meth.contains(&quot;throws&quot;)) {</span>
+<span class="fc" id="L111">                String checkName = meth.substring(meth.lastIndexOf(&quot;.&quot;) + 1);</span>
+<span class="fc" id="L112">                String methodName = isName(checkName);</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">                if (methodName != null) {</span>
+<span class="fc" id="L114">                    Goate methodData = methods.filter(meth + &quot;.&quot;);</span>
+<span class="fc" id="L115">                    Goate params = sortParams(methodData.filter(meth+&quot;.parameters.&quot;));</span>
+<span class="fc" id="L116">                    Object[] p = new Object[params.size()];</span>
+<span class="fc" id="L117">                    Class[] pc = new Class[params.size()];</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">                    if (p.length &gt; 0) {</span>
+<span class="fc" id="L119">                        buildParameters(p, pc, params);</span>
+                    }
+<span class="fc" id="L121">                    Object[] r = null;</span>
+<span class="fc" id="L122">                    Object r0 = null;</span>
+<span class="fc" id="L123">                    boolean notVoid = false;</span>
+<span class="fc" id="L124">                    boolean returnReal = Boolean.parseBoolean(&quot;&quot; + data.get(meth + &quot;.return.returnReal&quot;, &quot;false&quot;));</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">                    if (methodData.filter(meth + &quot;.return&quot;).size() &gt; 0) {</span>
+<span class="fc" id="L126">                        Object value = data.get(meth + &quot;.return.value&quot;);</span>
+<span class="fc" id="L127">                        String check = &quot;&quot; + value;</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">                        if (!check.equals(&quot;void&quot;)) {</span>
+<span class="fc" id="L129">                            notVoid = true;</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">                            if (!returnReal) {</span>
+<span class="fc" id="L131">                                Goate returns = methodData.filter(meth+&quot;.*value.&quot;);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">                                if (returns.size() &gt; 0) {</span>
+<span class="fc" id="L133">                                    r = new Object[returns.size() - 1];</span>
+<span class="fc" id="L134">                                    String baseReturn = returns.keys().iterator().next();</span>
+<span class="fc" id="L135">                                    baseReturn = baseReturn.substring(0, baseReturn.lastIndexOf(&quot;.&quot;));</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">                                    for (int i = 0; i &lt; returns.size(); i++) {</span>
+<span class="fc" id="L137">                                        String returnKey = baseReturn + &quot;.&quot; + i;</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">                                        if (i == 0) {</span>
+<span class="fc" id="L139">                                            r0 = data.get(returnKey);</span>
+                                        } else {
+<span class="fc" id="L141">                                            r[i - 1] = data.get(returnKey);</span>
+                                        }
+                                    }
+<span class="fc" id="L144">                                } else {</span>
+<span class="fc" id="L145">                                    r = null;</span>
+<span class="fc" id="L146">                                    r0 = value;</span>
+                                }
+                            }
+                        }
+                    }
+                    try {
+<span class="fc" id="L152">                        Method fn = new GoateReflection().findMut(theClass, methodName, pc);//theClass.getMethod(method, pc);</span>
+<span class="fc" id="L153">                        fn.setAccessible(true);</span>
+<span class="fc" id="L154">                        Object theThrows = data.get(meth + &quot;.throws&quot;, null);</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">                        if (theThrows == null) {</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">                            if (notVoid) {</span>
+                                try {
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">                                    if (!returnReal) {</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">                                        if (r != null) {</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">                                            if (!spy) {</span>
+<span class="fc" id="L161">                                                Mockito.when(fn.invoke(mock, p)).thenReturn(r0, r);</span>
+                                            } else {
+<span class="fc" id="L163">                                                fn.invoke(Mockito.doReturn(r0, r).when(mock), p);</span>
+                                            }
+                                        } else {
+<span class="fc bfc" id="L166" title="All 2 branches covered.">                                            if (!spy) {</span>
+<span class="fc" id="L167">                                                Mockito.when(fn.invoke(mock, p)).thenReturn(r0);</span>
+                                            } else {
+<span class="fc" id="L169">                                                fn.invoke(Mockito.doReturn(r0).when(mock), p);</span>
+                                            }
+                                        }
+                                    } else {
+<span class="nc" id="L173">                                        Mockito.when(fn.invoke(mock, p)).thenCallRealMethod();</span>
+                                    }
+<span class="nc" id="L175">                                } catch (Exception e) {</span>
+<span class="nc" id="L176">                                    LOG.error(&quot;Exception defining method mocks: &quot; + e.getMessage(), e);</span>
+<span class="pc" id="L177">                                }</span>
+                            }
+                        } else {
+                            try {
+<span class="fc" id="L181">                                Class exception = Class.forName(&quot;&quot; + theThrows);</span>
+<span class="fc" id="L182">                                Mockito.when(fn.invoke(mock, p)).thenThrow(exception);</span>
+<span class="nc" id="L183">                            } catch (ClassNotFoundException | IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc" id="L184">                                LOG.error(&quot;Exception setting up the throw for the mock: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L185">                            }</span>
+                        }
+<span class="nc" id="L187">                    } catch (NoSuchMethodException e) {</span>
+<span class="nc" id="L188">                        LOG.error(&quot;failed to find the method: &quot; + methodName + &quot;: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L189">                    }</span>
+                }
+            }
+<span class="fc" id="L192">        }</span>
+<span class="fc" id="L193">    }</span>
+
+    protected void buildParameters(Object[] p, Class[] pc, Goate theParameters) {
+<span class="fc bfc" id="L196" title="All 2 branches covered.">        for (String index : theParameters.keys()) {</span>
+<span class="fc" id="L197">            int i = Integer.parseInt(index);</span>
+<span class="fc" id="L198">            Goate param = (Goate) theParameters.get(index);</span>
+<span class="fc" id="L199">            p[i] = param.get(&quot;value&quot;);</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">            pc[i] = p[i] == null ? Object.class : p[i].getClass();</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">            if (param.get(&quot;type&quot;, null) != null) {</span>
+                try {
+<span class="fc" id="L203">                    pc[i] = Class.forName(&quot;&quot; + param.get(&quot;type&quot;));</span>
+<span class="nc" id="L204">                } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L205">                    LOG.error(&quot;unable to find the type for the parameter: &quot; + param.get(&quot;type&quot;));</span>
+<span class="pc" id="L206">                }</span>
+            } else {
+<span class="fc" id="L208">                String check = &quot;&quot; + param.getStrict(&quot;strict&quot;);</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">                if (check.contains(&quot;::&quot;)) {</span>
+<span class="fc" id="L210">                    Object b = new Interpreter(data).build(check, p[i]);</span>
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">                    if (PrimitiveDSL.isPrimitive(b)) {</span>
+<span class="nc" id="L212">                        PrimitiveDSL prim = (PrimitiveDSL) b;</span>
+<span class="nc" id="L213">                        pc[i] = prim.classType();</span>
+                    }
+                }
+            }
+<span class="fc" id="L217">        }</span>
+<span class="fc" id="L218">    }</span>
+
+    protected Goate sortParams(Goate params) {
+<span class="fc" id="L221">        Goate sorted = new Goate();</span>
+<span class="fc" id="L222">        int i = 0;</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">        for (String pv : params.filter(&quot;.*value&quot;).keys()) {</span>
+<span class="fc" id="L224">            String base = pv.substring(0, pv.lastIndexOf(&quot;.&quot;));</span>
+<span class="fc" id="L225">            Goate param = new Goate();</span>
+<span class="fc" id="L226">            int index = Integer.parseInt(&quot;&quot; + (data.get(base + &quot;.index&quot;, i)));</span>
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">            while (sorted.keys().contains(index)) {</span>
+<span class="nc" id="L228">                index++;</span>
+            }
+<span class="fc" id="L230">            param.put(&quot;value&quot;, data.get(pv));</span>
+<span class="fc" id="L231">            param.put(&quot;strict&quot;, data.getStrict(pv));</span>
+<span class="fc" id="L232">            param.put(&quot;type&quot;, data.get(base + &quot;.type&quot;));</span>
+<span class="fc" id="L233">            sorted.put(&quot;&quot; + index, param);</span>
+<span class="fc" id="L234">            i++;</span>
+<span class="fc" id="L235">        }</span>
+<span class="fc" id="L236">        return sorted;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

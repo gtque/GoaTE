@@ -28,15 +28,20 @@
 package com.thegoate.json.utils.tojson;
 
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.to.ToUtil;
+import com.thegoate.utils.to.ToUtility;
+import org.json.JSONObject;
 
 /**
  * The generic convert to json class.
  * This will attempt to look up the specific to json utility for the type detected.
  * Created by Eric Angeli on 5/5/2017.
  */
-public class ToJson extends UnknownUtilType implements ToJsonUtility{
+@ToUtil(type = JSONObject.class)
+public class ToJson extends UnknownUtilType implements ToJsonUtility, ToUtility<String> {
     ToJsonUtility tool = null;
     Object original = null;
+    boolean isList = false;
 
     public ToJson(Object o){
         this.original = o;
@@ -48,11 +53,17 @@ public class ToJson extends UnknownUtilType implements ToJsonUtility{
     }
 
     @Override
+    public ToJsonUtility isList(boolean isList) {
+        this.isList = isList;
+        return this;
+    }
+
+    @Override
     public String convert() {
         tool = (ToJsonUtility)buildUtil(original, ToJsonUtil.class);
         String result = "";
         if(tool!=null){
-            result = tool.convert();
+            result = tool.isList(isList).convert();
         }
         if(result==null||result.isEmpty()){
             LOG.info("Failed to convert: " + original);
@@ -65,11 +76,18 @@ public class ToJson extends UnknownUtilType implements ToJsonUtility{
         tool = (ToJsonUtility)buildUtil(original, ToJsonUtil.class);
         String result = "";
         if(tool!=null){
-            result = tool.convertStrict();
+            result = tool.isList(isList).convertStrict();
         }
         if(result==null||result.isEmpty()){
             LOG.info("Failed to convert: " + original);
         }
         return result;
+    }
+
+    @Override
+    public boolean checkType(Class tool, Class type) {
+        //        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
+        //        return tu.type()!=null?(tu.type() == type):(type == null);
+        return JSONObject.class.equals(type);
     }
 }

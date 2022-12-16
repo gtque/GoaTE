@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Employee.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.staff</a> &gt; <span class="el_source">Employee.java</span></div><h1>Employee.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.staff;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.AnnotationEvaluator;
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.expect.Expectation;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.metrics.Stopwatch;
+import com.thegoate.utils.togoate.ToGoate;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+/**
+ * Defines an employee object. An employee does some type of work by calling the work method.&lt;br&gt;
+ * In order to make full use of an employee with other GoaTE frameworks, they should be annotated
+ * with {@literal @}GoateJob to provide a list of jobs the employee fills.
+ * Use param(key) or param(key,default) to get the parameters for the job or directly access definition.
+ * When manipulating or setting the test run data use the class variable data.
+ * Created by gtque on 4/21/2017.
+ */
+<span class="fc" id="L53">public abstract class Employee&lt;T&gt; implements Worker&lt;Employee, T&gt; {</span>
+<span class="fc" id="L54">    protected final BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+<span class="fc" id="L55">    protected final static BleatBox slog = BleatFactory.getLogger(Employee.class);</span>
+<span class="fc" id="L56">    protected HealthRecord hr = new HealthRecord();</span>
+<span class="fc" id="L57">    protected Expectation expectation = null;</span>
+    protected Goate data;
+<span class="fc" id="L59">    protected Goate definition = new Goate();</span>
+<span class="fc" id="L60">    protected String name = &quot;&quot;;</span>
+<span class="fc" id="L61">    protected volatile long startTime = 0L;</span>
+<span class="fc" id="L62">    protected volatile T result = null;</span>
+<span class="fc" id="L63">    protected long period = 50L;</span>
+<span class="fc" id="L64">    protected boolean periodHasBeenSet = false;</span>
+
+    public HealthRecord getHrReport() {
+<span class="fc" id="L67">        return hr;</span>
+    }
+
+    public Employee&lt;T&gt; setName(String name){
+<span class="fc" id="L71">        this.name = name;</span>
+<span class="fc" id="L72">        return this;</span>
+    }
+
+    @Override
+    public Employee&lt;T&gt; expectation(Expectation expectation){
+<span class="fc" id="L77">        this.expectation = expectation;</span>
+<span class="fc" id="L78">        return this;</span>
+    }
+
+    public String parameterName(String parameter){
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        return new StringBuilder(name).append(name.isEmpty()?&quot;&quot;:&quot;.&quot;).append(parameter).toString();</span>
+    }
+
+    public String getName(){
+<span class="fc" id="L86">        return name;</span>
+    }
+
+    public String getNameDef(){
+<span class="nc" id="L90">        return name + &quot;.definition&quot;;</span>
+    }
+
+    public Employee&lt;T&gt; initData(){
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if(data==null) {</span>
+<span class="fc" id="L95">            data = new Goate();</span>
+        }
+<span class="fc" id="L97">        return this;</span>
+    }
+
+    protected Object param(String paramName) {
+<span class="nc" id="L101">        return param(paramName, null);</span>
+    }
+
+    protected Object param(String paramName, Object def){
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        return definition!=null?definition.get(paramName,def):def;</span>
+    }
+
+    public Employee&lt;T&gt; setData(Goate data) {
+<span class="fc" id="L109">        this.data = data;</span>
+        //no point in processing the annotations until the data is set.
+<span class="fc" id="L111">        new AnnotationEvaluator().process(this, getClass());//stubbed for now, but intended for processing of annotations for auto wire like functionality.</span>
+<span class="fc" id="L112">        return this;</span>
+    }
+
+    public Employee&lt;T&gt; defaultPeriod(long period){
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">        if(!periodHasBeenSet){</span>
+<span class="fc" id="L117">            this.period = period;</span>
+        }
+<span class="fc" id="L119">        return this;</span>
+    }
+
+    public Employee&lt;T&gt; period(long period){
+<span class="nc" id="L123">        this.period = period;</span>
+<span class="nc" id="L124">        periodHasBeenSet = true;</span>
+<span class="nc" id="L125">        return this;</span>
+    }
+
+    public synchronized final T syncWork(){
+<span class="fc" id="L129">        return syncWork(period);</span>
+    }
+
+    public synchronized final T syncWork(long waitMs){
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if(System.currentTimeMillis()-startTime&gt;waitMs){</span>
+<span class="fc" id="L134">            result = work();</span>
+<span class="fc" id="L135">            startTime = System.currentTimeMillis();</span>
+        }
+<span class="fc" id="L137">        return result;</span>
+    }
+
+    /**
+     * Always called immediately before doWork().&lt;br&gt;
+     * Override this method to define any common setup/configuration/initialization that needs
+     * to be done just prior to working after the definition and other parameters have been set.
+     * @return syntactic sugar, returns itself.
+     */
+    public Employee&lt;T&gt; clockIn(){
+<span class="fc" id="L147">        return this;</span>
+    }
+
+    public final T work() {
+<span class="fc" id="L151">        result = null;</span>
+<span class="fc" id="L152">        String lap = &quot;&quot;+System.nanoTime();</span>
+        try {
+<span class="fc bfc" id="L154" title="All 4 branches covered.">            if(data!=null&amp;&amp;data.get(&quot;lap&quot;,null)!=null) {</span>
+<span class="fc" id="L155">                String lt = data.get(&quot;lap&quot;, lap, String.class);</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">                if(!lt.isEmpty()){</span>
+<span class="fc" id="L157">                    lap = lt;</span>
+                }
+<span class="fc" id="L159">                Stopwatch.global.start(lap);</span>
+            }
+<span class="fc" id="L161">            result = (T)clockIn().doWork();</span>
+<span class="fc" id="L162">        } catch (Throwable t) {</span>
+            try {
+                //Creates a report in HR. Most reports are going to be exceptions.
+<span class="fc" id="L165">                ByteArrayOutputStream bs = new ByteArrayOutputStream();</span>
+<span class="fc" id="L166">                PrintStream ps = new PrintStream(bs, true, &quot;utf-8&quot;);</span>
+<span class="fc" id="L167">                t.printStackTrace(ps);</span>
+<span class="fc" id="L168">                String stack = new String(bs.toByteArray(), UTF_8);</span>
+<span class="fc" id="L169">                hr.report(t.getMessage(), stack);</span>
+<span class="nc" id="L170">            } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L171">                e.printStackTrace();</span>
+<span class="fc" id="L172">            }</span>
+<span class="fc" id="L173">            throw t;</span>
+        }finally {
+<span class="pc bpc" id="L175" title="2 of 8 branches missed.">            if(data!=null&amp;&amp;data.get(&quot;lap&quot;,null)!=null) {</span>
+<span class="pc" id="L176">                Stopwatch.global.split(lap);</span>
+            }
+<span class="fc" id="L178">        }</span>
+<span class="fc" id="L179">        return result;</span>
+    }
+
+    public Goate scrub(Goate data){
+<span class="fc" id="L183">        String[] baseScrub = {&quot;Scenario&quot;, &quot;job&quot;, &quot;abstract&quot;, &quot;extends&quot;, &quot;groups&quot;, &quot;expect&quot;, &quot;override&quot;, getName()+&quot;\\.definition&quot;};</span>
+<span class="fc" id="L184">        Goate scrubbed = clean(new Goate().merge(data,false),baseScrub);</span>
+<span class="fc" id="L185">        return clean(scrubbed, detailedScrub());</span>
+    }
+
+    public Goate clean(Goate data, String[] scrub){
+<span class="fc bfc" id="L189" title="All 2 branches covered.">        if(scrub!=null) {</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">            for (String key : scrub) {</span>
+<span class="fc" id="L191">                data.scrub(key);</span>
+            }
+        }
+<span class="fc" id="L194">        return data;</span>
+    }
+
+    public abstract String[] detailedScrub();
+
+    public final Employee&lt;T&gt; build(){
+<span class="nc" id="L200">        return init();</span>
+    }
+
+    public Employee&lt;T&gt; init(Goate data) {
+<span class="fc" id="L204">        setData(data);</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">        if(data!=null) {</span>
+<span class="fc" id="L206">            Object def = data.get(getName() + &quot;.definition&quot;);</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">            def = def != null ? def : data;</span>
+<span class="fc" id="L208">            definition = new ToGoate(def).convert();</span>
+<span class="fc" id="L209">            definition.merge(scrub(data), false);</span>
+        }
+<span class="fc" id="L211">        return init();</span>
+    }
+
+    public Employee&lt;T&gt; mergeData(Goate data){
+<span class="fc" id="L215">        definition.merge(scrub(data),false);</span>
+<span class="fc" id="L216">        return this;</span>
+    }
+
+    protected abstract Employee&lt;T&gt; init();
+
+    protected abstract T doWork();
+
+    public static Employee recruit(Class job, Goate data) {
+<span class="nc" id="L224">        GoateJob theJob = (GoateJob) job.getAnnotation(GoateJob.class);</span>
+<span class="nc" id="L225">        Employee employee = null;</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        if (theJob != null) {</span>
+<span class="nc" id="L227">            employee = recruit(theJob.jobs()[0], data);</span>
+        }
+<span class="nc" id="L229">        return employee;</span>
+    }
+
+    public static Employee&lt;Object&gt; recruit(String job, Goate data) {
+<span class="fc" id="L233">        return recruit(job, data, null, Object.class);</span>
+    }
+
+    public static &lt;T&gt; Employee&lt;T&gt; recruit(String job, Goate data, Class&lt;T&gt; type) {
+<span class="fc" id="L237">        return recruit(job, data, null, type);</span>
+    }
+
+    public static Employee&lt;Object&gt; recruit(String job, Goate definition, Goate parentData) {
+<span class="fc" id="L241">        return recruit (job, definition, parentData, Object.class);</span>
+    }
+    public static &lt;T&gt; Employee&lt;T&gt; recruit(String job, Goate definition, Goate parentData, Class&lt;T&gt; type){
+<span class="fc" id="L244">        Employee employee = null;</span>
+<span class="fc" id="L245">        String id = &quot;&quot;;</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        if(job.contains(&quot;#&quot;)){</span>
+<span class="fc" id="L247">            id = job.substring(job.indexOf(&quot;#&quot;)+1);</span>
+<span class="fc" id="L248">            job = job.substring(0, job.indexOf(&quot;#&quot;));</span>
+        }
+<span class="fc" id="L250">        Class recruit = findEmployee(job);</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">        if (recruit != null) {</span>
+            try {
+<span class="fc" id="L253">                employee = (Employee) recruit.newInstance();</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">                employee.setName(job + (id.isEmpty()?&quot;&quot;:(&quot;#&quot;+id)));</span>
+<span class="nc" id="L255">            } catch (InstantiationException | IllegalAccessException e) {</span>
+<span class="nc" id="L256">                slog.error(&quot;Problem recruiting the employee: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L257">            }</span>
+        }
+<span class="fc bfc" id="L259" title="All 2 branches covered.">        if (employee != null) {</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">            if(definition!=null) {</span>
+<span class="fc" id="L261">                definition.merge(employee.scrub(parentData), false);</span>
+            }
+<span class="fc" id="L263">            employee.init(definition);</span>
+        }
+<span class="fc" id="L265">        return employee;</span>
+    }
+
+    protected static Class findEmployee(String job) {
+<span class="fc" id="L269">        Class klass = null;</span>
+        try {
+<span class="fc" id="L271">            klass = new AnnotationFactory().find(job).using(GoateJob.class.getMethod(&quot;jobs&quot;)).annotatedWith(GoateJob.class).lookUp();</span>
+<span class="nc" id="L272">        } catch (NoSuchMethodException e) {</span>
+<span class="nc" id="L273">            slog.error(&quot;problem building directory of jobs: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L274">        }</span>
+<span class="fc" id="L275">        return klass;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

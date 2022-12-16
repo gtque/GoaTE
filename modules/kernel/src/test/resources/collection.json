@@ -1,0 +1,38 @@
+{
+  "nestedList": [
+    {
+      "aList": [
+        ""
+      ],
+      "aMap": {
+        "key": ""
+      },
+      "aIntArray": [
+        0
+      ],
+      "bimbap": {
+        "key": true
+      }
+    }
+  ],
+  "nestedPojo": {
+    "bInt": 0,
+    "aBoolean": false,
+    "bBoolean": true,
+    "aChar": "\u0000",
+    "aInt": 0,
+    "aString": "",
+    "Trashbinye": 0,
+    "bShort": 0,
+    "aFloat": 0,
+    "aDouble": 0,
+    "bDouble": 0,
+    "bByte": 0,
+    "aBigInteger": 0,
+    "bFloat": 0,
+    "aShort": 0,
+    "bChar": "A",
+    "aByte": 0
+  },
+  "theDate": null
+}

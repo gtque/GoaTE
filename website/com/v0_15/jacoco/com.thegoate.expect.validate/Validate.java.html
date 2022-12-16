@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Validate.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.expect.validate</a> &gt; <span class="el_source">Validate.java</span></div><h1>Validate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.expect.validate;
+
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.staff.Employee;
+import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.NotFound;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Created by Eric Angeli on 3/20/2019.
+ */
+public abstract class Validate extends Thread {
+<span class="fc" id="L49">    protected BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+<span class="fc" id="L50">    protected static BleatBox sLOG = BleatFactory.getLogger(Validate.class);</span>
+    public final static String HEALTH_CHECK = &quot;est1885drpepper23&quot;;
+<span class="fc" id="L52">    protected String starReplacement = &quot;_s#T$a%R_&quot;;</span>
+<span class="fc" id="L53">    protected String plusReplacement = &quot;_p#L$u%S_&quot;;</span>
+<span class="fc" id="L54">    protected String operator = &quot;&quot;;</span>
+    protected Goate exp;
+    protected Object from;
+    protected Object fromExpected;
+<span class="fc" id="L58">    protected Object fromExpectedResult = null;</span>
+    protected Goate data;
+    protected String key;
+    protected Object rtrn;
+<span class="fc" id="L62">    protected boolean result = false;</span>
+    protected long period;
+<span class="fc" id="L64">    private volatile boolean running = true;</span>
+<span class="fc" id="L65">    int patternIndex = 0;</span>
+<span class="fc" id="L66">    int checkIndex = 1;</span>
+<span class="fc" id="L67">    volatile List&lt;Goate&gt; fails = Collections.synchronizedList(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L68">    volatile List&lt;Goate&gt; passes = Collections.synchronizedList(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L69">    volatile List&lt;Goate&gt; notExecuted = Collections.synchronizedList(new ArrayList&lt;&gt;());</span>
+
+    public String operator() {
+<span class="fc" id="L72">        return this.operator;</span>
+    }
+
+    //The following should be implemented in each subclass of Validate.
+    public static Validate using(String operator) {
+<span class="nc" id="L77">        Validate vlad = new ValidateGoate();</span>
+<span class="nc" id="L78">        return vlad.setOperator(operator);</span>
+    }
+
+    public static Validate using(CompareUtility compare) {
+<span class="nc" id="L82">        return using(compare.getClass());</span>
+    }
+
+    public static Validate using(Class compare) {
+<span class="nc" id="L86">        CompareUtil op = getOp(compare);</span>
+<span class="nc" id="L87">        return using(op.operator());</span>
+    }
+    //the above should be implemented in each subclass of validate to build the correct type.
+
+    public static Validate lookUpGeneric(Goate exp, String key, Object from, Object fromExpected, Object rtrn, long cachePeriod, Goate data) {
+        Validate vlad;
+<span class="fc" id="L93">        String operator = &quot;&quot; + exp.get(&quot;operator&quot;);</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (rtrn instanceof Goate) {</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">            if(operator.equalsIgnoreCase(&quot;isPresent&quot;)){</span>
+<span class="fc" id="L96">                vlad = new ValidatePresence(exp, key, from, fromExpected, rtrn, cachePeriod, data);</span>
+            } else {
+<span class="fc" id="L98">                vlad = new ValidateGoate(exp, key, from, fromExpected, rtrn, cachePeriod, data);</span>
+            }
+        } else {
+<span class="fc" id="L101">            vlad = new ValidateNotGoate(exp, key, from, fromExpected, rtrn, cachePeriod, data);</span>
+        }
+<span class="fc" id="L103">        return vlad</span>
+<span class="fc" id="L104">                .setExp(exp)</span>
+<span class="fc" id="L105">                .setKey(key)</span>
+<span class="fc" id="L106">                .setRtrn(rtrn)</span>
+<span class="fc" id="L107">                .setPeriod(cachePeriod)</span>
+<span class="fc" id="L108">                .setData(data)</span>
+<span class="fc" id="L109">                .setOperator(operator);</span>
+    }
+
+    public static CompareUtil getOp(Class compare) {
+<span class="fc" id="L113">        CompareUtil op = ((CompareUtil) compare.getAnnotation(CompareUtil.class));</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if (op == null) {</span>
+<span class="nc" id="L115">            sLOG.error(&quot;Validate&quot;, &quot;The comparator class was not annotated with @CompareUtil&quot;);</span>
+        }
+<span class="fc" id="L117">        return op;</span>
+    }
+
+    public Validate setOperator(String operator) {
+<span class="fc" id="L121">        this.operator = operator;</span>
+<span class="fc" id="L122">        return this;</span>
+    }
+
+    public Validate setOperator(CompareUtility compare) {
+<span class="nc" id="L126">        return setOperator(compare.getClass());</span>
+    }
+
+    public Validate setOperator(Class compare) {
+<span class="nc" id="L130">        CompareUtil op = getOp(compare);</span>
+<span class="nc" id="L131">        return setOperator(op.operator());</span>
+    }
+
+    public List&lt;Goate&gt; getFails() {
+<span class="fc" id="L135">        return fails;</span>
+    }
+
+    public List&lt;Goate&gt; getPasses() {
+<span class="fc" id="L139">        return passes;</span>
+    }
+
+    public String name() {
+<span class="nc" id="L143">        return getKey();</span>
+    }
+
+<span class="fc" id="L146">    public Validate() {</span>
+<span class="fc" id="L147">    }</span>
+
+<span class="fc" id="L149">    public Validate(Goate exp, String key, Object from, Object fromExpected, Object rtrn, long cachePeriod, Goate data) {</span>
+<span class="fc" id="L150">        this.setExp(exp);</span>
+<span class="fc" id="L151">        this.setKey(key);</span>
+<span class="fc" id="L152">        this.setFrom(from);</span>
+<span class="fc" id="L153">        this.setFromExpected(fromExpected);</span>
+<span class="fc" id="L154">        this.setRtrn(rtrn);</span>
+<span class="fc" id="L155">        this.setData(data);</span>
+<span class="fc" id="L156">        this.setPeriod(cachePeriod);</span>
+<span class="fc" id="L157">    }</span>
+
+    public boolean running() {
+<span class="nc" id="L160">        return running;</span>
+    }
+
+    public void run() {
+<span class="fc" id="L164">        running = true;</span>
+        try {
+<span class="fc" id="L166">            result = true;</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">            if (!check(getExp(), getKey(), (Goate) getRtrn())) {</span>
+<span class="fc" id="L168">                result = false;</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">                if (getKey().contains(&quot;*&quot;)) {</span>
+<span class="fc" id="L170">                    fails.add(getExp());</span>
+                }
+            }
+<span class="nc" id="L173">        } catch (Throwable t) {</span>
+<span class="nc" id="L174">            fails.add(getExp());</span>
+        } finally {
+<span class="pc" id="L176">            running = false;</span>
+<span class="pc" id="L177">        }</span>
+<span class="fc" id="L178">    }</span>
+
+    public boolean result() {
+<span class="fc" id="L181">        return this.result;</span>
+    }
+
+    protected List&lt;String&gt; buildIndexChecks(String pattern) {
+<span class="fc" id="L185">        List&lt;String&gt; checks = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L186" title="All 4 branches covered.">        while (pattern.contains(&quot;*&quot;) || pattern.contains(&quot;+&quot;)) {</span>
+<span class="fc" id="L187">            String[] calculated = calculateIndexCheck(pattern);</span>
+<span class="fc" id="L188">            pattern = calculated[patternIndex];</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">            if (calculated[checkIndex] != null) {</span>
+<span class="fc" id="L190">                checks.add(calculated[checkIndex]);</span>
+            }
+<span class="fc" id="L192">        }</span>
+<span class="fc" id="L193">        return checks;</span>
+    }
+
+    protected boolean starBefore(String check){
+<span class="fc" id="L197">        int firstIndexStar = check.indexOf(&quot;*&quot;);</span>
+<span class="fc" id="L198">        int firstIndexPlus = check.lastIndexOf(&quot;+&quot;);</span>
+        //return firstIndexPlus &lt;= -1 || (firstIndexStar &lt;= -1 || (firstIndexStar &lt; firstIndexPlus));
+<span class="fc bfc" id="L200" title="All 2 branches covered.">        boolean result = firstIndexStar &lt;= firstIndexPlus;</span>
+<span class="pc bpc" id="L201" title="1 of 4 branches missed.">        if(firstIndexStar&lt;0&amp;&amp;firstIndexPlus&gt;-1){</span>
+<span class="fc" id="L202">            result = false;</span>
+        }
+<span class="fc" id="L204">        return result;</span>
+    }
+
+    private String[] calculateIndexCheck(String act1) {
+<span class="fc" id="L208">        String[] ic = {null, null};</span>
+<span class="fc" id="L209">        int pattern = 0;</span>
+<span class="fc" id="L210">        int check = 1;</span>
+<span class="fc" id="L211">        int firstIndexStar = act1.indexOf(&quot;*&quot;);</span>
+<span class="fc" id="L212">        int firstIndexPlus = act1.indexOf(&quot;+&quot;);</span>
+<span class="fc bfc" id="L213" title="All 4 branches covered.">        if (firstIndexStar &gt; -1 &amp;&amp; (firstIndexStar &lt; firstIndexPlus)) {</span>
+<span class="fc" id="L214">            ic = calculateStarCheck(act1, firstIndexStar);</span>
+        } else {
+<span class="fc bfc" id="L216" title="All 2 branches covered.">            if (firstIndexPlus &gt; -1) {</span>
+<span class="fc" id="L217">                String base = act1.substring(0, firstIndexPlus);</span>
+<span class="fc" id="L218">                ic[pattern] = base + plusReplacement + act1.substring(firstIndexPlus + 1);</span>
+<span class="fc" id="L219">                ic[check] = base + &quot;[0-9]+&quot; + act1.substring(firstIndexPlus + 1).replaceAll(&quot;\\[*\\*[0-9]*,*[0-9]*\\]*&quot;, &quot;*&quot;).replaceAll(&quot;\\+&quot;, &quot;*&quot;) + &quot;,&gt;=,1&quot;;</span>
+<span class="pc bpc" id="L220" title="1 of 2 branches missed.">            } else if (firstIndexStar &gt; -1) {</span>
+<span class="fc" id="L221">                ic = calculateStarCheck(act1, firstIndexStar);</span>
+            } else {
+<span class="nc" id="L223">                ic[pattern] = act1;</span>
+            }
+        }
+<span class="fc" id="L226">        return ic;</span>
+    }
+
+    protected String[] calculateStarCheck(String act1, int firstIndexStar) {
+<span class="fc" id="L230">        String[] ic = {null, null};</span>
+<span class="fc" id="L231">        int indexLeftSquare = act1.indexOf(&quot;[&quot;);</span>
+<span class="fc" id="L232">        String base = act1.substring(0, firstIndexStar);</span>
+<span class="fc bfc" id="L233" title="All 4 branches covered.">        if (indexLeftSquare &gt; -1 &amp;&amp; indexLeftSquare &lt; firstIndexStar) {</span>
+<span class="fc" id="L234">            int indexRightSquare = act1.indexOf(&quot;]&quot;);</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">            if (indexRightSquare &gt; firstIndexStar) {</span>
+<span class="fc" id="L236">                String[] i = act1.substring(firstIndexStar + 1, indexRightSquare).split(&quot;,&quot;);</span>
+<span class="fc" id="L237">                long size = Long.parseLong(i[0]);</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">                if (i.length == 2) {</span>
+<span class="fc" id="L239">                    size += Long.parseLong(i[1]);</span>
+                }
+<span class="fc" id="L241">                ic[patternIndex] = base.substring(0, base.length() - 1) + starReplacement + act1.substring(indexRightSquare + 1);</span>
+<span class="fc" id="L242">                ic[checkIndex] = base + &quot;0-9]+&quot; + act1.substring(indexRightSquare + 1).replaceAll(&quot;\\[*\\*[0-9]*,*[0-9]*\\]*&quot;, &quot;*&quot;).replaceAll(&quot;\\+&quot;, &quot;*&quot;) + &quot;,==,&quot; + size;</span>
+<span class="fc" id="L243">            } else {</span>
+<span class="nc" id="L244">                ic[patternIndex] = base + starReplacement + act1.substring(firstIndexStar + 1);</span>
+            }
+<span class="fc" id="L246">        } else {</span>
+<span class="fc" id="L247">            ic[patternIndex] = base + starReplacement + act1.substring(firstIndexStar + 1);</span>
+        }
+<span class="fc" id="L249">        return ic;</span>
+    }
+
+    protected abstract boolean check(Goate exp, String key, Goate fromData);
+
+    /**
+     * this is where the comparison actually takes place.
+     * This is a good place for a breakpoint when trying to debug a comparator.
+     *
+     * @param val  The actual value
+     * @param expV The expected value
+     * @param ev   The expecation definition
+     * @return True if condition met, otherwise false
+     */
+    protected boolean compare(Object val, Object expV, Goate ev) {
+<span class="fc" id="L264">        boolean result = true;</span>
+<span class="fc" id="L265">        CompareUtility compare = new Compare(val).to(expV).using(ev.get(&quot;operator&quot;));</span>
+<span class="fc" id="L266">        compare.setData(getData());</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">        if (!(compare.evaluate())) {//step into here to debug the comparator</span>
+<span class="fc" id="L268">            fails.add(ev);</span>
+<span class="fc" id="L269">            result = false;</span>
+        } else {
+<span class="fc" id="L271">            passes.add(ev);</span>
+        }
+<span class="fc" id="L273">        Goate health = compare.healthCheck();</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">        if (health.size() &gt; 0) {</span>
+<span class="fc" id="L275">            ev.put(HEALTH_CHECK + &quot;_health check&quot;, health);</span>
+        }
+<span class="fc" id="L277">        return result;</span>
+    }
+
+    protected boolean checkEvaluated(List&lt;Goate&gt; passed, String act1, int index) {
+<span class="fc" id="L281">        boolean found = false;</span>
+<span class="nc" id="L282">        String find = calculateKey(act1, index);</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">        for (Goate exp : passed) {</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">            if ((&quot;&quot; + exp.get(&quot;actual&quot;)).contains(find)) {</span>
+<span class="nc" id="L285">                found = true;</span>
+<span class="nc" id="L286">                break;</span>
+            }
+<span class="nc" id="L288">        }</span>
+<span class="nc" id="L289">        return found;</span>
+    }
+
+    protected boolean checkAct1(String act1, Object from, int index) {
+<span class="fc" id="L293">        boolean found = false;</span>
+<span class="fc" id="L294">        String check = calculateKey(act1, index);</span>
+<span class="fc" id="L295">        Object o = new Get(check).from(from);</span>
+<span class="pc bpc" id="L296" title="1 of 4 branches missed.">        if (o != null &amp;&amp; !(o instanceof NotFound)) {</span>
+<span class="fc" id="L297">            found = true;</span>
+        }
+<span class="fc" id="L299">        return found;</span>
+    }
+
+    private String calculateKey(String act1, int index) {
+<span class="fc" id="L303">        int lastIndex = act1.indexOf(&quot;*&quot;);</span>
+<span class="fc" id="L304">        String key = act1;</span>
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">        if (lastIndex &gt; -1) {</span>
+<span class="fc" id="L306">            key = act1.substring(0, lastIndex - 1);</span>
+<span class="pc bpc" id="L307" title="1 of 2 branches missed.">            if (lastIndex != act1.length()) {</span>
+<span class="fc" id="L308">                key += &quot;.&quot; + index;</span>
+            }
+        }
+<span class="fc" id="L311">        return key;</span>
+    }
+
+    private String encodeOffset(int offset, String c) {
+<span class="fc" id="L315">        StringBuilder os = new StringBuilder();</span>
+<span class="fc" id="L316">        offset++;</span>
+<span class="fc bfc" id="L317" title="All 2 branches covered.">        while (offset &gt; 0) {</span>
+<span class="fc" id="L318">            os.append(c);</span>
+<span class="fc" id="L319">            offset--;</span>
+        }
+<span class="fc" id="L321">        return os.toString();</span>
+    }
+
+    private int calculateOffset(String offset, int current) {
+<span class="pc bpc" id="L325" title="1 of 2 branches missed.">        return offset.contains(&quot;;&quot;) ? current : offset.length() - 1;</span>
+    }
+
+    public Object calculateKey(Object exp, String act1) {
+<span class="fc" id="L329">        String pattern = &quot;&quot; + exp;</span>
+<span class="fc" id="L330">        List&lt;String&gt; grouping = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L331">        int groupOffset = 0;</span>
+<span class="fc bfc" id="L332" title="All 2 branches covered.">        while (pattern.contains(&quot;%&quot;)) {</span>
+<span class="fc" id="L333">            pattern = pattern.replace(&quot;\\%&quot;, &quot;_p*e*r*C*e*n*t_&quot;);</span>
+<span class="fc" id="L334">            pattern = pattern.replace(&quot;%&quot;, &quot;_open-&quot; + encodeOffset(groupOffset, &quot;:&quot;) + &quot;-close_&quot;);</span>
+<span class="fc" id="L335">            pattern = pattern.replace(&quot;_p*e*r*C*e*n*t_&quot;, &quot;%&quot;);</span>
+<span class="fc" id="L336">            groupOffset++;</span>
+        }
+<span class="fc" id="L338">        Pattern p = Pattern.compile(&quot;([0-9]+)&quot;);</span>
+<span class="fc" id="L339">        Matcher m = p.matcher(&quot;&quot; + act1);</span>
+<span class="fc bfc" id="L340" title="All 2 branches covered.">        while (m.find()) {</span>
+<span class="fc" id="L341">            LOG.debug(&quot;Expected Wildcard Index&quot;, &quot;Number of groups found: &quot; + m.groupCount());</span>
+<span class="fc" id="L342">            LOG.debug(&quot;Expected Wildcard Index&quot;, &quot;Group: &quot; + m.group(0));</span>
+<span class="fc" id="L343">            grouping.add(m.group(0));</span>
+<span class="fc" id="L344">            LOG.debug(&quot;Expected Wildcard Index&quot;, &quot;grouping: &quot; + grouping.get(grouping.size() - 1));</span>
+<span class="fc" id="L345">            act1 = m.replaceFirst(&quot;_found-dnuof_&quot;);</span>
+<span class="fc" id="L346">            LOG.debug(&quot;Expected Wildcard Index&quot;, &quot;Remainder: &quot; + act1);</span>
+<span class="fc" id="L347">            m = p.matcher(&quot;&quot; + act1);</span>
+        }
+<span class="fc" id="L349">        int current = 0;</span>
+<span class="fc" id="L350">        Pattern p2 = Pattern.compile(&quot;(_open-(:*;*)-close_)&quot;);</span>
+<span class="fc" id="L351">        m = p2.matcher(pattern);</span>
+<span class="fc" id="L352">        LOG.debug(&quot;Expected Wildcard Index&quot;, &quot;filling: &quot; + pattern);</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">        while (m.find()) {</span>
+<span class="fc" id="L354">            String count = m.group(2);</span>
+<span class="fc" id="L355">            int ci = calculateOffset(count, current);</span>
+<span class="fc" id="L356">            pattern = m.replaceFirst(grouping.get(ci));</span>
+<span class="fc" id="L357">            LOG.debug(&quot;Expected Wildcard Index&quot;, &quot;filled: &quot; + pattern);</span>
+<span class="fc" id="L358">            current++;</span>
+<span class="fc" id="L359">            m = p2.matcher(pattern);</span>
+<span class="fc" id="L360">        }</span>
+<span class="fc" id="L361">        return pattern;</span>
+    }
+
+    protected Object getActualValue(Object data, String key) {
+<span class="fc" id="L365">        String[] keys = key.split(&quot;&gt;&quot;);</span>
+<span class="fc" id="L366">        Object act = data;</span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">        for (String k : keys) {</span>
+<span class="fc" id="L368">            act = new Get(k).from(act);</span>
+        }
+<span class="fc" id="L370">        return act;</span>
+    }
+
+    protected Object getExpectedValue(Object exp, String act1) {
+<span class="fc bfc" id="L374" title="All 4 branches covered.">        if ((&quot;&quot; + exp).contains(&quot;%&quot;)&amp;&amp;getFromExpected()!=null) {</span>
+<span class="fc" id="L375">            exp = calculateKey(exp, act1);</span>
+        }
+<span class="fc" id="L377">        Object result = exp;</span>
+<span class="fc bfc" id="L378" title="All 2 branches covered.">        if (getFromExpected() != null) {</span>
+<span class="fc bfc" id="L379" title="All 2 branches covered.">            if (fromExpectedResult == null) {</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">                if (getFromExpected() instanceof Employee) {</span>
+<span class="fc" id="L381">                    fromExpectedResult = ((Employee) getFromExpected()).defaultPeriod(getPeriod()).syncWork();</span>
+                } else {
+<span class="fc" id="L383">                    fromExpectedResult = getFromExpected();</span>
+                }
+            }
+<span class="fc" id="L386">            result = new Get(exp).from(fromExpectedResult);</span>
+        } else {
+<span class="fc" id="L388">            result = new Goate().get(&quot;result&quot;, result);</span>
+        }
+<span class="fc" id="L390">        return result;</span>
+    }
+
+    public Goate getExp() {
+<span class="fc" id="L394">        return exp;</span>
+    }
+
+    public Validate setExp(Goate exp) {
+<span class="fc" id="L398">        this.exp = exp;</span>
+<span class="fc" id="L399">        return this;</span>
+    }
+
+    public Object getFrom() {
+<span class="nc" id="L403">        return from;</span>
+    }
+
+    public Validate setFrom(Object from) {
+<span class="fc" id="L407">        this.from = from;</span>
+<span class="fc" id="L408">        return this;</span>
+    }
+
+    public Object getFromExpected() {
+<span class="fc" id="L412">        return fromExpected;</span>
+    }
+
+    public Validate setFromExpected(Object fromExpected) {
+<span class="fc" id="L416">        this.fromExpected = fromExpected;</span>
+<span class="fc" id="L417">        return this;</span>
+    }
+
+    public Goate getData() {
+<span class="fc" id="L421">        return data;</span>
+    }
+
+    public Validate setData(Goate data) {
+<span class="fc" id="L425">        this.data = data;</span>
+<span class="fc" id="L426">        return this;</span>
+    }
+
+    public String getKey() {
+<span class="fc" id="L430">        return key;</span>
+    }
+
+    public Validate setKey(String key) {
+<span class="fc" id="L434">        this.key = key;</span>
+<span class="fc" id="L435">        return this;</span>
+    }
+
+    public Object getRtrn() {
+<span class="fc" id="L439">        return rtrn;</span>
+    }
+
+    public Validate setRtrn(Object rtrn) {
+<span class="fc" id="L443">        this.rtrn = rtrn;</span>
+<span class="fc" id="L444">        return this;</span>
+    }
+
+    public long getPeriod() {
+<span class="fc" id="L448">        return period;</span>
+    }
+
+    public Validate setPeriod(long period) {
+<span class="fc" id="L452">        this.period = period;</span>
+<span class="fc" id="L453">        return this;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

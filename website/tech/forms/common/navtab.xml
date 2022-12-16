@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<navtab>
+	<div class="tab">
+		<div class="left">
+			<div class="top">
+			</div>
+			<div class="center">
+			</div>
+			<div class="left_bottom">
+			</div>
+		</div>
+		<nothtml type="ahref">
+		
+			
+				<href><nothtml type="_getphpvar">_href</nothtml></href>
+				<linktext><nothtml type="html"><div class="center"><nothtml type="_getphpvar">_label</nothtml></div></nothtml></linktext>
+			
+		
+		</nothtml>
+		<div class="right">
+			<div class="top">
+			</div>
+			<div class="center">
+			</div>
+			<div class="bottom">
+			</div>
+		</div>
+	</div>
+</navtab>

@@ -41,6 +41,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Identifies a ToJson utility")
 @Info
-@IndexAnnotated
+@IndexAnnotated(storeJavadoc = false)
 public @interface ToJsonUtil {
 }

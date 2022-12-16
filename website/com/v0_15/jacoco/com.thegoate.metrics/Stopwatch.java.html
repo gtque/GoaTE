@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Stopwatch.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.metrics</a> &gt; <span class="el_source">Stopwatch.java</span></div><h1>Stopwatch.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.metrics;
+
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Stopwatch class for measuring time.
+ * This uses System.nanoTime() to track the time, where the total time is the difference between the start and end times.
+ * Created by Eric Angeli on 2/12/2018.
+ */
+public class Stopwatch {
+
+<span class="fc" id="L43">    public static Stopwatch global = new Stopwatch();</span>
+
+<span class="fc" id="L45">    private final BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+
+<span class="fc" id="L47">    private volatile Goate timers = new Goate();</span>
+<span class="fc" id="L48">    private volatile String started = null;</span>
+
+<span class="fc" id="L50">    public Stopwatch(){</span>
+<span class="fc" id="L51">        lap(&quot;:overall:&quot;);</span>
+<span class="fc" id="L52">    }</span>
+
+    public Timer lap(String lap){
+<span class="fc" id="L55">        LOG.debug(&quot;Stopwatch&quot;, &quot;lap: &quot; + lap);</span>
+<span class="fc" id="L56">        return timers.get(lap, new Timer(), Timer.class);</span>
+    }
+
+    public Stopwatch start(){
+<span class="nc" id="L60">        return start(&quot;:overall:&quot;);</span>
+    }
+
+    public Stopwatch start(String lap) {
+<span class="fc" id="L64">        return start(lap, System.nanoTime());</span>
+    }
+
+    public Stopwatch start(String lap, long start){
+<span class="pc bpc" id="L68" title="1 of 4 branches missed.">        if(!lap.equals(&quot;:overall:&quot;)&amp;&amp;lap(&quot;:overall:&quot;).getStart()==0L){</span>
+<span class="fc" id="L69">            start(&quot;:overall:&quot;,start);</span>
+<span class="fc" id="L70">            started = lap;</span>
+        }
+<span class="fc" id="L72">        LOG.debug(&quot;Stopwatch&quot;, &quot;Lap(&quot;+lap+&quot;) start: &quot; + start);</span>
+<span class="fc" id="L73">        lap(lap).start(start);</span>
+<span class="fc" id="L74">        return this;</span>
+    }
+
+    public Stopwatch stop(){
+<span class="nc" id="L78">        return stop(&quot;:overall:&quot;);</span>
+    }
+
+    public Stopwatch stop(String lap) {
+<span class="fc" id="L82">        return stop(lap, System.nanoTime());</span>
+    }
+
+    public Stopwatch stop(String lap, long stop){
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if(lap.equals(started)){</span>
+<span class="fc" id="L87">            stop(&quot;:overall:&quot;,stop);</span>
+        }
+<span class="fc" id="L89">        LOG.debug(&quot;Stopwatch&quot;, &quot;Lap(&quot;+lap+&quot;) stop: &quot; + stop);</span>
+<span class="fc" id="L90">        lap(lap).stop(stop);</span>
+<span class="fc" id="L91">        return this;</span>
+    }
+
+    public Stopwatch split(String lap){
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if(lap!=null) {</span>
+<span class="fc" id="L96">            lap(lap).split();</span>
+        }
+<span class="fc" id="L98">        return this;</span>
+    }
+
+    public void stopAll() {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        for (String lap:timers.keys()) {</span>
+<span class="fc" id="L103">            Timer clock = timers.get(lap,null,Timer.class);</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">            if (clock.getStop() == 0L)</span>
+<span class="nc" id="L105">                clock.stop();</span>
+<span class="fc" id="L106">        }</span>
+<span class="fc" id="L107">    }</span>
+
+    public void clearAllLaps(){
+<span class="fc" id="L110">        timers = new Goate();</span>
+<span class="fc" id="L111">    }</span>
+
+    public void clearLaps(String lapPattern) {
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        for (String lap:timers.keys()) {</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">            if (lap.contains(lapPattern)){//change this to use regex pattern matcher?</span>
+<span class="nc" id="L116">                timers.drop(lap);</span>
+            }
+<span class="nc" id="L118">        }</span>
+<span class="nc" id="L119">    }</span>
+
+    public Goate getTimers(){
+<span class="nc" id="L122">        return timers;</span>
+    }
+
+<span class="fc" id="L125">    public class Timer {</span>
+<span class="fc" id="L126">        long start = 0L;</span>
+<span class="fc" id="L127">        long stop = 0L;</span>
+<span class="fc" id="L128">        Map&lt;String,Long&gt; splits = new HashMap&lt;&gt;();</span>
+
+        public Map&lt;String, Long&gt; splits(){
+<span class="fc" id="L131">            return this.splits;</span>
+        }
+
+        void split(){
+<span class="fc" id="L135">            split(&quot;&quot;+splits.size());</span>
+<span class="fc" id="L136">        }</span>
+
+        void split(String split){
+<span class="fc" id="L139">            splits.put(split, System.nanoTime());</span>
+<span class="fc" id="L140">        }</span>
+
+        void start(long time) {
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            if (start == 0L) {</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">                if (time &gt;= 0L) {</span>
+<span class="fc" id="L145">                    start = time;</span>
+                } else {
+<span class="nc" id="L147">                    start();</span>
+                }
+            }
+<span class="fc" id="L150">        }</span>
+
+        void stop(long time) {
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">            if (stop == 0L) {</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">                if (time &gt;= 0L) {</span>
+<span class="fc" id="L155">                    stop = time;</span>
+                } else {
+<span class="nc" id="L157">                    stop();</span>
+                }
+            }
+<span class="fc" id="L160">        }</span>
+
+        void start() {
+<span class="nc" id="L163">            start(System.nanoTime());</span>
+<span class="nc" id="L164">        }</span>
+
+        void stop() {
+<span class="nc" id="L167">            stop(System.nanoTime());</span>
+<span class="nc" id="L168">        }</span>
+
+        public long getTime() {
+<span class="fc" id="L171">            return stop - start;</span>
+        }
+
+        public long getStart() {
+<span class="fc" id="L175">            return start;</span>
+        }
+
+        public long getStop() {
+<span class="fc" id="L179">            return stop;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

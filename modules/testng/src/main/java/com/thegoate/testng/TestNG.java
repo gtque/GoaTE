@@ -27,16 +27,24 @@
 package com.thegoate.testng;
 
 import com.thegoate.Goate;
-import com.thegoate.data.DataLoader;
 import com.thegoate.expect.Expectation;
+import com.thegoate.expect.builder.ExpectationBuilder;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * The interface for TestNG based test classes.
  * Created by Eric Angeli on 5/11/2017.
  */
 public interface TestNG {
-    Object[][] dataLoader(ITestContext context) throws Exception;
+    void startUp(Method method, ITestResult result);
+    void finishUp(Method method);
+    void init(Goate data);
+    Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception;
     void defineDataLoaders();
     void defineDataLoaders(Goate runData, Goate constantData);
     Goate getRunDataLoader();
@@ -44,17 +52,29 @@ public interface TestNG {
     Goate getData();
     void setData(Goate data);
     void setRunNumber(int number);
-    void bumpRunNumber();
+    void bumpRunNumber(String name);
     int getRunNumber();
+    void initRunNumber(Method method);
     void setScenario(String scenario);
     String getScenario();
     Object get(String key);
     Object get(String key, Object def);
     <T>T get(String key, Object def, Class<T> type);
     TestNG put(String key, Object val);
+    boolean expectNow(Expectation expectation);
+    boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder);
+    boolean expectNow(List<Expectation> expectation);
+    boolean expectNow(Expectation expectation, boolean failImmediately);
+    boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder, boolean failImmediately);
+    boolean expectNow(List<Expectation> expectation, boolean failImmediately);
     TestNG expect(Expectation expectation);
+    TestNG expect(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder);
+    TestNG expect(List<Expectation> expectation);
     TestNG evalPeriod(long periodMS);
     TestNG evalTimeout(long periodMS);
     void evaluate();
+    void evaluate(ITestResult testResult);
     TestNG clearExpectations();
+    boolean isExpectationsSet();
+    boolean isExpectationsNotEvaluated();
 }

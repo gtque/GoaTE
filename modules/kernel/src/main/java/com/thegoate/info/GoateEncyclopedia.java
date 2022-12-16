@@ -29,13 +29,6 @@ package com.thegoate.info;
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.annotations.GoateDescription;
-import com.thegoate.dsl.GoateDSL;
-import com.thegoate.dsl.Interpreter;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Simple app for reading the dictionary.
@@ -50,6 +43,7 @@ public class GoateEncyclopedia {
      * Looks for anything annotated with Info and adds it to the index.
      * The last instance of a word wins, ie there will only be one version of a word in the dictionary
      * which may produce unexpected results if more than one uses the same word.
+     * @return the compiled encyclopedia describing all of Goate.
      */
     public GoateEncyclopedia buildIndex() {
         try {

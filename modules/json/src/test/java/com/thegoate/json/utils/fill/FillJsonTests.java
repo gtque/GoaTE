@@ -28,13 +28,10 @@ package com.thegoate.json.utils.fill;
 
 import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
+import com.thegoate.expect.Expectation;
 import com.thegoate.testng.TestNGEngineMethodDL;
-import com.thegoate.utils.compare.Compare;
-import org.json.JSONArray;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Tests against CompareJson utilities.
@@ -64,6 +61,12 @@ public class FillJsonTests extends TestNGEngineMethodDL {
                         .add("r.2.0", "a")
                         .add("operator", "==")
                         .add("expected", true))
+                .put("dl##", new StaticDL().add("Scenario", "fill with null")
+                        .add("json1", "{\"nullify\":42}")
+                        .add("json2", "{\"nullify\":null}")
+                        .add("nullify", "null::")
+                        .add("operator", "==")
+                        .add("expected", true))
                 .put("dl##", new StaticDL().add("Scenario", "json array")
                         .add("json1", "[\n" +
                                 "  {\n" +
@@ -84,7 +87,7 @@ public class FillJsonTests extends TestNGEngineMethodDL {
                 .put("dl##", new StaticDL().add("Scenario", "regex pattern matching")
                         .add("json1", "[{\"dropme\":42,\"empty\":\"should be empty\",\"isnull\":\"should be null\",\"e\":\"42\",\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"45\",\"g\":\"g\"},{\"a\":\"b\"},[\"b\"]]}]")
                         .add("json2", "[{\"empty\":\"\",\"isnull\":null,\"c\":\"x\",\"d\":\"z\",\"r\":[{\"a\":\"c\",\"g\":\"h\"},{\"a\":\"b\"},[\"a\"]],\"e\":\"y\"}]")
-                        .add("e", "y")
+                        .add("0.e", "y")
                         .add("[0-9]\\.dropme", "drop field::")
                         .add("0.empty", "empty field::")
                         .add("0.isnull", "null field::")
@@ -103,6 +106,10 @@ public class FillJsonTests extends TestNGEngineMethodDL {
         LOG.debug(json1);
         LOG.debug("" + get("json2"));
         put("json1", json1);
-        assertEquals(new Compare(get("json1")).to(get("json2")).using("" + get("operator")).evaluate(), get("expected"));
+//        assertEquals(new Compare(get("json1")).to(get("json2")).using("" + get("operator")).evaluate(), get("expected"));
+        expect(Expectation.build()
+                .actual(get("json1"))
+                .is("" + get("operator"))
+                .expected(get("json2")));
     }
 }

@@ -36,7 +36,7 @@ import org.jsoup.nodes.Document;
  * Get the field from the given json.
  * Created by Eric Angeli on 5/19/2017.
  */
-@GetUtil
+@GetUtil(type = Document.class)
 public class GetHtmlField extends HtmlUtil implements GetUtility {
 
     Document doc = null;

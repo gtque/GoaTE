@@ -28,6 +28,8 @@ package com.thegoate.utils.fill.serialize.pojos;
 
 import com.thegoate.utils.fill.serialize.GoatePojo;
 import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.IgnoreOnCompare;
+import com.thegoate.utils.fill.serialize.Kid;
 
 import java.math.BigDecimal;
 
@@ -35,7 +37,7 @@ import java.math.BigDecimal;
  * Created by Eric Angeli on 6/26/2018.
  */
 @GoatePojo(id = "simple pojo")
-public class SimplePojo {
+public class SimplePojo extends Kid {
 
     private String fieldName = "what?";
 
@@ -55,19 +57,23 @@ public class SimplePojo {
 
     private char c = 'c';
 
-    private Byte aByte = new Byte("1");
+    private Byte aByte = Byte.parseByte("1");
 
     private boolean bool = true;
 
-    //    @GoateSource(source = SimpleSource.class, key = "floaty mcfloatface")
+    //    @GoateSource(expected = SimpleSource.class, key = "floaty mcfloatface")
     private float f = 4f;
+
+    @IgnoreOnCompare
+    private String ignoreMe = "found them";
 
     public String getFieldName() {
         return fieldName;
     }
 
-    public void setFieldName(String fieldName) {
+    public SimplePojo setFieldName(String fieldName) {
         this.fieldName = fieldName;
+        return this;
     }
 
     public int getSomeInt() {
@@ -132,5 +138,13 @@ public class SimplePojo {
 
     public void setF(float f) {
         this.f = f;
+    }
+
+    public String getIgnoreMe() {
+        return ignoreMe;
+    }
+
+    public void setIgnoreMe(String ignoreMe) {
+        this.ignoreMe = ignoreMe;
     }
 }

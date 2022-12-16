@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.insert.InsertUtil;
 import com.thegoate.utils.insert.InsertUtility;
 import com.thegoate.utils.togoate.ToGoate;
 import org.json.JSONArray;
@@ -39,11 +40,12 @@ import org.json.JSONObject;
 /**
  * Created by Eric Angeli on 4/18/2018.
  */
+@InsertUtil
 public class InsertJson implements InsertUtility {
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
     String key = null;
     Object value = null;
-    String original = null;
+    Object original = null;
     String after = null;
     String in = null;
     String before = null;
@@ -64,6 +66,11 @@ public class InsertJson implements InsertUtility {
 
     @Override
     public InsertUtility into(String original) {
+        this.original = original;
+        return this;
+    }
+
+    public InsertJson into(Object original) {
         this.original = original;
         return this;
     }
@@ -140,6 +147,25 @@ public class InsertJson implements InsertUtility {
 
     @Override
     public String insert() throws Exception {
+        boolean isJsonObject = true;
+        if(original instanceof JSONObject || original instanceof JSONArray) {
+            if(original instanceof JSONArray){
+                isJsonObject = false;
+            }
+        } else {
+            if (("" + original).startsWith("[")) {
+                if (append) {
+                    append = false;
+                    in = "";
+                }
+                isJsonObject = false;
+            }
+        }
+        Object jsonObject = insertToJson(Object.class);
+        return isJsonObject?((JSONObject)jsonObject).toString(4):((JSONArray)jsonObject).toString(4);
+    }
+
+    public <T> T insertToJson(Class<T> type) throws Exception{
         if (before == null && after == null && in == null && append == false)
             throw new Exception("Failed to insert: No Location set. You must set \"after\" or \"before\" location.");
         if (original == null)
@@ -150,22 +176,29 @@ public class InsertJson implements InsertUtility {
         //    throw new Exception("Failed to insert: The value cannot be null");
         Object jsonObject;
         boolean isJsonObject = true;
-        if (original.startsWith("{")) {
-            jsonObject = new JSONObject(original);
-        } else {
-            jsonObject = new JSONArray(original);
-            if (append) {
-                append = false;
-                in = "";
+        if(original instanceof JSONObject || original instanceof JSONArray) {
+            if(original instanceof JSONArray){
+                isJsonObject = false;
             }
-            isJsonObject = false;
+            jsonObject = original;
+        } else {
+            if (("" + original).startsWith("{")) {
+                jsonObject = new JSONObject(original);
+            } else {
+                jsonObject = new JSONArray(original);
+                if (append) {
+                    append = false;
+                    in = "";
+                }
+                isJsonObject = false;
+            }
         }
         if (append)
             if (replace)
-                ((JSONObject) jsonObject).put(key, value);
+                ((JSONObject) jsonObject).put(key, value==null?JSONObject.NULL:value);
             else {
                 try {
-                    ((JSONObject) jsonObject).putOnce(key, value);
+                    ((JSONObject) jsonObject).putOnce(key, value==null?JSONObject.NULL:value);
                 } catch (JSONException je) {
                     LOG.warn("key already exists: " + key);
                 }
@@ -176,9 +209,8 @@ public class InsertJson implements InsertUtility {
             jsonObject = insertAfter(jsonObject);
         else if (in != null)
             jsonObject = insertIn(jsonObject);
-        return isJsonObject?((JSONObject)jsonObject).toString(4):((JSONArray)jsonObject).toString(4);
+        return (T)jsonObject;
     }
-
     /**
      * Simply appends the value as order does not matter in json.<br>
      * Unless you are adding to a JSONArray, in which case use "in" instead.
@@ -212,20 +244,20 @@ public class InsertJson implements InsertUtility {
     private Object insertIn(Object jsonObject) throws Exception {
         String ids[] = in.split("\\.");
         Object j = jsonObject;
+        int aid = -42;
         for (int i = 0; i < ids.length; i++) {//String id:ids) {
             String id = ids[i];
+            String next = (i < ids.length - 1 ? ids[i + 1] : key);
+            boolean isInt = false;
+            try {
+                aid = Integer.parseInt(next);
+                isInt = true;
+            } catch (Exception e) {
+                LOG.debug("Insert JSON", "Looks like it is a json object not a json array.");
+            }
             if(!id.isEmpty()) {
-                String next = (i < ids.length - 1 ? ids[i + 1] : key);
-                int aid = -42;
                 Object j2 = getJson(j, id);
-                if (j2 == null) {
-                    boolean isInt = false;
-                    try {
-                        aid = Integer.parseInt(next);
-                        isInt = true;
-                    } catch (Exception e) {
-                        LOG.debug("Insert JSON", "Looks like it is a json object not a json array.");
-                    }
+                if (j2 == null || j2 == JSONObject.NULL) {
                     if (isInt) {
                         j2 = new JSONArray();
                     } else {
@@ -250,14 +282,25 @@ public class InsertJson implements InsertUtility {
 //                    throw new Exception("Failed to insert: One of the elements in the id was not a JSONArray or JSONObject.");
 //            }
         }
-        if (j instanceof JSONArray)
-            ((JSONArray) j).put(value);
+        if (j instanceof JSONArray) {
+            int jLength = ((JSONArray)j).length();
+            if(aid>=jLength){
+                for(int jIndex = jLength; jIndex <= aid; jIndex++){
+                    ((JSONArray) j).put(jIndex, JSONObject.NULL);
+                }
+            }
+            if(aid<0){
+                ((JSONArray) j).put(value == null ? JSONObject.NULL : value);
+            } else {
+                ((JSONArray) j).put(aid, value == null ? JSONObject.NULL : value);
+            }
+        }
         else if (j instanceof JSONObject) {
             if (replace)
-                ((JSONObject) j).put(key, value);
+                ((JSONObject) j).put(key, value==null?JSONObject.NULL:value);
             else {
                 try {
-                    ((JSONObject) j).putOnce(key, value);
+                    ((JSONObject) j).putOnce(key, value==null?JSONObject.NULL:value);
                 } catch (JSONException je) {
                     LOG.warn("key already exists: " + key);
                 }
@@ -279,6 +322,8 @@ public class InsertJson implements InsertUtility {
                 JSONArray ja = (JSONArray)jsonObject;
                 if (id != null && !id.isEmpty() && ja.length()>Integer.parseInt(id)) {
                     result = ja.get(Integer.parseInt(id));
+                } else {
+                    LOG.debug("exceeded json array size");
                 }
             } catch (Exception e) {
                 //result = jsonObject;

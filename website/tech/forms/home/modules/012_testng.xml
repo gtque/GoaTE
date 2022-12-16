@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<q>
+	<p class="module_title">testng</p>
+	<p class="module_definition">GoaTE for TestNG. Provides different base classes that your test classes may extend to provide some standard dataprovider support that leverage the data loader framework from kernel. It also makes use of the expectations for defining what to validate for the tests. All bundled up and executed using TestNG.</p>
+</q>

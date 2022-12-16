@@ -33,7 +33,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Checks if a string contains the given string.
  * Created by Eric Angeli on 4/17/2018.
  */
-@CompareUtil(operator = "contains", type="String")
+@CompareUtil(operator = "contains", type = String.class)
 @IsDefault
 public class CompareStringContains extends CompareStringTool {
     public CompareStringContains(Object actual) {
@@ -42,8 +42,8 @@ public class CompareStringContains extends CompareStringTool {
 
     @Override
     public boolean evaluate() {
-        String check = ""+expected;
-        String act = "" + actual;
+        String check = ""+actual;
+        String act = "" + expected;
         return act.contains(check);
     }
 }

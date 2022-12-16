@@ -27,21 +27,27 @@
 
 package com.thegoate.utils.togoate;
 
+import java.util.Map;
+
 import com.thegoate.Goate;
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.to.ToUtil;
+import com.thegoate.utils.to.ToUtility;
 
 /**
- * The generic get class.
- * This will attempt to look up the specific get utility for the type detected.
+ * The generic togoate class.
+ * This will attempt to look up the specific to goate utility for the type detected.
  * Created by Eric Angeli on 5/5/2017.
  */
-public class ToGoate extends UnknownUtilType implements ToGoateUtility{
+@ToUtil(type = Goate.class)
+public class ToGoate extends UnknownUtilType<ToGoate> implements ToGoateUtility, ToUtility<Goate> {
     boolean autoIncrement = true;
     ToGoateUtility tool = null;
     protected Object original = null;
 
     public ToGoate(Object o){
         this.original = o;
+//        useCache = true;
     }
 
     @Override
@@ -66,9 +72,21 @@ public class ToGoate extends UnknownUtilType implements ToGoateUtility{
                 result = tool.autoIncrement(autoIncrement).convert();
             }
             if (result == null) {
-                LOG.info("Failed to convert: " + original);
+                if(original instanceof Map && ((Map)original).entrySet().iterator().hasNext() && ((Map.Entry)((Map)original).entrySet().iterator().next()).getKey() instanceof String){
+                    result = new Goate((Map<String, ?>)original);
+                } else {
+                    LOG.debug("Failed to convert: " + original);
+                    result = new Goate().put("_original_", original);
+                }
             }
         }
         return result;
+    }
+
+    @Override
+    public boolean checkType(Class tool, Class type) {
+        //        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
+        //        return tu.type()!=null?(tu.type() == type):(type == null);
+        return Goate.class.equals(type);
     }
 }

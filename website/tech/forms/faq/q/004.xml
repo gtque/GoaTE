@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<q>
+	<dt class="question">Does GoaTE work with [insert random library/framework]?</dt>
+	<dd class="answer">Sure. GoaTE is really just a library. There may not be a specific GoaTE interface defined for the library/framework, but it won't interfer with it. And the existing patterns defined may be applied to your usage of the other library or framework.</dd>
+</q>

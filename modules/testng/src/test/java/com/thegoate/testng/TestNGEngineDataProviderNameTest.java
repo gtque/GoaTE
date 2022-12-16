@@ -28,7 +28,7 @@ package com.thegoate.testng;
 
 import com.thegoate.Goate;
 import com.thegoate.data.GoateProvider;
-import com.thegoate.data.StaticDL;
+import com.thegoate.expect.Expectation;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
@@ -57,7 +57,19 @@ public class TestNGEngineDataProviderNameTest extends TestNGEngineAnnotatedDL {
         put("c", 3);
         assertEquals(get("c"),3);
         assertEquals(data.size(), 4);
+        expect(Expectation.build().actual(true).isEqualTo(true));
     }
 
+
+    @Test(groups = {"unit"}, dependsOnMethods = "putRunData")
+    public void secondFactoryTest() throws Exception {
+//        assertEquals(data.size(), 4);
+        assertEquals(get("b"),"y");
+        assertEquals(get("a"),"x");
+        put("c", 3);
+        assertEquals(get("c"),3);
+        assertEquals(data.size(), 4);
+        expect(Expectation.build().actual(true).isEqualTo(true));
+    }
 
 }

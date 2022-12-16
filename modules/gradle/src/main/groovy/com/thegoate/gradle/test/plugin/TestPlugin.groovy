@@ -24,11 +24,11 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.gradle.test.plugin;
+package com.thegoate.gradle.test.plugin
 
-import com.thegoate.gradle.BaseGoatePlugin;
-import org.gradle.api.Project;
-import org.gradle.api.tasks.testing.Test;
+import com.thegoate.gradle.BaseGoatePlugin
+import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
 
 /**
  * Define the test closure.
@@ -41,6 +41,7 @@ public class TestPlugin extends BaseGoatePlugin {
         dependsOn(project, "jacoco");
         ((Test) project.getTasks().getByName("test")).configure({
             //def testRemote = project.hasProperty("remoteTest")?project.remoteTest.equals("true"):false;
+            def useHttp = project.hasProperty("useHttp") ? project.useHttp.equals("true") : true;
             def testGroups = project.hasProperty("testGroups") ? (project.testGroups.equals("all") ? "unit,integration,api" : project.testGroups) : 'unit'
             def excludedGroups = project.hasProperty("excludeGroups") ? project.excludeGroup : ''
             def testSuite = project.hasProperty("testSuite") ? project.testSuite : ''
@@ -53,6 +54,7 @@ public class TestPlugin extends BaseGoatePlugin {
             systemProperty "spring.freemarker.checkTemplateLocation", "false";
             systemProperty "spring.velocity.checkTemplateLocation", "false";
             systemProperty "user.dir", project.buildscript.sourceFile.parentFile.path
+            systemProperty "testng.dtd.http", useHttp
             useTestNG() {
                 listeners << "org.testng.reporters.XMLReporter"
                 if (testSuite.equals('')) {

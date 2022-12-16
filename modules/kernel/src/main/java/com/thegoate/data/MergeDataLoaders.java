@@ -28,8 +28,6 @@ package com.thegoate.data;
 
 import com.thegoate.Goate;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**

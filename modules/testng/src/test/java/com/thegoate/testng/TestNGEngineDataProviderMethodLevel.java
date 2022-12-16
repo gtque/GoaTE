@@ -32,6 +32,9 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Eric Angeli on 5/11/2017.
  */
@@ -44,23 +47,49 @@ public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
     @GoateProvider(name = "sample")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
+        LOG.info("data size: " + data.size());
+        LOG.info("data: " + data.toString());
+        assertEquals(data.size(), 3);
         assertEquals(get("b","z"),"y");
         assertEquals(get("a","y"),"x");
         //put("c", 3);
         assertEquals(get("c",3),3);
-        assertEquals(data.size(), 5);
+        assertEquals(data.size(), 4);
     }
 
     @GoateProvider(name = "com.thegoate.testng.test.SampleDLP")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData2(Goate d) throws Exception {
-        assertEquals(data.size(), 4);
+        LOG.info("data size: " + data.size());
+        LOG.info("data: " + data.toString());
+        assertEquals(data.size(), 3);
         assertEquals(get("b"),"y");
         assertEquals(get("a"),"x");
         put("c", 3);
         assertEquals(get("c"),3);
-        assertEquals(data.size(), 5);
+        assertEquals(data.size(), 4);
     }
 
+    public int removeDuplicates(int[] nums)
+    {
+        int size = 0;
+        int lastNum = 0;
+        for(int index = 0; index < nums.length; index++){
+            if(size == 0 || lastNum!=nums[index]){
+                lastNum = nums[index];
+                nums[size] = lastNum;
+                size++;
+            }
+        }
+        return size;
+    }
+
+    @Test
+    public void testDup(){
+        int[] ia = {0,0,1,1,1,2,2,3,3,4};
+        List<String> list = new ArrayList<>();
+        list.add(0, "hello");
+        int size = removeDuplicates(ia);
+        assertEquals(size, 5);
+    }
 }

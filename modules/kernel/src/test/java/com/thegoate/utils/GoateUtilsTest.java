@@ -29,7 +29,10 @@ package com.thegoate.utils;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
+
+import com.thegoate.Goate;
 
 /**
  * Test the helper methods in GoateUtils.
@@ -44,5 +47,15 @@ public class GoateUtilsTest {
         assertEquals(GoateUtils.getProperty("finklestein","man taco"),"dooda");
         GoateUtils.removeEnvironment("finklestein");
         assertEquals(GoateUtils.getProperty("finklestein","man taco"),"man taco");
+    }
+
+    @Test(groups = {"unit"})
+    public void toGoateFromString(){
+        Goate g = new Goate()
+            .put("test", "toGoate::a=42;b=hello world;c=boolean::true");
+        Goate g2 = g.get("test", new Goate(), Goate.class);
+        assertEquals(g2.get("a", "43", String.class), "42");
+        assertEquals(g2.get("b", "42", String.class), "hello world");
+        assertTrue(g2.get("c", false, Boolean.class));
     }
 }

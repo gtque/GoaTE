@@ -38,15 +38,20 @@ import com.thegoate.logging.BleatFactory;
 public abstract class Rest implements RestSpec {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
 
+    public static final String typeSeparator = "<type>";
+
+    protected Goate cookies = new Goate();
     protected Goate headers = new Goate();
     protected Goate queryParams = new Goate();
     protected Goate urlParams = new Goate();
     protected Goate pathParams = new Goate();
     protected Goate body = new Goate();
     protected Goate custom = new Goate();
+    protected Object config = null;
     protected String baseURL = "";//this should include the port if different from default.
     protected int timeout = 15;
     protected boolean logAll = true;
+    protected boolean urlEncode = true;
     public static final String MP_ID_NOT_SET = "_mp_id_not_set";
     public enum BODY {
         form, urlencoded, raw, binary, multipart
@@ -100,6 +105,22 @@ public abstract class Rest implements RestSpec {
     @Override
     public RestSpec header(String key, Object value) {
         headers.put(key, value);
+        return this;
+    }
+
+    @Override
+    public RestSpec cookies(Goate data) {
+        if(data!=null) {
+            for (String key : data.keys()) {
+                cookie(key, data.get(key));
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public RestSpec cookie(String key, Object value) {
+        cookies.put(key, value);
         return this;
     }
 
@@ -232,7 +253,16 @@ public abstract class Rest implements RestSpec {
 
     @Override
     public RestSpec multipartFormData(String key, Object value) {
+        return multipartFormData(key, value, null);
+    }
+
+    @Override
+    public RestSpec multipartFormData(String key, Object value, String contentType){
         bodyFormat = BODY.multipart;
+        //>=contentType
+        if(contentType!=null){
+            key = typeSeparator+contentType;
+        }
         return body(bodyFormat, key, value);
     }
 
@@ -292,6 +322,11 @@ public abstract class Rest implements RestSpec {
     }
 
     @Override
+    public Goate getCookies(){
+        return cookies;
+    }
+
+    @Override
     public Goate getBody(){
         return body;
     }
@@ -302,8 +337,31 @@ public abstract class Rest implements RestSpec {
         return this;
     }
 
+
+    @Override
+    public RestSpec configure(Object config) {
+        this.config = config;
+        return this;
+    }
+
+    @Override
+    public Object getConfig(){
+        return this.config;
+    }
+
     @Override
     public int getTimeout(){
         return timeout;
+    }
+
+    @Override
+    public RestSpec urlEncode(boolean encode){
+        this.urlEncode = encode;
+        return this;
+    }
+
+    @Override
+    public boolean urlEncode(){
+        return this.urlEncode;
     }
 }

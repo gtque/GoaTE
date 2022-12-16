@@ -30,6 +30,7 @@ import com.thegoate.Goate;
 import com.thegoate.mock.annotations.Mocker;
 import com.thegoate.reflection.GoateReflection;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -39,7 +40,7 @@ import java.lang.reflect.InvocationTargetException;
  * See mockito spy for more information.
  * Created by Eric Angeli on 9/20/2017.
  */
-@Mocker(type = "spy")
+@Mocker(type = Spy.class)
 public class MockSpy extends MockObject {
 
     public MockSpy(){

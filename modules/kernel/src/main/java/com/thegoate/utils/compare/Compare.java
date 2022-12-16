@@ -30,21 +30,38 @@ import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.UnknownUtilType;
-
+import com.thegoate.utils.UtilCache;
+import com.thegoate.utils.compare.tools.CompareObject;
+import com.thegoate.utils.type.FindType;
 
 /**
- * Generic sompare service.
+ * Generic compare service.
  * Created by Eric Angeli on 5/9/2017.
  */
+@UtilCache(name = "compare", useCache = true)
 public class Compare extends UnknownUtilType implements CompareUtility {
     final BleatBox LOG = BleatFactory.getLogger(getClass());
-    CompareUtility tool = null;
+//    CompareUtility tool = null;
     Object actual = null;
     Object operator = null;
     Object expected = null;
+    boolean compareNumeric = false;
+    boolean triedOnce = false;
+    protected boolean triedExpected = false;
 
-    public Compare(Object actual){
+    public Compare(Object actual) {
+        super();
         this.actual = actual;
+    }
+
+    public Compare triedOnce(boolean triedOnce) {
+        this.triedOnce = triedOnce;
+        return this;
+    }
+
+    public Compare alreadyTriedExpected(boolean triedExpected) {
+        this.triedExpected = triedExpected;
+        return this;
     }
 
     @Override
@@ -53,43 +70,110 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     }
 
     @Override
-    public Goate healthCheck(){
-        return tool!=null?tool.healthCheck():new Goate();
+    public Goate healthCheck() {
+        //return new Goate().merge(health, false).merge(tool != null ? tool.healthCheck() : new Goate(), false);
+        return new Goate().merge(health, false);
     }
+
+    @Override
+    public boolean checkType(Class tool, Class type) {
+        CompareUtil tu = (CompareUtil) tool.getAnnotation(CompareUtil.class);
+        return tu.type() != null ? (tu.type() == type) : (type == null);
+    }
+
     @Override
     public boolean evaluate() {
-        if(tool==null){
-            buildTool();//step into here if the tool is still null for some reason.
-        }
-        //if tool is still null, this indicates a problem trying to find the
-        //right comparator. Either nothing was found or there was no default.
-        // if tool is null, re-run debug and step into buildtool above.
         boolean result = false;
+        CompareUtility tool = lookupTool();
         try {
-            tool.to(expected).using(operator);
-            result = tool.evaluate();//step into evaluate here to debug the comparator implementation
-        }catch (Exception e){
+            if (tool != null) {
+                result = tool.evaluate();//step into evaluate here to debug the comparator implementation
+            }
+            if (!result) {
+                if(tool != null) {
+                    CompareUtil toolAnnotation = tool.getClass().getAnnotation(CompareUtil.class);
+                    health.put("compare tool", new Goate()
+                            .put("name", tool.getClass().getSimpleName())
+                            .put("operator", toolAnnotation.operator())
+                            .put("type", toolAnnotation.type().getSimpleName()));
+                }
+            }
+            health.merge(tool != null ? tool.healthCheck() : new Goate(), false);
+        } catch (Exception e) {
             LOG.debug("Compare", "Failed to compare: " + e.getMessage(), e);
         }
         return result;
     }
 
-    protected void buildTool(){
-        try {
-            tool = (CompareUtility) buildUtil(actual, CompareUtil.class, ""+operator, CompareUtil.class.getMethod("operator"));
-        } catch (NoSuchMethodException e) {
-            LOG.error("Problem finding the compare utility: " + e.getMessage(), e);
+    protected CompareUtility lookupTool() {
+        Object act = actual;
+        Object exp = expected;
+        CompareUtility tool = null;
+        Class type = new FindType().type(act);
+        health.put("actual_type", type!=null?type.getSimpleName():"actual type not detected");
+        Class etype = new FindType().type(exp);
+        health.put("expected_type", etype!=null?etype.getSimpleName():"expected type not detected");
+        if ((type == null || triedOnce || type == String.class) && (!("" + operator).equalsIgnoreCase("isNull"))) {
+            //because the type check may not be doing a parse check, so a string could still be something different,
+            //check the expected to see if it has a specific type.
+            if (etype != null && !triedExpected) {
+                type = etype;
+                triedExpected = true;
+            }
         }
-    }
-    public CompareUtility getTool(){
-        if(tool==null){
-            buildTool();
+
+        try {
+            tool = (CompareUtility) buildUtil(actual, CompareUtil.class, actual, "" + operator, CompareUtil.class.getMethod("operator"), type);
+            if (tool == null) {
+                LOG.warn("compare tool", "failed to find the compare utility, clearing the cache and trying one more time.");
+                clearCache(getClass(), CompareUtil.class);
+                tool = (CompareUtility) buildUtil(actual, CompareUtil.class, actual, "" + operator, CompareUtil.class.getMethod("operator"), type);
+            }
+        } catch (NoSuchMethodException e) {
+            LOG.warn("compare tool", "failed to find the compare utility: " + e.getMessage(), e);
+        }
+
+        //if tool is still null, this indicates a problem trying to find the
+        //right comparator. Either nothing was found or there was no default.
+        // if tool is null, re-run debug and step into buildtool above.
+        if (tool == null) {
+            LOG.warn("Compare Tool", "failed to find the proper compare tool");
+            health.put("Tool Not Found", "Could not find \"" + operator + "\" for: " + actual + ", of type: " + type.getName());
+            health.put("tool", tool);
+        } else {
+            if (compareNumeric && tool instanceof CompareObject) {
+                health.put("Tool Not Found", "Expecting to compare a numeric, but did not find an implementation for the numeric type: \"" + operator + "\" for: " + actual.getClass());
+            } else {
+                LOG.debug("Compare", "Found comparator: " + tool.getClass());
+                if (tool instanceof CompareTool) {
+                    ((CompareTool) tool).triedOnce(triedOnce).alreadyTriedExpected(triedExpected);
+                }
+                tool.actual(actual).to(expected).using(operator);
+            }
         }
         return tool;
     }
 
+    protected CompareUtility buildTool(Object checkFor) {
+        return buildTool(checkFor, "isType");
+    }
+
+    protected CompareUtility buildTool(Object checkFor, String isType) {
+        CompareUtility foundTool = null;
+        try {
+            foundTool = (CompareUtility) buildUtil(checkFor, CompareUtil.class, "" + operator, CompareUtil.class.getMethod("operator"), isType);
+        } catch (NoSuchMethodException e) {
+            LOG.error("Problem finding the compare utility: " + e.getMessage(), e);
+        }
+        return foundTool;
+    }
+
+    public CompareUtility getTool() {
+        return buildTool(actual);
+    }
+
     @Override
-    public CompareUtility actual(Object actual){
+    public CompareUtility actual(Object actual) {
         this.actual = actual;
         return this;
     }
@@ -103,6 +187,11 @@ public class Compare extends UnknownUtilType implements CompareUtility {
     @Override
     public CompareUtility using(Object operator) {
         this.operator = operator;
+        return this;
+    }
+
+    public Compare compareNumeric(boolean compareNumeric) {
+        this.compareNumeric = compareNumeric;
         return this;
     }
 }

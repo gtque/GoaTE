@@ -28,9 +28,9 @@ package com.thegoate.rest.assured;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.RestSpec;
-import io.restassured.specification.RequestSpecification;
 
-import java.io.PrintStream;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.specification.RequestSpecification;
 
 /**
  * Used for defining the rest assured interface needed for building a Rest Assured based Rest class.

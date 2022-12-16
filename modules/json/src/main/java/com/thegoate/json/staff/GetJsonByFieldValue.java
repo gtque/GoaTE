@@ -29,13 +29,18 @@ package com.thegoate.json.staff;
 import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.json.utils.togoate.JSONToGoate;
+import com.thegoate.locate.Locate;
 import com.thegoate.staff.Employee;
 import com.thegoate.staff.GoateJob;
+import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.NotFound;
 import com.thegoate.utils.togoate.ToGoate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Finds a json field by value.
@@ -49,42 +54,77 @@ import java.util.List;
                 "json: the json to look in, required if not from result",})
 public class GetJsonByFieldValue extends Employee {
 
-    public static GetJsonByFieldValue value(Object value){
+    protected boolean notFound = false;//return original by default.
+
+    public static GetJsonByFieldValue value(Object value) {
         return new GetJsonByFieldValue().valueToFind(value);
     }
 
-    public GetJsonByFieldValue root(String rootPattern){
+    public GetJsonByFieldValue returnNotFound() {
+        notFound = true;
+        return this;
+    }
+
+    public GetJsonByFieldValue returnOriginal() {
+        notFound = false;
+        return this;
+    }
+
+    public GetJsonByFieldValue root(Locate path){
+        return root(path.toPath());
+    }
+
+    public GetJsonByFieldValue root(String rootPattern) {
         definition.put("root", rootPattern);
         return this;
     }
 
-    public GetJsonByFieldValue valueToFind(Object value){
+    public GetJsonByFieldValue valueToFind(Object value) {
         definition.put("value", value);
         return this;
     }
 
-    public GetJsonByFieldValue pathPattern(String pattern){
+    public GetJsonByFieldValue pathPattern(Locate path){
+        return pathPattern(path.toPath());
+    }
+
+    public GetJsonByFieldValue pathPattern(String pattern) {
         definition.put("key", pattern);
         return this;
     }
 
-    public GetJsonByFieldValue fromResult(){
+    public GetJsonByFieldValue fromResult() {
         return fromResult(true);
     }
 
-    public GetJsonByFieldValue fromResult(boolean fromResult){
+    public GetJsonByFieldValue fromResult(boolean fromResult) {
         definition.put("from result", fromResult);
         return this;
     }
 
-    public GetJsonByFieldValue from(Object source){
+    public GetJsonByFieldValue from(Object source) {
         definition.put("from result", true);
         definition.put("_goate_result", source);
         return this;
     }
 
-    public GetJsonByFieldValue json(Object json){
+    public GetJsonByFieldValue json(Object json) {
         definition.put("json", json).put("from result", false);
+        return this;
+    }
+
+    public GetJsonByFieldValue secondaryCondition(String secondBase, Locate pathPattern, Object value) {
+        return secondaryCondition(secondBase, pathPattern.toPath(), value);
+    }
+    public GetJsonByFieldValue secondaryCondition(Locate secondBase, String pathPattern, Object value) {
+        return secondaryCondition(secondBase.toPath(), pathPattern, value);
+    }
+    public GetJsonByFieldValue secondaryCondition(Locate secondBase, Locate pathPattern, Object value) {
+        return secondaryCondition(secondBase.toPath(), pathPattern.toPath(), value);
+    }
+    public GetJsonByFieldValue secondaryCondition(String secondBase, String pathPattern, Object value) {
+        List<Condition> secondary = definition.get("secondary", new ArrayList<Condition>(), List.class);
+        secondary.add(new Condition(secondBase, pathPattern, value));
         return this;
     }
 
@@ -96,6 +136,7 @@ public class GetJsonByFieldValue extends Employee {
     @Override
     protected Object doWork() {
         Goate json;
+        List<Condition> secondary = definition.get("secondary", new ArrayList<Condition>(), List.class);
         String foundKey = "";
         String root = definition.get("root", null, String.class);
         Object theJson = definition.get("json", "{}");
@@ -111,7 +152,7 @@ public class GetJsonByFieldValue extends Employee {
         if (root == null) {
             roots.add(json);
         } else {
-            for(String key:json.filterStrict(root).keys()){
+            for (String key : json.filterStrict(root).keys()) {
                 roots.add(json.get(key));
             }
         }
@@ -119,31 +160,104 @@ public class GetJsonByFieldValue extends Employee {
             Goate jt = new ToGoate(oj).convert();
             Goate filtered = jt.filterStrict(field);
             for (String key : filtered.keys()) {
-                if (filtered.get(key) != null && filtered.get(key).equals(value)) {
-                    foundKey = key;
-                    break;
+                if (new Compare(filtered.get(key)).to(value).using("==").evaluate()) {
+                    if (checkSecond(jt, key, secondary)) {
+                        foundKey = key;
+                        break;
+                    }
                 }
             }
-            if(!foundKey.isEmpty()) {
-                if (root == null) {
-                    if (foundKey.contains(".")) {
-                        foundKey = foundKey.substring(0, foundKey.lastIndexOf("."));
-                    } else {
-                        foundKey = "";
-                    }
-                } else {
+            if (!foundKey.isEmpty()) {
+                if (root != null) {
                     theJson = oj;
                     foundKey = "";
                 }
                 break;
+            } else if(notFound){
+                theJson = new NotFound(field + "("+ value + "): not found in the json");
             }
         }
-        return foundKey.isEmpty() ? theJson : json.get(foundKey);
+        return foundKey.isEmpty() ? theJson : findValidParent(foundKey, json);
+    }
+
+    private boolean checkSecond(Goate jt, String key, List<Condition> secondary) {
+        boolean result = true;
+        if (secondary != null && secondary.size() > 0) {
+            for (Condition second : secondary) {
+                Pattern p = Pattern.compile(second.getBase());
+                Matcher m = p.matcher(key);
+                if (m.find()) {
+                    String keyBase = m.group();
+                    String secondKey = keyBase + (keyBase.isEmpty() ? "" : ".") + second.getPathPattern();
+                    Goate filtered = jt.filterStrict(secondKey);
+                    result = false;
+                    for (String key2 : filtered.keys()) {
+                        if (new Compare(filtered.get(key2)).to(second.getValue()).using("==").evaluate()) {
+                            result = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private Object findValidParent(String foundKey, Goate json) {
+        Object result = null;
+        if (foundKey.contains(".")) {
+            foundKey = foundKey.substring(0, foundKey.lastIndexOf('.'));
+        } else {
+            foundKey = "";
+        }
+        if (!foundKey.isEmpty()) {
+            result = json.get(foundKey);
+            if (result == null) {
+                result = findValidParent(foundKey, json);
+            }
+        }
+        return result;
     }
 
     @Override
     public String[] detailedScrub() {
         String[] scrub = {"root", "path", "key", "value", "from result", "json"};
         return scrub;
+    }
+
+    private class Condition {
+        protected String base;
+        protected String pathPattern;
+        protected Object value;
+
+        Condition(String base, String pathPattern, Object value) {
+            this.base = base;
+            this.pathPattern = pathPattern;
+            this.value = value;
+        }
+
+        public String getBase() {
+            return base;
+        }
+
+        public void setBase(String base) {
+            this.base = base;
+        }
+
+        public String getPathPattern() {
+            return pathPattern;
+        }
+
+        public void setPathPattern(String pathPattern) {
+            this.pathPattern = pathPattern;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
     }
 }

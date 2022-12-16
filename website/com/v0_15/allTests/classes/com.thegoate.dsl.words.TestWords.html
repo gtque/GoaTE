@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class com.thegoate.dsl.words.TestWords</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class com.thegoate.dsl.words.TestWords</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.thegoate.dsl.words.html">com.thegoate.dsl.words</a> &gt; TestWords</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">6</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.007s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">com.thegoate.dsl.words.TestWords:dateShiftStatic:(0)</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.dsl.words.TestWords:dateShiftStaticNegativeUnits:(0)</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.dsl.words.TestWords:dateTimeShiftNegativeStatic:(0)</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.dsl.words.TestWords:dateTimeShiftStatic:(0)</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.dsl.words.TestWords:sumNoFilter:(0)</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.dsl.words.TestWords:sumWithFilter:(0)</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>[INFO] 2021-02-18 21:46:19,986 com.thegoate.dsl.words.TestWords: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.dsl.words.TestWords:dateShiftStatic:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:46:19,986 com.thegoate.dsl.words.DateShiftDSL: Date Shift:Pattern: yyyy-MM-dd
+[DEBUG] 2021-02-18 21:46:19,986 com.thegoate.dsl.words.DateShiftDSL: Date Shift:Original Date: 2009-11-22
+[DEBUG] 2021-02-18 21:46:19,986 com.thegoate.dsl.words.DateShiftDSL: Date Shift:New Date: 2009-11-24
+[DEBUG] 2021-02-18 21:46:19,987 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:46:19,997 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:46:20,000 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual(2009-11-24) == 2009-11-24
+
+[DEBUG] 2021-02-18 21:46:20,007 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.date.CompareDateEqual
+[DEBUG] 2021-02-18 21:46:20,007 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,007 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,008 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,008 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,008 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:46:20,009 com.thegoate.dsl.words.TestWords: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:2009-11-24
+	expected:2009-11-24
+	expected_value:2009-11-24
+	from:actual:2009-11-24
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:46:20,010 com.thegoate.dsl.words.TestWords: Shut Down:
+*****************************************************************
+*	com.thegoate.dsl.words.TestWords:dateShiftStatic:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:46:20,010 com.thegoate.dsl.words.TestWords: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.dsl.words.TestWords:dateShiftStaticNegativeUnits:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:46:20,011 com.thegoate.dsl.words.DateShiftDSL: Date Shift:Pattern: yyyy-MM-dd
+[DEBUG] 2021-02-18 21:46:20,011 com.thegoate.dsl.words.DateShiftDSL: Date Shift:Original Date: 2009-12-24
+[DEBUG] 2021-02-18 21:46:20,011 com.thegoate.dsl.words.DateShiftDSL: Date Shift:New Date: 2009-11-24
+[DEBUG] 2021-02-18 21:46:20,011 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:46:20,012 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:46:20,013 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual(2009-11-24) == 2009-11-24
+
+[DEBUG] 2021-02-18 21:46:20,021 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.date.CompareDateEqual
+[DEBUG] 2021-02-18 21:46:20,021 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,022 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,022 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,022 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,022 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:46:20,023 com.thegoate.dsl.words.TestWords: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:2009-11-24
+	expected:2009-11-24
+	expected_value:2009-11-24
+	from:actual:2009-11-24
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:46:20,024 com.thegoate.dsl.words.TestWords: Shut Down:
+*****************************************************************
+*	com.thegoate.dsl.words.TestWords:dateShiftStaticNegativeUnits:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:46:20,024 com.thegoate.dsl.words.TestWords: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.dsl.words.TestWords:dateTimeShiftNegativeStatic:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:46:20,025 com.thegoate.dsl.words.DateTimeShiftDSL: Date Shift:Pattern: uuuu-MM-dd HH:mm:ss
+[DEBUG] 2021-02-18 21:46:20,025 com.thegoate.dsl.words.DateTimeShiftDSL: Date Shift:Original Date: 2009-11-25 00:00:00
+[DEBUG] 2021-02-18 21:46:20,025 com.thegoate.dsl.words.DateTimeShiftDSL: Date Shift:New Date: 2009-11-24 00:00:00
+[DEBUG] 2021-02-18 21:46:20,026 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:46:20,027 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:46:20,028 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual(2009-11-24 00:00:00) == 2009-11-24  00:00:00
+
+[DEBUG] 2021-02-18 21:46:20,034 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.date.CompareDateEqual
+[DEBUG] 2021-02-18 21:46:20,034 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,034 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,034 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,034 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,034 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:46:20,036 com.thegoate.dsl.words.TestWords: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:2009-11-24 00:00:00
+	expected:2009-11-24  00:00:00
+	expected_value:2009-11-24  00:00:00
+	from:actual:2009-11-24 00:00:00
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:46:20,036 com.thegoate.dsl.words.TestWords: Shut Down:
+*****************************************************************
+*	com.thegoate.dsl.words.TestWords:dateTimeShiftNegativeStatic:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:46:20,037 com.thegoate.dsl.words.TestWords: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.dsl.words.TestWords:dateTimeShiftStatic:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:46:20,038 com.thegoate.dsl.words.DateTimeShiftDSL: Date Shift:Pattern: yyyy-MM-dd HH:mm:ss
+[DEBUG] 2021-02-18 21:46:20,038 com.thegoate.dsl.words.DateTimeShiftDSL: Date Shift:Original Date: 2009-11-23 00:00:00
+[DEBUG] 2021-02-18 21:46:20,038 com.thegoate.dsl.words.DateTimeShiftDSL: Date Shift:New Date: 2009-11-24 00:00:00
+[DEBUG] 2021-02-18 21:46:20,038 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:46:20,039 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:46:20,040 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual(2009-11-24 00:00:00) == 2009-11-24 00:00:00
+
+[DEBUG] 2021-02-18 21:46:20,045 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.date.CompareDateEqual
+[DEBUG] 2021-02-18 21:46:20,045 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,045 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,045 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,045 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,046 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:46:20,047 com.thegoate.dsl.words.TestWords: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:2009-11-24 00:00:00
+	expected:2009-11-24 00:00:00
+	expected_value:2009-11-24 00:00:00
+	from:actual:2009-11-24 00:00:00
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:46:20,048 com.thegoate.dsl.words.TestWords: Shut Down:
+*****************************************************************
+*	com.thegoate.dsl.words.TestWords:dateTimeShiftStatic:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:46:20,049 com.thegoate.dsl.words.TestWords: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.dsl.words.TestWords:sumNoFilter:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:46:20,050 com.thegoate.dsl.words.SumFieldsDSL: Sum:Problem adding: true
+java.lang.NumberFormatException: null
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:497)
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:383)
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:809)
+	at com.thegoate.dsl.words.SumFieldsDSL.evaluate(SumFieldsDSL.java:85)
+	at com.thegoate.dsl.Interpreter.translate(Interpreter.java:78)
+	at com.thegoate.Goate.processDSL(Goate.java:242)
+	at com.thegoate.Goate.get(Goate.java:201)
+	at com.thegoate.Goate.get(Goate.java:167)
+	at com.thegoate.Goate.get(Goate.java:159)
+	at com.thegoate.dsl.words.TestWords.sumNoFilter(TestWords.java:23)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:124)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:583)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:719)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:989)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:125)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:109)
+	at org.testng.TestRunner.privateRun(TestRunner.java:648)
+	at org.testng.TestRunner.run(TestRunner.java:505)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:455)
+	at org.testng.SuiteRunner.access$000(SuiteRunner.java:40)
+	at org.testng.SuiteRunner$SuiteWorker.run(SuiteRunner.java:489)
+	at org.testng.internal.thread.ThreadUtil$1.call(ThreadUtil.java:52)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+[DEBUG] 2021-02-18 21:46:20,051 com.thegoate.dsl.words.SumFieldsDSL: Sum:Problem adding: howdy
+java.lang.NumberFormatException: null
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:497)
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:383)
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:809)
+	at com.thegoate.dsl.words.SumFieldsDSL.evaluate(SumFieldsDSL.java:85)
+	at com.thegoate.dsl.Interpreter.translate(Interpreter.java:78)
+	at com.thegoate.Goate.processDSL(Goate.java:242)
+	at com.thegoate.Goate.get(Goate.java:201)
+	at com.thegoate.Goate.get(Goate.java:167)
+	at com.thegoate.Goate.get(Goate.java:159)
+	at com.thegoate.dsl.words.TestWords.sumNoFilter(TestWords.java:23)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:124)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:583)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:719)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:989)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:125)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:109)
+	at org.testng.TestRunner.privateRun(TestRunner.java:648)
+	at org.testng.TestRunner.run(TestRunner.java:505)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:455)
+	at org.testng.SuiteRunner.access$000(SuiteRunner.java:40)
+	at org.testng.SuiteRunner$SuiteWorker.run(SuiteRunner.java:489)
+	at org.testng.internal.thread.ThreadUtil$1.call(ThreadUtil.java:52)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+[DEBUG] 2021-02-18 21:46:20,053 com.thegoate.dsl.words.SumFieldsDSL: Sum:Problem adding: aa:-42
+bb:-42
+java.lang.NumberFormatException: null
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:497)
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:383)
+	at java.math.BigDecimal.&lt;init&gt;(BigDecimal.java:809)
+	at com.thegoate.dsl.words.SumFieldsDSL.evaluate(SumFieldsDSL.java:85)
+	at com.thegoate.dsl.Interpreter.translate(Interpreter.java:78)
+	at com.thegoate.Goate.processDSL(Goate.java:242)
+	at com.thegoate.Goate.get(Goate.java:201)
+	at com.thegoate.Goate.get(Goate.java:167)
+	at com.thegoate.Goate.get(Goate.java:159)
+	at com.thegoate.dsl.words.TestWords.sumNoFilter(TestWords.java:23)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:124)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:583)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:719)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:989)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:125)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:109)
+	at org.testng.TestRunner.privateRun(TestRunner.java:648)
+	at org.testng.TestRunner.run(TestRunner.java:505)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:455)
+	at org.testng.SuiteRunner.access$000(SuiteRunner.java:40)
+	at org.testng.SuiteRunner$SuiteWorker.run(SuiteRunner.java:489)
+	at org.testng.internal.thread.ThreadUtil$1.call(ThreadUtil.java:52)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+[DEBUG] 2021-02-18 21:46:20,054 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:46:20,054 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:46:20,056 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual(87.14159) == 87.14159
+
+[DEBUG] 2021-02-18 21:46:20,062 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.f.CompareFloatEqualTo
+[DEBUG] 2021-02-18 21:46:20,062 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,062 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,062 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,062 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,062 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:46:20,064 com.thegoate.dsl.words.TestWords: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:87.14159
+	expected:87.14159
+	expected_value:87.14159
+	from:actual:87.14159
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:46:20,065 com.thegoate.dsl.words.TestWords: Shut Down:
+*****************************************************************
+*	com.thegoate.dsl.words.TestWords:sumNoFilter:(0)	*
+
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:46:20,067 com.thegoate.dsl.words.TestWords: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.dsl.words.TestWords:sumWithFilter:(0)	*
+
+*****************************************************************
+[DEBUG] 2021-02-18 21:46:20,068 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:46:20,068 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:46:20,070 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual(45.14159) == 45.14159
+
+[DEBUG] 2021-02-18 21:46:20,076 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.f.CompareFloatEqualTo
+[DEBUG] 2021-02-18 21:46:20,077 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,077 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,077 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:46:20,077 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:46:20,077 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:46:20,078 com.thegoate.dsl.words.TestWords: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:45.14159
+	expected:45.14159
+	expected_value:45.14159
+	from:actual:45.14159
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:46:20,079 com.thegoate.dsl.words.TestWords: Shut Down:
+*****************************************************************
+*	com.thegoate.dsl.words.TestWords:sumWithFilter:(0)	*
+
+***************************Finished Up***************************
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.0.1</a> at Feb 18, 2021 9:47:41 PM</p>
+</div>
+</div>
+</body>
+</html>

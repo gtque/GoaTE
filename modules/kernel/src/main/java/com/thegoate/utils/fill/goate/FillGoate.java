@@ -14,7 +14,9 @@ public class FillGoate implements FillUtility {
     Goate data;
 
     public FillGoate(Object val) {
-        this.kid = (Goate)val;
+        if(val instanceof Goate) {
+            this.kid = (Goate) val;
+        }
     }
 
     @Override

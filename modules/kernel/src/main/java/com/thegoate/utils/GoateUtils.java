@@ -37,10 +37,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
- * Some basic utily helpers.
+ * Some basic utility helpers.
  * Created by gtque on 5/3/2017.
  */
 public class GoateUtils {
@@ -68,6 +69,10 @@ public class GoateUtils {
 
     public static String getFilePath(String file){
         return getFilePath(file, false, false);
+    }
+
+    public static boolean fileExists(String file){
+        return new File(getFilePath(file)).exists();
     }
 
     public static String moveUpDir(String fileName){
@@ -139,7 +144,14 @@ public class GoateUtils {
             path = temp.getAbsolutePath();
             LOG.debug("Goate File Util","file path: " + path);
         } catch (Exception e) {
-            LOG.error("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
+            LOG.debug("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
+        }
+        if(path.contains("%")){
+            try {
+                path = URLDecoder.decode(path, "UTF-8");
+            } catch(Exception e){
+                LOG.info("Goate File Util", "Failed to decode a possibly url encoded path to UTF-8");
+            }
         }
         return path;
     }
@@ -157,7 +169,7 @@ public class GoateUtils {
             /// we obtain the actual environment
             final Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
             final Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-            final boolean environmentAccessibility = theEnvironmentField.isAccessible();
+            final boolean environmentAccessibility = theEnvironmentField.canAccess(null);//isAccessible();
             theEnvironmentField.setAccessible(true);
 
             final Map<K, V> env = (Map<K, V>) theEnvironmentField.get(null);
@@ -174,13 +186,13 @@ public class GoateUtils {
                 // The ProcessEnvironment$Variable is the key of the map
                 final Class<K> variableClass = (Class<K>) Class.forName("java.lang.ProcessEnvironment$Variable");
                 final Method convertToVariable = variableClass.getMethod("valueOf", String.class);
-                final boolean conversionVariableAccessibility = convertToVariable.isAccessible();
+                final boolean conversionVariableAccessibility = convertToVariable.canAccess(null);//.isAccessible();
                 convertToVariable.setAccessible(true);
 
                 // The ProcessEnvironment$Value is the value fo the map
                 final Class<V> valueClass = (Class<V>) Class.forName("java.lang.ProcessEnvironment$Value");
                 final Method convertToValue = valueClass.getMethod("valueOf", String.class);
-                final boolean conversionValueAccessibility = convertToValue.isAccessible();
+                final boolean conversionValueAccessibility = convertToValue.canAccess(null);//.isAccessible();
                 convertToValue.setAccessible(true);
 
                 if (value == null) {
@@ -200,7 +212,7 @@ public class GoateUtils {
 
             // we apply the same to the case insensitive environment
             final Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
-            final boolean insensitiveAccessibility = theCaseInsensitiveEnvironmentField.isAccessible();
+            final boolean insensitiveAccessibility = theCaseInsensitiveEnvironmentField.canAccess(null);//.isAccessible();
             theCaseInsensitiveEnvironmentField.setAccessible(true);
             // Not entirely sure if this needs to be casted to ProcessEnvironment$Variable and $Value as well
             final Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
@@ -222,7 +234,7 @@ public class GoateUtils {
                 List<Field> map = mapFields(filteredClass);
                 for(Field field:map){
                     try {
-                        final boolean fieldAccessibility = field.isAccessible();
+                        final boolean fieldAccessibility = field.canAccess(null);//.isAccessible();
                         field.setAccessible(true);
                         // we obtain the environment
                         final Map<String, String> map2 = (Map<String, String>) field.get(env);
@@ -280,5 +292,9 @@ public class GoateUtils {
            tabs.append("\t");
         }
         return tabs.toString();
+    }
+
+    public static boolean truth(Object value){
+        return value==null?false:Boolean.parseBoolean(""+value);
     }
 }

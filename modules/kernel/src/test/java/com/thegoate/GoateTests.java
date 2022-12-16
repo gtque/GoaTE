@@ -30,51 +30,135 @@ package com.thegoate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.data.PropertyFileDL;
 import com.thegoate.data.StaticDL;
+import com.thegoate.expect.Expectation;
 import com.thegoate.map.EnumMap;
+import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.GoateUtils;
-import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
+
+import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.testng.Assert.assertEquals;
+import static com.thegoate.locate.Locate.path;
+import static org.testng.Assert.*;
 
 /**
  * Created by gtque on 4/21/2017.
  */
-public class GoateTests {
+public class GoateTests extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
-    public void testEnumMapping(){
+    public void testPutMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", "b");
+        map.put("b", null);
+        map.put("c", "current time::");
+
+        Goate d = new Goate(map);
+        assertEquals(d.size(), map.size());
+        assertEquals(d.get("a"), map.get("a"));
+        assertNull(d.get("b"));
+    }
+
+    @Test(groups = {"unit"})
+    public void testFilterByValue() {
+        Goate g = new Goate().put("a", 42).put("b", true).put("c", "true").put("d", "hello").put("e", 84).put("f", "string").put("g", false).put("h", "hello");
+
+        Goate a1 = g.filterByValue(true);
+        Goate a2 = g.filterByValue(42);
+        Goate a3 = g.filterByValue("hello");
+        Goate a4 = g.filterByValue(false);
+        expect(Expectation.build()
+                .actual(a1.size())
+                .isEqualTo(2)
+                .failureMessage("checking a1 filtered on true"));
+        expect(Expectation.build()
+                .actual(a2.size())
+                .isEqualTo(1)
+                .failureMessage("checking a2 filtered on 42"));
+        expect(Expectation.build()
+                .actual(a3.size())
+                .isEqualTo(2)
+                .failureMessage("checking a3 filtered on 'hello'"));
+        expect(Expectation.build()
+                .actual(a4.size())
+                .isEqualTo(1)
+                .failureMessage("checking a4 filtered on false"));
+    }
+
+
+    @Test(groups = {"unit"})
+    public void testFilterExcludeByValue() {
+        Goate g = new Goate().put("a", 42).put("b", true).put("c", "true").put("d", "hello").put("e", 84).put("f", "string").put("g", false).put("h", "hello");
+
+        Goate a1 = g.filterExcludeByValue(true);
+        Goate a2 = g.filterExcludeByValue(42);
+        Goate a3 = g.filterExcludeByValue("hello");
+        Goate a4 = g.filterExcludeByValue(false);
+        expect(Expectation.build()
+                .actual(a1.size())
+                .isEqualTo(6)
+                .failureMessage("checking a1 filtered excluded on true"));
+        expect(Expectation.build()
+                .actual(a2.size())
+                .isEqualTo(7)
+                .failureMessage("checking a2 filtered excluded on 42"));
+        expect(Expectation.build()
+                .actual(a3.size())
+                .isEqualTo(6)
+                .failureMessage("checking a3 filtered excluded on 'hello'"));
+        expect(Expectation.build()
+                .actual(a4.size())
+                .isEqualTo(7)
+                .failureMessage("checking a4 filtered excluded on false"));
+    }
+
+    @Test(groups = {"unit"})
+    public void testUrlEncodedPath() {
+        String path = "nonexistant%402/sample.json";
+        path = GoateUtils.getFilePath(path);
+        assertEquals(path, "\\\\nonexistant@2\\sample.json");
+    }
+
+    @Test(groups = {"unit"})
+    public void testEnumMapping() {
         String key = EnumMap.map("frickle").to(STACKLES.class).toString();
         assertEquals(key, "frackle");
     }
 
-    public enum STACKLES{
-        crackle("crickle"),frackle("frickle");
+    public enum STACKLES {
+        crackle("crickle"), frackle("frickle");
         String column = "";
-        STACKLES(String column){
+
+        STACKLES(String column) {
             this.column = column;
         }
-        public boolean map(String key){
+
+        public boolean map(String key) {
             return column.equals(key);
         }
     }
 
     @Test(groups = {"unit"})
-    public void addAutoIncrement(){
+    public void addAutoIncrement() {
         Goate data = new Goate()
                 .put("test##", "a")
                 .put("atest", "nanotime::")
-                .put("test2","c")
+                .put("test2", "c")
                 .put("test##", "b");
         assertEquals(data.size(), 3);
-        assertEquals(data.get("test2"),"b");
+        assertEquals(data.get("test2"), "b");
     }
 
     @Test(groups = {"unit"})
-    public void addAutoIncrementNested(){
+    public void addAutoIncrementNested() {
         Goate data = new Goate()
                 .put("test##.##", "a")
                 .put("test##", "b")
@@ -82,35 +166,216 @@ public class GoateTests {
                 .put("test##.##", "c")
                 .put("test0.##", "a1");
         assertEquals(data.size(), 5);
-        assertEquals(data.get("test1"),"b");
-        assertEquals(data.get("test0.1"),"a1");
-        assertEquals(data.get("test2.0"),"c");
+        assertEquals(data.get("test1"), "b");
+        assertEquals(data.get("test0.1"), "a1");
+        assertEquals(data.get("test2.0"), "c");
     }
 
     @Test(groups = {"unit"})
-    public void staticDataLoader(){
-        DataLoader dl = new StaticDL().add("test##", "a").add("atest", "nanotime::").add("test2","c").add("test##", "b");
+    public void staticDataLoader() {
+        DataLoader dl = new StaticDL().add("test##", "a").add("atest", "nanotime::").add("test2", "c").add("test##", "b");
         Goate data = dl.load().get(0);
         assertEquals(data.size(), 3);
-        assertEquals(data.get("test2"),"b");
+        assertEquals(data.get("test2"), "b");
     }
 
     @Test(groups = {"unit"})
-    public void propertyFileDataLoaderStringPath(){
+    public void propertyFileDataLoaderStringPath() {
         DataLoader dl = new PropertyFileDL().file("sample.prop");
         Goate data = dl.load().get(0);
 
         assertEquals(data.size(), 5);
-        assertEquals(data.get("test3"),"d");
+        assertEquals(data.get("test3"), "d");
     }
 
     @Test(groups = {"unit"})
-    public void propertyFileDataLoaderFile(){
+    public void specialCharacterInPropertyValue() {
+        DataLoader dl = new PropertyFileDL().file("special_characters.prop");
+        Goate data = dl.load().get(0);
+
+        assertEquals(data.size(), 5);
+        assertEquals(data.get("test3"), "d=#4");
+    }
+
+    @Test(groups = {"unit"})
+    public void propertyFileDataLoaderFile() {
         System.out.println(System.currentTimeMillis());
         DataLoader dl = new PropertyFileDL().file(new File(GoateUtils.getFilePath("sample.prop")));
         Goate data = dl.load().get(0);
         System.out.println("goate data: \n" + data.toString());
         assertEquals(data.size(), 5);
-        assertEquals(data.get("test3"),"d");
+        assertEquals(data.get("test3"), "d");
+    }
+
+    @Test(groups = {"unit"})
+    public void filterGoate() {
+        String d = "{\n" +
+                "        \"a\": [\n" +
+                "                {\"b\":true,\"f\":false},\n" +
+                "                {\"b\":true,\"f\":false},\n" +
+                "                {\"b\":true,\"f\":false},\n" +
+                "                {\"b\":true}\n" +
+                "            ],\n" +
+                "        \"c\": 42\n" +
+                "    }";
+        Goate data = new ToGoate(d).convert();
+        Goate f1 = data.filterStrict(path().match("a").dot().anyNumberOneOrMore().toPath());
+        Goate f2 = data.filterStrict(path().match("a").dot().anyNumberOneOrMore().dot().matchOneOrMore("f").toPath());
+        Goate f3 = data.filterStrict(path().match("a").dot().anyNumberOneOrMore().dot().match("f").nTimes(3).toPath());
+        assertEquals(f1.size(), 4);
+    }
+
+    @Test(groups = {"unit"})
+    public void mapToGoate() {
+        Map<String, Object> the_map = new HashMap<>();
+        the_map.put("a", 42.41);
+        the_map.put("b", false);
+        Goate g = new ToGoate(the_map).convert();
+        System.out.println(g.toString());
+    }
+
+    @Test(groups = {"unit"})
+    public void regeX() {
+        String d = "-!a!--!a.0!--!a.0.b!--!a.0.f!--!a.1!--!a.1.b!--!a.1.f!--!a.2!--!a.2.b!--!a.2.f!--!a.3!--!a.3.b!--!c!-";
+        String pattern = "(-!a\\.[0-9]+\\.f!-){3}";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(d);
+        while (m.find()) {
+            String key = m.group().replace("-!", "").replace("!-", "");
+            System.out.println(key);
+        }
+    }
+
+    @Test(groups = {"unit"})
+    public void testBoolean() {
+        Goate g = new Goate().put("actual", true);
+        assertTrue(g.get("actual", false, Boolean.class));
+    }
+
+    @Test(groups = {"unit"})
+    public void testShort() {
+        Goate g = new Goate().put("actual", "42");
+        short actual = g.get("actual", 84, Short.class);
+        assertEquals(actual, 42);
+    }
+
+    @Test(groups = {"unit"})
+    public void testInteger() {
+        Goate g = new Goate().put("actual", "42");
+        int actual = g.get("actual", 84, Integer.class);
+        assertEquals(actual, 42);
+    }
+
+    @Test(groups = {"unit"})
+    public void testDouble() {
+        Goate g = new Goate().put("actual", "42");
+        double actual = g.get("actual", 84, Double.class);
+        assertEquals(actual, 42D);
+    }
+
+    @Test(groups = {"unit"})
+    public void testFloat() {
+        Goate g = new Goate().put("actual", "42.4");
+        float actual = g.get("actual", 84.8, Float.class);
+        assertEquals(actual, 42.4F);
+    }
+
+    @Test(groups = {"unit"})
+    public void testDecimalCompare() {
+        Goate g = new Goate().put("actual", 42.42D);
+        Goate g2 = new Goate().put("actual", "42.42");
+        //float actual = g.get("actual", 84.8, Float.class);
+        float f = Float.parseFloat("$4,200.42".replaceAll("[,$]", ""));
+        expect(Expectation.build()
+                .actual(g)
+                .isEqualTo(g2));
+    }
+
+    @Test(groups = {"unit"})
+    public void testLong() {
+        Goate g = new Goate().put("actual", "42");
+        long actual = g.get("actual", 84L, Long.class);
+        assertEquals(actual, 42L);
+    }
+
+    @Test(groups = {"unit"})
+    public void testByte() {
+        Goate g = new Goate().put("actual", 1);
+        byte actual = g.get("actual", 2, Byte.class);
+        byte expected = 1;
+        assertEquals(actual, 1);
+    }
+
+    @Test(groups = {"unit"})
+    public void testCharacter() {
+        Goate g = new Goate().put("actual", "a");
+        char actual = g.get("actual", 'b', Character.class);
+        assertEquals(actual, 'a');
+    }
+
+    @Test(groups = {"poc"})
+    public void testMatcher() {
+        String key = "search parameter.0.iMaximumsamMax";
+        Pattern search = Pattern.compile("Max");
+        Matcher m = search.matcher(key);
+        assertEquals(m.find(), true);
+    }
+
+    @Test(groups = {"unit"})
+    public void castToLong() {
+        Goate g = new Goate().put("actual", "42");
+        long al = g.get("actual", "NaN", Long.class);
+
+        expect(Expectation.build()
+                .actual(al)
+                .isEqualTo(42L));
+    }
+
+    @Test(groups = {"unit"})
+    public void castStringToJson() {
+        Goate g = new Goate().put("actual", "{\"field\":true}");
+        JSONObject al = g.get("actual", "NaN", JSONObject.class);
+
+        expect(Expectation.build()
+                .actual(al)
+                .isEqualTo("{\"field\":true}"));
+    }
+
+    @Test(groups = {"unit"})
+    public void castJsonToString() {
+        Goate g = new Goate().put("actual", new JSONObject().put("field", true));
+        String al = g.get("actual", "NaN", String.class);
+
+        expect(Expectation.build()
+                .actual(al)
+                .isEqualTo("{\"field\":true}"));
+    }
+
+    class valueKey extends Sponge{
+        @Override
+        public String soap(String dirty) {
+            return dirty.replace("type","value");
+        }
+    }
+
+    @Test(groups = {"unit"})
+    public void filterByValueFromJsonArray() {
+        String json = "{\"collection\":[{\"value\":\"hello\", \"type\":\"MS:GREETING\"},{\"value\":\"James\", \"type\":\"MS:NAME\"},{\"value\":\"howdy\", \"type\":\"MS:GREETING\"},{\"value\":\"George\", \"type\":\"MS:NAME\"}]}";
+        String jsonGreetings = "{\"greetings\":[{\"value\":\"hello\"},{\"value\":\"howdy\"}]}";
+        Goate jGoate = new ToGoate(json).convert();
+        StringBuilder filter = new StringBuilder("(_goate_filter_start").append(System.currentTimeMillis());
+        jGoate.filterByValue("MS:GREETING").scrubKeys(".*", new valueKey())
+                .keys()
+                .stream().forEach(key -> filter.append("|").append(key));
+        filter.append(")");
+        Goate filtered = jGoate.filter(filter.toString());
+        expect(Expectation.build()
+                .actual(filtered.size())
+                .isEqualTo(2));
+//        expect(Expectation.build()
+//                .actual("greetings.+")
+//                .from(jsonGreetings)
+//                .isEqualTo("collection.%.value")
+//        .fromExpected(filtered));
     }
 }

@@ -32,6 +32,9 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +46,7 @@ public class DeSerializer extends Cereal{
     private BleatBox LOG = BleatFactory.getLogger(getClass());
     private Goate data;
     private Class dataSource;
+    private List<Class> genericType = new ArrayList<>();
 
     public <T> T build(Class<T> type){
         Object o = null;
@@ -60,18 +64,29 @@ public class DeSerializer extends Cereal{
                 for(Map.Entry<String, Field> field:fields.entrySet()){
                     GoateSource gs = findGoateSource(field.getValue(), dataSource);
                     String fieldKey = field.getKey();
+                    boolean flatten = false;
                     if(gs!=null){
                         fieldKey = gs.key();
+                        flatten = gs.flatten();
                     }
-                    Object value = data.get(fieldKey);
-                    boolean acc = field.getValue().isAccessible();
+                    Object value = fieldKey.isEmpty()?data:data.get(fieldKey);
+                    boolean acc = field.getValue().canAccess(o);//.isAccessible();
                     field.getValue().setAccessible(true);
                     try {
                         if(value!=null
                                 ||data.filter(fieldKey+"\\.").size()>0
                                 ||data.getStrict(fieldKey)!=null
                                 ||field.getValue().getType().getAnnotation(GoatePojo.class)!=null) {
-                            field.getValue().set(o, new Cast(data.filter(fieldKey).scrubKeys(fieldKey+"\\."), dataSource).field(field.getValue()).cast(value,field.getValue().getType()));
+                            Goate d = new Goate().merge(data,false);
+                            if(!flatten){
+                                d = data.filter(fieldKey.replace("##", "[0-9]*"));
+                                if(!fieldKey.isEmpty()){
+                                    d = d.scrubKeys(fieldKey+"\\.");
+                                }
+                            } else {
+                                d = data.filterStrict(fieldKey.replace("##","[0-9]*"));
+                            }
+                            field.getValue().set(o, new Cast(d, dataSource).container(o).field(field.getValue()).cast(value,getType(field.getValue())));
                         }
                     } catch (Exception e) {
                         LOG.error("Build Pojo", "Failed to set field: " + e.getMessage(), e);
@@ -85,12 +100,35 @@ public class DeSerializer extends Cereal{
         return (T)o;
     }
 
+    private Class getType(Field field){
+        Class c = field.getType();
+        if(c == Object.class){
+            Generic t = field.getAnnotation(Generic.class);
+            if(t != null) {
+                int index = t.index();
+                if(genericType.size()>index){
+                    c = genericType.get(index);
+                }
+            }
+        }
+        return c;
+    }
+
     private Object buildInstance(Class type) throws IllegalAccessException, InstantiationException {
         if(type==null){
             LOG.error("Build Pojo", "Can't build the pojo if you don't tell me what to build.");
             throw new RuntimeException("The pojo class was not specified.");
         }
-        return type.newInstance();
+        Object o = null;
+        try {
+            o = type.getDeclaredConstructor().newInstance();
+        } catch (InvocationTargetException | NoSuchMethodException e) {
+            LOG.error("Building Pojo", "Problem instantiating new instance: " + e.getMessage(), e);
+        }
+        if(o instanceof TypeT){
+            ((TypeT)o).setGoateType(genericType);
+        }
+        return o;
     }
 
     public DeSerializer data(Goate data){
@@ -98,7 +136,15 @@ public class DeSerializer extends Cereal{
         return this;
     }
 
-    public DeSerializer data(Map<String, Object> data){
+    public DeSerializer T(Class type){
+        return genericType(type);
+    }
+    public DeSerializer genericType(Class type){
+        this.genericType.add(type);
+        return this;
+    }
+
+    public DeSerializer data(Map<String, ?> data){
         return data(new Goate(data));
     }
 

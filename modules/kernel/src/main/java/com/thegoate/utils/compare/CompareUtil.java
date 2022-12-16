@@ -44,5 +44,5 @@ import java.lang.annotation.RetentionPolicy;
 @IndexAnnotated
 public @interface CompareUtil {
     String operator();
-    String type();
+    Class type() default Object.class;
 }

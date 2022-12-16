@@ -39,6 +39,8 @@ public class SampleDLP extends DLProvider {
     @Override
     public void init() {
         runData.put("dl##", new StaticDL().add("a","x").add("Scenario", "use DLProvider."));
+        runData.put("dl##", new StaticDL().add("a","x").add("Scenario", "use DLProvider 2."));
+        runData.put("dl##", new StaticDL().add("a","x").add("Scenario", "use DLProvider 3."));
         constantData.put("dl##", new StaticDL().add("b","y"));
     }
 }

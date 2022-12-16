@@ -28,7 +28,7 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-import com.thegoate.dsl.DSL;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.dsl.PrimitiveDSL;
 
@@ -37,6 +37,7 @@ import com.thegoate.dsl.PrimitiveDSL;
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "int")
+@GoateDescription(description = "Returns the int representation of the value.")
 public class IntDSL extends PrimitiveDSL {
     public IntDSL(Object value) {
         super(value);

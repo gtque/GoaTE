@@ -27,13 +27,12 @@
 package com.thegoate.utils.compare.tools.f;
 
 import com.thegoate.utils.compare.CompareUtil;
-import com.thegoate.utils.compare.tools.integer.CompareIntTool;
 
 /**
  * Compares two floats for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = "==", type = "float")
+@CompareUtil(operator = "==", type = Float.class)
 public class CompareFloatEqualTo extends CompareFloatTool {
 
     public CompareFloatEqualTo(Object actual) {
@@ -44,7 +43,7 @@ public class CompareFloatEqualTo extends CompareFloatTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = Float.parseFloat(""+actual)==Float.parseFloat(""+expected);
+            result = parseFloat(actual)==parseFloat(expected);
         }catch(Exception e){
             result = tryExpectedType("==");
         }

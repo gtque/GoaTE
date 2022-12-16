@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GoateReflection.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.reflection</a> &gt; <span class="el_source">GoateReflection.java</span></div><h1>GoateReflection.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.reflection;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.fill.serialize.GoateIgnore;
+
+/**
+ * Some simple custom methods for reflection.
+ * This class cannot use BleatBox, it causes a circular dependency.
+ * Created by gtque on 4/24/2017.
+ */
+<span class="fc" id="L50">public class GoateReflection {</span>
+
+	public Constructor findConstructor(Class theClass, Object[] args) {
+<span class="fc" id="L53">		return findConstructor(theClass.getConstructors(), args);</span>
+	}
+
+	public Constructor findConstructor(Constructor&lt;?&gt;[] constructors, Object[] args) {
+<span class="fc" id="L57">		Constructor p = null;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">		for (Constructor constructor : constructors) {</span>
+<span class="fc" id="L59">			Class&lt;?&gt;[] ptypes = constructor.getParameterTypes();</span>
+<span class="fc" id="L60">			boolean found = false;</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">			if (ptypes.length == args.length) {</span>
+<span class="fc" id="L62">				found = true;</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">				for (int i = 0; i &lt; args.length; i++) {</span>
+<span class="fc bfc" id="L64" title="All 4 branches covered.">					if (args[i] != null &amp;&amp; isPrimitive(args[i].getClass())) {</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">						if (ptypes[i].equals(Integer.TYPE)) {</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">							if (!(args[i] instanceof Integer)) {</span>
+<span class="nc" id="L67">								found = false;</span>
+							}
+<span class="fc bfc" id="L69" title="All 2 branches covered.">						} else if (ptypes[i].equals(Byte.TYPE)) {</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">							if (!(args[i] instanceof Byte)) {</span>
+<span class="nc" id="L71">								found = false;</span>
+							}
+<span class="fc bfc" id="L73" title="All 2 branches covered.">						} else if (ptypes[i].equals(Double.TYPE)) {</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">							if (!(args[i] instanceof Double)) {</span>
+<span class="fc" id="L75">								found = false;</span>
+							}
+<span class="fc bfc" id="L77" title="All 2 branches covered.">						} else if (ptypes[i].equals(Float.TYPE)) {</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">							if (!(args[i] instanceof Float)) {</span>
+<span class="fc" id="L79">								found = false;</span>
+							}
+<span class="fc bfc" id="L81" title="All 2 branches covered.">						} else if (ptypes[i].equals(Long.TYPE)) {</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">							if (!(args[i] instanceof Long)) {</span>
+<span class="fc" id="L83">								found = false;</span>
+							}
+<span class="fc bfc" id="L85" title="All 2 branches covered.">						} else if (ptypes[i].equals(Boolean.TYPE)) {</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">							if (!(args[i] instanceof Boolean)) {</span>
+<span class="fc" id="L87">								found = false;</span>
+							}
+<span class="fc bfc" id="L89" title="All 2 branches covered.">						} else if (ptypes[i].equals(Character.TYPE)) {</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">							if (!(args[i] instanceof Character)) {</span>
+<span class="fc" id="L91">								found = false;</span>
+							}
+<span class="fc bfc" id="L93" title="All 2 branches covered.">						} else if (!ptypes[i].equals(Object.class)) {</span>
+<span class="fc" id="L94">							found = false;</span>
+						}
+					} else {
+<span class="fc bfc" id="L97" title="All 4 branches covered.">						if (args[i] != null &amp;&amp; !ptypes[i].isAssignableFrom(args[i].getClass())) {</span>
+<span class="fc" id="L98">							found = false;</span>
+						}
+					}
+				}
+			}
+<span class="fc bfc" id="L103" title="All 2 branches covered.">			if (found) {</span>
+<span class="fc" id="L104">				p = constructor;</span>
+<span class="fc" id="L105">				break;</span>
+			}
+		}
+<span class="fc" id="L108">		return p;</span>
+	}
+
+	public boolean isPrimitiveOrNumerical(Object o) {
+<span class="pc bpc" id="L112" title="1 of 8 branches missed.">		return o != null &amp;&amp; (isPrimitive(o.getClass()) || o instanceof Number || primitiveType(o) != null);</span>
+	}
+
+	public boolean isPrimitive(Class c) {
+<span class="fc bfc" id="L116" title="All 4 branches covered.">		return c.equals(Boolean.class) || c.equals(Boolean.TYPE)</span>
+<span class="pc bpc" id="L117" title="1 of 4 branches missed.">			|| c.equals(Byte.class) || c.equals(Byte.TYPE)</span>
+<span class="fc bfc" id="L118" title="All 4 branches covered.">			|| c.equals(Integer.class) || c.equals(Integer.TYPE)</span>
+<span class="fc bfc" id="L119" title="All 4 branches covered.">			|| c.equals(Double.class) || c.equals(Double.TYPE)</span>
+<span class="fc bfc" id="L120" title="All 4 branches covered.">			|| c.equals(Float.class) || c.equals(Float.TYPE)</span>
+<span class="fc bfc" id="L121" title="All 4 branches covered.">			|| c.equals(Long.class) || c.equals(Long.TYPE)</span>
+<span class="fc bfc" id="L122" title="All 4 branches covered.">			|| c.equals(Character.class) || c.equals(Character.TYPE)</span>
+<span class="fc bfc" id="L123" title="All 4 branches covered.">			|| c.equals(Short.class) || c.equals(Short.TYPE);</span>
+	}
+
+	public boolean isBooleanType(Class c) {
+<span class="pc bpc" id="L127" title="1 of 4 branches missed.">		return c.equals(Boolean.class) || c.equals(Boolean.TYPE);</span>
+	}
+
+	public boolean isByteType(Class c) {
+<span class="pc bpc" id="L131" title="1 of 4 branches missed.">		return c.equals(Byte.class) || c.equals(Byte.TYPE);</span>
+	}
+
+	public boolean isIntegerType(Class c) {
+<span class="pc bpc" id="L135" title="1 of 4 branches missed.">		return c.equals(Integer.class) || c.equals(Integer.TYPE);</span>
+	}
+
+	public boolean isDoubleType(Class c) {
+<span class="pc bpc" id="L139" title="1 of 4 branches missed.">		return c.equals(Double.class) || c.equals(Double.TYPE);</span>
+	}
+
+	public boolean isFloatType(Class c) {
+<span class="pc bpc" id="L143" title="1 of 4 branches missed.">		return c.equals(Float.class) || c.equals(Float.TYPE);</span>
+	}
+
+	public boolean isLongType(Class c) {
+<span class="pc bpc" id="L147" title="1 of 4 branches missed.">		return c.equals(Long.class) || c.equals(Long.TYPE);</span>
+	}
+
+	public boolean isCharacterType(Class c) {
+<span class="pc bpc" id="L151" title="1 of 4 branches missed.">		return c.equals(Character.class) || c.equals(Character.TYPE);</span>
+	}
+
+	public boolean isShortType(Class c) {
+<span class="pc bpc" id="L155" title="1 of 4 branches missed.">		return c.equals(Short.class) || c.equals(Short.TYPE);</span>
+	}
+
+	public boolean isBoolean(Object c) {
+<span class="fc" id="L159">		String cs = &quot;&quot; + c;</span>
+<span class="fc bfc" id="L160" title="All 6 branches covered.">		return (c instanceof Boolean) || cs.equalsIgnoreCase(&quot;true&quot;) || cs.equalsIgnoreCase(&quot;false&quot;);</span>
+	}
+
+	public boolean isByte(Object c) {
+<span class="fc" id="L164">		String cs = &quot;&quot; + c;</span>
+<span class="fc" id="L165">		boolean result = false;</span>
+		try {
+<span class="fc" id="L167">			Byte.parseByte(cs);</span>
+<span class="fc" id="L168">			result = true;</span>
+<span class="nc" id="L169">		} catch (Throwable e) {</span>
+			//            LOG.debug(&quot;&quot;+actual + &quot; is not a float.&quot;);
+<span class="fc" id="L171">		}</span>
+<span class="fc" id="L172">		return result;</span>
+	}
+
+	public boolean isInteger(Object c) {
+<span class="fc" id="L176">		String cs = &quot;&quot; + c;</span>
+<span class="fc" id="L177">		boolean result = false;</span>
+		try {
+<span class="fc" id="L179">			Integer.parseInt(cs);</span>
+<span class="fc" id="L180">			result = true;</span>
+<span class="fc" id="L181">		} catch (Throwable e) {</span>
+			//            LOG.debug(&quot;&quot;+actual + &quot; is not a float.&quot;);
+<span class="fc" id="L183">		}</span>
+<span class="fc" id="L184">		return result;</span>
+	}
+
+	public boolean isDouble(Object c) {
+<span class="fc" id="L188">		String cs = &quot;&quot; + c;</span>
+<span class="fc" id="L189">		boolean result = false;</span>
+		try {
+<span class="fc" id="L191">			Double.parseDouble(cs);</span>
+<span class="fc" id="L192">			result = true;</span>
+<span class="fc" id="L193">		} catch (Throwable e) {</span>
+			//            LOG.debug(&quot;&quot;+actual + &quot; is not a float.&quot;);
+<span class="fc" id="L195">		}</span>
+<span class="fc" id="L196">		return result;</span>
+	}
+
+	public boolean isFloat(Object c) {
+<span class="fc" id="L200">		String cs = &quot;&quot; + c;</span>
+<span class="fc" id="L201">		boolean result = false;</span>
+		try {
+<span class="fc" id="L203">			Float.parseFloat(cs);</span>
+<span class="fc" id="L204">			result = true;</span>
+<span class="fc" id="L205">		} catch (Throwable e) {</span>
+			//            LOG.debug(&quot;&quot;+actual + &quot; is not a float.&quot;);
+<span class="fc" id="L207">		}</span>
+<span class="fc" id="L208">		return result;</span>
+	}
+
+	public boolean isLong(Object c) {
+<span class="fc" id="L212">		String cs = &quot;&quot; + c;</span>
+<span class="fc" id="L213">		boolean result = false;</span>
+		try {
+<span class="fc" id="L215">			Long.parseLong(cs);</span>
+<span class="fc" id="L216">			result = true;</span>
+<span class="fc" id="L217">		} catch (Throwable e) {</span>
+			//            LOG.debug(&quot;&quot;+actual + &quot; is not a float.&quot;);
+<span class="fc" id="L219">		}</span>
+<span class="fc" id="L220">		return result;</span>
+	}
+
+	public boolean isCharacter(Object c) {
+<span class="fc" id="L224">		String cs = &quot;&quot; + c;</span>
+<span class="fc" id="L225">		boolean result = false;</span>
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">		if (cs.length() == 1) {</span>
+<span class="fc" id="L227">			result = true;</span>
+		}
+<span class="fc" id="L229">		return result;</span>
+	}
+
+	public boolean isShort(Object c) {
+<span class="fc" id="L233">		String cs = &quot;&quot; + c;</span>
+<span class="fc" id="L234">		boolean result = false;</span>
+		try {
+<span class="fc" id="L236">			Short.parseShort(cs);</span>
+<span class="fc" id="L237">			result = true;</span>
+<span class="nc" id="L238">		} catch (Throwable e) {</span>
+			//            LOG.debug(&quot;&quot;+actual + &quot; is not a float.&quot;);
+<span class="fc" id="L240">		}</span>
+<span class="fc" id="L241">		return result;</span>
+	}
+
+	public List&lt;Method&gt; getDeclaredMethods(Class klass) {
+<span class="fc" id="L245">		List&lt;Method&gt; methods = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">		for (Method m : klass.getDeclaredMethods()) {</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">			if (!m.getName().startsWith(&quot;$jacoco&quot;)) {</span>
+<span class="fc" id="L248">				methods.add(m);</span>
+			}
+		}
+<span class="fc" id="L251">		return methods;</span>
+	}
+
+	public List&lt;Method&gt; getAllMethods(Class klass) {
+<span class="fc" id="L255">		return getAllMethods(klass, new ArrayList&lt;&gt;());</span>
+	}
+
+	public List&lt;Method&gt; getAllMethods(Class klass, List&lt;Method&gt; methods) {
+<span class="fc bfc" id="L259" title="All 2 branches covered.">		if (methods == null) {</span>
+<span class="fc" id="L260">			methods = new ArrayList&lt;&gt;();</span>
+		}
+<span class="fc bfc" id="L262" title="All 2 branches covered.">		for (Method m : klass.getDeclaredMethods()) {</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">			if (!m.getName().startsWith(&quot;$jacoco&quot;)) {</span>
+<span class="fc" id="L264">				methods.add(m);</span>
+			}
+		}
+<span class="fc bfc" id="L267" title="All 2 branches covered.">		if (klass.getSuperclass() != null) {</span>
+<span class="fc" id="L268">			methods = getAllMethods(klass.getSuperclass(), methods);</span>
+		}
+<span class="fc" id="L270">		return methods;</span>
+	}
+
+	public Method findMut(Class actualClass, String theMethod, Class[] pc) throws NoSuchMethodException {
+<span class="fc" id="L274">		String theClass = actualClass.getName();</span>
+<span class="pc bpc" id="L275" title="1 of 2 branches missed.">		int pcl = pc == null ? 0 : pc.length;</span>
+<span class="fc" id="L276">		List&lt;Method&gt; methods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L277">		getAllMethods(actualClass, methods);</span>
+<span class="fc" id="L278">		Method result = null;</span>
+<span class="pc bpc" id="L279" title="1 of 2 branches missed.">		for (Method m : methods) {</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">			if (m.getName().equals(theMethod)) {</span>
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">				if (m.getParameterTypes().length == pcl) {</span>
+<span class="fc" id="L282">					boolean matched = true;</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">					for (Class type : m.getParameterTypes()) {</span>
+<span class="fc" id="L284">						boolean found = false;</span>
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">						for (Class c : pc) {</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">							if (type.isAssignableFrom(c)) {</span>
+<span class="fc" id="L287">								found = true;</span>
+<span class="fc" id="L288">								break;</span>
+							}
+						}
+<span class="pc bpc" id="L291" title="1 of 2 branches missed.">						if (!found) {</span>
+<span class="nc" id="L292">							matched = false;</span>
+						}
+					}
+<span class="pc bpc" id="L295" title="3 of 4 branches missed.">					if (matched || pcl == 0) {</span>
+<span class="fc" id="L296">						result = m;</span>
+<span class="fc" id="L297">						break;</span>
+					}
+				}
+			}
+<span class="fc" id="L301">		}</span>
+<span class="pc bpc" id="L302" title="1 of 2 branches missed.">		if (result == null) {</span>
+<span class="nc" id="L303">			throw new NoSuchMethodException(&quot;&quot; + theMethod + &quot; could not be found in &quot; + theClass);</span>
+		}
+<span class="fc" id="L305">		return result;</span>
+	}
+
+	public Map&lt;String, Field&gt; findFields(Class theClass) {
+<span class="fc" id="L309">		Map&lt;String, Field&gt; fields = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L310">		findFields(theClass, fields);</span>
+<span class="fc" id="L311">		return fields;</span>
+	}
+
+	public void findFields(Class theClass, Map&lt;String, Field&gt; fieldMap) {
+<span class="pc bpc" id="L315" title="1 of 2 branches missed.">		if (fieldMap != null) {</span>
+<span class="fc bfc" id="L316" title="All 2 branches covered.">			for (Field f : theClass.getDeclaredFields()) {</span>
+<span class="fc bfc" id="L317" title="All 4 branches covered.">				if (!f.getName().contains(&quot;$jacocoData&quot;) &amp;&amp; f.getType() != theClass) {</span>
+					//need to specify a list of things to ignore, in a property file perhaps?
+					//need to ignore nested objects of the same type to avoid recursion issues,
+					//it may still be possible if the object is not the same type, but some object in the nested one does.
+<span class="fc" id="L321">					GoateIgnore ignore = f.getAnnotation(GoateIgnore.class);</span>
+<span class="fc bfc" id="L322" title="All 2 branches covered.">					if (ignore == null) {</span>
+<span class="fc" id="L323">						fieldMap.put(f.getName(), f);</span>
+					}
+				}
+			}
+<span class="fc bfc" id="L327" title="All 2 branches covered.">			if (theClass.getSuperclass() != null) {</span>
+<span class="fc" id="L328">				findFields(theClass.getSuperclass(), fieldMap);</span>
+			}
+		}
+<span class="fc" id="L331">	}</span>
+
+	public Method findMethod(Object theClass, String methodName) {
+<span class="fc" id="L334">		Optional&lt;Method&gt; first = getAllMethods(theClass.getClass()).stream().filter(m -&gt; m.getName().equals(methodName)).findFirst();</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">		return first.isPresent() ? first.get() : null;</span>
+	}
+
+	public Class findClass(String theClass) {
+<span class="nc" id="L339">		Class&lt;?&gt; cls = null;</span>
+		try {
+<span class="nc" id="L341">			cls = Class.forName(theClass);</span>
+<span class="nc" id="L342">		} catch (ClassNotFoundException ignored) {</span>
+<span class="nc" id="L343">		}</span>
+<span class="nc" id="L344">		return cls;</span>
+	}
+
+	public Class primitiveType(Object o) {
+<span class="fc" id="L348">		Class klass = null;</span>
+<span class="fc bfc" id="L349" title="All 2 branches covered.">		if(o instanceof String) {</span>
+<span class="fc bfc" id="L350" title="All 4 branches covered.">			if((&quot;&quot;+o).matches(&quot;[truefalsTRUEFALS$.,\\-+0-9]+&quot;)||(&quot;&quot;+o).length()&lt;2) {</span>
+				try {
+<span class="fc" id="L352">					parseLong(o);</span>
+<span class="fc" id="L353">					klass = Long.class;</span>
+<span class="fc" id="L354">				} catch (Exception peLong) {</span>
+					try {
+<span class="nc" id="L356">						parseInt(o);</span>
+<span class="nc" id="L357">						klass = Integer.class;</span>
+<span class="fc" id="L358">					} catch (Exception peInteger) {</span>
+						try {
+<span class="nc" id="L360">							parseShort(o);</span>
+<span class="nc" id="L361">							klass = Short.class;</span>
+<span class="fc" id="L362">						} catch (Exception peShort) {</span>
+							try {
+<span class="fc" id="L364">								parseFloat(o);</span>
+<span class="fc" id="L365">								klass = Float.class;</span>
+<span class="fc" id="L366">							} catch (Exception peFloat) {</span>
+								try {
+<span class="nc" id="L368">									parseDouble(o);</span>
+<span class="nc" id="L369">									klass = Double.class;</span>
+<span class="fc" id="L370">								} catch (Exception peDouble) {</span>
+									try {
+<span class="fc" id="L372">										parseChar(o);</span>
+<span class="fc" id="L373">										klass = Character.class;</span>
+<span class="fc" id="L374">									} catch (Exception pe) {</span>
+										try {
+<span class="nc" id="L376">											parseByte(o);</span>
+<span class="nc" id="L377">											klass = Byte.class;</span>
+<span class="fc" id="L378">										} catch (Exception peByte) {</span>
+											try {
+<span class="fc" id="L380">												parseBoolean(o);</span>
+<span class="fc" id="L381">												klass = Boolean.class;</span>
+<span class="fc" id="L382">											} catch (Exception peBoolean) {</span>
+<span class="fc" id="L383">												BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+<span class="fc" id="L384">												LOG.debug(&quot;Goate Reflection&quot;, &quot;I had to give up looking up your primitive type: &quot; + o);</span>
+<span class="fc" id="L385">											}</span>
+<span class="nc" id="L386">										}</span>
+<span class="fc" id="L387">									}</span>
+<span class="nc" id="L388">								}</span>
+<span class="fc" id="L389">							}</span>
+<span class="nc" id="L390">						}</span>
+<span class="nc" id="L391">					}</span>
+<span class="fc" id="L392">				}</span>
+			}
+		} else {
+<span class="fc bfc" id="L395" title="All 2 branches covered.">			if(isPrimitive(o.getClass())){</span>
+<span class="fc" id="L396">				klass = o.getClass();</span>
+			}
+		}
+<span class="fc" id="L399">		return klass;</span>
+	}
+
+	public BigDecimal parseBigDecimal(Object value) {
+<span class="nc" id="L403">		return new BigDecimal((&quot;&quot; + value).replaceAll(&quot;[,$]&quot;, &quot;&quot;));</span>
+	}
+
+	public byte parseByte(Object value) {
+<span class="fc" id="L407">		return Byte.parseByte((&quot;&quot; + value).replaceAll(&quot;[,$]&quot;, &quot;&quot;));</span>
+	}
+
+	public char parseChar(Object value) {
+<span class="fc" id="L411">		String v = &quot;&quot; + value;</span>
+<span class="fc bfc" id="L412" title="All 2 branches covered.">		if (v.length() &gt; 1) {</span>
+<span class="fc" id="L413">			throw new ClassCastException(&quot;Problem: &quot; + value + &quot; is not a valid char.&quot;);</span>
+		}
+<span class="fc" id="L415">		return v.charAt(0);</span>
+	}
+
+	public double parseDouble(Object value) {
+<span class="fc" id="L419">		return Double.parseDouble((&quot;&quot; + value).replaceAll(&quot;[,$]&quot;, &quot;&quot;));</span>
+	}
+
+	public float parseFloat(Object value) {
+<span class="fc" id="L423">		return Float.parseFloat((&quot;&quot; + value).replaceAll(&quot;[,$]&quot;, &quot;&quot;));</span>
+	}
+
+	public int parseInt(Object value) {
+<span class="fc" id="L427">		return Integer.parseInt((&quot;&quot; + value).replaceAll(&quot;[,$]&quot;, &quot;&quot;));</span>
+	}
+
+	public long parseLong(Object value) {
+<span class="fc" id="L431">		return Long.parseLong((&quot;&quot; + value).replaceAll(&quot;[,$]&quot;, &quot;&quot;));</span>
+	}
+
+	public short parseShort(Object value) {
+<span class="fc" id="L435">		return Short.parseShort((&quot;&quot; + value).replaceAll(&quot;[,$]&quot;, &quot;&quot;));</span>
+	}
+
+	public boolean parseBoolean(Object value) {
+<span class="fc" id="L439">		String v = &quot;&quot; + value;</span>
+<span class="fc bfc" id="L440" title="All 4 branches covered.">		if(!v.equalsIgnoreCase(&quot;true&quot;)&amp;&amp;!v.equalsIgnoreCase(&quot;false&quot;)){</span>
+<span class="fc" id="L441">			throw new RuntimeException(&quot;Not a parseable boolean: ie, not true or false.&quot;);</span>
+		}
+<span class="fc" id="L443">		return Boolean.parseBoolean(v);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

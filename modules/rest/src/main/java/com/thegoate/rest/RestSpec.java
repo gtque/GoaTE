@@ -45,6 +45,10 @@ public interface RestSpec {
 
     RestSpec header(String key, Object value);
 
+    RestSpec cookies(Goate data);
+
+    RestSpec cookie(String key, Object value);
+
     RestSpec queryParams(Goate data);
 
     RestSpec queryParam(String key, Object value);
@@ -83,6 +87,8 @@ public interface RestSpec {
 
     RestSpec multipartFormData(String key, Object value);
 
+    RestSpec multipartFormData(String key, Object value, String contentType);
+
     RestSpec customData(Goate data);
 
     RestSpec customData(Enum key, Object value);
@@ -101,7 +107,15 @@ public interface RestSpec {
 
     RestSpec baseURL(String url);
 
+    RestSpec logSpec();
+
+    RestSpec urlEncode(boolean encode);
+
+    boolean urlEncode();
+
     Goate getHeaders();
+
+    Goate getCookies();
 
     Goate getQueryParameters();
 
@@ -119,6 +133,10 @@ public interface RestSpec {
 
     String getBaseURL();
 
+    RestSpec configure(Object config);
+
+    Object getConfig();
+
     RestSpec config();
 
     Object get(String endpoint);
@@ -130,4 +148,6 @@ public interface RestSpec {
     Object delete(String endpoint);
 
     Object patch(String endpoint);
+
+    Object head(String endpoint);
 }

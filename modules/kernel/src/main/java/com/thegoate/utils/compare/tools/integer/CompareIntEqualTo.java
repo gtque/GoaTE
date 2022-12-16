@@ -32,7 +32,7 @@ import com.thegoate.utils.compare.CompareUtil;
  * Compares two ints for equality.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "==", type = "int")
+@CompareUtil(operator = "==", type = Integer.class)
 public class CompareIntEqualTo extends CompareIntTool {
 
     public CompareIntEqualTo(Object actual) {
@@ -43,7 +43,7 @@ public class CompareIntEqualTo extends CompareIntTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = Integer.parseInt(""+actual)==Integer.parseInt(""+expected);
+            result = parseInt(actual)==parseInt(expected);
         }catch(Exception e){
             result = tryExpectedType("==");
         }

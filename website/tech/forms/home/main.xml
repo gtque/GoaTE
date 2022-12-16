@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="transform/thptransform.xsl"?>
+<html>
+	<head>
+		<meta name="author" content="gtque"/>
+		<meta name="description" content="The technical home for GoaTE. Including tutorials, faq, and perhaps a forum one day..."/>
+		<meta name="keywords" content="goate, test engine, java, testng, unit test, unit testing, software qa, software testing, test framework"/>
+		<title title="GoaTE Tech">The smartest goate in the world.</title>
+		<file>forms/common/style.xml</file>
+	</head>
+	<body>
+		<div id="main" class="main">
+		</div>
+		<div id="mainmain" class="mainmain">
+			<file>forms/home/maincenter.xml</file>
+			<file>forms/home/mainright.xml</file>
+			<file>forms/common/infofooter.xml</file>
+		</div>
+	</body>
+</html>

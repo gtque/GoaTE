@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Locate.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.locate</a> &gt; <span class="el_source">Locate.java</span></div><h1>Locate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.locate;
+
+/**
+ * Created by Eric Angeli on 3/20/2019.
+ */
+<span class="fc" id="L32">public class Locate {</span>
+<span class="fc" id="L33">    protected StringBuilder path = new StringBuilder();</span>
+<span class="fc" id="L34">    private String oneOrMoreNumber = &quot;([0-9])+&quot;;</span>
+<span class="fc" id="L35">    private String zeroOrMoreNumber = &quot;([0-9])*&quot;;</span>
+
+    public static Locate start(String start) {
+<span class="nc" id="L38">        return path().match(start);</span>
+    }
+
+    public static Locate path() {
+<span class="fc" id="L42">        return new Locate();</span>
+    }
+
+    public Locate wildcardIndex() {
+<span class="nc" id="L46">        return anyNumberZeroOrMore();</span>
+    }
+
+    public Locate wildcardIndex(int expectedSize) {
+<span class="nc" id="L50">        return matchNTimes(zeroOrMoreNumber, expectedSize);</span>
+    }
+
+    public Locate wildcardIndex(int expectedSize, int startingIndex) {
+<span class="nc" id="L54">        return matchNTimesStartingAt(zeroOrMoreNumber, expectedSize, startingIndex);</span>
+    }
+
+    public Locate wildcardIndexOneOrMore() {
+<span class="nc" id="L58">        return anyNumberOneOrMore();</span>
+    }
+
+    public Locate matchIndex() {
+<span class="nc" id="L62">        return wildcardIndex();</span>
+    }
+
+    /**
+     * At the locate level this is mostly just syntactic sugar.
+     * Extensions of Locate may implement more explicit use of matchIndex(int matchIndex)
+     *
+     * @param matchIndex the index to match, ignored in this implementation.
+     * @return self
+     */
+    public Locate matchIndex(int matchIndex) {
+<span class="nc" id="L73">        return wildcardIndex();</span>
+    }
+
+    public Locate dot() {
+<span class="fc" id="L77">        path.append(&quot;\\.&quot;);</span>
+<span class="fc" id="L78">        return this;</span>
+    }
+
+    public Locate anyNumberOneOrMore() {
+<span class="fc" id="L82">        path.append(oneOrMoreNumber);</span>
+<span class="fc" id="L83">        return this;</span>
+    }
+
+    public Locate anyNumberZeroOrMore() {
+<span class="fc" id="L87">        path.append(zeroOrMoreNumber);</span>
+<span class="fc" id="L88">        return this;</span>
+    }
+
+    public Locate anyLetterOneOrMore() {
+<span class="nc" id="L92">        path.append(&quot;([a-zA-Z])+&quot;);</span>
+<span class="nc" id="L93">        return this;</span>
+    }
+
+    public Locate anyLetterZeroOrMore() {
+<span class="nc" id="L97">        path.append(&quot;([a-zA-Z])*&quot;);</span>
+<span class="nc" id="L98">        return this;</span>
+    }
+
+    public Locate match(String pattern) {
+<span class="fc" id="L102">        path.append(pattern);</span>
+<span class="fc" id="L103">        return this;</span>
+    }
+
+    public Locate matchZeroOrMore(String pattern) {
+<span class="fc" id="L107">        path.append(&quot;(&quot;).append(pattern).append(&quot;)*&quot;);</span>
+<span class="fc" id="L108">        return this;</span>
+    }
+
+    public Locate matchOneOrMore(String pattern) {
+<span class="fc" id="L112">        path.append(&quot;(&quot;).append(pattern).append(&quot;)+&quot;);</span>
+<span class="fc" id="L113">        return this;</span>
+    }
+
+    public Locate matchNTimes(String pattern, int numberOfTimesToMatch) {
+<span class="nc" id="L117">        path.append(&quot;{&quot;).append(numberOfTimesToMatch).append(&quot;}&quot;);</span>
+<span class="nc" id="L118">        return this;</span>
+    }
+
+    public Locate matchNTimesStartingAt(String pattern, int numberOfTimesToMatch, int start) {
+<span class="nc" id="L122">        path.append(pattern).append(&quot;{&quot;).append(start).append(&quot;,&quot;).append(numberOfTimesToMatch).append(&quot;}&quot;);</span>
+<span class="nc" id="L123">        return this;</span>
+    }
+
+    public Locate nTimes(int numberOfTimesToMatch) {
+<span class="fc" id="L127">        path.insert(0, &quot;((&quot;).append(&quot;){&quot;).append(numberOfTimesToMatch).append(&quot;})&quot;);</span>
+<span class="fc" id="L128">        return this;</span>
+    }
+
+    public Locate nTimesStartingAt(int numberOfTimesToMatch, int start) {
+<span class="nc" id="L132">        path.insert(0, &quot;((&quot;).append(&quot;){&quot;).append(start).append(&quot;,&quot;).append(numberOfTimesToMatch).append(&quot;})&quot;);</span>
+<span class="nc" id="L133">        return this;</span>
+    }
+
+    public String end() {
+<span class="nc" id="L137">        return toPath();</span>
+    }
+
+    public String end(String match) {
+<span class="fc" id="L141">        path.append(match);</span>
+<span class="fc" id="L142">        return toPath();</span>
+    }
+
+    public String toPath() {
+<span class="fc" id="L146">        return path.toString();</span>
+    }
+
+//    public Locate find(String find){
+//        this.find = find;
+//        return this;
+//    }
+//
+//    public Locate in(Object source){
+//        this.source = source;
+//        return this;
+//    }
+//
+//    @Override
+//    public String[] detailedScrub() {
+//        return new String[0];
+//    }
+//
+//    @Override
+//    protected Employee init() {
+//        return this;
+//    }
+//
+//    @Override
+//    protected Object doWork() {
+//        Object container = source;
+//        if(container instanceof Employee){
+//            container = ((Employee) container).work();
+//        }
+//        return new Get(find).from(container);
+//    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

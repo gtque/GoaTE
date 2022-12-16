@@ -95,14 +95,23 @@ public class EutConfigDSL extends DSL {
         return eut(key, defaultValue, new Goate());
     }
 
-    public static String eut(String key, String defaultValue, Goate data){
-        EutConfigDSL eut = new EutConfigDSL("eut::"+key+(defaultValue==null?"":(","+defaultValue)));
-        return ""+eut.evaluate(data);
+    public static <T> T eut(String key, Object defaultValue, Class<T> type){
+        return eut(key, defaultValue, type, new Goate());
+    }
+
+    public static String eut(String key, String defaultValue, Goate data) {
+        return eut(key, defaultValue, String.class, data);
+    }
+    public static <T> T eut(String key, Object defaultValue, Class<T> type, Goate data){
+        EutConfigDSL eut = new EutConfigDSL("eut::"+key+(defaultValue==null?"":(","+(""+defaultValue).replace(",","\\,"))));
+        return new Goate().get("chet", eut.evaluate(data), type);
     }
 
     @Override
     public Object evaluate(Goate data) {
-        eut = (Goate)data.get("_goate_:eutConfig", eut);
+        if(data.get("_goate_:eutConfig")!=null){
+            eut = data.get("_goate_:eutConfig", eut, Goate.class);
+        }
         eut.put("_init_", true);
         if(!loaded) {
             loaded = true;

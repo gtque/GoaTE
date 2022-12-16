@@ -27,9 +27,9 @@
 package com.thegoate.json;
 
 import com.thegoate.Goate;
+import com.thegoate.json.utils.type.JsonType;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.Utility;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,25 +76,9 @@ public abstract class JsonUtil implements Utility {
 
     @Override
     public boolean isType(Object check) {
-        boolean istype = true;
-        try{
-            if(!(check instanceof JSONObject)) {
-                if (new JSONObject(""+check) == null) {
-                    istype = false;
-                }
-            }
-        }catch(JSONException je){
-            try{
-                if(!(check instanceof JSONArray)) {
-                    if (new JSONArray(""+check) == null) {
-                        istype = false;
-                    }
-                }
-            }catch (Exception e){
-                istype = false;
-            }
-        }
-        return istype;
+        return new JsonType().isType(check);
     }
+
+
     protected abstract Object processNested(Object subContainer);
 }

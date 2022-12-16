@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>EqualIgnoreFields.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.json.utils.compare.tools</a> &gt; <span class="el_source">EqualIgnoreFields.java</span></div><h1>EqualIgnoreFields.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.json.utils.compare.tools;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.IsDefault;
+import com.thegoate.expect.ExpectedBuilder;
+import com.thegoate.json.utils.fill.FillJson;
+import com.thegoate.json.utils.tojson.ToJson;
+import com.thegoate.utils.compare.Compare;
+import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.compare.CompareUtility;
+import com.thegoate.utils.togoate.ToGoate;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.List;
+
+/**
+ * Checks to see if a permission grant matches expected.
+ * The actual is expected to be a json object that has at least two fields:
+ * permissionName and granted
+ * the expected is expected to be a json object that contains an element with a name matching permissionName
+ * and the value is the expected grant state.
+ * Created by Eric Angeli on 4/9/2018.
+ */
+@IsDefault
+@CompareUtil(operator = &quot;isEqualIgnoreFields&quot;, type = JSONObject.class)
+public class EqualIgnoreFields extends CompareJson implements ExpectedBuilder {
+<span class="fc" id="L54">    Object expected = null;</span>
+<span class="fc" id="L55">    Object fromExpected = null;</span>
+
+    public EqualIgnoreFields(Object actual) {
+<span class="fc" id="L58">        super(actual);</span>
+<span class="fc" id="L59">    }</span>
+
+    @Override
+    public void init(Object val){
+<span class="fc" id="L63">        processNested = false;</span>
+<span class="fc" id="L64">        super.init(val);</span>
+<span class="fc" id="L65">    }</span>
+
+    @Override
+    protected Object processNested(Object o) {
+<span class="nc" id="L69">        return null;</span>
+    }
+
+    @Override
+    public boolean evaluate() {
+<span class="fc" id="L74">        Goate expectedDef = new ToGoate(expected).convert();</span>
+<span class="fc" id="L75">        Goate drop = new Goate();</span>
+<span class="fc" id="L76">        JSONArray ignored = new JSONArray(&quot;&quot; + expectedDef.get(&quot;_goate_ignore&quot;, &quot;[]&quot;));</span>
+<span class="fc" id="L77">        expectedDef.merge(data, false);</span>
+<span class="fc" id="L78">        Object expectedJson = expectedDef.get(&quot;expected json&quot;, new JSONObject(expected.toString()));</span>
+<span class="fc" id="L79">        defineIgnore(drop, ignored);</span>
+<span class="fc" id="L80">        Object tao = null;</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (drop.size() &gt; 0) {</span>
+<span class="fc" id="L82">            expectedJson = new FillJson(expectedJson).with(drop);</span>
+<span class="fc" id="L83">            tao = new ToJson(takeActionOn).convert();</span>
+<span class="fc" id="L84">            tao = new FillJson(tao).with(drop);</span>
+        }
+<span class="fc" id="L86">        CompareUtility compare = new Compare(tao).to(expectedJson).using(&quot;==&quot;);</span>
+<span class="fc" id="L87">        boolean result = compare.evaluate();</span>
+<span class="fc" id="L88">        health = compare.healthCheck();</span>
+<span class="fc" id="L89">        return result;</span>
+    }
+
+    protected void defineIgnore(Goate drop, JSONArray ignored) {
+<span class="pc bpc" id="L93" title="1 of 4 branches missed.">        for (int i = 0; ignored != null &amp;&amp; i &lt; ignored.length(); i++) {</span>
+<span class="fc" id="L94">            drop.put(ignored.getString(i), &quot;drop field::&quot;);</span>
+        }
+<span class="fc" id="L96">        drop.put(&quot;_goate_ignore&quot;, &quot;drop field::&quot;);</span>
+<span class="fc" id="L97">    }</span>
+
+    public CompareUtility actual(Object actual) {
+<span class="fc" id="L100">        this.takeActionOn = actual;</span>
+<span class="fc" id="L101">        return this;</span>
+    }
+
+    public CompareUtility to(Object expected) {
+<span class="fc" id="L105">        this.expected = expected;</span>
+<span class="fc" id="L106">        return this;</span>
+    }
+
+    public CompareUtility using(Object operator) {
+<span class="fc" id="L110">        return this;</span>
+    }
+
+    public static EqualIgnoreFields expected(Object expected) {
+<span class="fc" id="L114">        return new EqualIgnoreFields(null).setExpected(expected);</span>
+    }
+
+    public EqualIgnoreFields fromExpected(Object fromExpected){
+<span class="nc" id="L118">        this.fromExpected = fromExpected;</span>
+<span class="nc" id="L119">        return this;</span>
+    }
+
+    @Override
+    public Object fromExpected(){
+<span class="fc" id="L124">        return this.fromExpected;</span>
+    }
+<span class="fc" id="L126">    JSONArray ignore = new JSONArray();</span>
+
+    public EqualIgnoreFields setExpected(Object expected) {
+<span class="fc" id="L129">        this.expected = expected;</span>
+<span class="fc" id="L130">        return this;</span>
+    }
+
+    public EqualIgnoreFields ignoreField(String field) {
+<span class="fc" id="L134">        ignore.put(field);</span>
+<span class="fc" id="L135">        return this;</span>
+    }
+
+    public EqualIgnoreFields ignoreFields(List&lt;?&gt; fields) {
+<span class="fc" id="L139">        fields.forEach(field -&gt; ignore.put(field));</span>
+<span class="fc" id="L140">        return this;</span>
+    }
+
+    public EqualIgnoreFields ignoreFields(JSONArray fields) {
+<span class="nc" id="L144">        return ignoreFields(fields.toList());</span>
+    }
+
+    public Object generateExpected() {
+<span class="fc" id="L148">        JSONObject jo = new JSONObject();</span>
+<span class="fc" id="L149">        jo.put(&quot;expected json&quot;, expected);</span>
+<span class="fc" id="L150">        jo.put(&quot;_goate_ignore&quot;, ignore);</span>
+<span class="fc" id="L151">        return jo;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

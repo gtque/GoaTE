@@ -30,10 +30,10 @@ import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.data.DLProvider;
 import com.thegoate.data.GoateDLP;
+import com.thegoate.data.GoateNullClass;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.reflection.GoateReflection;
 import org.testng.ITestContext;
-import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
@@ -44,6 +44,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.thegoate.testng.TestNGRunFactory.*;
 
 /**
  * This can be used to define data provider at the method level.
@@ -67,7 +69,9 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
 
     @DataProvider(name = "methodLoader")
     public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
-        number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+        number.put(""+method.getDeclaringClass().getCanonicalName()+":"+method.getName(), 0);
+        //number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+        setTestClass(method.getDeclaringClass());
         this.testContext = context;
         if (context != null) {
             xt = context.getCurrentXmlTest();
@@ -75,67 +79,71 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         Goate rdl = new Goate();
         Goate cdl = new Goate();
         buildDataLoaders(rdl, cdl, method);
-        return TestNGRunFactory.loadRuns(rdl, cdl, false,testContext.getIncludedGroups(),testContext.getExcludedGroups());
+        return TestNGRunFactory.loadRuns(method, provider, rdl, cdl, false,testContext.getIncludedGroups(),testContext.getExcludedGroups());
     }
 
     protected void buildDataLoaders(Goate rdl, Goate cdl, Method method) {
         GoateProvider gp = method.getAnnotation(GoateProvider.class);
-        if (gp != null) {
+        this.provider = gp;
+        if (gp != null && (!runCacheEnabled || (runCacheEnabled && !providerCache.containsKey(providerCacheDefaultId(gp))))) {
             try {
                 AnnotationFactory af = new AnnotationFactory();
-                DLProvider provider = (DLProvider) af.find(gp.name()).annotatedWith(GoateDLP.class)
+                DLProvider dlProvider = (DLProvider) af.find(gp.name()).annotatedWith(GoateDLP.class)
                         .using(GoateDLP.class.getMethod("name"))
                         .build();
-                if (provider == null) {
+                if (dlProvider == null) {
                     try {
-                        provider = (DLProvider) Class.forName(gp.name()).newInstance();
+                        dlProvider = (DLProvider) Class.forName(gp.name()).getDeclaredConstructor().newInstance();
                     } catch (Exception e) {
                         LOG.warn("trying to find data loader method provider: " + gp.name());
                     }
                 }
-                if (provider != null) {
-                    provider.init();
-                    provider.getConstantDataLoaders().put("_goate:method", method);
-                    rdl.merge(provider.getRunDataLoaders(), true);
-                    cdl.merge(provider.getConstantDataLoaders(), true);
+                if (dlProvider != null) {
+                    dlProvider.init();
+//                    dlProvider.getConstantDataLoaders().put("_goate:method", method);
+                    rdl.merge(dlProvider.getRunDataLoaders(), true);
+                    cdl.merge(dlProvider.getConstantDataLoaders(), true);
                 } else {
-                    Goate[] providers = buildMethodProviders(gp.name(), method);
+                    Goate[] providers = buildMethodProviders(gp.name(), method, gp.container());
                     if (providers == null) {
                         throw new Exception("Failed to find the DLProvider: " + gp.name());
                     }else{
                         if(providers[1]==null){
                             providers[1] = new Goate();
                         }
-                        providers[1].put("_goate:method", method);
+//                        providers[1].put("_goate:method", method);
                         rdl.merge(providers[0], true);
                         cdl.merge(providers[1], true);
                     }
                 }
-//                for(String k:rdl.keys()){
-//                    Goate g = (Goate)rdl.get(k);
-//                    g.put("_goate:method", method);
-//                }
             } catch (Exception e) {
                 LOG.error("There was a problem building the providers: " + e.getMessage(), e);
             }
         }
     }
 
-    protected Goate[] buildMethodProviders(String name, Method method) {
+    protected Goate[] buildMethodProviders(String name, Method method, Class container) {
         Goate[] providers = null;
         GoateReflection gr = new GoateReflection();
         List<Method> methods = new ArrayList<>();
-        gr.getAllMethods(method.getDeclaringClass(), methods);//getClass(), methods);
-        for (Method m : methods) {//ToDo:make a way to call DL methods from other classes?
+        Class declaring_class = method.getDeclaringClass();
+        if(!container.equals(GoateNullClass.class)) {
+            declaring_class = container;
+        }
+        gr.getAllMethods(declaring_class, methods);
+
+        for (Method m : methods) {
             GoateDLP dlp = m.getAnnotation(GoateDLP.class);
             if (m.getName().equals(name) || (dlp != null && dlp.name().equals(name))) {
                 try {
-                    providers = (Goate[]) m.invoke(method.getDeclaringClass().newInstance());
+                    providers = (Goate[]) m.invoke(declaring_class.getDeclaredConstructor().newInstance());
                     break;
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     LOG.error("Problem defining data loaders for a method: " + name + "\n" + e.getMessage(), e);
                 } catch (InstantiationException e) {
                     LOG.error("Problem defining data loaders for a method, make sure the test class as a default/empty constructor: " + name + "\n" + e.getMessage(), e);
+                } catch (NoSuchMethodException e) {
+                    LOG.error("Defining Data Loaders", "Problem instantiating new instance: " + e.getMessage(), e);
                 }
             }
         }
@@ -155,18 +163,5 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         }catch(Exception e){
             LOG.info("Define Data Loaders", "Not using factory");
         }
-    }
-
-    @Override
-    public void startUp(Method method) {
-        super.startUp(method);
-    }
-
-    @BeforeMethod(alwaysRun = true)
-    public void initDataMethod(Object[] d, Method m) {
-        if (d != null&&d.length>0) {
-            init((Goate)d[0]);
-        }
-        startUp(m);
     }
 }

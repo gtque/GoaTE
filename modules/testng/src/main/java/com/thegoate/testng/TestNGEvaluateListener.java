@@ -26,13 +26,17 @@
  */
 package com.thegoate.testng;
 
+import com.thegoate.expect.ExpectationError;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
 import org.testng.*;
-import org.testng.annotations.Test;
 
 /**
  * Created by Eric Angeli on 11/28/2017.
  */
 public class TestNGEvaluateListener implements IInvokedMethodListener, ITestListener {
+
+    BleatBox LOG = BleatFactory.getLogger(getClass());
 
     @Override
     public void onTestStart(ITestResult arg0) {
@@ -68,24 +72,51 @@ public class TestNGEvaluateListener implements IInvokedMethodListener, ITestList
     }
 
     @Override
-    public void beforeInvocation(IInvokedMethod method, ITestResult iTestResult) {
+    public void beforeInvocation(IInvokedMethod method, ITestResult result) {
     }
 
     @Override
     public void afterInvocation(IInvokedMethod method, ITestResult result) {
-        if(method.isTestMethod()) {
-            if(result.getTestName()!=null) {
+        if (method.isTestMethod()) {
+            if (result.getTestName() != null) {
                 TestNG test = TestMap.tests.get(result.getTestName());
+                ExpectToFail expectToFail = method.getTestMethod().getConstructorOrMethod().getMethod().getAnnotation(ExpectToFail.class);
                 try {
                     if (test != null) {
-                        test.evaluate();
+                        test.evaluate(result);
+                        if (test.isExpectationsSet()) {
+                            if (test.isExpectationsNotEvaluated()) {
+                                LOG.warn("Evaluate", "Looks like some expectations were defined, but never evaluated.");
+                                throw new ExpectationError("Failed to evaluate defined expectations.");
+                            }
+                        }
+                        test.clearExpectations();
+                        if (expectToFail != null) {
+                            if (result.getStatus() == ITestResult.SUCCESS) {
+                                result.setStatus(ITestResult.FAILURE);
+                                result.setThrowable(new Throwable("The test was expected to fail, but it didn't for some reason."));
+                            } else if (result.getStatus() == ITestResult.FAILURE) {
+                                result.setStatus(ITestResult.SUCCESS);
+                                LOG.info("Test Failed", "Expect it to fail and it did: " + result.getThrowable().getMessage(), result.getThrowable());
+                                result.setThrowable(null);
+                            }
+                        }
                     }
                 } catch (Throwable t) {
-                    result.setStatus(ITestResult.FAILURE);
-                    result.setThrowable(t);
-                    t.printStackTrace();
+                    if (expectToFail == null) {
+                        result.setStatus(ITestResult.FAILURE);
+//                    if (eut("assert.printStackTrace", true, Boolean.class)) {
+                        result.setThrowable(t);
+//                    }
+                    } else {
+                        LOG.info("Test Failed", "Expect it to fail and it did: " + t.getMessage(), t);
+                        result.setThrowable(null);
+                    }
                 } finally {
                     TestMap.tests.remove(result.getTestName());//clearing map for garbage collection
+                    if (test != null) {
+                        test.finishUp(method.getTestMethod().getConstructorOrMethod().getMethod());
+                    }
                 }
             }
         }

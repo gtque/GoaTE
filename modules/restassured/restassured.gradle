@@ -27,10 +27,31 @@
 import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
-    compile "io.rest-assured:rest-assured:+"
-    compile "com.github.dzieciou.testing:curl-logger:+"
-    compile d.depends(":kernel", project.internalVersion);
-    compile d.depends(":rest", project.internalVersion);
-    testCompile d.depends(":testng", project.internalVersion);
-    testCompile d.depends(":json", project.internalVersion);
+    api  "io.rest-assured:rest-assured:5.2.0"
+    api  ("com.github.dzieciou.testing:curl-logger:2.1.2") {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+    }
+    api  d.depends(":kernel", project.internalVersion);
+    api  d.depends(":rest", project.internalVersion);
+    testImplementation d.depends(":testng", project.internalVersion);
+    testImplementation d.depends(":json", project.internalVersion);
+    testImplementation d.depends(":spring", project.internalVersion)
+    testImplementation "org.springframework:spring-aop:5.3.23"
+    testImplementation "org.springframework:spring-beans:5.3.23"
+    testImplementation "org.springframework:spring-context:5.3.23"
+    testImplementation "org.springframework:spring-core:5.3.23"
+    testImplementation "org.springframework:spring-expression:5.3.23"
+    testImplementation "org.springframework:spring-jms:5.3.23"
+    testImplementation "org.springframework:spring-jdbc:5.3.23"
+    testImplementation "org.springframework:spring-messaging:5.3.23"
+    testImplementation "org.springframework:spring-oxm:5.3.23"
+    testImplementation "org.springframework:spring-web:5.3.23"
+    testImplementation "org.springframework:spring-webmvc:5.3.23"
+    testImplementation "org.springframework.boot:spring-boot:2.7.5"
+    testImplementation "org.springframework.boot:spring-boot-starter:2.7.5"
+    testImplementation "org.springframework.boot:spring-boot-starter-tomcat:2.7.5"
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:2.13.4.2"
+    testImplementation "com.fasterxml.jackson.core:jackson-core:2.13.4"
+    testImplementation "com.fasterxml.jackson.core:jackson-annotations:2.13.4"
+//    testImplementation "com.oracle.jdbc:ojdbc8:12.2.0.1"
 }

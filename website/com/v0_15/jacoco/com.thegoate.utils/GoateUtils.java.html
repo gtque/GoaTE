@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GoateUtils.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.utils</a> &gt; <span class="el_source">GoateUtils.java</span></div><h1>GoateUtils.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+
+package com.thegoate.utils;
+
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.file.Copy;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.*;
+
+/**
+ * Some basic utility helpers.
+ * Created by gtque on 5/3/2017.
+ */
+<span class="nc" id="L47">public class GoateUtils {</span>
+<span class="fc" id="L48">    static final BleatBox LOG = BleatFactory.getLogger(GoateUtils.class);</span>
+
+    public static Object getProperty(String key){
+<span class="fc" id="L51">        return getProperty(key, null);</span>
+    }
+    public static Object getProperty(String key, Object def){
+<span class="fc" id="L54">        return new Goate().get(key,def);</span>
+    }
+
+    public static void sleep(long sleepInMillis){
+<span class="nc" id="L58">        sleep(sleepInMillis, LOG);</span>
+<span class="nc" id="L59">    }</span>
+
+    public static void sleep(long sleepInMillis, BleatBox logger){
+        try{
+<span class="fc" id="L63">            Thread.sleep(sleepInMillis);</span>
+<span class="nc" id="L64">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L65">            logger.warn(&quot;Goate Sleep Util&quot;,&quot;problem sleeping: &quot; + e.getMessage());</span>
+<span class="nc" id="L66">            Thread.currentThread().interrupt();</span>
+<span class="fc" id="L67">        }</span>
+<span class="fc" id="L68">    }</span>
+
+    public static String getFilePath(String file){
+<span class="fc" id="L71">        return getFilePath(file, false, false);</span>
+    }
+
+    public static boolean fileExists(String file){
+<span class="nc" id="L75">        return new File(getFilePath(file)).exists();</span>
+    }
+
+    public static String moveUpDir(String fileName){
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        while(fileName.contains(&quot;../&quot;)){</span>
+<span class="fc" id="L80">            String temp = fileName.substring(0,fileName.indexOf(&quot;../&quot;));</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">            if(temp.endsWith(&quot;/&quot;)){</span>
+<span class="fc" id="L82">                temp = temp.substring(0,temp.length()-1);</span>
+            }
+<span class="fc" id="L84">            int upFolderIndex = temp.lastIndexOf(&quot;/&quot;);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">            if(upFolderIndex&gt;0){</span>
+<span class="fc" id="L86">                temp = temp.substring(0,upFolderIndex);</span>
+            }
+<span class="fc" id="L88">            fileName = temp + fileName.substring(fileName.indexOf(&quot;../&quot;)+2);</span>
+
+<span class="fc" id="L90">        }</span>
+<span class="fc" id="L91">        return fileName;</span>
+    }
+    public static String getFilePath(String fileName,boolean leaveInJar, boolean force) {
+<span class="pc bpc" id="L94" title="2 of 4 branches missed.">        if (fileName.indexOf(&quot;/&quot;) != 0&amp;&amp;fileName.indexOf(&quot;\\&quot;)!=0)</span>
+<span class="fc" id="L95">            fileName = &quot;/&quot;+fileName;</span>
+
+<span class="fc" id="L97">        fileName = moveUpDir(fileName);</span>
+
+<span class="fc" id="L99">        String path = System.getProperty(&quot;user.dir&quot;) + fileName;</span>
+//        LOG.debug(&quot;checking path: &quot; + path);
+<span class="fc" id="L101">        LOG.debug(&quot;Goate File Util&quot;,&quot;checking path: &quot; + path);</span>
+        try {
+<span class="fc" id="L103">            File temp = new File(path);</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            if (!temp.exists()) {</span>
+<span class="fc" id="L105">                path = fileName;</span>
+<span class="fc" id="L106">                LOG.debug(&quot;Goate File Util&quot;,&quot;file did not exist, checking resources: &quot; + path);</span>
+<span class="fc" id="L107">                URL opath = GoateUtils.class.getResource(path);</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">                if(opath!=null) {</span>
+<span class="fc" id="L109">                    path = GoateUtils.class.getResource(path).toString();</span>
+                }else{
+<span class="fc" id="L111">                    LOG.debug(&quot;Goate File Util&quot;,&quot;did not find the resource&quot;);</span>
+                }
+//                LOG.debug(&quot;path: &quot; + path);
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">                if (path.contains(&quot;jar:&quot;)) {</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">                    if(!leaveInJar) {</span>
+<span class="nc" id="L116">                        File tf = new File(&quot;temp&quot;+fileName);</span>
+<span class="nc bnc" id="L117" title="All 4 branches missed.">                        if(force||!tf.exists()) {</span>
+<span class="nc" id="L118">                            String tempPath = new Copy().file(opath).to(&quot;temp&quot; + fileName, force);</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">                            if (tempPath == null) {</span>
+<span class="nc" id="L120">                                path = new File(&quot;temp&quot; + path.substring(path.lastIndexOf(&quot;/&quot;))).getAbsolutePath();</span>
+                            } else {
+<span class="nc" id="L122">                                path = new File(tempPath).getAbsolutePath();</span>
+                            }
+<span class="nc" id="L124">                        } else {</span>
+<span class="nc" id="L125">                            path = tf.getAbsolutePath();</span>
+                        }
+<span class="nc" id="L127">                    }else{</span>
+<span class="nc" id="L128">                        path = path.replace(&quot;jar:&quot;,&quot;&quot;);</span>
+                    }
+                }
+<span class="fc" id="L131">                path = path.replace(&quot;file:/&quot;, &quot;&quot;);</span>
+<span class="fc" id="L132">                path = path.replace(&quot;file:&quot;, &quot;&quot;);</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">                if(path.indexOf(&quot;:&quot;)!=1)</span>
+<span class="fc" id="L134">                    path = &quot;/&quot;+path;</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">                if (path.contains(&quot;:&quot;)) {</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">                    if (path.indexOf(&quot;/&quot;) == 0) {</span>
+<span class="fc" id="L137">                        path = path.substring(1);</span>
+                    }
+                }
+<span class="fc" id="L140">                LOG.debug(&quot;Goate File Util&quot;,&quot;modified path to look in: &quot;+path);</span>
+<span class="fc" id="L141">                temp = new File(path);</span>
+//                LOG.debug(&quot;full adjust path: &quot; + path);
+            }
+<span class="fc" id="L144">            path = temp.getAbsolutePath();</span>
+<span class="fc" id="L145">            LOG.debug(&quot;Goate File Util&quot;,&quot;file path: &quot; + path);</span>
+<span class="nc" id="L146">        } catch (Exception e) {</span>
+<span class="nc" id="L147">            LOG.debug(&quot;Goate File Util&quot;,&quot;Exception encountered finding file: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L148">        }</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if(path.contains(&quot;%&quot;)){</span>
+            try {
+<span class="fc" id="L151">                path = URLDecoder.decode(path, &quot;UTF-8&quot;);</span>
+<span class="nc" id="L152">            } catch(Exception e){</span>
+<span class="nc" id="L153">                LOG.info(&quot;Goate File Util&quot;, &quot;Failed to decode a possibly url encoded path to UTF-8&quot;);</span>
+<span class="fc" id="L154">            }</span>
+        }
+<span class="fc" id="L156">        return path;</span>
+    }
+
+    /**
+     * Borrowed from stack over flow. I have lost the original information, if
+     * you know it please let me know so I may give appropriate credit.
+     * @param key the key or name of the environment variable to set
+     * @param value The value to set it to.
+     * @param &lt;K&gt; generic type
+     * @param &lt;V&gt; generic type
+     */
+    public static &lt;K, V&gt; void setEnvironment(String key, String value){
+        try {
+            /// we obtain the actual environment
+<span class="fc" id="L170">            final Class&lt;?&gt; processEnvironmentClass = Class.forName(&quot;java.lang.ProcessEnvironment&quot;);</span>
+<span class="fc" id="L171">            final Field theEnvironmentField = processEnvironmentClass.getDeclaredField(&quot;theEnvironment&quot;);</span>
+<span class="fc" id="L172">            final boolean environmentAccessibility = theEnvironmentField.isAccessible();</span>
+<span class="fc" id="L173">            theEnvironmentField.setAccessible(true);</span>
+
+<span class="fc" id="L175">            final Map&lt;K, V&gt; env = (Map&lt;K, V&gt;) theEnvironmentField.get(null);</span>
+
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">            if (System.getProperty(&quot;os.name&quot;).contains(&quot;Windows&quot;)) {</span>
+                // This is all that is needed on windows running java jdk 1.8.0_92
+<span class="fc bfc" id="L179" title="All 2 branches covered.">                if (value == null) {</span>
+<span class="fc" id="L180">                    env.remove(key);</span>
+                } else {
+<span class="fc" id="L182">                    env.put((K) key, (V) value);</span>
+                }
+            } else {
+                // This is triggered to work on openjdk 1.8.0_91
+                // The ProcessEnvironment$Variable is the key of the map
+<span class="nc" id="L187">                final Class&lt;K&gt; variableClass = (Class&lt;K&gt;) Class.forName(&quot;java.lang.ProcessEnvironment$Variable&quot;);</span>
+<span class="nc" id="L188">                final Method convertToVariable = variableClass.getMethod(&quot;valueOf&quot;, String.class);</span>
+<span class="nc" id="L189">                final boolean conversionVariableAccessibility = convertToVariable.isAccessible();</span>
+<span class="nc" id="L190">                convertToVariable.setAccessible(true);</span>
+
+                // The ProcessEnvironment$Value is the value fo the map
+<span class="nc" id="L193">                final Class&lt;V&gt; valueClass = (Class&lt;V&gt;) Class.forName(&quot;java.lang.ProcessEnvironment$Value&quot;);</span>
+<span class="nc" id="L194">                final Method convertToValue = valueClass.getMethod(&quot;valueOf&quot;, String.class);</span>
+<span class="nc" id="L195">                final boolean conversionValueAccessibility = convertToValue.isAccessible();</span>
+<span class="nc" id="L196">                convertToValue.setAccessible(true);</span>
+
+<span class="nc bnc" id="L198" title="All 2 branches missed.">                if (value == null) {</span>
+<span class="nc" id="L199">                    env.remove(convertToVariable.invoke(null, key));</span>
+                } else {
+                    // we place the new value inside the map after conversion so as to
+                    // avoid class cast exceptions when rerunning this code
+<span class="nc" id="L203">                    env.put((K) convertToVariable.invoke(null, key), (V) convertToValue.invoke(null, value));</span>
+
+                    // reset accessibility to what they were
+<span class="nc" id="L206">                    convertToValue.setAccessible(conversionValueAccessibility);</span>
+<span class="nc" id="L207">                    convertToVariable.setAccessible(conversionVariableAccessibility);</span>
+                }
+            }
+            // reset environment accessibility
+<span class="fc" id="L211">            theEnvironmentField.setAccessible(environmentAccessibility);</span>
+
+            // we apply the same to the case insensitive environment
+<span class="fc" id="L214">            final Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField(&quot;theCaseInsensitiveEnvironment&quot;);</span>
+<span class="fc" id="L215">            final boolean insensitiveAccessibility = theCaseInsensitiveEnvironmentField.isAccessible();</span>
+<span class="fc" id="L216">            theCaseInsensitiveEnvironmentField.setAccessible(true);</span>
+            // Not entirely sure if this needs to be casted to ProcessEnvironment$Variable and $Value as well
+<span class="fc" id="L218">            final Map&lt;String, String&gt; cienv = (Map&lt;String, String&gt;) theCaseInsensitiveEnvironmentField.get(null);</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">            if (value == null) {</span>
+                // remove if null
+<span class="fc" id="L221">                cienv.remove(key);</span>
+            } else {
+<span class="fc" id="L223">                cienv.put(key, value);</span>
+            }
+<span class="fc" id="L225">            theCaseInsensitiveEnvironmentField.setAccessible(insensitiveAccessibility);</span>
+<span class="nc" id="L226">        } catch (final ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc" id="L227">            throw new IllegalStateException(&quot;Failed setting environment variable &lt;&quot; + key + &quot;&gt; to &lt;&quot; + value + &quot;&gt;&quot;, e);</span>
+<span class="nc" id="L228">        } catch (final NoSuchFieldException e) {</span>
+            // we could not find theEnvironment
+<span class="nc" id="L230">            final Map&lt;String, String&gt; env = System.getenv();</span>
+            //Stream.of(Collections.class.getDeclaredClasses())
+<span class="nc" id="L232">            List&lt;Class&gt; filteredClass = filterClasses();</span>
+            try {
+<span class="nc" id="L234">                List&lt;Field&gt; map = mapFields(filteredClass);</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">                for(Field field:map){</span>
+                    try {
+<span class="nc" id="L237">                        final boolean fieldAccessibility = field.isAccessible();</span>
+<span class="nc" id="L238">                        field.setAccessible(true);</span>
+                        // we obtain the environment
+<span class="nc" id="L240">                        final Map&lt;String, String&gt; map2 = (Map&lt;String, String&gt;) field.get(env);</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">                        if (value == null) {</span>
+                            // remove if null
+<span class="nc" id="L243">                            map.remove(key);</span>
+                        } else {
+<span class="nc" id="L245">                            map2.put(key, value);</span>
+                        }
+                        // reset accessibility
+<span class="nc" id="L248">                        field.setAccessible(fieldAccessibility);</span>
+<span class="nc" id="L249">                    } catch (final ConcurrentModificationException e1) {</span>
+                        // This may happen if we keep backups of the environment before calling this method
+                        // as the map that we kept as a backup may be picked up inside this block.
+                        // So we simply skip this attempt and continue adjusting the other maps
+                        // To avoid this one should always keep individual keys/value backups not the entire map
+<span class="nc" id="L254">                        LOG.info(&quot;Attempted to modify source map: &quot; + field.getDeclaringClass() + &quot;#&quot; + field.getName(), e1);</span>
+<span class="nc" id="L255">                    } catch (final IllegalAccessException e1) {</span>
+<span class="nc" id="L256">                        throw new IllegalStateException(&quot;Failed setting environment variable &lt;&quot; + key + &quot;&gt; to &lt;&quot; + value + &quot;&gt;. Unable to access field!&quot;, e1);</span>
+<span class="nc" id="L257">                    }</span>
+<span class="nc" id="L258">                }</span>
+<span class="nc" id="L259">            } catch (NoSuchFieldException e1) {</span>
+<span class="nc" id="L260">                e1.printStackTrace();</span>
+<span class="nc" id="L261">            }</span>
+<span class="fc" id="L262">        }</span>
+<span class="fc" id="L263">        LOG.info(&quot;Set environment variable &lt;&quot; + key + &quot;&gt; to &lt;&quot; + value + &quot;&gt;. Sanity Check: &quot; + System.getenv(key));</span>
+<span class="fc" id="L264">    }</span>
+
+    public static void removeEnvironment(String key){
+<span class="fc" id="L267">        setEnvironment(key, null);</span>
+<span class="fc" id="L268">    }</span>
+
+    protected static List&lt;Class&gt; filterClasses(){
+<span class="nc" id="L271">        List&lt;Class&gt; classes = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">        for(Class c : Collections.class.getDeclaredClasses()) {</span>
+            // obtain the declared classes of type $UnmodifiableMap
+<span class="nc bnc" id="L274" title="All 2 branches missed.">            if(&quot;java.util.Collections$UnmodifiableMap&quot;.equals(c.getName())){</span>
+<span class="nc" id="L275">                classes.add(c);</span>
+            }
+        }
+<span class="nc" id="L278">        return classes;</span>
+    }
+
+    protected static List&lt;Field&gt; mapFields(List&lt;Class&gt; classes) throws NoSuchFieldException {
+<span class="nc" id="L282">        List&lt;Field&gt; map = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">        for(Class c:classes){</span>
+<span class="nc" id="L284">            map.add(c.getDeclaredField(&quot;m&quot;));</span>
+<span class="nc" id="L285">        }</span>
+<span class="nc" id="L286">        return map;</span>
+    }
+
+    public static String tab(int count){
+<span class="fc" id="L290">        StringBuilder tabs = new StringBuilder(&quot;&quot;);</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">        for(;count&gt;0;count--){</span>
+<span class="fc" id="L292">           tabs.append(&quot;\t&quot;);</span>
+        }
+<span class="fc" id="L294">        return tabs.toString();</span>
+    }
+
+    public static boolean truth(Object value){
+<span class="nc bnc" id="L298" title="All 2 branches missed.">        return value==null?false:Boolean.parseBoolean(&quot;&quot;+value);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

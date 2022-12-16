@@ -76,7 +76,9 @@ public class GoateDepends {
         if (!override && (!prj.hasProperty("oneOff") || prj.oneOff.isEmpty())) {
             d = prj.rootProject.findProject((!dependency.startsWith(":")?":":"")+dependency);
         } else {
-            dependency += javaVersion;
+            if(prj.hasProperty("projectJavaLabel") && Boolean.parseBoolean("" + prj.projectJavaLabel)) {
+                dependency += javaVersion;
+            }
             d = group + (!dependency.startsWith(":")?":":"") + dependency + ":" + (baseVer != null && !baseVer.isEmpty() ? baseVer : "") + "+";
         }
         return d;

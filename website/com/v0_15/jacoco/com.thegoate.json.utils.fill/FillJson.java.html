@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>FillJson.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.json.utils.fill</a> &gt; <span class="el_source">FillJson.java</span></div><h1>FillJson.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.json.utils.fill;
+
+import com.thegoate.Goate;
+import com.thegoate.json.JsonUtil;
+import com.thegoate.utils.fill.FillUtil;
+import com.thegoate.utils.fill.FillUtility;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.stream.Collectors;
+
+import static com.thegoate.utils.GoateUtils.tab;
+
+/**
+ * Fills the given json with corresponding date in from the given Goate collection.
+ * Created by Eric Angeli on 3/5/2018.
+ */
+@FillUtil
+public class FillJson extends JsonUtil implements FillUtility {
+    private StringBuilder description;
+<span class="fc" id="L51">    private int tabCount = 0;</span>
+
+    public FillJson(Object val) {
+<span class="fc" id="L54">        super(val);</span>
+<span class="fc" id="L55">    }</span>
+
+    @Override
+    protected void init(Object val){
+<span class="fc" id="L59">        processNested = false;</span>
+<span class="fc" id="L60">        super.init(val);</span>
+<span class="fc" id="L61">    }</span>
+
+    @Override
+    protected Object processNested(Object subContainer) {
+<span class="nc" id="L65">        return null;</span>
+    }
+
+    @Override
+    public String with(Goate data) {
+<span class="fc" id="L70">        String result = &quot;&quot;;</span>
+<span class="fc" id="L71">        description = new StringBuilder(&quot;&quot;);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (takeActionOn != null) {</span>
+            try {
+<span class="fc" id="L74">                result = processJSON(&quot;&quot; + takeActionOn, data);</span>
+<span class="nc" id="L75">            } catch (Exception e) {</span>
+<span class="nc" id="L76">                result = &quot;&quot; + takeActionOn;</span>
+<span class="fc" id="L77">            }</span>
+        }
+<span class="fc" id="L79">        return result;</span>
+    }
+
+    public String getDescription() {
+<span class="fc" id="L83">        tabCount = 0;</span>
+<span class="fc" id="L84">        description = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L85">        processJSON(&quot;&quot; + takeActionOn, new Goate());</span>
+<span class="fc" id="L86">        return description.toString();</span>
+    }
+
+    private String processJSON(String json, Goate data) {
+        Object jsonObject;
+<span class="fc" id="L91">        boolean isJsonObject = true;</span>
+        try {
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            if (json.startsWith(&quot;[&quot;)) {</span>
+<span class="fc" id="L94">                jsonObject = new JSONArray(json);</span>
+<span class="fc" id="L95">                isJsonObject = false;</span>
+            } else {
+<span class="fc" id="L97">                jsonObject = new JSONObject(json);</span>
+            }
+<span class="nc" id="L99">        } catch (JSONException je) {</span>
+<span class="nc" id="L100">            throw new RuntimeException(&quot;FillJson: converting to a json object: &quot; + je.getMessage());</span>
+<span class="fc" id="L101">        }</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        jsonObject = isJsonObject ? processJSONObject((JSONObject) jsonObject, &quot;&quot;, data) : processJSONArray((JSONArray) jsonObject, &quot;&quot;, data);</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        json = isJsonObject?((JSONObject)jsonObject).toString(4):((JSONArray)jsonObject).toString(4);</span>
+<span class="fc" id="L104">        return json;</span>
+    }
+
+    private JSONObject processJSONObject(JSONObject jsonData, String prekey, Goate data) {
+        try {
+<span class="fc" id="L109">            Iterator&lt;?&gt; keys = jsonData.keys();</span>
+<span class="fc" id="L110">            ArrayList&lt;String&gt; remove = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">            while (keys.hasNext()) {</span>
+<span class="fc" id="L112">                String key = (String) keys.next();</span>
+<span class="fc" id="L113">                Object jsonValue = jsonData.get(key);</span>
+<span class="fc" id="L114">                Object value = getValue(prekey + key, data);</span>
+
+<span class="fc" id="L116">                description.append(tab(tabCount)).append(prekey).append(key).append(&quot;\n&quot;);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">                if (value != null) {</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">                    if (value.equals(&quot;drop field::&quot;))</span>
+<span class="fc" id="L119">                        remove.add(key);</span>
+<span class="pc bpc" id="L120" title="1 of 4 branches missed.">                    else if (value.equals(&quot;empty field::&quot;)||value.equals(&quot;empty::&quot;))</span>
+<span class="fc" id="L121">                        jsonData.put(key, &quot;&quot;);</span>
+<span class="pc bpc" id="L122" title="1 of 4 branches missed.">                    else if (value.equals(&quot;null field::&quot;)||value.equals(&quot;null::&quot;))</span>
+<span class="fc" id="L123">                        jsonData.put(key, JSONObject.NULL);</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">                    else if (!value.equals(&quot;&quot;))</span>
+<span class="fc" id="L125">                        jsonData.put(key, value);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">                } else if (jsonValue instanceof JSONObject) {</span>
+<span class="fc" id="L127">                    jsonData.put(key, processJSONObject((JSONObject) jsonValue, prekey + key + &quot;.&quot;, data));</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">                } else if (jsonValue instanceof JSONArray) {</span>
+<span class="fc" id="L129">                    jsonData.put(key, processJSONArray((JSONArray) jsonValue, prekey + key + &quot;.&quot;, data));</span>
+                }
+<span class="fc" id="L131">            }</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">            for (String aRemove : remove) {</span>
+<span class="fc" id="L133">                jsonData.remove(aRemove);</span>
+<span class="fc" id="L134">            }</span>
+<span class="nc" id="L135">        } catch (Exception e) {</span>
+<span class="nc" id="L136">            throw new RuntimeException(&quot;FillJson: processing the json object: &quot; + e + &quot;\n&quot; + Arrays.toString(e.getStackTrace()));</span>
+<span class="fc" id="L137">        }</span>
+<span class="fc" id="L138">        return jsonData;</span>
+    }
+
+    private Object getValue(String keyPattern, Goate data){
+<span class="fc" id="L142">        Object value = data.get(keyPattern);</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        if(value==null){</span>
+<span class="fc" id="L144">            String kp = data.keys().parallelStream().filter(k -&gt; {</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">                if(keyPattern.matches(k)){</span>
+<span class="fc" id="L146">                    return true;</span>
+                }
+<span class="fc" id="L148">                return false;</span>
+<span class="fc" id="L149">            }).collect(Collectors.joining(&quot;,&quot;));</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">            if(!kp.isEmpty()) {</span>
+<span class="fc" id="L151">                value = data.get(kp);</span>
+            }
+        }
+<span class="fc" id="L154">        return value;</span>
+    }
+    private JSONArray processJSONArray(JSONArray jsonArray, String prekey, Goate data) {
+<span class="fc" id="L157">        tabCount++;</span>
+        try {
+<span class="fc" id="L159">            ArrayList&lt;String&gt; drop = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">            for (int index = 0; index &lt; jsonArray.length(); index++) {</span>
+<span class="fc" id="L161">                Object jsonValue = jsonArray.get(index);</span>
+<span class="fc" id="L162">                Object value = getValue(prekey + index, data);</span>
+
+<span class="fc" id="L164">                description.append(tab(tabCount)).append(prekey).append(index).append(&quot;\n&quot;);</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">                if (value != null) {</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">                    if (value.equals(&quot;drop field::&quot;))</span>
+<span class="fc" id="L167">                        drop.add(&quot;&quot; + index);//jsonData.remove(key);</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">                    else if (value.equals(&quot;empty field::&quot;))</span>
+<span class="nc" id="L169">                        jsonArray.put(index, &quot;&quot;);</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">                    else if (value.equals(&quot;null field::&quot;))</span>
+<span class="nc" id="L171">                        jsonArray.put(index, JSONObject.NULL);</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">                    else if (!value.equals(&quot;&quot;))</span>
+<span class="fc" id="L173">                        jsonArray.put(index, value);</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">                } else if (jsonValue instanceof JSONObject) {</span>
+<span class="fc" id="L175">                    jsonArray.put(index, processJSONObject((JSONObject) jsonValue, prekey + index + &quot;.&quot;, data));</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">                } else if (jsonValue instanceof JSONArray) {</span>
+<span class="fc" id="L177">                    jsonArray.put(index, processJSONArray((JSONArray) jsonValue, prekey + index + &quot;.&quot;, data));</span>
+                }
+            }
+<span class="fc bfc" id="L180" title="All 2 branches covered.">            for (int i = drop.size() - 1; i &gt;= 0; i--)</span>
+            {
+<span class="fc" id="L182">                jsonArray.remove(Integer.parseInt(drop.get(i)));</span>
+            }
+<span class="nc" id="L184">        } catch (Exception e) {</span>
+<span class="nc" id="L185">            throw new RuntimeException(&quot;FillJson: processing json array: &quot; + e.getMessage());</span>
+<span class="fc" id="L186">        }</span>
+<span class="fc" id="L187">        tabCount--;</span>
+<span class="fc" id="L188">        return jsonArray;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

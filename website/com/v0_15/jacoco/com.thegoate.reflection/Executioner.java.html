@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Executioner.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.reflection</a> &gt; <span class="el_source">Executioner.java</span></div><h1>Executioner.java</h1><pre class="source lang-java linenums">package com.thegoate.reflection;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.test.SkipThread;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+public class Executioner&lt;T&gt; {
+<span class="fc" id="L15">    BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+
+<span class="fc" id="L17">    int threadPoolSize = 1;</span>
+
+<span class="fc" id="L19">    public Executioner(){</span>
+
+<span class="fc" id="L21">    }</span>
+
+<span class="fc" id="L23">    public Executioner(int threadPoolSize){</span>
+<span class="fc" id="L24">        this.threadPoolSize = threadPoolSize;</span>
+<span class="fc" id="L25">    }</span>
+
+    public boolean process(List&lt;T&gt; threads) {
+<span class="fc" id="L28">        ExecutorService es = Executors.newFixedThreadPool(threadPoolSize);</span>
+<span class="fc" id="L29">        boolean running = true;</span>
+<span class="fc" id="L30">        int expected = threads.size();</span>
+<span class="fc" id="L31">        List&lt;Future&lt;?&gt;&gt; futures = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        for (T thread:threads) {</span>
+<span class="pc bpc" id="L33" title="1 of 4 branches missed.">            if(thread instanceof Thread &amp;&amp; !(thread instanceof SkipThread)) {</span>
+<span class="fc" id="L34">                futures.add(es.submit((Thread)thread));</span>
+            }
+<span class="fc" id="L36">        }</span>
+<span class="fc" id="L37">        int completed = 0;</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        while(running){</span>
+<span class="fc" id="L39">            running = false;</span>
+<span class="fc" id="L40">            completed = 0;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">            for(Future&lt;?&gt; f:futures){</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">                if(!f.isDone()){</span>
+<span class="fc" id="L43">                    running = true;</span>
+                } else {
+<span class="fc" id="L45">                    completed++;</span>
+                }
+<span class="fc" id="L47">            }</span>
+        }
+        try {
+<span class="fc" id="L50">            LOG.debug(&quot;shutting down executor&quot;);</span>
+<span class="fc" id="L51">            es.shutdown();</span>
+<span class="fc" id="L52">            es.awaitTermination(5, TimeUnit.SECONDS);</span>
+        }
+<span class="nc" id="L54">        catch (InterruptedException e) {</span>
+<span class="nc" id="L55">            LOG.error(&quot;interrupted: &quot; + e.getMessage(), e);</span>
+        }
+        finally {
+<span class="pc bpc" id="L58" title="5 of 6 branches missed.">            if (!es.isTerminated()) {</span>
+<span class="nc" id="L59">                LOG.error(&quot;force cancel non-finished tasks&quot;);</span>
+            }
+<span class="pc" id="L61">            es.shutdownNow();</span>
+<span class="pc" id="L62">            LOG.debug(&quot;shutdown finished&quot;);</span>
+<span class="pc" id="L63">        }</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        return expected==completed;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

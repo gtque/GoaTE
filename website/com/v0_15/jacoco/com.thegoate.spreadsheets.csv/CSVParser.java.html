@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CSVParser.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.spreadsheets.csv</a> &gt; <span class="el_source">CSVParser.java</span></div><h1>CSVParser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.spreadsheets.csv;
+
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Created by Eric Angeli on 8/10/2018.
+ */
+public class CSVParser {
+<span class="nc" id="L48">    BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+    org.apache.commons.csv.CSVParser csvParser;
+<span class="nc" id="L50">    List&lt;CSVRecord&gt; records = null;</span>
+<span class="nc" id="L51">    Map&lt;String, Integer&gt; map = null;</span>
+    /**
+     * Creates a parser for the given {@link File}.
+     *
+     * @param file    a CSV file. Must not be null.
+     * @param charset A Charset
+     * @param format  the CSVFormat used for CSV parsing. Must not be null.
+     * @return a new parser
+     * @throws IllegalArgumentException If the parameters of the format are inconsistent or if either file or format are null.
+     * @throws IOException              If an I/O error occurs
+     */
+    @SuppressWarnings(&quot;resource&quot;)
+    public static CSVParser parse(final File file, final Charset charset, final CSVFormat format) throws IOException {
+<span class="nc" id="L64">        return new CSVParser(org.apache.commons.csv.CSVParser.parse(file, charset, format));</span>
+    }
+
+    /**
+     * Creates a CSV parser using the given {@link CSVFormat}.
+     * &lt;p&gt;
+     * If you do not read all records from the given {@code reader}, you should call {@link #close()} on the parser,
+     * unless you close the {@code reader}.
+     * &lt;/p&gt;
+     *
+     * @param inputStream an InputStream containing CSV-formatted input. Must not be null.
+     * @param charset     a Charset.
+     * @param format      the CSVFormat used for CSV parsing. Must not be null.
+     * @return a new CSVParser configured with the given reader and format.
+     * @throws IllegalArgumentException If the parameters of the format are inconsistent or if either reader or format are null.
+     * @throws IOException              If there is a problem reading the header or skipping the first record
+     * @since 1.5
+     */
+    @SuppressWarnings(&quot;resource&quot;)
+    public static CSVParser parse(final InputStream inputStream, final Charset charset, final CSVFormat format)
+            throws IOException {
+<span class="nc" id="L85">        return new CSVParser(org.apache.commons.csv.CSVParser.parse(new InputStreamReader(inputStream, charset), format));</span>
+    }
+
+    /**
+     * Creates a parser for the given {@link Path}.
+     *
+     * @param path    a CSV file. Must not be null.
+     * @param charset A Charset
+     * @param format  the CSVFormat used for CSV parsing. Must not be null.
+     * @return a new parser
+     * @throws IllegalArgumentException If the parameters of the format are inconsistent or if either file or format are null.
+     * @throws IOException              If an I/O error occurs
+     * @since 1.5
+     */
+    public static CSVParser parse(final Path path, final Charset charset, final CSVFormat format) throws IOException {
+<span class="nc" id="L100">        return new CSVParser(org.apache.commons.csv.CSVParser.parse(Files.newBufferedReader(path, charset), format));</span>
+    }
+
+    /**
+     * Creates a CSV parser using the given {@link CSVFormat}
+     * &lt;p&gt;
+     * If you do not read all records from the given {@code reader}, you should call {@link #close()} on the parser,
+     * unless you close the {@code reader}.
+     * &lt;/p&gt;
+     *
+     * @param reader a Reader containing CSV-formatted input. Must not be null.
+     * @param format the CSVFormat used for CSV parsing. Must not be null.
+     * @return a new CSVParser configured with the given reader and format.
+     * @throws IllegalArgumentException If the parameters of the format are inconsistent or if either reader or format are null.
+     * @throws IOException              If there is a problem reading the header or skipping the first record
+     * @since 1.5
+     */
+    public static CSVParser parse(Reader reader, final CSVFormat format) throws IOException {
+<span class="nc" id="L118">        return new CSVParser(new org.apache.commons.csv.CSVParser(reader, format));</span>
+    }
+
+    /**
+     * Creates a parser for the given {@link String}.
+     *
+     * @param string a CSV string. Must not be null.
+     * @param format the CSVFormat used for CSV parsing. Must not be null.
+     * @return a new parser
+     * @throws IllegalArgumentException If the parameters of the format are inconsistent or if either string or format are null.
+     * @throws IOException              If an I/O error occurs
+     */
+    public static CSVParser parse(final String string, final CSVFormat format) throws IOException {
+<span class="nc" id="L131">        return new CSVParser(new org.apache.commons.csv.CSVParser(new StringReader(string), format));</span>
+    }
+
+    /**
+     * Creates a parser for the given URL.
+     * &lt;p&gt;
+     * If you do not read all records from the given {@code url}, you should call {@link #close()} on the parser, unless
+     * you close the {@code url}.
+     * &lt;/p&gt;
+     *
+     * @param url     a URL. Must not be null.
+     * @param charset the charset for the resource. Must not be null.
+     * @param format  the CSVFormat used for CSV parsing. Must not be null.
+     * @return a new parser
+     * @throws IllegalArgumentException If the parameters of the format are inconsistent or if either url, charset or format are null.
+     * @throws IOException              If an I/O error occurs
+     */
+    public static CSVParser parse(final URL url, final Charset charset, final CSVFormat format) throws IOException {
+<span class="nc" id="L149">        return new CSVParser(new org.apache.commons.csv.CSVParser(new InputStreamReader(url.openStream(), charset), format));</span>
+    }
+
+<span class="nc" id="L152">    public CSVParser(org.apache.commons.csv.CSVParser csvParser) {</span>
+<span class="nc" id="L153">        this.csvParser = csvParser;</span>
+<span class="nc" id="L154">    }</span>
+
+    /**
+     * Customized CSV parser using the given {@link CSVFormat}
+     * &lt;p&gt;
+     * If you do not read all records from the given {@code reader}, you should call {@link #close()} on the parser,
+     * unless you close the {@code reader}.
+     * &lt;/p&gt;
+     *
+     * @param reader a Reader containing CSV-formatted input. Must not be null.
+     * @param format the CSVFormat used for CSV parsing. Must not be null.
+     * @throws IllegalArgumentException If the parameters of the format are inconsistent or if either reader or format are null.
+     * @throws IOException              If there is a problem reading the header or skipping the first record
+     */
+    public CSVParser(final Reader reader, final CSVFormat format) throws IOException {
+<span class="nc" id="L169">        this(reader, format, 0, 1);</span>
+<span class="nc" id="L170">    }</span>
+
+    /**
+     * Customized CSV parser using the given {@link CSVFormat}
+     * &lt;p&gt;
+     * If you do not read all records from the given {@code reader}, you should call {@link #close()} on the parser,
+     * unless you close the {@code reader}.
+     * &lt;/p&gt;
+     *
+     * @param reader          a Reader containing CSV-formatted input. Must not be null.
+     * @param format          the CSVFormat used for CSV parsing. Must not be null.
+     * @param characterOffset Lexer offset when the parser does not start parsing at the beginning of the source.
+     * @param recordNumber    The next record number to assign
+     * @throws IllegalArgumentException If the parameters of the format are inconsistent or if either reader or format are null.
+     * @throws IOException              If there is a problem reading the header or skipping the first record
+     * @since 1.1
+     */
+    @SuppressWarnings(&quot;resource&quot;)
+    public CSVParser(final Reader reader, final CSVFormat format, final long characterOffset, final long recordNumber)
+<span class="nc" id="L189">            throws IOException {</span>
+<span class="nc" id="L190">        csvParser = new org.apache.commons.csv.CSVParser(reader, format, characterOffset, recordNumber);</span>
+<span class="nc" id="L191">    }</span>
+
+    /**
+     * Closes resources.
+     *
+     * @throws IOException If an I/O error occurs
+     */
+    public void close() throws IOException {
+<span class="nc" id="L199">        csvParser.close();</span>
+<span class="nc" id="L200">    }</span>
+
+    /**
+     * Returns the current line number in the input stream.
+     * &lt;p&gt;
+     * &lt;strong&gt;ATTENTION:&lt;/strong&gt; If your CSV input has multi-line values, the returned number does not correspond to
+     * the record number.
+     * &lt;/p&gt;
+     *
+     * @return current line number
+     */
+    public long getCurrentLineNumber() {
+<span class="nc" id="L212">        return csvParser.getCurrentLineNumber();</span>
+    }
+
+    /**
+     * Gets the first end-of-line string encountered.
+     *
+     * @return the first end-of-line string
+     * @since 1.5
+     */
+    public String getFirstEndOfLine() {
+<span class="nc" id="L222">        return csvParser.getFirstEndOfLine();</span>
+    }
+
+    /**
+     * Returns a copy of the header map that iterates in column order.
+     * &lt;p&gt;
+     * The map keys are column names. The map values are 0-based indices.
+     * &lt;/p&gt;
+     *
+     * @return a copy of the header map that iterates in column order.
+     */
+    public Map&lt;String, Integer&gt; getHeaderMap() {
+<span class="nc bnc" id="L234" title="All 2 branches missed.">        if (map == null) {</span>
+<span class="nc" id="L235">            map = csvParser.getHeaderMap();</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">            if (map == null) {</span>
+                try {
+<span class="nc" id="L238">                    CSVRecord record = getRecords().get(0);</span>
+<span class="nc" id="L239">                    map = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">                    for (int i = 0; i &lt; record.size(); i++) {</span>
+<span class="nc" id="L241">                        map.put(record.get(i), i);</span>
+                    }
+<span class="nc" id="L243">                } catch (IOException e) {</span>
+<span class="nc" id="L244">                    LOG.debug(&quot;CSV Parse&quot;, &quot;Problem getting header map: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L245">                }</span>
+            }
+        }
+<span class="nc" id="L248">        return map;</span>
+    }
+
+    /**
+     * Returns the current record number in the input stream.
+     * &lt;p&gt;
+     * &lt;strong&gt;ATTENTION:&lt;/strong&gt; If your CSV input has multi-line values, the returned number does not correspond to
+     * the line number.
+     * &lt;/p&gt;
+     *
+     * @return current record number
+     */
+    public long getRecordNumber() {
+<span class="nc" id="L261">        return csvParser.getRecordNumber();</span>
+    }
+
+    /**
+     * Parses the CSV input according to the given format and returns the content as a list of
+     * {@link CSVRecord CSVRecords}.
+     * &lt;p&gt;
+     * The returned content starts at the current parse-position in the stream.
+     * &lt;/p&gt;
+     *
+     * @return list of {@link CSVRecord CSVRecords}, may be empty
+     * @throws IOException on parse error or input read-failure
+     */
+    public List&lt;CSVRecord&gt; getRecords() throws IOException {
+<span class="nc bnc" id="L275" title="All 2 branches missed.">        if (records == null) {</span>
+<span class="nc" id="L276">            records = csvParser.getRecords();</span>
+        }
+<span class="nc" id="L278">        return records;</span>
+    }
+
+    /**
+     * Gets whether this parser is closed.
+     *
+     * @return whether this parser is closed.
+     */
+    public boolean isClosed() {
+<span class="nc" id="L287">        return csvParser.isClosed();</span>
+    }
+
+    /**
+     * Returns an iterator on the records.
+     * &lt;p&gt;
+     * An {@link IOException} caught during the iteration are re-thrown as an
+     * {@link IllegalStateException}.
+     * &lt;/p&gt;
+     */
+    public Iterator&lt;CSVRecord&gt; iterator() {
+<span class="nc" id="L298">        return csvParser.iterator();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

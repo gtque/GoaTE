@@ -27,7 +27,6 @@
 package com.thegoate.barn.staff;
 
 import com.thegoate.annotations.GoateDescription;
-import com.thegoate.rest.staff.ApiEmployee;
 import com.thegoate.staff.Employee;
 import com.thegoate.staff.GoateJob;
 import org.json.JSONArray;

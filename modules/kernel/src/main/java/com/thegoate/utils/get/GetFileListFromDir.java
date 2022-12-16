@@ -28,11 +28,10 @@
 package com.thegoate.utils.get;
 
 import com.thegoate.utils.GoateUtils;
+import com.thegoate.utils.type.IsType;
+import com.thegoate.utils.type.TypeUtility;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +39,9 @@ import java.util.List;
  * recursively gets all files in a given directory.
  * Created by Eric Angeli on 5/5/2017.
  */
-@GetUtil
-public class GetFileListFromDir extends GetTool{
+@IsType
+@GetUtil(type = GetFileListFromDir.class)
+public class GetFileListFromDir extends GetTool implements TypeUtility {
 
     List<File> files = new ArrayList<>();
 
@@ -102,5 +102,10 @@ public class GetFileListFromDir extends GetTool{
         }
         Object result = processNested(files);
         return result;
+    }
+
+    @Override
+    public Class type(Object check) {
+        return getClass();
     }
 }

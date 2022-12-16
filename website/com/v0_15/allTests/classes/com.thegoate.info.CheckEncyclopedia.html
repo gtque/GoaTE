@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class com.thegoate.info.CheckEncyclopedia</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class com.thegoate.info.CheckEncyclopedia</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.thegoate.info.html">com.thegoate.info</a> &gt; CheckEncyclopedia</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.086s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">simpleCheckEncyclopedia</td>
+<td class="success">0.086s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>GoateDescription: 
+	description: Add a description of what ever is being annotated.
+	related topics: {}
+	method of look up: 
+	com.thegoate.annotations.GoateDescription
+IsDefault: 
+	description: Marks the class the default choice, used by unknown utilities if a more specific match cannot be found.
+	related topics: {}
+	method of look up: 
+	com.thegoate.annotations.IsDefault
+GoateDLP: 
+	description: Identifies a data loader provider.
+	related topics: {}
+	method of look up: name
+	com.thegoate.data.GoateDLP
+GoateDataModeler: 
+	description: Identifies a GoaTE data modeler.
+	related topics: {}
+	method of look up: name
+	com.thegoate.data.GoateDataModeler
+GoateProvider: 
+	description: Identifies a provider definition.
+	related topics: {}
+	method of look up: name
+	com.thegoate.data.GoateProvider
+GoateDSL: 
+	description: Used to define a new word in the GoaTE DSL.
+	related topics: {}
+	method of look up: word
+	com.thegoate.dsl.GoateDSL
+Validator: 
+	description: Used to identify a new validator.
+	related topics: {}
+	method of look up: 
+	com.thegoate.expect.validate.Validator
+Info: 
+	description: Annotate GoaTE annotation with @Info to automatically pick it up in the encyclopedia.
+	related topics: {}
+	method of look up: classifier
+	com.thegoate.info.Info
+ToJsonUtil: 
+	description: Identifies a ToJson utility
+	related topics: {}
+	method of look up: 
+	com.thegoate.json.utils.tojson.ToJsonUtil
+Bleat: 
+	description: Add this annotation to your BleatBox implementation. There should only be one bleatbox implementation in your class path. Otherwise there is no guarantee which one will be used.
+	related topics: {}
+	method of look up: 
+	com.thegoate.logging.Bleat
+GoateAmplifier: 
+	description: Add this annotation to your amplifier implementation
+	related topics: {}
+	method of look up: 
+	com.thegoate.logging.volume.amp.GoateAmplifier
+GoateSheet: 
+	description: Used to indicate supported file type.
+	related topics: {}
+	method of look up: 
+	com.thegoate.spreadsheets.utils.GoateSheet
+GoateJob: 
+	description: Identifies a job.
+	related topics: {}
+	method of look up: jobs
+	com.thegoate.staff.GoateJob
+GoateTask: 
+	description: Identifies a method as a task that can be executed by the goate framework.
+	related topics: {}
+	method of look up: task
+	com.thegoate.staff.GoateTask
+GoateTaskContainer: 
+	description: Identifies classes that contain GoaTE tasks.
+	related topics: {}
+	method of look up: 
+	com.thegoate.staff.GoateTaskContainer
+ResetStatics: 
+	description: Used to indicate if there are any static variables that have to be reset, especially between test execution.
+	related topics: {}
+	method of look up: 
+	com.thegoate.statics.ResetStatics
+UtilCache: 
+	description: Identifies get utilities.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.UtilCache
+CompareUtil: 
+	description: Identifies a compare implementation.
+	related topics: {}
+	method of look up: operator
+	com.thegoate.utils.compare.CompareUtil
+FillUtil: 
+	description: Identifies fill utilities.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.FillUtil
+CastUtil: 
+	description: Used to identify cast utility implementations.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.serialize.CastUtil
+GoateIgnore: 
+	description: Identifies a pojo class as being consumable by GoaTE.
+	related topics: {}
+	method of look up: id
+	com.thegoate.utils.fill.serialize.GoateIgnore
+GoatePojo: 
+	description: Identifies a pojo class as being consumable by GoaTE.
+	related topics: {}
+	method of look up: id
+	com.thegoate.utils.fill.serialize.GoatePojo
+GoateSource: 
+	description: Used to define a mapping from a source to the field in the pojo.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.serialize.GoateSource
+GoateSourceDef: 
+	description: Identifies a pojo source definition.
+	related topics: {}
+	method of look up: id
+	com.thegoate.utils.fill.serialize.GoateSourceDef
+GoateSources: 
+	description: Allows for staking of GoateSource annotations to specify more than one source mapping for a field in a pojo.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.serialize.GoateSources
+ListType: 
+	description: Used for identifying a more explicit list implementation in a pojo.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.serialize.collections.ListType
+ListTypes: 
+	description: Used to set the type of object in the list in a pojo.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.serialize.collections.ListTypes
+MapKeyType: 
+	description: Defines the object type for the key of a map in a pojo.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.serialize.collections.MapKeyType
+MapType: 
+	description: Defines the object type for the value of a map in a pojo.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.serialize.collections.MapType
+StringConverterUtil: 
+	description: Used to identify string converter implementations.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.fill.serialize.string.StringConverterUtil
+GetUtil: 
+	description: Identifies get utilities.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.get.GetUtil
+InsertUtil: 
+	description: Identifies insert utilities.
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.insert.InsertUtil
+ToGoateUtil: 
+	description: Identifies a ToGoate utility
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.togoate.ToGoateUtil
+ToListUtil: 
+	description: Identifies a ToList utility
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.tolist.ToListUtil
+IsNullRepresentation: 
+	description: Identifies a null Representation
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.type.IsNullRepresentation
+IsType: 
+	description: Identifies a Type utility
+	related topics: {}
+	method of look up: 
+	com.thegoate.utils.type.IsType
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.0.1</a> at Feb 18, 2021 9:47:41 PM</p>
+</div>
+</div>
+</body>
+</html>

@@ -30,8 +30,6 @@ import com.thegoate.Goate;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.get.GetFileAsString;
 import com.thegoate.xml.utils.get.GetHtmlField;
-import com.thegoate.xml.utils.get.GetXmlField;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.testng.annotations.Test;
 

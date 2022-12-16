@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<header>
+	<div id="header">
+		<div id="title">
+			<div id="logo">
+				<div id="logo_image">
+					<img src="_flow_path_/style/images/thp_goate_logo_150by150.png"/>
+				</div>
+				<div id="logo_name">
+					<nothtml type="_p"> GoaTE</nothtml><br></br>
+					<nothtml type="_p"> Tech</nothtml>
+				</div>
+			</div>
+			<div id="stayintouch">
+				<!--<div id="facebook">
+					<a href="http://www.facebook.com">
+						<img src="images/socialnetworking_facebook_icon_116x24.gif"/>
+					</a>
+				</div>-->
+			</div>
+		</div>
+		<file>forms/common/navbar.xml</file>
+	</div>
+</header>

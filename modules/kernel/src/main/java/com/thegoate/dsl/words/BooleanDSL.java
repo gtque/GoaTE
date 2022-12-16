@@ -28,6 +28,7 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.dsl.PrimitiveDSL;
 
@@ -36,7 +37,8 @@ import com.thegoate.dsl.PrimitiveDSL;
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "boolean")
-public class BooleanDSL extends PrimitiveDSL {
+@GoateDescription(description = "Returns the boolean representation of the value.")
+public class BooleanDSL extends PrimitiveDSL<Boolean> {
     public BooleanDSL(Object value) {
         super(value);
     }
@@ -47,7 +49,7 @@ public class BooleanDSL extends PrimitiveDSL {
     }
 
     @Override
-    public Object evaluate(Goate data) {
+    public Boolean evaluate(Goate data) {
         String value = "" + get(1,data);
         return Boolean.parseBoolean(value);
     }

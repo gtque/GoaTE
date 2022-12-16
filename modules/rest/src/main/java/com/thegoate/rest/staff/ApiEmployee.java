@@ -27,6 +27,7 @@
 package com.thegoate.rest.staff;
 
 import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.rest.RestCall;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
 import com.thegoate.staff.Employee;
@@ -39,8 +40,14 @@ import java.lang.reflect.InvocationTargetException;
  * the data and looking up the right Rest wrapper implementation.
  * Created by Eric Angeli on 5/17/2017.
  */
-public abstract class ApiEmployee extends Employee {
+public abstract class ApiEmployee<T> extends Employee<T> {
     RestSpec rest = null;
+
+    public void logRequest(){
+        if(rest!=null){
+            rest.logSpec();
+        }
+    }
 
     @Override
     public Employee init() {
@@ -60,6 +67,7 @@ public abstract class ApiEmployee extends Employee {
         if(spec!=null) {
             spec.baseURL(definition.get("base url", null, true, String.class));
             spec.headers(definition.filterAndSplitKeyValuePairs("headers."));
+            spec.cookies(definition.filterAndSplitKeyValuePairs("cookies."));
             spec.urlParams(definition.filterAndSplitKeyValuePairs("url params."));
             spec.queryParams(definition.filterAndSplitKeyValuePairs("query params."));
             spec.pathParams(definition.filterAndSplitKeyValuePairs("path params."));
@@ -70,7 +78,14 @@ public abstract class ApiEmployee extends Employee {
             spec.multipartData(definition.filterAndSplitKeyValuePairs("multipart"));
             spec.customData(definition.filterAndSplitKeyValuePairs("custom params."));
             spec.timeout(Integer.parseInt(""+definition.get("rest.timeout",15)));
+            spec.configure(definition.get("config", null));
             spec.config();
+            if(definition.get(RestCall.ENABLE_LOG, true, Boolean.class)){
+                spec.enableLog();
+            } else {
+                spec.disableLog();
+            }
+            spec.urlEncode(definition.get("urlEncode", true, Boolean.class));
         }
         return spec;
     }

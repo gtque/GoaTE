@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MockBuilder.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.mock</a> &gt; <span class="el_source">MockBuilder.java</span></div><h1>MockBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.mock;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.mock.annotations.Mocker;
+import com.thegoate.mock.staff.Mock;
+
+import java.lang.reflect.InvocationTargetException;
+
+import org.mockito.Spy;
+
+/**
+ * Builds and returns a mock of the given object.
+ * Created by Eric Angeli on 6/28/2017.
+ */
+<span class="fc" id="L44">public class MockBuilder {</span>
+
+<span class="fc" id="L46">    BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+<span class="fc" id="L47">    Goate definition = new Goate();</span>
+<span class="fc" id="L48">    String currentMethod = &quot;&quot;;</span>
+<span class="fc" id="L49">    int constructorIndex = 0;</span>
+<span class="fc" id="L50">    int methodIndex = 0;</span>
+<span class="fc" id="L51">    int methodParameterIndex = 0;</span>
+
+    public Mock buildMocker(Class mock) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+<span class="fc" id="L54">        AnnotationFactory af = new AnnotationFactory();</span>
+<span class="fc" id="L55">        return (Mock) af.annotatedWith(Mocker.class).find(mock).using(&quot;type&quot;).build();</span>
+    }
+
+    public Object build(){
+<span class="fc" id="L59">        return build(definition);</span>
+    }
+
+    public Object build(Goate data){
+<span class="fc" id="L63">        Mock mock = null;</span>
+<span class="fc" id="L64">        Class type = Object.class;//&quot;object&quot;;</span>
+        try {
+<span class="fc" id="L66">            type = data.get(&quot;type&quot;, type, Class.class);</span>
+<span class="fc" id="L67">            mock = buildMocker(type);</span>
+<span class="nc" id="L68">        }catch(Exception e){</span>
+<span class="nc" id="L69">            LOG.error(&quot;Failed to load the mock builder for: &quot; + type + &quot;\n&quot; + e.getMessage(), e);</span>
+<span class="fc" id="L70">        }</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        return mock!=null?mock.build(data):null;</span>
+    }
+
+    public MockBuilder define(String property, Object value){
+<span class="fc" id="L75">        definition.put(property, value);</span>
+<span class="fc" id="L76">        return this;</span>
+    }
+
+    public MockBuilder object(){
+<span class="fc" id="L80">        return type(Object.class);</span>
+    }
+
+    public MockBuilder spy(){
+<span class="fc" id="L84">        return type(Spy.class);</span>
+    }
+
+    public MockBuilder type(Class type){
+<span class="fc" id="L88">        return define(&quot;type&quot;,type);</span>
+    }
+
+    public MockBuilder setClass(Class theClass){
+<span class="fc" id="L92">        return setClass(theClass.getName());</span>
+    }
+
+    public MockBuilder setClass(String theClass){
+<span class="fc" id="L96">        return define(&quot;class&quot;, theClass);</span>
+    }
+
+    public MockBuilder field(String field, Object value){
+<span class="fc" id="L100">        return define(&quot;fields.&quot;+field,value);</span>
+    }
+
+    public MockBuilder constructorParameter(Object value){
+<span class="nc" id="L104">        return constructorParameter(value, null, constructorIndex++);</span>
+    }
+
+    public MockBuilder constructorParameter(Object value, Class parameterType){
+<span class="nc" id="L108">        return constructorParameter(value, parameterType.getName(), constructorIndex++);</span>
+    }
+
+    public MockBuilder constructorParameter(Object value, String parameterType){
+<span class="nc" id="L112">        return constructorParameter(value, parameterType, constructorIndex++);</span>
+    }
+
+    public MockBuilder constructorParameter(Object value, int index){
+<span class="nc" id="L116">        return constructorParameter(value, null, index);</span>
+    }
+
+    public MockBuilder constructorParameter(Object value, String parameterType, int index){
+<span class="nc" id="L120">        String base = &quot;constructor.&quot;+index+&quot;.&quot;;</span>
+<span class="nc" id="L121">        define(base + &quot;value&quot;, value);</span>
+<span class="nc" id="L122">        define(base + &quot;index&quot;, index);</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if(parameterType!=null){</span>
+<span class="nc" id="L124">            define(base + &quot;type&quot;, parameterType);</span>
+        }
+<span class="nc" id="L126">        return this;</span>
+    }
+
+    public MockBuilder method(String method){
+<span class="fc" id="L130">        this.currentMethod = &quot;methods.&quot;+methodIndex+&quot;.&quot;+method;</span>
+<span class="fc" id="L131">        methodIndex++;</span>
+<span class="fc" id="L132">        methodParameterIndex = 0;</span>
+<span class="fc" id="L133">        return define(currentMethod,method);</span>
+    }
+
+    public MockBuilder methodParameter(Object value){
+<span class="fc" id="L137">        return methodParameter(value, null, methodParameterIndex++);</span>
+    }
+
+    public MockBuilder methodParameter(Object value, int methodParameterIndex){
+<span class="nc" id="L141">        return methodParameter(value, null, methodParameterIndex);</span>
+    }
+
+    public MockBuilder methodParameter(Object value, Class parameterType){
+<span class="nc" id="L145">        return methodParameter(value, parameterType.getName(), methodParameterIndex++);</span>
+    }
+
+    public MockBuilder methodParameter(Object value, String parameterType){
+<span class="fc" id="L149">        return methodParameter(value, parameterType, methodParameterIndex++);</span>
+    }
+
+    public MockBuilder methodParameter(Object value, String parameterType, int index){
+<span class="fc" id="L153">        String base = currentMethod+&quot;.parameters.&quot;+index+&quot;.&quot;;</span>
+<span class="fc" id="L154">        define(base + &quot;value&quot;, value);</span>
+<span class="fc" id="L155">        define(base + &quot;index&quot;, index);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">        if(parameterType!=null){</span>
+<span class="fc" id="L157">            define(base + &quot;type&quot;, parameterType);</span>
+        }
+<span class="fc" id="L159">        return this;</span>
+    }
+
+    public MockBuilder returnReal(){
+<span class="nc" id="L163">        return define(currentMethod+&quot;.return.returnReal&quot;, &quot;boolean::true&quot;);</span>
+    }
+
+    public MockBuilder returnValue(Object value){
+<span class="fc" id="L167">        return define(currentMethod+&quot;.return.value&quot;, value);</span>
+    }
+
+    public MockBuilder returnValues(Object... values){
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        for(int i=0; i&lt;values.length; i++) {</span>
+<span class="fc" id="L172">            define(currentMethod + &quot;.return.value.&quot; + i, values[i]);</span>
+        }
+<span class="fc" id="L174">        return this;</span>
+    }
+
+    public MockBuilder methodThrows(Class theClass){
+<span class="fc" id="L178">        return methodThrows(theClass.getName());</span>
+    }
+
+    public MockBuilder methodThrows(String theClassPath){
+<span class="fc" id="L182">        return define(currentMethod+&quot;.throws&quot;, theClassPath);</span>
+    }
+
+    public MockBuilder methodThrows(Throwable theThrowable){
+<span class="nc" id="L186">        return define(currentMethod+&quot;.throws&quot;, theThrowable);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

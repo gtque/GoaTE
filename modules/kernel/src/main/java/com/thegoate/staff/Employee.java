@@ -30,6 +30,7 @@ package com.thegoate.staff;
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationEvaluator;
 import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.expect.Expectation;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.metrics.Stopwatch;
@@ -38,6 +39,7 @@ import com.thegoate.utils.togoate.ToGoate;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -49,15 +51,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * When manipulating or setting the test run data use the class variable data.
  * Created by gtque on 4/21/2017.
  */
-public abstract class Employee {
+public abstract class Employee<T> implements Worker<Employee, T> {
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected final static BleatBox slog = BleatFactory.getLogger(Employee.class);
     protected HealthRecord hr = new HealthRecord();
+    protected Expectation expectation = null;
     protected Goate data;
     protected Goate definition = new Goate();
     protected String name = "";
     protected volatile long startTime = 0L;
-    protected volatile Object result = null;
+    protected volatile T result = null;
     protected long period = 50L;
     protected boolean periodHasBeenSet = false;
 
@@ -65,24 +68,30 @@ public abstract class Employee {
         return hr;
     }
 
-    protected Employee setName(String name){
+    public Employee<T> setName(String name){
         this.name = name;
         return this;
     }
 
-    protected String parameterName(String parameter){
+    @Override
+    public Employee<T> expectation(Expectation expectation){
+        this.expectation = expectation;
+        return this;
+    }
+
+    public String parameterName(String parameter){
         return new StringBuilder(name).append(name.isEmpty()?"":".").append(parameter).toString();
     }
 
-    protected String getName(){
+    public String getName(){
         return name;
     }
 
-    protected String getNameDef(){
+    public String getNameDef(){
         return name + ".definition";
     }
 
-    public Employee initData(){
+    public Employee<T> initData(){
         if(data==null) {
             data = new Goate();
         }
@@ -97,31 +106,31 @@ public abstract class Employee {
         return definition!=null?definition.get(paramName,def):def;
     }
 
-    public Employee setData(Goate data) {
+    public Employee<T> setData(Goate data) {
         this.data = data;
         //no point in processing the annotations until the data is set.
         new AnnotationEvaluator().process(this, getClass());//stubbed for now, but intended for processing of annotations for auto wire like functionality.
         return this;
     }
 
-    public Employee defaultPeriod(long period){
+    public Employee<T> defaultPeriod(long period){
         if(!periodHasBeenSet){
             this.period = period;
         }
         return this;
     }
 
-    public Employee period(long period){
+    public Employee<T> period(long period){
         this.period = period;
         periodHasBeenSet = true;
         return this;
     }
 
-    public synchronized final Object syncWork(){
+    public synchronized final T syncWork(){
         return syncWork(period);
     }
 
-    public synchronized final Object syncWork(long waitMs){
+    public synchronized final T syncWork(long waitMs){
         if(System.currentTimeMillis()-startTime>waitMs){
             result = work();
             startTime = System.currentTimeMillis();
@@ -129,13 +138,28 @@ public abstract class Employee {
         return result;
     }
 
-    public final Object work() {
+    /**
+     * Always called immediately before doWork().<br>
+     * Override this method to define any common setup/configuration/initialization that needs
+     * to be done just prior to working after the definition and other parameters have been set.
+     * @return syntactic sugar, returns itself.
+     */
+    public Employee<T> clockIn(){
+        return this;
+    }
+
+    public final T work() {
         result = null;
+        String lap = ""+System.nanoTime();
         try {
             if(data!=null&&data.get("lap",null)!=null) {
-                Stopwatch.global.start(data.get("lap", Thread.currentThread().getName(), String.class));
+                String lt = data.get("lap", lap, String.class);
+                if(!lt.isEmpty()){
+                    lap = lt;
+                }
+                Stopwatch.global.start(lap);
             }
-            result = doWork();
+            result = (T)clockIn().doWork();
         } catch (Throwable t) {
             try {
                 //Creates a report in HR. Most reports are going to be exceptions.
@@ -150,7 +174,7 @@ public abstract class Employee {
             throw t;
         }finally {
             if(data!=null&&data.get("lap",null)!=null) {
-                Stopwatch.global.split(data.get("lap", Thread.currentThread().getName(), String.class));
+                Stopwatch.global.split(lap);
             }
         }
         return result;
@@ -173,11 +197,11 @@ public abstract class Employee {
 
     public abstract String[] detailedScrub();
 
-    public final Employee build(){
+    public final Employee<T> build(){
         return init();
     }
 
-    public Employee init(Goate data) {
+    public Employee<T> init(Goate data) {
         setData(data);
         if(data!=null) {
             Object def = data.get(getName() + ".definition");
@@ -188,14 +212,14 @@ public abstract class Employee {
         return init();
     }
 
-    public Employee mergeData(Goate data){
+    public Employee<T> mergeData(Goate data){
         definition.merge(scrub(data),false);
         return this;
     }
 
-    protected abstract Employee init();
+    protected abstract Employee<T> init();
 
-    protected abstract Object doWork();
+    protected abstract T doWork();
 
     public static Employee recruit(Class job, Goate data) {
         GoateJob theJob = (GoateJob) job.getAnnotation(GoateJob.class);
@@ -206,11 +230,18 @@ public abstract class Employee {
         return employee;
     }
 
-    public static Employee recruit(String job, Goate data) {
-        return recruit(job, data, new Goate());
+    public static Employee<Object> recruit(String job, Goate data) {
+        return recruit(job, data, null, Object.class);
     }
 
-    public static Employee recruit(String job, Goate definition, Goate parentData){
+    public static <T> Employee<T> recruit(String job, Goate data, Class<T> type) {
+        return recruit(job, data, null, type);
+    }
+
+    public static Employee<Object> recruit(String job, Goate definition, Goate parentData) {
+        return recruit (job, definition, parentData, Object.class);
+    }
+    public static <T> Employee<T> recruit(String job, Goate definition, Goate parentData, Class<T> type){
         Employee employee = null;
         String id = "";
         if(job.contains("#")){
@@ -220,9 +251,9 @@ public abstract class Employee {
         Class recruit = findEmployee(job);
         if (recruit != null) {
             try {
-                employee = (Employee) recruit.newInstance();
+                employee = (Employee) recruit.getDeclaredConstructor().newInstance();
                 employee.setName(job + (id.isEmpty()?"":("#"+id)));
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 slog.error("Problem recruiting the employee: " + e.getMessage(), e);
             }
         }

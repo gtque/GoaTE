@@ -1,0 +1,18 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="TestNG Module Tests">
+    <!-- ************************************************************************** -->
+    <!-- **********************This XML Runs All The*************************** -->
+    <!-- **************************Tests**************************** -->
+    <!-- ************************************************************************** -->
+    <test name="Domain APIs">
+        <groups>
+            <run>
+                <include name="testng"></include>
+                <include name="unit"></include>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.thegoate.testng.*"/>
+        </packages>
+    </test>
+</suite>

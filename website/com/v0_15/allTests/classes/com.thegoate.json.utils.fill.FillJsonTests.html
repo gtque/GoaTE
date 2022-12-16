@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class com.thegoate.json.utils.fill.FillJsonTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class com.thegoate.json.utils.fill.FillJsonTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.thegoate.json.utils.fill.html">com.thegoate.json.utils.fill</a> &gt; FillJsonTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">3</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.020s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">com.thegoate.json.utils.fill.FillJsonTests:fillJson:equals returns true when equal(3)</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.json.utils.fill.FillJsonTests:fillJson:json array(2)</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">com.thegoate.json.utils.fill.FillJsonTests:fillJson:regex pattern matching(1)</td>
+<td class="success">0.014s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>[INFO] 2021-02-18 21:45:30,535 com.thegoate.json.utils.fill.FillJsonTests: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.json.utils.fill.FillJsonTests:fillJson:regex pattern matching(1)	*
+*	0.e:y	*
+*	0.empty:empty field::	*
+*	0.isnull:null field::	*
+*	0.r.0:json object::{&quot;a&quot;:&quot;c&quot;\,&quot;g&quot;:&quot;h&quot;}	*
+*	0.r.2.0:a	*
+*	Scenario:regex pattern matching	*
+*	[0-9]\.dropme:drop field::	*
+*	expected:true	*
+*	json1:[...]	*
+*	json2:[...]	*
+*	operator:==	*
+*****************************************************************
+[DEBUG] 2021-02-18 21:45:30,548 com.thegoate.json.utils.fill.FillJsonTests: :	0
+	0.r
+		0.r.0
+		0.r.0.a
+		0.r.0.g
+		0.r.1
+		0.r.1.a
+		0.r.2
+			0.r.2.0
+	0.c
+	0.isnull
+	0.d
+	0.e
+	0.empty
+
+[DEBUG] 2021-02-18 21:45:30,548 com.thegoate.json.utils.fill.FillJsonTests: :[{
+    &quot;r&quot;: [
+        {
+            &quot;a&quot;: &quot;c&quot;,
+            &quot;g&quot;: &quot;h&quot;
+        },
+        {&quot;a&quot;: &quot;b&quot;},
+        [&quot;a&quot;]
+    ],
+    &quot;c&quot;: &quot;x&quot;,
+    &quot;isnull&quot;: null,
+    &quot;d&quot;: &quot;z&quot;,
+    &quot;e&quot;: &quot;y&quot;,
+    &quot;empty&quot;: &quot;&quot;
+}]
+[DEBUG] 2021-02-18 21:45:30,548 com.thegoate.json.utils.fill.FillJsonTests: :[{&quot;empty&quot;:&quot;&quot;,&quot;isnull&quot;:null,&quot;c&quot;:&quot;x&quot;,&quot;d&quot;:&quot;z&quot;,&quot;r&quot;:[{&quot;a&quot;:&quot;c&quot;,&quot;g&quot;:&quot;h&quot;},{&quot;a&quot;:&quot;b&quot;},[&quot;a&quot;]],&quot;e&quot;:&quot;y&quot;}]
+[DEBUG] 2021-02-18 21:45:30,549 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:45:30,550 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:45:30,553 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual([{
+    &quot;r&quot;: [
+        {
+            &quot;a&quot;: &quot;c&quot;,
+            &quot;g&quot;: &quot;h&quot;
+        },
+        {&quot;a&quot;: &quot;b&quot;},
+        [&quot;a&quot;]
+    ],
+    &quot;c&quot;: &quot;x&quot;,
+    &quot;isnull&quot;: null,
+    &quot;d&quot;: &quot;z&quot;,
+    &quot;e&quot;: &quot;y&quot;,
+    &quot;empty&quot;: &quot;&quot;
+}]) == [{&quot;empty&quot;:&quot;&quot;,&quot;isnull&quot;:null,&quot;c&quot;:&quot;x&quot;,&quot;d&quot;:&quot;z&quot;,&quot;r&quot;:[{&quot;a&quot;:&quot;c&quot;,&quot;g&quot;:&quot;h&quot;},{&quot;a&quot;:&quot;b&quot;},[&quot;a&quot;]],&quot;e&quot;:&quot;y&quot;}]
+
+[DEBUG] 2021-02-18 21:45:30,554 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.json.utils.compare.tools.CompareJsonEqualTo
+[DEBUG] 2021-02-18 21:45:30,555 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,556 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,557 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,557 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :a: the objects values were not equal. b != c
+[DEBUG] 2021-02-18 21:45:30,558 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,558 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :0: the object was a json array, but the other one was not.
+[DEBUG] 2021-02-18 21:45:30,558 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :1: the object was a json array, but the other one was not.
+[DEBUG] 2021-02-18 21:45:30,559 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,561 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,561 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :isnull: both objects were null
+[DEBUG] 2021-02-18 21:45:30,562 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,562 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,563 com.thegoate.reflection.GoateReflection: Goate Reflection:I had to give up looking up your primitive type: 
+[DEBUG] 2021-02-18 21:45:30,564 com.thegoate.reflection.GoateReflection: Goate Reflection:I had to give up looking up your primitive type: 
+[DEBUG] 2021-02-18 21:45:30,565 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,566 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,567 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,568 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,568 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :a: the objects values were not equal. b != c
+[DEBUG] 2021-02-18 21:45:30,569 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,569 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :0: the object was a json array, but the other one was not.
+[DEBUG] 2021-02-18 21:45:30,569 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :1: the object was a json array, but the other one was not.
+[DEBUG] 2021-02-18 21:45:30,570 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,571 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,571 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :isnull: both objects were null
+[DEBUG] 2021-02-18 21:45:30,572 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,573 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,574 com.thegoate.reflection.GoateReflection: Goate Reflection:I had to give up looking up your primitive type: 
+[DEBUG] 2021-02-18 21:45:30,574 com.thegoate.reflection.GoateReflection: Goate Reflection:I had to give up looking up your primitive type: 
+[DEBUG] 2021-02-18 21:45:30,575 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,575 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,575 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,576 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,576 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,576 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:45:30,579 com.thegoate.json.utils.fill.FillJsonTests: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:[...]
+	expected:[...]
+	expected_value:[...]
+	from:actual:[...]
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:45:30,581 com.thegoate.json.utils.fill.FillJsonTests: Shut Down:
+*****************************************************************
+*	com.thegoate.json.utils.fill.FillJsonTests:fillJson:regex pattern matching(1)	*
+*	0.e:y	*
+*	0.empty:empty field::	*
+*	0.isnull:null field::	*
+*	0.r.0:json object::{&quot;a&quot;:&quot;c&quot;\,&quot;g&quot;:&quot;h&quot;}	*
+*	0.r.2.0:a	*
+*	Scenario:regex pattern matching	*
+*	[0-9]\.dropme:drop field::	*
+*	expected:true	*
+*	json1:[...]	*
+*	json2:[...]	*
+*	operator:==	*
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:45:30,584 com.thegoate.json.utils.fill.FillJsonTests: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.json.utils.fill.FillJsonTests:fillJson:json array(2)	*
+*	Scenario:json array	*
+*	expected:true	*
+*	json1:[...]	*
+*	json2:[...]	*
+*	operator:==	*
+*****************************************************************
+[DEBUG] 2021-02-18 21:45:30,586 com.thegoate.json.utils.fill.FillJsonTests: :	0
+	0.field
+	0.rejected
+	0.message
+
+[DEBUG] 2021-02-18 21:45:30,586 com.thegoate.json.utils.fill.FillJsonTests: :[{
+    &quot;field&quot;: &quot;varianceChangeOptions.equityVariance&quot;,
+    &quot;rejected&quot;: &quot;9066473733806080234472943&quot;,
+    &quot;message&quot;: &quot;numeric value out of bounds (&lt;5 digits&gt;&lt;6 digits&gt; expected)&quot;
+}]
+[DEBUG] 2021-02-18 21:45:30,586 com.thegoate.json.utils.fill.FillJsonTests: :[
+  {
+    &quot;field&quot;: &quot;varianceChangeOptions.equityVariance&quot;,
+    &quot;rejected&quot;: 9066473733806080234472943,
+    &quot;message&quot;: &quot;numeric value out of bounds (&lt;5 digits&gt;&lt;6 digits&gt; expected)&quot;
+  }
+]
+[DEBUG] 2021-02-18 21:45:30,587 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:45:30,587 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:45:30,590 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual([{
+    &quot;field&quot;: &quot;varianceChangeOptions.equityVariance&quot;,
+    &quot;rejected&quot;: &quot;9066473733806080234472943&quot;,
+    &quot;message&quot;: &quot;numeric value out of bounds (&lt;5 digits&gt;&lt;6 digits&gt; expected)&quot;
+}]) == [
+  {
+    &quot;field&quot;: &quot;varianceChangeOptions.equityVariance&quot;,
+    &quot;rejected&quot;: 9066473733806080234472943,
+    &quot;message&quot;: &quot;numeric value out of bounds (&lt;5 digits&gt;&lt;6 digits&gt; expected)&quot;
+  }
+]
+
+[DEBUG] 2021-02-18 21:45:30,591 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.json.utils.compare.tools.CompareJsonEqualTo
+[DEBUG] 2021-02-18 21:45:30,592 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,593 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.f.CompareFloatEqualTo
+[DEBUG] 2021-02-18 21:45:30,594 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,596 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,597 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.f.CompareFloatEqualTo
+[DEBUG] 2021-02-18 21:45:30,597 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,599 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,600 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,603 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,604 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,604 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:45:30,606 com.thegoate.json.utils.fill.FillJsonTests: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:[...]
+	expected:[...]
+	expected_value:[...]
+	from:actual:[...]
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:45:30,608 com.thegoate.json.utils.fill.FillJsonTests: Shut Down:
+*****************************************************************
+*	com.thegoate.json.utils.fill.FillJsonTests:fillJson:json array(2)	*
+*	Scenario:json array	*
+*	expected:true	*
+*	json1:[...]	*
+*	json2:[...]	*
+*	operator:==	*
+***************************Finished Up***************************
+[INFO] 2021-02-18 21:45:30,610 com.thegoate.json.utils.fill.FillJsonTests: Start Up:
+***************************Starting Up***************************
+*	com.thegoate.json.utils.fill.FillJsonTests:fillJson:equals returns true when equal(3)	*
+*	Scenario:equals returns true when equal	*
+*	dropme:drop field::	*
+*	e:y	*
+*	empty:empty field::	*
+*	expected:true	*
+*	isnull:null field::	*
+*	json1:{...}	*
+*	json2:{...}	*
+*	operator:==	*
+*	r.0:json object::{&quot;a&quot;:&quot;c&quot;\,&quot;g&quot;:&quot;h&quot;}	*
+*	r.2.0:a	*
+*****************************************************************
+[DEBUG] 2021-02-18 21:45:30,613 com.thegoate.json.utils.fill.FillJsonTests: :r
+	r.0
+	r.0.a
+	r.0.g
+	r.1
+	r.1.a
+	r.2
+		r.2.0
+c
+isnull
+d
+e
+empty
+
+[DEBUG] 2021-02-18 21:45:30,613 com.thegoate.json.utils.fill.FillJsonTests: :{
+    &quot;r&quot;: [
+        {
+            &quot;a&quot;: &quot;c&quot;,
+            &quot;g&quot;: &quot;h&quot;
+        },
+        {&quot;a&quot;: &quot;b&quot;},
+        [&quot;a&quot;]
+    ],
+    &quot;c&quot;: &quot;x&quot;,
+    &quot;isnull&quot;: null,
+    &quot;d&quot;: &quot;z&quot;,
+    &quot;e&quot;: &quot;y&quot;,
+    &quot;empty&quot;: &quot;&quot;
+}
+[DEBUG] 2021-02-18 21:45:30,613 com.thegoate.json.utils.fill.FillJsonTests: :{&quot;empty&quot;:&quot;&quot;,&quot;isnull&quot;:null,&quot;c&quot;:&quot;x&quot;,&quot;d&quot;:&quot;z&quot;,&quot;r&quot;:[{&quot;a&quot;:&quot;c&quot;,&quot;g&quot;:&quot;h&quot;},{&quot;a&quot;:&quot;b&quot;},[&quot;a&quot;]],&quot;e&quot;:&quot;y&quot;}
+[DEBUG] 2021-02-18 21:45:30,614 com.thegoate.expect.ExpectEvaluator: :starting executor to evaluate expectations.
+[DEBUG] 2021-02-18 21:45:30,614 com.thegoate.expect.Expectation: Expectation:evaluating expectations.
+[INFO] 2021-02-18 21:45:30,616 com.thegoate.expect.validate.ValidateGoate: Expect:evaluating:actual({
+    &quot;r&quot;: [
+        {
+            &quot;a&quot;: &quot;c&quot;,
+            &quot;g&quot;: &quot;h&quot;
+        },
+        {&quot;a&quot;: &quot;b&quot;},
+        [&quot;a&quot;]
+    ],
+    &quot;c&quot;: &quot;x&quot;,
+    &quot;isnull&quot;: null,
+    &quot;d&quot;: &quot;z&quot;,
+    &quot;e&quot;: &quot;y&quot;,
+    &quot;empty&quot;: &quot;&quot;
+}) == {&quot;empty&quot;:&quot;&quot;,&quot;isnull&quot;:null,&quot;c&quot;:&quot;x&quot;,&quot;d&quot;:&quot;z&quot;,&quot;r&quot;:[{&quot;a&quot;:&quot;c&quot;,&quot;g&quot;:&quot;h&quot;},{&quot;a&quot;:&quot;b&quot;},[&quot;a&quot;]],&quot;e&quot;:&quot;y&quot;}
+
+[DEBUG] 2021-02-18 21:45:30,617 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.json.utils.compare.tools.CompareJsonEqualTo
+[DEBUG] 2021-02-18 21:45:30,618 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,619 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,619 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,620 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :a: the objects values were not equal. b != c
+[DEBUG] 2021-02-18 21:45:30,620 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,620 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :0: the object was a json array, but the other one was not.
+[DEBUG] 2021-02-18 21:45:30,620 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :1: the object was a json array, but the other one was not.
+[DEBUG] 2021-02-18 21:45:30,621 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,622 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,622 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :isnull: both objects were null
+[DEBUG] 2021-02-18 21:45:30,623 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,624 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,625 com.thegoate.reflection.GoateReflection: Goate Reflection:I had to give up looking up your primitive type: 
+[DEBUG] 2021-02-18 21:45:30,625 com.thegoate.reflection.GoateReflection: Goate Reflection:I had to give up looking up your primitive type: 
+[DEBUG] 2021-02-18 21:45:30,626 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,626 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,627 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,628 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,628 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :a: the objects values were not equal. b != c
+[DEBUG] 2021-02-18 21:45:30,629 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,629 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :0: the object was a json array, but the other one was not.
+[DEBUG] 2021-02-18 21:45:30,629 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :1: the object was a json array, but the other one was not.
+[DEBUG] 2021-02-18 21:45:30,630 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,631 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,631 com.thegoate.json.utils.compare.tools.CompareJsonEqualTo: :isnull: both objects were null
+[DEBUG] 2021-02-18 21:45:30,631 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,632 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.c.CompareCharEqualTo
+[DEBUG] 2021-02-18 21:45:30,633 com.thegoate.reflection.GoateReflection: Goate Reflection:I had to give up looking up your primitive type: 
+[DEBUG] 2021-02-18 21:45:30,633 com.thegoate.reflection.GoateReflection: Goate Reflection:I had to give up looking up your primitive type: 
+[DEBUG] 2021-02-18 21:45:30,634 com.thegoate.utils.compare.Compare: Compare:Found comparator: class com.thegoate.utils.compare.tools.CompareObjectEqualTo
+[DEBUG] 2021-02-18 21:45:30,634 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,634 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,634 com.thegoate.reflection.Executioner: :shutting down executor
+[DEBUG] 2021-02-18 21:45:30,635 com.thegoate.reflection.Executioner: :shutdown finished
+[DEBUG] 2021-02-18 21:45:30,635 com.thegoate.expect.ExpectEvaluator: Expectations:Evaluation finished successfully
+[INFO] 2021-02-18 21:45:30,636 com.thegoate.json.utils.fill.FillJsonTests: Status:
+passed:
+--------------------
+	actual:actual
+	actual_value:{...}
+	expected:{...}
+	expected_value:{...}
+	from:actual:{...}
+	operator:==
+--------------------
+
+[INFO] 2021-02-18 21:45:30,638 com.thegoate.json.utils.fill.FillJsonTests: Shut Down:
+*****************************************************************
+*	com.thegoate.json.utils.fill.FillJsonTests:fillJson:equals returns true when equal(3)	*
+*	Scenario:equals returns true when equal	*
+*	dropme:drop field::	*
+*	e:y	*
+*	empty:empty field::	*
+*	expected:true	*
+*	isnull:null field::	*
+*	json1:{...}	*
+*	json2:{...}	*
+*	operator:==	*
+*	r.0:json object::{&quot;a&quot;:&quot;c&quot;\,&quot;g&quot;:&quot;h&quot;}	*
+*	r.2.0:a	*
+***************************Finished Up***************************
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.0.1</a> at Feb 18, 2021 9:47:41 PM</p>
+</div>
+</div>
+</body>
+</html>

@@ -26,13 +26,15 @@
  */
 package com.thegoate.utils.fill.serialize.primitives;
 
+import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.fill.serialize.CastUtil;
 import com.thegoate.utils.fill.serialize.GoateCastUtility;
 
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-@CastUtil
+@CastUtil(type = Integer.class)
+@IsDefault(forType = true)
 public class CastInt extends GoateCastUtility {
 
     public CastInt(Object value) {
@@ -41,7 +43,7 @@ public class CastInt extends GoateCastUtility {
 
     @Override
     public <T> T cast(Class<T> type) {
-        return (T)(Object)Integer.parseInt("" + value);
+        return (T)(Object)Integer.parseInt("" + ((""+value).equalsIgnoreCase("true")?1:(""+value).equalsIgnoreCase("false")?0:value));
     }
 
     @Override

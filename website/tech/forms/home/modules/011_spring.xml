@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<q>
+	<p class="module_title">spring</p>
+	<p class="module_definition">Provides support for writing spring based tests using TestNG.</p>
+</q>

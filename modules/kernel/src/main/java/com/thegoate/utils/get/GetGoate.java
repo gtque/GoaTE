@@ -33,7 +33,7 @@ import com.thegoate.Goate;
  * Loads the file specified in from into a string and returns it.
  * Created by Eric Angeli on 5/5/2017.
  */
-@GetUtil
+@GetUtil(type = Goate.class)
 public class GetGoate extends GetTool{
 
     public GetGoate(){

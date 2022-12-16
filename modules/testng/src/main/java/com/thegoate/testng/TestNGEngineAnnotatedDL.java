@@ -32,6 +32,10 @@ import com.thegoate.data.DLProvider;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 
+import java.lang.reflect.Method;
+
+import static com.thegoate.testng.TestNGRunFactory.*;
+
 /**
  * Useful when specifying the data loader/provider using annotations.
  * The test class should be annotated with {@literal @}GoateProvider <br>
@@ -47,20 +51,27 @@ public class TestNGEngineAnnotatedDL extends TestNGEngine {
 
     public TestNGEngineAnnotatedDL(Goate data){
         super(data);
+        setTestClass(getClass());
     }
+
+//    @Override
+//    public void startUp(Method method) {
+//
+//    }
 
     @Override
     public void defineDataLoaders() {
         AnnotationFactory af = new AnnotationFactory();
         GoateProvider gp = getClass().getAnnotation(GoateProvider.class);
-        if(gp!=null){
+        this.provider = gp;
+        if(gp!=null && (!runCacheEnabled || (runCacheEnabled && !providerCache.containsKey(providerCacheDefaultId(gp))))){
             try {
                 DLProvider provider = (DLProvider) af.find(gp.name()).annotatedWith(GoateDLP.class)
                         .using(GoateDLP.class.getMethod("name"))
                         .build();
                 if(provider==null){
                     try {
-                        provider = (DLProvider) Class.forName(gp.name()).newInstance();
+                        provider = (DLProvider) Class.forName(gp.name()).getDeclaredConstructor().newInstance();
                     }catch(Exception e){
                         LOG.warn("tried to find DLProvider using class name but could not find or instantiate: " + gp.name(), e);
                     }

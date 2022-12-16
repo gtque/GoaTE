@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>TestNGRunFactory.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.testng</a> &gt; <span class="el_source">TestNGRunFactory.java</span></div><h1>TestNGRunFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.testng;
+
+import com.thegoate.Goate;
+import com.thegoate.data.DataLoader;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.GoateUtils;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Loads the run data and builds the runs.
+ * Created by Eric Angeli on 5/11/2017.
+ */
+<span class="nc" id="L45">public class TestNGRunFactory {</span>
+<span class="fc" id="L46">    static final BleatBox LOG = BleatFactory.getLogger(TestNGRunFactory.class);</span>
+
+    public static Object[][] loadRuns(Goate runData, Goate constantData, boolean atLeastOneRun, String[] include, String[] exclude) {
+<span class="fc" id="L49">        List&lt;Goate&gt; runs = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L50">        Goate constants = new Goate();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (runData != null) {</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">            for (String key : runData.keys()) {</span>
+<span class="fc" id="L53">                List&lt;Goate&gt; list = ((DataLoader) runData.get(key)).load();</span>
+<span class="fc" id="L54">                runs.addAll(list);</span>
+<span class="fc" id="L55">            }</span>
+        }
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (constantData != null) {</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">            for (String key : constantData.keys()) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">                if (key.equals(&quot;_goate:method&quot;)) {</span>
+<span class="fc" id="L60">                    constants.put(key, constantData.get(key));</span>
+                } else {
+<span class="fc" id="L62">                    constants.merge(((DataLoader) constantData.get(key)).load().get(0), true);</span>
+                    //the last loaded value of the constant wins.
+                }
+<span class="fc" id="L65">            }</span>
+        }
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (runs.size() == 0) {</span>
+<span class="fc" id="L68">            runs.add(null);</span>
+        }
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (constants.size() &gt; 0) {</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">            for (Goate data : runs) {</span>
+<span class="fc" id="L72">                int i = -42;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                if (data == null) {</span>
+<span class="fc" id="L74">                    i = runs.indexOf(data);</span>
+<span class="fc" id="L75">                    data = new Goate();</span>
+                }
+<span class="fc" id="L77">                data.merge(constants, false);</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">                if (i != -42) {</span>
+<span class="fc" id="L79">                    runs.set(i, data);</span>
+                }
+                //a constant can be overloaded by setting it in the run data.
+<span class="fc" id="L82">            }</span>
+        }
+<span class="fc" id="L84">        runs = filter(runs);</span>
+<span class="fc bfc" id="L85" title="All 4 branches covered.">        if (runs.size() == 1 &amp;&amp; runs.get(0) == null) {</span>
+<span class="fc" id="L86">            runs = new ArrayList&lt;&gt;();</span>
+        }
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        Object[][] rawData = new Object[runs.size()][runs.size() &gt; 0 ? 1 : 0];</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        for (int i = 0; i &lt; rawData.length; i++) {</span>
+<span class="fc" id="L90">            rawData[i][0] = runs.get(i);</span>
+        }
+<span class="fc" id="L92">        Object[][] empty = {};</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        return rawData.length &gt; 0 ? rawData : empty;</span>
+    }
+
+    protected static List&lt;Goate&gt; filterGroups(List&lt;Goate&gt; runs, String[] include, String[] exclude) {
+<span class="nc" id="L97">        List&lt;Goate&gt; filteredInc = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L98">        List&lt;Goate&gt; filtered = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L99" title="All 4 branches missed.">        if (include != null &amp;&amp; include.length &gt; 0) {</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            for (Goate run : runs) {</span>
+<span class="nc" id="L101">                String groups = run.get(&quot;groups&quot;, &quot;&quot;, String.class);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                if (!groups.isEmpty()) {</span>
+
+                }
+<span class="nc" id="L105">            }</span>
+        }
+
+<span class="nc" id="L108">        return filtered;</span>
+    }
+
+    protected static boolean checkRunGroups(Object runData, String[] runGroups) {
+<span class="fc" id="L112">        boolean check = true;</span>
+<span class="pc bpc" id="L113" title="2 of 4 branches missed.">        if (runGroups != null &amp;&amp; runGroups.length &gt; 0) {</span>
+<span class="fc" id="L114">            Object run = runData;</span>
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">            if (runData != null &amp;&amp; runData instanceof Goate) {</span>
+<span class="fc" id="L116">                run = ((Goate) runData).get(&quot;groups&quot;);</span>
+            }
+<span class="fc bfc" id="L118" title="All 2 branches covered.">            if (run != null) {</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">                if (run instanceof String) {</span>
+<span class="fc" id="L120">                    String runsIn = (&quot;-r-&quot; + run + &quot;-r-&quot;).replace(&quot;,&quot;, &quot;-r-,-r-&quot;).replaceAll(&quot;\\s*-r-\\s*&quot;, &quot;-r-&quot;);</span>
+<span class="fc" id="L121">                    check = Arrays.stream(runGroups).parallel().anyMatch(runsIn::contains);</span>
+<span class="fc" id="L122">                } else {</span>
+<span class="nc" id="L123">                    check = false;</span>
+                }
+            } else {
+<span class="fc" id="L126">                check = false;</span>
+            }
+        }
+<span class="fc" id="L129">        return check;</span>
+    }
+
+    protected static List&lt;Goate&gt; filterRunGroups(List&lt;Goate&gt; runs) {
+<span class="fc" id="L133">        List&lt;Goate&gt; filtered = runs;</span>
+<span class="fc" id="L134">        String runId = &quot;&quot; + GoateUtils.getProperty(&quot;runGroups&quot;, &quot;empty::&quot;);</span>
+<span class="pc bpc" id="L135" title="1 of 4 branches missed.">        if (!runId.equals(&quot;null&quot;) &amp;&amp; !runId.isEmpty()) {</span>
+<span class="fc" id="L136">            String[] runIds = (&quot;-r-&quot; + runId.replace(&quot;,&quot;, &quot;-r-,-r-&quot;) + &quot;-r-&quot;).replaceAll(&quot;\\s*-r-\\s*&quot;, &quot;-r-&quot;).split(&quot;,&quot;);</span>
+<span class="fc" id="L137">            filtered = runs.stream().filter(run -&gt; checkRunGroups(run, runIds)).collect(Collectors.toList());</span>
+        }
+
+<span class="fc" id="L140">        return filtered;</span>
+    }
+
+    protected static List&lt;Goate&gt; filter(List&lt;Goate&gt; runs) {
+<span class="fc" id="L144">        List&lt;Goate&gt; filtered = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L145">        String runId = &quot;&quot; + GoateUtils.getProperty(&quot;run&quot;, &quot;empty::&quot;);</span>
+<span class="pc bpc" id="L146" title="1 of 4 branches missed.">        if (!runId.equals(&quot;null&quot;) &amp;&amp; !runId.isEmpty()) {</span>
+<span class="fc" id="L147">            String[] runIds = runId.split(&quot;&quot; + GoateUtils.getProperty(&quot;runDelimiter&quot;, &quot;,&quot;));</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">            for (String run : runIds) {</span>
+<span class="fc" id="L149">                int runNum = -42;</span>
+                try {
+<span class="nc" id="L151">                    runNum = Integer.parseInt(run);</span>
+<span class="nc" id="L152">                    LOG.debug(&quot;Filtering by run number: &quot; + runNum);</span>
+<span class="fc" id="L153">                } catch (Throwable t) {</span>
+<span class="fc" id="L154">                    LOG.debug(&quot;Filtering by scenario: &quot; + run);</span>
+<span class="nc" id="L155">                }</span>
+<span class="fc" id="L156">                int count = 0;</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">                for (Goate rd : runs) {</span>
+<span class="fc" id="L158">                    count++;</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">                    if (rd != null) {</span>
+<span class="fc" id="L160">                        boolean runEnabled = Boolean.parseBoolean(&quot;&quot; + rd.get(&quot;runEnabled&quot;, &quot;true&quot;));</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">                        if (runEnabled) {</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">                            if (runNum &gt;= 0) {</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">                                if (runNum == count) {</span>
+<span class="nc" id="L164">                                    filtered.add(rd.drop(&quot;runEnabled&quot;));</span>
+                                }
+                            } else {
+<span class="fc" id="L167">                                String sKey = rd.findKeyIgnoreCase(&quot;Scenario&quot;);</span>
+<span class="fc" id="L168">                                String scene = &quot;&quot; + rd.get(sKey);</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">                                if (scene.equals(run)) {</span>
+<span class="fc" id="L170">                                    filtered.add(rd.drop(&quot;runEnabled&quot;));</span>
+                                }
+                            }
+                        }
+                    }
+<span class="fc" id="L175">                }</span>
+            }
+<span class="fc" id="L177">        } else {</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">            for (Goate rd : runs) {</span>
+<span class="fc" id="L179">                Object b = &quot;true&quot;;</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">                if (rd != null) {</span>
+<span class="fc" id="L181">                    b = rd.get(&quot;runEnabled&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L182">                    rd.drop(&quot;runEnabled&quot;);</span>
+                }
+<span class="fc" id="L184">                boolean runEnabled = Boolean.parseBoolean(&quot;&quot; + b);</span>
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">                if (runEnabled) {</span>
+<span class="fc" id="L186">                    filtered.add(rd);</span>
+                }
+<span class="fc" id="L188">            }</span>
+        }
+<span class="fc" id="L190">        return filterRunGroups(filtered);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

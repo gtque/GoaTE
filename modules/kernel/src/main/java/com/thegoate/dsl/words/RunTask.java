@@ -27,18 +27,23 @@
 
 package com.thegoate.dsl.words;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.staff.GoateTask;
 import com.thegoate.staff.GoateTaskContainer;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Executes and runs the specified task.
@@ -46,6 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by gtque on 4/21/2017.
  */
 @GoateDSL(word = "do")
+@GoateDescription(description = "Executes and runs the specified task.", parameters = {"Object: value"})
 public class RunTask extends DSL {
     Goate parameters = new Goate();
 
@@ -93,7 +99,7 @@ public class RunTask extends DSL {
             Method m = findTask();
             Object[] args = buildArgs(m, task, parameters);
             try {
-                boolean accessible = m.isAccessible();
+                boolean accessible = m.canAccess(owner);//.isAccessible();
                 LOG.debug("class: " + m.getDeclaringClass());
                 LOG.debug("method: " + m.getName());
                 LOG.debug("parameters: " + printArgs(args));

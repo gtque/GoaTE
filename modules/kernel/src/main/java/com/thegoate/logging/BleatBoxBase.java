@@ -27,6 +27,8 @@
 package com.thegoate.logging;
 
 
+import java.util.logging.Level;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +47,37 @@ public abstract class BleatBoxBase implements BleatBox{
     public BleatBoxBase(Class logger){
         this.loggingClass = logger;
         LOG = LoggerFactory.getLogger(logger);
+        setVolume(LOG.isDebugEnabled(),
+            LOG.isErrorEnabled(),
+            LOG.isInfoEnabled(),
+            LOG.isTraceEnabled(),
+            LOG.isWarnEnabled());
+    }
+
+    protected void setVolume(boolean debug, boolean error, boolean info, boolean trace, boolean warn) {
+        if (trace) {
+            setVolume(Level.FINE);
+        } else if (debug) {
+            setVolume(Level.CONFIG);
+        } else if (info) {
+            setVolume(Level.INFO);
+        } else if (warn) {
+            setVolume(Level.WARNING);
+        } else if(error){
+            setVolume(Level.SEVERE);
+        } else {
+            setVolume(Level.INFO);
+        }
+    }
+
+    public BleatBox setVolume(Level volume) {
+        this.volume = BleatLevel.level(volume, loggingClass.getName());
+        return this;
     }
 
     /**
      * Always returns null right now.<br>
-     * This is a place holder for possible future funtionality not yet implemented.
+     * This is a place holder for possible future functionality not yet implemented.
      * @return The level information.
      */
     @Override

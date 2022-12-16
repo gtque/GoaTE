@@ -30,6 +30,8 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.RestAuthBasicUserPW;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
+
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -108,6 +110,14 @@ public class RABasicAuth extends RestAuthBasicUserPW implements RASpec{
         return response;
     }
 
+    @Override
+    public Object head(String endpoint) {
+        specification = RestAssured.build(this);
+        response = specification.head(endpoint);
+        log(response);
+        return response;
+    }
+
     protected void log(Response response){
         if(doLog()){
             LOG.debug("RABasicAuth","response follows");
@@ -121,5 +131,13 @@ public class RABasicAuth extends RestAuthBasicUserPW implements RASpec{
         specification = RestAssured.init(given(), this);
         specification = specification.auth().preemptive().basic(user, password);
         return specification;
+    }
+
+    @Override
+    public RestSpec logSpec() {
+        if(specification!=null){
+            specification.log().all();
+        }
+        return this;
     }
 }

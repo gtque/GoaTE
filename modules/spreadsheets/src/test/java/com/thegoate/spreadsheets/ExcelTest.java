@@ -28,9 +28,8 @@ package com.thegoate.spreadsheets;
 
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
-import com.thegoate.spreadsheets.data.SpreadSheetAbstractedDL;
 import com.thegoate.expect.Expectation;
-import com.thegoate.map.EnumMap;
+import com.thegoate.spreadsheets.data.SpreadSheetAbstractedDL;
 import com.thegoate.spreadsheets.data.SpreadSheetDL;
 import com.thegoate.spreadsheets.dsl.words.LoadExcel;
 import com.thegoate.spreadsheets.utils.SheetUtils;
@@ -40,7 +39,6 @@ import com.thegoate.utils.file.Delete;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.thegoate.expect.ExpectMatchWildcardIndexPath.matchWildcardIndex;
@@ -64,7 +62,7 @@ public class ExcelTest extends TestNGEngineMethodDL {
         assertEquals(Integer.parseInt("" + sheet.get("z", 0)), 42);
         assertEquals(sheet.get("z", 1), "42.01");
         assertEquals(sheet.get("c", 0, "e"), "e");
-        assertEquals(sheet.get(2, 0, 3), 3);
+        assertEquals(sheet.get(2, 0, 3), "e");
     }
 
     @Test(groups = {"unit"})
@@ -77,7 +75,7 @@ public class ExcelTest extends TestNGEngineMethodDL {
         assertEquals(Integer.parseInt("" + sheet.get("z", 0)), 42);
         assertEquals(sheet.get("z", 1), "42.01");
         assertEquals(sheet.get("c", 0, "e"), "e");
-        assertEquals(sheet.get(2, 0, 3), 3);
+        assertEquals(sheet.get(2, 0, 3), "e");
         assertEquals(sheet.get("a", 3), "howdy");
     }
 
@@ -153,7 +151,7 @@ public class ExcelTest extends TestNGEngineMethodDL {
         assertEquals(Integer.parseInt(""+sheet.get("z",0)),42);
         assertEquals(sheet.get("z",1),"42.01");
         assertEquals(sheet.get("c",0,"e"),"e");
-        assertEquals(sheet.get(2,0,3),3);
+        assertEquals(sheet.get(2,0,3),"e");
     }
 
     @Test(groups = {"unit"})

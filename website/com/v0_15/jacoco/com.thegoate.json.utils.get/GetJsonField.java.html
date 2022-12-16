@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GetJsonField.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.json.utils.get</a> &gt; <span class="el_source">GetJsonField.java</span></div><h1>GetJsonField.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.json.utils.get;
+
+import com.thegoate.Goate;
+import com.thegoate.json.JsonUtil;
+import com.thegoate.json.utils.togoate.JSONToGoate;
+import com.thegoate.utils.get.Get;
+import com.thegoate.utils.get.GetUtil;
+import com.thegoate.utils.get.GetUtility;
+import com.thegoate.utils.get.NotFound;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/**
+ * Get the field from the given json.
+ * Created by Eric Angeli on 5/19/2017.
+ */
+@GetUtil(type = JSONObject.class)
+public class GetJsonField extends JsonUtil implements GetUtility {
+
+    public GetJsonField(Object val) {
+<span class="fc" id="L47">        super(val);</span>
+<span class="fc" id="L48">    }</span>
+
+    @Override
+    protected Object processNested(Object subContainer) {
+<span class="fc" id="L52">        Object result = subContainer;</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if(nested!=null){</span>
+<span class="fc" id="L54">            result = new Get(nested).from(subContainer);</span>
+        }
+<span class="fc" id="L56">        return result;</span>
+    }
+
+    @Override
+    public Object from(Object container) {
+<span class="fc" id="L61">        Object result = null;</span>
+<span class="pc bpc" id="L62" title="1 of 6 branches missed.">        if(takeActionOn instanceof String &amp;&amp; (takeActionOn.equals(&quot;size()&quot;)||takeActionOn.equals(&quot;length()&quot;))){</span>
+            try {
+<span class="fc" id="L64">                result = new JSONArray(container.toString()).length();</span>
+<span class="fc" id="L65">            }catch(Exception e){</span>
+                try {
+<span class="fc" id="L67">                    result = new JSONObject(container.toString()).length();</span>
+<span class="nc" id="L68">                }catch(Exception e1) {</span>
+<span class="nc" id="L69">                    LOG.warn(&quot;The container was not something to get the size from.\n&quot; + e1.getMessage(), e1);</span>
+<span class="fc" id="L70">                }</span>
+<span class="fc" id="L71">            }</span>
+        }else {
+<span class="fc" id="L73">            Goate g = new JSONToGoate(container).convert();</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">            if (g != null) {</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">                if(g.keys().contains(&quot;&quot;+takeActionOn)) {</span>
+<span class="fc" id="L76">                    result = g.get(&quot;&quot; + takeActionOn);</span>
+                }else{
+<span class="fc" id="L78">                    result = new NotFound(&quot;&quot;+takeActionOn);</span>
+                }
+            }
+        }
+<span class="fc" id="L82">        result = processNested(result);</span>
+<span class="fc" id="L83">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

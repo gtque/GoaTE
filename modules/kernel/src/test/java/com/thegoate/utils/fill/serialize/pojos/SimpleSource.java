@@ -31,6 +31,6 @@ import com.thegoate.utils.fill.serialize.GoateSourceDef;
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-@GoateSourceDef(id = "simple source")
+@GoateSourceDef(id = "simple expected")
 public @interface SimpleSource {
 }

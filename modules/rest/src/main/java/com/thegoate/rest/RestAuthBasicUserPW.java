@@ -39,12 +39,12 @@ public abstract class RestAuthBasicUserPW extends Rest {
     }
 
     public RestAuthBasicUserPW user(String user){
-        this.user = user;
+        processCustomData(Settings.user, user);
         return this;
     }
 
     public RestAuthBasicUserPW password(String password){
-        this.password = password;
+        processCustomData(Settings.password, password);
         return this;
     }
 

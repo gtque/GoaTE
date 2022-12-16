@@ -44,4 +44,5 @@ import java.lang.annotation.RetentionPolicy;
 @IndexAnnotated
 public @interface ListType {
     Class type();
+    int index() default 0;
 }

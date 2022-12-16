@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<q>
+	<dt class="question">Wait, how many libraries are there in GoaTE?</dt>
+	<dd class="answer">We prefer to call them "modules". Currently there are 13 modules in GoaTE. The main module is the "kernel". New modules are added as needed and requested.</dd>
+</q>

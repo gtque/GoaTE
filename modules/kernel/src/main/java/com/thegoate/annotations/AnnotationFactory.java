@@ -56,7 +56,7 @@ public class AnnotationFactory {
         }
     }
 
-    String id;
+    Object id;
     String methodId;
     Constructor constructor = null;
     Object[] constructorArgs = new Object[0];
@@ -88,7 +88,7 @@ public class AnnotationFactory {
         return this;
     }
 
-    public AnnotationFactory find(String id) {
+    public AnnotationFactory find(Object id) {
         this.id = id;
         return this;
     }
@@ -164,9 +164,9 @@ public class AnnotationFactory {
         buildDirectory();
         Class c = null;
         LOG.debug("looking for " + annotation.getName());
-        String theClass = id;
+        String theClass = ""+id;
         try {
-            c = directory.get(annotation.getCanonicalName()).get(id);
+            c = directory.get(annotation.getCanonicalName()).get(theClass);
         } catch (NullPointerException e) {
             LOG.error("could not get the class: " + theClass + "; " + e.getMessage(), e);
         }
@@ -180,18 +180,34 @@ public class AnnotationFactory {
     }
 
     /**
+     * Clear the built directory. Use to force the directory to be rebuilt.
+     * @return
+     */
+    public synchronized AnnotationFactory clearDirectory(){
+        directory.remove(annotation.getCanonicalName());
+        return this;
+    }
+
+    /**
      * The listings for each annotation is generated only one time, the first time they are looked up.
      *
      * @return The instance of itself, syntactic sugar for stringing calls together.
      */
-    public AnnotationFactory buildDirectory() {
+    public synchronized AnnotationFactory buildDirectory() {
         if (!directory.containsKey(annotation.getCanonicalName())) {
             directory.put(annotation.getCanonicalName(), new ConcurrentHashMap<>());
         }
         Map<String, Class> listing = directory.get(annotation.getCanonicalName());
         if (listing.size() == 0) {
-            for (Class<?> klass : ClassIndex.getAnnotated(annotation)) {
+            if(LOG!=null) {
+                LOG.debug("Building Directory "+annotation.getCanonicalName(), "the listing was empty, trying to build it.");
+            }
+            Iterable<Class<?>> klasses = ClassIndex.getAnnotated(annotation);
+            for (Class<?> klass : klasses) {
                 String theClass = klass.getCanonicalName();
+                if(LOG!=null) {
+                    LOG.debug("Adding to directory", theClass);
+                }
                 try {
                     Class temp = Class.forName(theClass);
                     Annotation service = temp.getAnnotation(annotation);
@@ -199,6 +215,7 @@ public class AnnotationFactory {
                     if (check != null) {
                         Object theCheck = check.invoke(service);
                         if (theCheck != null && theCheck.getClass().isArray()) {
+                            listing.put("" + theClass, klass.forName(theClass));
                             for (Object aido : (Object[]) theCheck) {
                                 listing.put("" + aido, klass.forName(theClass));
                             }
@@ -209,9 +226,15 @@ public class AnnotationFactory {
                         listing.put(temp.getCanonicalName(), klass.forName(theClass));//default to using the full class name.
                     }
                     if (setDefault) {
-                        Annotation def = temp.getAnnotation(IsDefault.class);
+                        IsDefault def = (IsDefault) temp.getAnnotation(IsDefault.class);
                         if (def != null) {
-                            listing.put("default", temp);
+							if(def.forType()) {
+								listing.put("default", temp);
+							} else {
+							    if(!listing.containsKey("default")) {
+                                    listing.put("default", temp);
+                                }
+							}
                         }
                     }
                 } catch (ClassNotFoundException | NullPointerException | IllegalAccessException | InvocationTargetException e) {
@@ -233,38 +256,64 @@ public class AnnotationFactory {
         Object o = null;
         if (klass != null) {
             if (constructorArgs != null) {
+                Object[] ca = constructorArgs;
                 if (constructor == null) {
                     constructor = new GoateReflection().findConstructor(klass.getConstructors(), constructorArgs);
+                    if(constructor == null){
+//                        LOG.debug("Build Class", "didn't find specific constructor, checking for default constructor");
+                        constructor = new GoateReflection().findConstructor(klass.getConstructors(), new Object[0]);
+                        ca = new Object[0];
+                    }
                 }
                 if (constructor != null) {
-                    o = constructor.newInstance(constructorArgs);
+                    try {
+//                        if(ca!=null) {
+                            o = constructor.newInstance(ca);
+//                        } else {
+//                            o = constructor.getDeclaredConstructor().newInstance();
+//                        }
+                    }catch(IllegalAccessException | InstantiationException | InvocationTargetException e){
+                        LOG.debug("Building Class", "Problem instantiating a new instances: " + e.getMessage(), e);
+                        throw e;
+                    }
+                } else {
+                    LOG.info("Building Class", "Could not find the constructor, wil check for a default constructor...");
+
                 }
             } else {
-                o = klass.newInstance();
+                try {
+                    o = klass.getDeclaredConstructor().newInstance();
+                } catch (NoSuchMethodException e) {
+                    LOG.error("Build Class", "Problem instantiating new instance: " + e.getMessage(), e);
+                }
             }
+        } else {
+            LOG.debug("Building Class", "The class was not specified, definitely could not build it.");
         }
         return o;
     }
 
     public Class lookUpByAnnotatedMethod() {
         buildDirectory();
+        LOG.debug("Look Up Annotated Method", "Trying to look up an annotated method: " + methodId);
         Class klass = null;
         Map<String, Class> listings = directory.get(annotation.getCanonicalName());
         for (String theClass : listings.keySet()) {
+            LOG.debug("Checking Class", theClass);
             List<Method> methods = new GoateReflection().getDeclaredMethods(listings.get(theClass));
+            LOG.debug("Methods to check ("+methods.size()+")", methods.toString());
             for (Method m : methods) {
                 if (m.isAnnotationPresent(methodAnnotation)) {
                     for (Method am : methodAnnotation.getDeclaredMethods()) {
                         Annotation dam = m.getAnnotation(methodAnnotation);
                         try {
+                            LOG.debug("Checking Method", am.getName());
                             if (methodId.equals(am.invoke(dam))) {
                                 klass = listings.get(theClass);
                                 break;
                             }
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            LOG.debug("Look Up Annotated Method", "Problem accessing method: " + e.getMessage(), e);
                         }
                     }
                     if (klass != null) {

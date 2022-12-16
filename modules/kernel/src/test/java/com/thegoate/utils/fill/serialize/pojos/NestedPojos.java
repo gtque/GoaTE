@@ -27,6 +27,8 @@
 package com.thegoate.utils.fill.serialize.pojos;
 
 import com.thegoate.utils.fill.serialize.GoatePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.Kid;
 import com.thegoate.utils.fill.serialize.collections.MapKeyType;
 import com.thegoate.utils.fill.serialize.collections.MapType;
 
@@ -37,9 +39,10 @@ import java.util.Map;
  * Created by Eric Angeli on 6/27/2018.
  */
 @GoatePojo(id = "nested pojo")
-public class NestedPojos {
+public class NestedPojos extends Kid {
     private ComplexPojo[] cp;
     private List<Object> list;
+    @GoateSource(source = Cheese.class, key="flumbers")
     private int[] numbers;
     private int[] numbers2;
     @MapType(type = Boolean.class)

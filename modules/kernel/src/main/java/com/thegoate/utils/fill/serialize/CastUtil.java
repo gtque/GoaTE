@@ -41,4 +41,5 @@ import java.lang.annotation.RetentionPolicy;
 @Info
 @IndexAnnotated
 public @interface CastUtil {
+	Class type() default Object.class;
 }

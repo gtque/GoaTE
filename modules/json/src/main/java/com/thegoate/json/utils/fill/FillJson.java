@@ -59,6 +59,7 @@ public class FillJson extends JsonUtil implements FillUtility {
         processNested = false;
         super.init(val);
     }
+
     @Override
     protected Object processNested(Object subContainer) {
         return null;
@@ -66,41 +67,65 @@ public class FillJson extends JsonUtil implements FillUtility {
 
     @Override
     public String with(Goate data) {
-        String result = "";
+        boolean isJsonObject = true;
+        if(takeActionOn instanceof JSONObject || takeActionOn instanceof JSONArray) {
+            if(takeActionOn instanceof JSONArray) {
+                isJsonObject = false;
+            }
+        } else {
+            String json = "" + takeActionOn;
+            if (json.startsWith("[")) {
+                isJsonObject = false;
+            }
+        }
+        Object jsonObject = withToJson(data, Object.class);
+        return isJsonObject?((JSONObject)jsonObject).toString(4):((JSONArray)jsonObject).toString(4);
+    }
+
+    public <T> T withToJson(Goate data, Class<T> type) {
+        Object result = null;
         description = new StringBuilder("");
         if (takeActionOn != null) {
             try {
-                result = processJSON("" + takeActionOn, data);
+                result = processJSON(takeActionOn, data, type);
             } catch (Exception e) {
-                result = "" + takeActionOn;
+                result = takeActionOn;
             }
         }
-        return result;
+        return (T) result;
     }
 
     public String getDescription() {
         tabCount = 0;
         description = new StringBuilder("");
-        processJSON("" + takeActionOn, new Goate());
+        processJSON(takeActionOn, new Goate(), Object.class);
         return description.toString();
     }
 
-    private String processJSON(String json, Goate data) {
+    private <T> T processJSON(Object ojson, Goate data, Class<T> type) {
         Object jsonObject;
         boolean isJsonObject = true;
         try {
-            if (json.startsWith("[")) {
-                jsonObject = new JSONArray(json);
-                isJsonObject = false;
+            if(ojson instanceof JSONObject || ojson instanceof JSONArray) {
+                jsonObject = ojson;
+                if(ojson instanceof JSONArray) {
+                    isJsonObject = false;
+                }
             } else {
-                jsonObject = new JSONObject(json);
+                String json = "" + ojson;
+                if (json.startsWith("[")) {
+                    jsonObject = new JSONArray(json);
+                    isJsonObject = false;
+                } else {
+                    jsonObject = new JSONObject(json);
+                }
             }
         } catch (JSONException je) {
             throw new RuntimeException("FillJson: converting to a json object: " + je.getMessage());
         }
         jsonObject = isJsonObject ? processJSONObject((JSONObject) jsonObject, "", data) : processJSONArray((JSONArray) jsonObject, "", data);
-        json = isJsonObject?((JSONObject)jsonObject).toString(4):((JSONArray)jsonObject).toString(4);
-        return json;
+        return (T)jsonObject;
+//        return json;
     }
 
     private JSONObject processJSONObject(JSONObject jsonData, String prekey, Goate data) {
@@ -140,14 +165,17 @@ public class FillJson extends JsonUtil implements FillUtility {
     private Object getValue(String keyPattern, Goate data){
         Object value = data.get(keyPattern);
         if(value==null){
-            String kp = data.keys().parallelStream().filter(k -> {
-                if(keyPattern.matches(k)){
-                    return true;
+            value = data.getStrict(keyPattern);
+            if(value == null) {
+                String kp = data.keys().parallelStream().filter(k -> {
+                    if (keyPattern.matches(k)) {
+                        return true;
+                    }
+                    return false;
+                }).collect(Collectors.joining(","));
+                if (!kp.isEmpty()) {
+                    value = data.get(kp);
                 }
-                return false;
-            }).collect(Collectors.joining(","));
-            if(!kp.isEmpty()) {
-                value = data.get(kp);
             }
         }
         return value;
@@ -164,9 +192,9 @@ public class FillJson extends JsonUtil implements FillUtility {
                 if (value != null) {
                     if (value.equals("drop field::"))
                         drop.add("" + index);//jsonData.remove(key);
-                    else if (value.equals("empty field::"))
+                    else if (value.equals("empty field::")|value.equals("empty::"))
                         jsonArray.put(index, "");
-                    else if (value.equals("null field::"))
+                    else if (value.equals("null field::")|value.equals("null::"))
                         jsonArray.put(index, JSONObject.NULL);
                     else if (!value.equals(""))
                         jsonArray.put(index, value);

@@ -27,7 +27,6 @@
 package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.annotations.GoateDescription;
-import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;

@@ -29,19 +29,15 @@ import java.util.concurrent.TimeUnit
 import com.thegoate.gradle.GoateGradleHelper
 buildscript {
     repositories {
+        gradlePluginPortal()
         mavenCentral()
-        jcenter()
-        maven{
-            url "https://dl.bintray.com/goate/GoaTE"
-        }
         mavenLocal()
     }
     dependencies {
-        classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:+"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
-        classpath 'goate:gradle8:0.3.201705310130'
+//        classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
+        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.42.0'
+        classpath 'com.thegoate:gradle:0.15.8.202104300242'
     }
 }
 
@@ -54,43 +50,57 @@ buildscript {
 
 //-Dorg.gradle.java.home=<path to jdk>
 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
-def maxJV = "8";//this should be updated when a new version of java is supported.
+def maxJV = "17";//this should be updated when a new version of java is supported.
 String javaVersion = "" + Integer.parseInt(project.hasProperty("javaVersion") ? (project.javaVersion.isEmpty() ? maxJV : project.javaVersion) : maxJV)
 if (javaVersion.contains(".")) {
     javaVersion = javaVersion.substring(("" + javaVersion).indexOf(".") + 1);
 }
 
-def vbase = '0.15'
+def majorVersion = 0
+def minorVersion = 15
+def vbase = "${majorVersion}.${minorVersion}.${javaVersion}"
 def buildDate = "" + (project.hasProperty("buildDate")?project.buildDate:sdf.format(new Date()))
-def v = "${vbase}." + buildDate
-def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : project.release) : 'beta'
+def v = "${vbase}." + (project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? buildDate : '0'):'0')
+def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : ('-'+project.release)) : '-SNAPSHOT'
+def isNonStable = { String version ->
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+(-r)?$/
+    return !stableKeyword && !(version ==~ regex)
+}
 
 allprojects {
     repositories {
         mavenCentral()
-        jcenter()
-        maven{
-            url "https://dl.bintray.com/goate/GoaTE"
-        }
         mavenLocal()
     }
     apply plugin: 'idea'
     apply plugin: 'maven-publish'
-    apply plugin: 'maven'
-    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'signing'
     apply plugin: 'jacoco'
+    apply plugin: "com.github.ben-manes.versions"
+
     version = v + release;
-    group = "goate"
+    group = "com.thegoate"
     configurations {
         goatescala
     }
     dependencies{
-        goatescala "org.scala-lang:scala-compiler:2.11.8"
-        goatescala "org.scala-lang:scala-library:2.11.8"
-        goatescala "org.scala-lang:scala-reflect:2.11.8"
-        goatescala "org.scala-lang:scala-actors:2.11.8"
-        goatescala "org.scala-lang:scala-xml:2.11.0-M4"
-        goatescala "com.google.inject:guice:4.0"
+//        goatescala "org.scala-lang:scala-compiler:2.13.5"
+//        goatescala "org.scala-lang:scala-library:2.13.5"
+//        goatescala "org.scala-lang:scala-reflect:2.13.5"
+//        goatescala "org.scala-lang:scala-actors:2.11.12"
+//        goatescala "org.scala-lang:scala-xml:2.11.0-M4"
+//        goatescala "com.google.inject:guice:5.0.1"
+    }
+
+    dependencyUpdates {
+        rejectVersionIf {
+            isNonStable(it.candidate.version)
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += ['-Xlint:deprecation']
     }
 }
 
@@ -101,7 +111,7 @@ configurations.all {
 }
 
 wrapper {
-    gradleVersion = '4.8.1' //version required
+    gradleVersion = '7.0' //version required
 }
 
 subprojects {
@@ -109,12 +119,13 @@ subprojects {
         annotations;
     }
     boolean oneOff = project.hasProperty("oneOff")
-    def projectName = "${project.name}" + javaVersion
+    def projectJavaLabel = project.hasProperty("projectJavaLabel")?project.projectJavaLabel:"false"
+    def projectName = "${project.name}" + (Boolean.parseBoolean(""+projectJavaLabel)?javaVersion:"")
     projectName = projectName.replace(":", "").replace("module", "")
     apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'groovy'
     apply plugin: 'jacoco'
-    apply plugin: 'com.jfrog.bintray'
     apply plugin: 'goate.test'
     //apply plugin: 'application'
 
@@ -128,17 +139,19 @@ subprojects {
             name = "${project.name}"
         }
     }
+
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
     dependencies {
-        testCompile 'ch.qos.logback:logback-classic:1.1.7'
-        testCompile 'ch.qos.logback:logback-access:1.1.7'
-        testCompile 'ch.qos.logback:logback-core:1.1.7'
-        testCompile 'org.codehaus.janino:janino:2.7.8'
-        annotationProcessor "org.atteo.classindex:classindex:3.3"
+        testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+        testImplementation 'ch.qos.logback:logback-access:1.2.11'
+        testImplementation 'ch.qos.logback:logback-core:1.2.11'
+        testImplementation 'org.codehaus.janino:janino:3.1.8'
+        annotationProcessor 'org.atteo.classindex:classindex:3.11'
+        testAnnotationProcessor 'org.atteo.classindex:classindex:3.11'
     }
 
-    jar.baseName = projectName
+    jar.archiveBaseName = projectName
 
     sourceSets {
         test {
@@ -146,7 +159,7 @@ subprojects {
         }
     }
     jacoco {
-        toolVersion = "0.7.6.201602180812"
+        toolVersion = "0.8.8"//"0.7.6.201602180812"
     }
     configurations.all {
         resolutionStrategy.force 'xml-apis:xml-apis:1.4.01'
@@ -158,57 +171,74 @@ subprojects {
 
     def siteUrl = 'http://www.thegoate.com'
     def gitUrl = 'https://github.com/gtque/goate'
-    bintray {
-        user = bintray_user
-        key = bintray_api_key
 
-        configurations = ['archives'] //When uploading configuration files
-        pkg {
-            userOrg = 'goate'
-            repo = 'GoaTE'
-            name = projectName
-            websiteUrl = siteUrl
-            issueTrackerUrl = 'https://github.com/gtque/goate/issues'
-            vcsUrl = gitUrl
-            licenses = ['MIT']
-            labels = ['GoaTE', projectName.replace(javaVersion,"")]
-            publicDownloadNumbers = true
-        }
-    }
-
-    install  {
-        repositories.mavenInstaller {
-            //System.out.println("installing: " + group + ":" + projectName + ":" + version)
-            GoateGradleHelper.customPom(pom, configurations, project.javaVersion, oneOff)
-            pom {
-                project {
-                    url siteUrl
-                    // Set your license
-                    licenses {
-                        license {
-                            name 'MIT'
-                            url 'http://www.thegoate.com/licenses/LICENSE-MIT.txt'
-                        }
-                    }
-                    developers {
-                        developer{
-                            id 'gtque'
-                            name 'Eric Angeli'
-                        }
-                    }
-                }
-            }
-            doLast{
-                System.out.println("installed: " + project.group + ":" + projectName + ":" + version)
-            }
-        }
+//    install  {
+//        repositories.mavenInstaller {
+//            //System.out.println("installing: " + group + ":" + projectName + ":" + version)
+//            def jv = ""
+//            if(Boolean.parseBoolean(""+projectJavaLabel)){
+//                jv = project.javaVersion
+//            }
+//            GoateGradleHelper.customPom(pom, configurations, jv, oneOff)
+//            pom {
+//                project {
+//                    description = 'goate module for ' + projectName
+//                    name projectName
+//                    url siteUrl
+//                    // Set your license
+//                    licenses {
+//                        license {
+//                            name 'MIT'
+//                            url 'http://www.thegoate.com/licenses/LICENSE-MIT.txt'
+//                        }
+//                    }
+//                    developers {
+//                        developer{
+//                            id 'gtque'
+//                            name 'Eric Angeli'
+//                        }
+//                    }
+//                    scm {
+//                        url gitUrl
+//                    }
+//                }
+//            }
+//            doLast{
+//                System.out.println("installed: " + project.group + ":" + projectName + ":" + version)
+//            }
+//        }
+//    }
+    java {
+        withJavadocJar()
+        withSourcesJar()
     }
     publishing {
         publications {
             goate(MavenPublication) {
                 from components.java
-                groupId "goate"
+                groupId "com.thegoate"
                 artifactId projectName
+//                artifact artifacts
+                pom {
+                    description = 'goate module for ' + projectName
+                    name = projectName
+                    url = siteUrl
+                    licenses {
+                        license {
+                            name = 'MIT'
+                            url = 'http://www.thegoate.com/licenses/LICENSE-MIT.txt'
+                        }
+                    }
+                    developers {
+                        developer{
+                            id = 'gtque'
+                            name = 'Eric Angeli'
+                        }
+                    }
+                    scm {
+                        url = gitUrl
+                    }
+                }
                 GoateGradleHelper.customPom(pom, configurations, project.javaVersion, true)
             }
         }
@@ -217,72 +247,109 @@ subprojects {
                 destination = file("$buildDir/${projectName}-${version}.pom")
             }
         }
-    }
-
-    artifactory {
-        contextUrl = "${artifactory_url}"
-        //The base Artifactory URL if not overridden by the publisher/resolver
-        publish {
-            repository {
-                repoKey = 'release'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-            }
-            defaults {
-                publications('goate')
-            }
-        }
-        resolve {
-            repository {
-                repoKey = 'libs-release'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-
+        repositories {
+            maven {
+                // change URLs to point to your repos, e.g. http://my.org/repo
+                def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                authentication {
+                    basic(BasicAuthentication){
+                        credentials {
+                            username = ossrhUsername
+                            password = ossrhPassword
+                        }
+                    }
+                }
             }
         }
     }
+
+//    uploadArchives {
+//        repositories {
+//            mavenDeployer {
+////                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//
+//                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+//                    authentication(userName: ossrhUsername, password: ossrhPassword)
+//                }
+//
+//                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+//                    authentication(userName: ossrhUsername, password: ossrhPassword)
+//                }
+//
+//                def jv = ""
+//                if(Boolean.parseBoolean(""+projectJavaLabel)){
+//                    jv = project.javaVersion
+//                }
+//                GoateGradleHelper.customPom(pom, configurations, jv, oneOff)
+//                pom {
+//                    project {
+//                        description = 'goate module for ' + projectName
+//                        name projectName
+//                        url siteUrl
+//                        // Set your license
+//                        licenses {
+//                            license {
+//                                name 'MIT'
+//                                url 'http://www.thegoate.com/licenses/LICENSE-MIT.txt'
+//                            }
+//                        }
+//                        developers {
+//                            developer{
+//                                id 'gtque'
+//                                name 'Eric Angeli'
+//                            }
+//                        }
+//                        scm {
+//                            url gitUrl
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     idea {
         module {
             scopes.PROVIDED.plus += [configurations.annotations]
         }
     }
     task jarTest(type: Jar) {
-        classifier = "tests"
+        archiveClassifier.set("tests")
         from sourceSets.test.output, sourceSets.main.output
     }
 
-    task sourcesJar(type: Jar) {
+    task allsourcesJar(type: Jar) {
         from sourceSets.main.allSource
-        classifier = 'sources'
-        baseName = "${projectName}"
+        archiveClassifier.set('sources')
+        archiveBaseName.set("${projectName}")
     }
 
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+    task alljavadocJar(type: Jar, dependsOn: javadoc) {
+        archiveClassifier.set('jdoc')
         from javadoc.destinationDir
-        baseName = "${projectName}"
+        archiveBaseName.set("${projectName}")
     }
     task groovydocJar(type: Jar, dependsOn: groovydoc) {
-        classifier = 'groovydoc'
+        archiveClassifier.set('gdoc')
         from groovydoc.destinationDir
-        baseName = "${projectName}"
+        archiveBaseName.set("${projectName}")
     }
 
-    task alldocsJar(type: Jar, dependsOn: [javadocJar,groovydocJar]){
-        classifier = 'doc'
-        from groovydocJar.archivePath,javadocJar.archivePath
-        baseName = "${projectName}"
+    javadocJar{
+        dependsOn alljavadocJar,groovydocJar
+        archiveClassifier.set('javadoc')
+        from groovydocJar.archiveFile,alljavadocJar.archiveFile
+        archiveBaseName.set("${projectName}")
     }
-    artifacts {
-        archives alldocsJar
-        archives sourcesJar
+    signing {
+        sign configurations.archives
+        sign publishing.publications.goate
     }
 }
 
 jacoco {
-    toolVersion = "0.7.6.201602180812"
+    toolVersion = "0.8.8"
 }
 
 // get class dirs for project dependencies
@@ -318,26 +385,62 @@ task jacocoMerge(type: JacocoMerge) {
     executionData = getJacocoExecFiles()
     destinationFile = project.file("$buildDir/jacoco/data/jacoco.exec")
 }
+
 // generate coverage report for this project and all its project dependencies
 task jacocoMergedReport(type: JacocoReport) {
     dependsOn jacocoMerge
     System.out.println("merged execs: " + jacocoMerge.destinationFile);
     reports {
-        xml.enabled false
-        csv.enabled false
-        html.destination file("$buildDir/reports/jacoco")
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir("$buildDir/reports/jacoco")
     }
 
-    classDirectories = files(getJacocoClassDirs().collect {
+    classDirectories.from = files(getJacocoClassDirs().collect {
         fileTree(dir: it, exclude: ['com/**/gradle/**','com/**/performance/**','com/**/barn/idea/**'])
     })
-    sourceDirectories = getJacocoSrcDirs()
+    sourceDirectories.from = getJacocoSrcDirs()
 
     executionData jacocoMerge.destinationFile
 }
 
 task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/allTests")
+    if(project.hasProperty("testReport")) {
+        subprojects {
+            plugins.withType(JavaPlugin) {
+                test {
+                    ignoreFailures true
+                }
+            }
+        }
+    }
+    destinationDirectory = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
-    reportOn subprojects*.test
+    //reportOn subprojects*.test
+    testResults.from(subprojects*.test)
+}
+
+ext.testFailures = 0 //set a global variable to hold a number of failures
+
+gradle.taskGraph.whenReady { taskGraph ->
+
+    taskGraph.allTasks.each { task -> //get all tasks
+        if (task.name == "test") { //filter it to test tasks only
+
+            task.ignoreFailures = true //keepgoing if it fails
+            task.afterSuite { desc, result ->
+                if (desc.getParent() == null) {
+                    ext.testFailures += result.getFailedTestCount() //count failures
+                }
+            }
+        }
+    }
+}
+
+gradle.buildFinished { //when it finishes check if there are any failures and blow up
+
+    if (ext.testFailures > 0) {
+        ant.fail("The build finished but ${ext.testFailures} tests failed - blowing up the build ! ")
+    }
+
 }

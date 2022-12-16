@@ -30,7 +30,6 @@ package com.thegoate.utils.get;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.UnknownUtilType;
 
 /**
  * Base class for Get Utilities. Adds logger, and class level variables.

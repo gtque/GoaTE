@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<q>
+	<p class="module_title">kernel</p>
+	<p class="module_definition">This is the main module in GoaTE. It defines the GoaTE data object (which provides the DSL layer and is backed by a concurrent map). It defines the interfaces for expectations, employees, the various utilities, and a mechanism for defining data loaders.</p>
+</q>

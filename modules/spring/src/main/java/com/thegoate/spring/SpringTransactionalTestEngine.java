@@ -28,18 +28,22 @@ package com.thegoate.spring;
 
 import com.thegoate.Goate;
 import com.thegoate.expect.Expectation;
+import com.thegoate.expect.builder.ExpectationBuilder;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.testng.TestNG;
+import com.thegoate.testng.TestNGEngine;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.ITest;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Wrapper class combines AbstractTestNGSpringContextTests and Test Engine functionality from GoaTE.
@@ -49,26 +53,29 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     TestNGEngineMethodDL engine = null;
     protected Goate runData = null;
     protected Goate constantData = null;
+    protected Goate data = null;
 
     public SpringTransactionalTestEngine(){
         engine = new TestNGEngineMethodDL();
         engine.setLOG(BleatFactory.getLogger(getClass()));
+        this.data = engine.getData();
     }
 
     public SpringTransactionalTestEngine(Goate data){
         engine = new TestNGEngineMethodDL(data);
         engine.setLOG(BleatFactory.getLogger(getClass()));
+        this.data = engine.getData();
     }
 
     @Override
-    @DataProvider(name = "dataLoader")
-    public Object[][] dataLoader(ITestContext context) throws Exception {
+    @DataProvider(name = "springTransactionalDataLoader")
+    public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();
-        return engine.dataLoader(context);
+        return engine.dataLoader(method, context);
     }
 
-    @DataProvider(name = "methodLoader")
+    @DataProvider(name = "springTransactionalMethodLoader")
     public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
         engine.initDataLoaders();
         defineDataLoaders();
@@ -116,8 +123,8 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
-    public void bumpRunNumber() {
-        engine.bumpRunNumber();
+    public void bumpRunNumber(String name) {
+        engine.bumpRunNumber(name);
     }
 
     @Override
@@ -152,22 +159,68 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
 
     @Override
     public TestNG put(String key, Object val) {
-        return engine.put(key, val);
+        engine.put(key, val);
+        return this;
+    }
+
+    @Override
+    public boolean expectNow(Expectation expectation) {
+        return expectNow(expectation, false);
+    }
+
+    @Override
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder) {
+        return expectNow(expectationBuilder, false);
+    }
+
+    @Override
+    public boolean expectNow(List<Expectation> expectation) {
+        return expectNow(expectation, false);
+    }
+
+    @Override
+    public boolean expectNow(Expectation expectation, boolean failImmediately) {
+        return engine.expectNow(expectation, failImmediately);
+    }
+
+    @Override
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder, boolean failImmediately) {
+        return engine.expectNow(expectationBuilder, failImmediately);
+    }
+
+    @Override
+    public boolean expectNow(List<Expectation> expectation, boolean failImmediately) {
+        return engine.expectNow(expectation, failImmediately);
     }
 
     @Override
     public TestNG expect(Expectation expectation) {
-        return engine.expect(expectation);
+        engine.expect(expectation);
+        return this;
+    }
+
+    @Override
+    public TestNG expect(ExpectationBuilder<? extends ExpectationBuilder> expectationBuilder){
+        engine.expect(expectationBuilder.build());
+        return this;
+    }
+
+    @Override
+    public TestNG expect(List<Expectation> expectation) {
+        engine.expect(expectation);
+        return this;
     }
 
     @Override
     public TestNG evalPeriod(long periodMS) {
-        return engine.evalPeriod(periodMS);
+        engine.evalPeriod(periodMS);
+        return this;
     }
 
     @Override
     public TestNG evalTimeout(long timeoutMS) {
-        return engine.evalTimeout(timeoutMS);
+        engine.evalTimeout(timeoutMS);
+        return this;
     }
 
     @Override
@@ -176,8 +229,14 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
     }
 
     @Override
+    public void evaluate(ITestResult testResult) {
+        engine.evaluate(testResult);
+    }
+
+    @Override
     public TestNG clearExpectations() {
-        return engine.clearExpectations();
+        engine.clearExpectations();
+        return this;
     }
 
     @Override
@@ -185,20 +244,39 @@ public class SpringTransactionalTestEngine extends AbstractTransactionalTestNGSp
         return engine.getTestName();
     }
 
-    public void startUp(Method method) {
-        engine.startUp(method);
+    @BeforeMethod(alwaysRun = true, dependsOnMethods = "initDataMethod")
+    public void startUp(Method method, ITestResult result) {
+        engine.startUp(method, result);
     }
 
     @BeforeMethod(alwaysRun = true)
     public void initDataMethod(Object[] d, Method m) {
-        if (d != null&&d.length>0) {
-            engine.init((Goate)d[0]);
-        }
-        startUp(m);
+        TestNGEngine.doInitData(d, m, this);
     }
 
     @AfterMethod(alwaysRun = true)
     public void finishUp(Method method) {
         engine.finishUp(method);
+    }
+
+    @Override
+    public void init(Goate data) {
+        engine.init(data);
+        this.data = data;
+    }
+
+    @Override
+    public boolean isExpectationsSet() {
+        return engine.isExpectationsSet();
+    }
+
+    @Override
+    public boolean isExpectationsNotEvaluated() {
+        return engine.isExpectationsNotEvaluated();
+    }
+
+    @Override
+    public void initRunNumber(Method method) {
+        engine.initRunNumber(method);
     }
 }

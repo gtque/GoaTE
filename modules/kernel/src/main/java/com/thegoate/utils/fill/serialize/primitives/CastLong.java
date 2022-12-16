@@ -26,13 +26,15 @@
  */
 package com.thegoate.utils.fill.serialize.primitives;
 
+import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.fill.serialize.CastUtil;
 import com.thegoate.utils.fill.serialize.GoateCastUtility;
 
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-@CastUtil
+@CastUtil(type = Long.class)
+@IsDefault(forType = true)
 public class CastLong extends GoateCastUtility {
 
     public CastLong(Object value) {

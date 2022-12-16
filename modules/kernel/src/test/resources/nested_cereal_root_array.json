@@ -1,0 +1,20 @@
+[
+  {
+    "box": {
+      "size": 14
+    },
+    "type": "fruit loops"
+  },
+  {
+    "box": {
+      "size": 14
+    },
+    "type": "lucky charms"
+  },
+  {
+    "box": {
+      "size": 10
+    },
+    "type": "fruit loops"
+  }
+]

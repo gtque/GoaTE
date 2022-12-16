@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="transform/thptransform.xsl"?>
+<html>
+	<head>
+		<meta name="author" content="gtque"/>
+		<file>forms/_flow_form_/head.xml</file>
+		<file>forms/common/style.xml</file>
+	</head>
+	<body>
+		<div id="main" class="main">
+		</div>
+		<div id="mainmain" class="mainmain">
+		    <file>forms/common/header.xml</file>
+			<file>forms/_flow_form_/maincenter.xml</file>
+			<file>forms/common/infofooter.xml</file>
+		</div>
+	</body>
+</html>

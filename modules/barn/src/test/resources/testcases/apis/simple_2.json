@@ -1,0 +1,35 @@
+{
+  "Scenario":"get google, but first yahoo, and clean up with msn",
+  "groups":"simple,extendsarray",
+  "abstract":false,
+  "extends":[
+    "base.json",
+    "cleanup.json"
+  ],
+  "method":"get",
+  "end point":"",
+  "security":"none",
+  "headers":[
+  ],
+  "custom params":[
+  ],
+  "form params":[
+  ],
+  "multipart":[
+  ],
+  "query params":[
+  ],
+  "expect":[
+    "get result>a.*.xyz,==,hello",
+    "get result>status code,==,200"
+  ],
+  "setup":[
+    {
+      "job":"api",
+      "base url":"https://yahoo.com",
+      "method":"get",
+      "end point":"",
+      "security":"none"
+    }
+  ]
+}

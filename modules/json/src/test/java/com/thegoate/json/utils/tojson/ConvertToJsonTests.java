@@ -4,7 +4,6 @@ import com.thegoate.Goate;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtility;
-import org.json.JSONArray;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertTrue;

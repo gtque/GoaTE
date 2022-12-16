@@ -43,5 +43,5 @@ import java.lang.annotation.RetentionPolicy;
 @Info(classifier = "type")
 @IndexAnnotated
 public @interface Mocker {
-    String type();
+    Class type();
 }

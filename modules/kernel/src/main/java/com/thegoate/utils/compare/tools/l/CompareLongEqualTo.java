@@ -27,13 +27,12 @@
 package com.thegoate.utils.compare.tools.l;
 
 import com.thegoate.utils.compare.CompareUtil;
-import com.thegoate.utils.compare.tools.f.CompareFloatTool;
 
 /**
  * Compares two longs for equality.
  * Created by Eric Angeli on 7/14/2017.
  */
-@CompareUtil(operator = "==", type = "long")
+@CompareUtil(operator = "==", type = Long.class)
 public class CompareLongEqualTo extends CompareLongTool {
 
     public CompareLongEqualTo(Object actual) {
@@ -44,7 +43,7 @@ public class CompareLongEqualTo extends CompareLongTool {
     public boolean evaluate() {
         boolean result = false;
         try{
-            result = Long.parseLong(""+actual)==Long.parseLong(""+expected);
+            result = parseLong(actual)==parseLong(expected);
         }catch(Exception e){
             result = tryExpectedType("==");
         }

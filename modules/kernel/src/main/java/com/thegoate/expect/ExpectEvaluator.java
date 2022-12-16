@@ -30,6 +30,7 @@ package com.thegoate.expect;
 import com.thegoate.Goate;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.Executioner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,12 +48,26 @@ public class ExpectEvaluator {
     final BleatBox LOG = BleatFactory.getLogger(getClass());
 
     List<ExpectThreadExecuter> expectations = null;
-    StringBuilder failed = new StringBuilder("");
+    volatile StringBuilder failed = new StringBuilder("");
     volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
     volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
+    volatile List<Goate> skipped = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
+    volatile List<Goate> zeroOrMore = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
 
     public ExpectEvaluator(ExpectationThreadBuilder etb){
         buildExpectations(etb);
+    }
+
+    public ExpectEvaluator(List<ExpectEvaluator> evs){
+        if(evs != null && evs.size()>0) {
+            for (ExpectEvaluator ev : evs) {
+                failed.append("\n").append(ev.failed());
+                fails.addAll(ev.fails());
+                passes.addAll(ev.passes());
+                skipped.addAll(ev.skipped());
+                zeroOrMore.addAll(ev.zeroOrMore());
+            }
+        }
     }
 
     protected void buildExpectations(ExpectationThreadBuilder etb){
@@ -69,13 +84,20 @@ public class ExpectEvaluator {
         process(threadSize);
         for(ExpectThreadExecuter expect:expectations){
             if(!expect.status()){
+//                LOG.debug("Expect Evaluation", "detected a failed expectation: " + expect.getExpectation().getExpectations());
                 result = false;
+                LOG.info("Expect Evaluation", "detected failed expectations: " + expect.failedMessage());
                 failed.append(expect.failedMessage());
                 fails.addAll(expect.fails());
             }
             passes.addAll(expect.passes());
         }
+        checkForSkipped();
         return result;
+    }
+
+    public List<ExpectThreadExecuter> expectations(){
+        return expectations;
     }
 
     public List<Goate> fails(){
@@ -86,44 +108,65 @@ public class ExpectEvaluator {
         return passes;
     }
 
+    public List<Goate> zeroOrMore(){
+        return zeroOrMore;
+    }
+
+    public List<Goate> skipped(){
+        return skipped;
+    }
+
     public String failed(){
-        return failed.toString();
+        return failed!=null?failed.toString():"no failed messages";
     }
 
     protected void process(int threadSize){
         LOG.debug("starting executor to evaluate expectations.");
-        boolean running = true;
-        ExecutorService es = Executors.newFixedThreadPool(threadSize);
-        //need a way to provide an order of execution for expectations,
-        //if not careful could fill up the thread pool with blocking threads waiting for something else to
-        //to be executed, but can't because the pool is full.
-        List<Future<?>> futures = new ArrayList<>();
-        for (ExpectThreadExecuter expectation : expectations) {
-            futures.add(es.submit(expectation));
+        if(new Executioner<ExpectThreadExecuter>(threadSize).process(expectations())){
+            LOG.debug("Expectations", "Evaluation finished successfully");
+        } else {
+            LOG.info("Expectations", "Evaluation did not finish successfully, at least one expectation was not executed for some reason.");
+            failed.append("/nNot all expectation threads were executed successfully for some reason, please review the logs.");
+            fails.add(new Goate().put("actual", expectations().size()).put("health check", "failed to execute all the threads for some reason."));
         }
-        while(running){
-            running = false;
-            for(Future<?> f:futures){
-                if(!f.isDone()){
-                    running = true;
+    }
+
+    private void checkForSkipped(){
+        for (ExpectThreadExecuter expectation : expectations()) {
+            Expectation ex = expectation.getExpectation();
+            Goate eval = ex.getExpectations();
+            //if(eval.size()>(passes().size()+fails().size())) {
+                //LOG.debug("Evaluate", "detected possible skipped expectation.");
+                for (String key : eval.keys()) {
+                    Goate exp = eval.get(key, null, Goate.class);
+                    if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), passes())) {
+                        if (!checkInExpectationList(exp.get("actual"), exp.get("operator", null, String.class), fails())) {
+                            if (!("" + exp.get("actual")).contains("*") && !("" + exp.get("actual")).contains("+")) {
+                                skipped.add(exp);
+                            } else {
+                                if (!("" + exp.get("actual")).contains("+")) {
+                                    zeroOrMore.add(exp);
+                                }
+                            }
+                        }
+                    }
+                }
+            //}
+        }
+    }
+
+    private boolean checkInExpectationList(Object actual, String operator, List<Goate> list) {
+        String act = "" + actual;
+        boolean result = false;
+        for (Goate expectation : list) {
+            if (act.equals("" + expectation.get("actual", null))) {
+                if (operator.equals("" + expectation.get("operator", null, String.class))) {
+                    result = true;
+                    break;
                 }
             }
         }
-        try {
-            LOG.debug("shutting down executor");
-            es.shutdown();
-            es.awaitTermination(5, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException e) {
-            LOG.error("interrupted: " + e.getMessage(), e);
-        }
-        finally {
-            if (!es.isTerminated()) {
-                LOG.error("force cancel non-finished tasks");
-            }
-            es.shutdownNow();
-            LOG.debug("shutdown finished");
-        }
+        return result;
     }
 
 }

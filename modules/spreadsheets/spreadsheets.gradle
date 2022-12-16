@@ -27,14 +27,13 @@
 import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
-    compile d.depends(":kernel", project.internalVersion);
-    compile 'org.apache.poi:poi:+';
-    compile "org.apache.poi:poi-scratchpad:+"
-    compile "org.apache.poi:poi-excelant:+"
-    compile "org.apache.poi:poi-ooxml:+"
-    compile "org.apache.poi:poi-ooxml-schemas:+"
-    compile 'org.apache.commons:commons-csv:+';
-	compile "org.apache.xmlbeans:xmlbeans:+";
-    testCompile d.depends(":json", project.internalVersion);
-    testCompile d.depends(":testng", project.internalVersion);
+    api  d.depends(":kernel", project.internalVersion);
+    api  'org.apache.poi:poi:5.2.3';
+    api  "org.apache.poi:poi-scratchpad:5.2.3"
+    api  "org.apache.poi:poi-excelant:5.2.3"
+    api  "org.apache.poi:poi-ooxml:5.2.3"
+    api  'org.apache.commons:commons-csv:1.9.0';
+	api  "org.apache.xmlbeans:xmlbeans:5.1.1";
+    testImplementation d.depends(":json", project.internalVersion);
+    testImplementation d.depends(":testng", project.internalVersion);
 }

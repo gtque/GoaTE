@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="transform/thptransform.xsl"?>
+<head>
+	<meta name="description" content="The technical home for GoaTE. Including tutorials, faq, and perhaps a forum one day..."/>
+	<meta name="keywords" content="goate, test engine, java, testng, unit test, unit testing, software qa, software testing, test framework"/>
+	<title title="GoaTE Tech">The smartest goate in the world.</title>
+</head>

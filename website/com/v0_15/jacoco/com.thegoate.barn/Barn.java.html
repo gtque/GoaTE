@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Barn.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.barn</a> &gt; <span class="el_source">Barn.java</span></div><h1>Barn.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.barn;
+
+import com.thegoate.Goate;
+import com.thegoate.barn.data.BarnDataLoader;
+import com.thegoate.barn.staff.StepsExecutor;
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.ExpectationThreadBuilder;
+import com.thegoate.testng.TestNGEngine;
+import org.testng.SkipException;
+
+import static org.testng.Assert.assertTrue;
+
+/**
+ * The base barn class for running complete data driven tests.
+ * Created by Eric Angeli on 5/22/2017.
+ */
+public class Barn extends TestNGEngine {
+<span class="fc" id="L44">    protected String label = &quot;barn&quot;;//default label, all tests in the test case directory belong to this group.</span>
+<span class="fc" id="L45">    protected String baseTestCaseDir = &quot;testcases&quot;;</span>
+<span class="fc" id="L46">    protected ExpectEvaluator ev = null;</span>
+<span class="fc" id="L47">    Throwable preFailure = null;</span>
+
+    public Barn() {
+<span class="fc" id="L50">        super();</span>
+<span class="fc" id="L51">        includeClassMethodInName = false;</span>
+<span class="fc" id="L52">    }</span>
+
+    public Barn(Goate data) {
+<span class="fc" id="L55">        super(data);</span>
+<span class="fc" id="L56">        includeClassMethodInName = false;</span>
+<span class="fc" id="L57">    }</span>
+
+    @Override
+    public void defineDataLoaders() {
+<span class="fc" id="L61">        runData.put(&quot;dl##&quot;, new BarnDataLoader().testCaseDirectory(baseTestCaseDir).defaultGroup(label));</span>
+<span class="fc" id="L62">    }</span>
+
+    public void setup() {
+<span class="fc" id="L65">        LOG.debug(&quot;Barn Setup&quot;, &quot;----running setup----&quot;);</span>
+        try {
+<span class="fc" id="L67">            steps(&quot;setup&quot;);</span>
+<span class="fc" id="L68">        } catch (Throwable t) {</span>
+<span class="fc" id="L69">            preFailure = t;</span>
+<span class="fc" id="L70">        }</span>
+<span class="fc" id="L71">        LOG.debug(&quot;Barn Setup&quot;, &quot;----finished setup----&quot;);</span>
+<span class="fc" id="L72">    }</span>
+
+    public void cleanup() {
+<span class="fc" id="L75">        LOG.debug(&quot;Cleanup&quot;, &quot;----running cleanup----&quot;);</span>
+        try {
+<span class="fc" id="L77">            steps(&quot;cleanup&quot;);</span>
+<span class="fc" id="L78">            evaluatePostconditions();</span>
+<span class="nc" id="L79">        } catch (Throwable t) {</span>
+<span class="nc" id="L80">            LOG.warn(getTestName(), &quot;Cleanup had a failure: &quot; + t.getMessage(), t);</span>
+<span class="nc" id="L81">            throw t;</span>
+<span class="fc" id="L82">        }</span>
+<span class="fc" id="L83">        LOG.debug(&quot;Cleanup&quot;, &quot;----finished cleanup----&quot;);</span>
+<span class="fc" id="L84">    }</span>
+
+    protected void steps(String step) {
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (data.size() &gt; 0) {</span>
+<span class="fc" id="L88">            StepsExecutor dosteps = new StepsExecutor(data).notOrdered();</span>
+<span class="fc" id="L89">            String steps = &quot;&quot; + data.get(step, &quot;[]&quot;);</span>
+<span class="fc" id="L90">            data.put(step + &quot;_result##&quot;, dosteps.doSteps(steps));</span>
+        }
+<span class="fc" id="L92">    }</span>
+
+    public void execute() {
+<span class="fc" id="L95">        setup();</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (data.size() == 0) {</span>
+<span class="nc" id="L97">            LOG.skip(getTestName(), &quot;Skipping test because there is nothing to execute.&quot;);</span>
+<span class="nc" id="L98">            throw new SkipException(&quot;No run data.&quot;);</span>
+        }
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (preFailure != null) {</span>
+<span class="fc" id="L101">            LOG.skip(getTestName(), &quot;Skipping test because pre-steps failed: &quot; + preFailure.getMessage());</span>
+<span class="fc" id="L102">            throw new SkipException(preFailure.getMessage());</span>
+        } else {
+            try {
+                //the status of preconditions is only printed if one of the preconditions fails.
+<span class="fc" id="L106">                LOG.debug(getTestName(), &quot;----checking preconditions----&quot;);</span>
+<span class="fc" id="L107">                evaluatePreconditions();</span>
+<span class="fc" id="L108">                ev = null;//reset to null so that if the test throws an exception</span>
+                //the checks for preconditions don't get printed.
+                try {
+<span class="fc" id="L111">                    LOG.debug(getTestName(), &quot;----starting execution----&quot;);</span>
+<span class="fc" id="L112">                    StepsExecutor steps = new StepsExecutor(data).notOrdered();</span>
+<span class="fc" id="L113">                    data.put(&quot;_goate_result&quot;, steps.doSteps(null).get(&quot;0&quot;));</span>
+<span class="nc" id="L114">                } catch (Throwable t) {</span>
+<span class="nc" id="L115">                    LOG.fatal(getTestName(), &quot;Encountered a problem executing the test: &quot; + t.getMessage(), t);</span>
+<span class="nc" id="L116">                    throw t;</span>
+                } finally {
+<span class="pc" id="L118">                    LOG.debug(getTestName(), &quot;----finished execution----&quot;);</span>
+<span class="pc" id="L119">                    LOG.debug(getTestName(), &quot;----evaluating expectations----&quot;);</span>
+<span class="pc" id="L120">                }</span>
+<span class="fc" id="L121">                evaluateExpectations();</span>
+<span class="nc" id="L122">            } catch (Throwable t) {</span>
+<span class="nc" id="L123">                throw t;</span>
+            } finally {
+<span class="pc" id="L125">                LOG.debug(getTestName(), &quot;----finished expectations----&quot;);</span>
+<span class="pc" id="L126">                cleanup();</span>
+<span class="pc" id="L127">            }</span>
+        }
+<span class="fc" id="L129">    }</span>
+
+    protected void evaluateExpectations() {
+<span class="fc" id="L132">        evaluate(&quot;expect&quot;, false);</span>
+<span class="fc" id="L133">    }</span>
+
+    protected void evaluatePreconditions() {
+<span class="fc" id="L136">        evaluate(&quot;preconditions&quot;, true);</span>
+<span class="fc" id="L137">    }</span>
+
+    protected void evaluatePostconditions() {
+<span class="fc" id="L140">        evaluate(&quot;postconditions&quot;, false);</span>
+<span class="fc" id="L141">    }</span>
+
+    protected void evaluate(String stage, boolean clearAfterRunning) {
+<span class="fc" id="L144">        etb = new ExpectationThreadBuilder(new Goate().put(&quot;parent&quot;, data).merge(data, false));</span>
+<span class="fc" id="L145">        etb.expect(data.filter(stage + &quot;\\.&quot;));</span>
+<span class="fc" id="L146">        evalTimeout(Long.parseLong(&quot;&quot; + data.get(stage + &quot;_timeout&quot;, data.get(&quot;timeout_expect&quot;, 500L))));</span>
+<span class="fc" id="L147">        evalPeriod(Long.parseLong(&quot;&quot; + data.get(stage + &quot;_period&quot;, data.get(&quot;period_expect&quot;, 50L))));</span>
+<span class="fc" id="L148">        evaluate(clearAfterRunning);</span>
+<span class="fc" id="L149">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

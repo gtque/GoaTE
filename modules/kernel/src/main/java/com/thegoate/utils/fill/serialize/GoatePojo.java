@@ -30,6 +30,7 @@ import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
 import org.atteo.classindex.IndexAnnotated;
 
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -40,6 +41,8 @@ import java.lang.annotation.RetentionPolicy;
 @GoateDescription(description = "Identifies a pojo class as being consumable by GoaTE.")
 @Info(classifier = "id")
 @IndexAnnotated
+@Inherited
 public @interface GoatePojo {
     String id() default "";
+    boolean forceCast() default false;
 }

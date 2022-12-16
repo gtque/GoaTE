@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>BarnSummaryReportEmployee.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.barn.staff</a> &gt; <span class="el_source">BarnSummaryReportEmployee.java</span></div><h1>BarnSummaryReportEmployee.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.barn.staff;
+
+import com.thegoate.Goate;
+import com.thegoate.barn.data.BarnDataLoader;
+import com.thegoate.json.utils.tojson.GoateToJSON;
+import com.thegoate.staff.Employee;
+import com.thegoate.staff.GoateJob;
+import com.thegoate.utils.fill.FillString;
+
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * Generates a preview of the evaluated barn json.
+ * Created by Eric Angeli on 5/22/2017.
+ */
+@GoateJob(jobs = {&quot;barn summary&quot;})
+<span class="fc" id="L44">public class BarnSummaryReportEmployee extends Employee {</span>
+<span class="fc" id="L45">    enum SUMMARY_TYPE {</span>
+<span class="fc" id="L46">        API(&quot;end point,method&quot;,&quot;get:/&quot;,&quot;${method}:${end point}&quot;);</span>
+<span class="fc" id="L47">        String defaultId = &quot;&quot;;</span>
+<span class="fc" id="L48">        String idPattern = &quot;&quot;;</span>
+        String[] criticalInfo;
+<span class="fc" id="L50">        SUMMARY_TYPE(String criticalList, String defaultId, String idPattern){</span>
+<span class="fc" id="L51">            criticalInfo = criticalList.split(&quot;,&quot;);</span>
+<span class="fc" id="L52">            this.defaultId = defaultId;</span>
+<span class="fc" id="L53">            this.idPattern = idPattern;</span>
+<span class="fc" id="L54">        }</span>
+        public String[] getCriticalInfo(){
+<span class="fc" id="L56">            return criticalInfo;</span>
+        }
+        public String getDefaultId(){
+<span class="fc" id="L59">            return defaultId;</span>
+        }
+        public String getIdPattern(){
+<span class="fc" id="L62">            return idPattern;</span>
+        }
+    }
+<span class="fc" id="L65">    String barnRoot = &quot;&quot;;</span>
+<span class="fc" id="L66">    String groups = &quot;&quot;;</span>
+<span class="fc" id="L67">    String exclude = &quot;&quot;;</span>
+<span class="fc" id="L68">    String type = &quot;&quot;;</span>
+<span class="fc" id="L69">    boolean simple = false;</span>
+
+    public BarnSummaryReportEmployee root(String root){
+<span class="fc" id="L72">        initData();</span>
+<span class="fc" id="L73">        definition.put(&quot;barn root&quot;, root);</span>
+<span class="fc" id="L74">        return this;</span>
+    }
+
+    public BarnSummaryReportEmployee groups(String groups){
+<span class="fc" id="L78">        initData();</span>
+<span class="fc" id="L79">        definition.put(&quot;barn groups&quot;, groups);</span>
+<span class="fc" id="L80">        return this;</span>
+    }
+
+    public BarnSummaryReportEmployee exclude(String exclude){
+<span class="fc" id="L84">        initData();</span>
+<span class="fc" id="L85">        definition.put(&quot;barn exclude&quot;, exclude);</span>
+<span class="fc" id="L86">        return this;</span>
+    }
+
+    public BarnSummaryReportEmployee jobType(String type){
+<span class="fc" id="L90">        initData();</span>
+<span class="fc" id="L91">        definition.put(&quot;barn type&quot;, type);</span>
+<span class="fc" id="L92">        return this;</span>
+    }
+
+    public BarnSummaryReportEmployee simple(){
+<span class="fc" id="L96">        this.simple = true;</span>
+<span class="fc" id="L97">        return this;</span>
+    }
+
+    @Override
+    public Employee init() {
+<span class="fc" id="L102">        barnRoot = definition.get(&quot;barn root&quot;,&quot;&quot;, String.class);</span>
+<span class="fc" id="L103">        groups = definition.get(&quot;barn groups&quot;,&quot;&quot;, String.class);</span>
+<span class="fc" id="L104">        exclude = definition.get(&quot;barn exclude&quot;,&quot;&quot;, String.class);</span>
+<span class="fc" id="L105">        type = definition.get(&quot;barn type&quot;,&quot;&quot;, String.class).toUpperCase(Locale.ROOT);</span>
+<span class="fc" id="L106">        return this;</span>
+    }
+
+    @Override
+    protected Object doWork() {
+<span class="fc" id="L111">        Goate summary = new Goate();</span>
+<span class="fc" id="L112">        BarnDataLoader bdl = new BarnDataLoader();</span>
+<span class="fc" id="L113">        bdl.testCaseDirectory(barnRoot).groups(groups).excludes(exclude);</span>
+<span class="fc" id="L114">        List&lt;Goate&gt; testCases = bdl.load();</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if(testCases!=null){</span>
+<span class="fc" id="L116">            String[] criticalInfo = SUMMARY_TYPE.valueOf(type).getCriticalInfo();</span>
+<span class="fc" id="L117">            String defaultId = SUMMARY_TYPE.valueOf(type).getDefaultId();</span>
+<span class="fc" id="L118">            String idPattern = SUMMARY_TYPE.valueOf(type).getIdPattern();</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">            for(Goate testCase : testCases){</span>
+<span class="fc" id="L120">                String identifier = null;</span>
+<span class="fc" id="L121">                Goate extraInfo = new Goate();</span>
+                int index;
+                Goate tempSummary;
+<span class="fc bfc" id="L124" title="All 2 branches covered.">                for(String info:criticalInfo) {</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">                    if(identifier==null) {</span>
+<span class="fc" id="L126">                        identifier = &quot;&quot;+new FillString(idPattern).with(testCase);</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">                        if(identifier.equals(idPattern)){</span>
+<span class="nc" id="L128">                            identifier = defaultId;</span>
+                        }
+<span class="fc" id="L130">                        tempSummary = summary.get(identifier, new Goate(), Goate.class);</span>
+<span class="fc" id="L131">                        tempSummary.put(&quot;_summary_count_&quot;,tempSummary.get(&quot;_summary_count_&quot;,0, Integer.class)+1);</span>
+<span class="fc" id="L132">                        index = tempSummary.get(&quot;_summary_count_&quot;,0, Integer.class);</span>
+<span class="pc bpc" id="L133" title="2 of 4 branches missed.">                        if(criticalInfo.length&gt;1&amp;&amp;!simple) {</span>
+<span class="nc" id="L134">                            extraInfo = tempSummary.get(&quot;additional info.&quot; + index, new Goate(), Goate.class);</span>
+                        }
+                    } else {
+<span class="fc" id="L137">                        extraInfo.put(info,testCase.get(info));</span>
+                    }
+                }
+<span class="fc" id="L140">            }</span>
+
+        }
+<span class="fc" id="L143">        int total = 0;</span>
+<span class="fc" id="L144">        Goate temp = new Goate();</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        for(String key:summary.keys()){</span>
+<span class="fc" id="L146">            total += summary.get(key, temp, Goate.class).get(&quot;_summary_count_&quot;,0,Integer.class);</span>
+<span class="fc" id="L147">        }</span>
+<span class="fc" id="L148">        summary.put(type+&quot;_total_count&quot;, summary.size());</span>
+<span class="fc" id="L149">        summary.put(&quot;test total&quot;, total);</span>
+<span class="fc" id="L150">        return new GoateToJSON(summary).convert();</span>
+    }
+
+    @Override
+    public String[] detailedScrub() {
+<span class="nc" id="L155">        String[] scrub = {};</span>
+<span class="nc" id="L156">        return scrub;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

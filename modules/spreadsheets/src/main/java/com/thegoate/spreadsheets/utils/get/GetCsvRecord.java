@@ -36,7 +36,7 @@ import com.thegoate.utils.get.GetUtility;
  * Get the field from the given json.
  * Created by Eric Angeli on 5/19/2017.
  */
-@GetUtil
+@GetUtil(type = CSVRecord.class)
 public class GetCsvRecord extends CsvRecordUtil implements GetUtility {
 
     public GetCsvRecord(Object val) {

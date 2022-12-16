@@ -36,4 +36,5 @@ import com.thegoate.utils.Utility;
 public interface ToJsonUtility extends Utility {
     String convert();
     String convertStrict();
+    ToJsonUtility isList(boolean isList);
 }

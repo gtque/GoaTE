@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>TestNGEngine.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.testng</a> &gt; <span class="el_source">TestNGEngine.java</span></div><h1>TestNGEngine.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.testng;
+
+import com.thegoate.Goate;
+import com.thegoate.expect.ExpectEvaluator;
+import com.thegoate.expect.Expectation;
+import com.thegoate.expect.ExpectationError;
+import com.thegoate.expect.ExpectationThreadBuilder;
+import com.thegoate.expect.amp.FailAmplifier;
+import com.thegoate.expect.amp.PassAmplifier;
+import com.thegoate.expect.amp.SkippedAmplifier;
+import com.thegoate.expect.amp.ZeroOrMoreAmplifier;
+import com.thegoate.expect.builder.ExpectationBuilder;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.metrics.Stopwatch;
+import com.thegoate.statics.StaticScrubber;
+import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.get.Get;
+import org.testng.ITest;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
+import org.testng.annotations.*;
+import org.testng.xml.XmlTest;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
+import static org.testng.Assert.assertTrue;
+
+
+/**
+ * The base class for writing TestNG classes.
+ * Created by Eric Angeli on 5/11/2017.
+ */
+@Listeners({TestNGEvaluateListener.class})
+public abstract class TestNGEngine implements ITest, TestNG {
+
+<span class="fc" id="L71">    private Class testClass = getClass();</span>
+    //    protected volatile boolean dd = false;
+<span class="fc" id="L73">    protected BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+<span class="fc" id="L74">    protected Goate data = null;</span>
+    protected Goate runData;
+    protected Goate constantData;
+<span class="fc" id="L77">    protected int runNumber = 0;</span>
+<span class="fc" id="L78">    protected String scenario = &quot;&quot;;</span>
+<span class="fc" id="L79">    protected String methodName = &quot;&quot;;</span>
+<span class="fc" id="L80">    protected boolean muteFrom = false;</span>
+<span class="fc" id="L81">    protected boolean includeClassMethodInName = true;</span>
+<span class="fc" id="L82">    ITestContext testContext = null;</span>
+<span class="fc" id="L83">    XmlTest xt = null;</span>
+    protected ExpectationThreadBuilder etb;
+    protected ExpectEvaluator ev;
+<span class="fc" id="L86">    private List&lt;ExpectEvaluator&gt; executedExpectations = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L87">    protected volatile boolean expectationsSet = false;</span>
+<span class="fc" id="L88">    protected volatile boolean expectationsNotEvaluated = true;</span>
+
+<span class="fc" id="L90">    public static Map&lt;String, Integer&gt; number = new ConcurrentHashMap&lt;&gt;();</span>
+
+<span class="fc" id="L92">    public TestNGEngine() {</span>
+<span class="fc" id="L93">        setData(null);</span>
+<span class="fc" id="L94">    }</span>
+
+<span class="fc" id="L96">    public TestNGEngine(Goate data) {</span>
+<span class="fc" id="L97">        init(data);</span>
+<span class="fc" id="L98">    }</span>
+
+    public void setLOG(BleatBox box) {
+<span class="fc" id="L101">        LOG = box;</span>
+<span class="fc" id="L102">    }</span>
+
+    protected boolean isFactoryDriven(){
+<span class="fc" id="L105">        Constructor[] constructors = testClass.getConstructors();</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        for(Constructor constructor:constructors){</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">            if(constructor.getAnnotation(Factory.class)!=null){</span>
+<span class="fc" id="L108">                return true;</span>
+            }
+        }
+<span class="fc" id="L111">        return false;</span>
+    }
+
+    protected boolean isDataDriven(Test test, boolean gp){
+<span class="fc bfc" id="L115" title="All 4 branches covered.">        return (!test.dataProvider().isEmpty())||(gp);</span>
+    }
+
+
+    @BeforeMethod(alwaysRun = true, dependsOnMethods = &quot;initDataMethod&quot;)
+    @Override
+    public void startUp(Method method, ITestResult testResult) {
+<span class="fc" id="L122">        methodName = method.getName();</span>
+<span class="fc" id="L123">        Test test = method.getAnnotation(Test.class);</span>
+<span class="fc" id="L124">        boolean gp = isFactoryDriven();</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if (isDataDriven(test, gp)) {</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            if(gp){</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">                if(!number.containsKey(&quot;&quot; + testClass.getCanonicalName() + &quot;:&quot; + methodName)){</span>
+<span class="fc" id="L128">                    number.put(&quot;&quot; + testClass.getCanonicalName() + &quot;:&quot; + methodName, 0);</span>
+                }
+//                initGoate(testResult.getParameters(), method);//change to getFactoryParameters() after upgrading verison of TestNG
+            } else {
+<span class="fc bfc" id="L132" title="All 2 branches covered.">                if(!number.containsKey(&quot;&quot; + testClass.getCanonicalName() + &quot;:&quot; + methodName)){</span>
+<span class="fc" id="L133">                    number.put(&quot;&quot; + testClass.getCanonicalName() + &quot;:&quot; + methodName, 0);</span>
+                }
+//                initGoate(testResult.getParameters(), method);
+            }
+<span class="fc" id="L137">            bumpRunNumber(methodName);</span>
+<span class="fc" id="L138">            setRunNumber(number.get(&quot;&quot; + testClass.getCanonicalName() + &quot;:&quot; + methodName));</span>
+        } else {
+<span class="fc" id="L140">            data = new Goate();</span>
+<span class="fc" id="L141">            setRunNumber(0);</span>
+        }
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        if (data != null){</span>
+<span class="fc bfc" id="L144" title="All 4 branches covered.">            if(getScenario()==null||getScenario().isEmpty()){</span>
+<span class="fc" id="L145">                setScenario((String)data.get(&quot;Scenario&quot;));</span>
+            }
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">            if(data.get(&quot;lap&quot;, null) != null) {</span>
+<span class="nc" id="L148">                Stopwatch.global.start(data.get(&quot;lap&quot;, Thread.currentThread().getName(), String.class));</span>
+            }
+        }
+<span class="fc" id="L151">        etb = new ExpectationThreadBuilder(data);</span>
+<span class="fc" id="L152">        executedExpectations = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L153">        String startMessage = &quot;\n&quot; +</span>
+                &quot;***************************Starting Up***************************\n&quot; +
+<span class="fc" id="L155">                &quot;*\t&quot; + getTestName() + &quot;\t*\n&quot;;</span>
+<span class="fc" id="L156">        startMessage += data.toString(&quot;*\t&quot;, &quot;\t*&quot;);</span>
+<span class="fc" id="L157">        startMessage += &quot;\n*****************************************************************&quot;;</span>
+<span class="fc" id="L158">        TestMap.tests.put(getTestName(), this);</span>
+<span class="fc" id="L159">        LOG.info(&quot;Start Up&quot;, startMessage);</span>
+<span class="fc" id="L160">    }</span>
+
+    @BeforeMethod(alwaysRun = true)
+    public void initDataMethod(){
+<span class="fc" id="L164">        UnknownUtilType.clearCache(Get.class);</span>
+<span class="fc" id="L165">    }</span>
+
+    //    @AfterMethod(alwaysRun = true)
+    @Override
+    public void finishUp(Method method) {
+<span class="fc" id="L170">        StaticScrubber scrubber = new StaticScrubber();</span>
+<span class="pc bpc" id="L171" title="2 of 4 branches missed.">        if (data != null &amp;&amp; data.get(&quot;lap&quot;, null) != null) {</span>
+<span class="nc" id="L172">            Stopwatch.global.stop(data.get(&quot;lap&quot;, Thread.currentThread().getName(), String.class));</span>
+        }
+<span class="fc" id="L174">        scrubber.scrub();</span>
+<span class="fc" id="L175">        String endMessage = &quot;\n&quot; +</span>
+                &quot;*****************************************************************\n&quot; +
+<span class="fc" id="L177">                &quot;*\t&quot; + getTestName() + &quot;\t*\n&quot;;</span>
+<span class="fc" id="L178">        endMessage += data.toString(&quot;*\t&quot;, &quot;\t*&quot;);</span>
+<span class="fc" id="L179">        endMessage += &quot;\n***************************Finished Up***************************&quot;;</span>
+<span class="fc" id="L180">        LOG.info(&quot;Shut Down&quot;, endMessage);</span>
+<span class="fc" id="L181">    }</span>
+
+    @BeforeMethod(alwaysRun = true)
+    public void initGoate(Object[] data, Method method){
+<span class="fc" id="L185">        doInitData(data, method, this);</span>
+<span class="fc" id="L186">    }</span>
+
+    public static void doInitData(Object[] data, Method method, TestNG test){
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">        if(data!=null){</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">            if(data.length&gt;0) {</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">                if (data[0] instanceof Goate) {</span>
+<span class="fc" id="L192">                    test.init((Goate) data[0]);</span>
+                } else {
+<span class="nc" id="L194">                    Goate dGoate = new Goate();</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                    if (data[0] instanceof Map) {</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">                        for (Map.Entry&lt;String, String&gt; entry : ((Map&lt;String, String&gt;) data[0]).entrySet()) {</span>
+<span class="nc" id="L197">                            dGoate.put(entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L198">                        }</span>
+                    } else {
+<span class="nc" id="L200">                        Parameter[] parameters = method.getParameters();</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">                        for (int i = 0; i &lt; parameters.length; i++) {</span>
+<span class="nc" id="L202">                            Parameter parameter = parameters[i];</span>
+<span class="nc" id="L203">                            dGoate.put(parameter.getName(), data[i]);</span>
+                        }
+                    }
+<span class="nc" id="L206">                    test.init(dGoate);</span>
+<span class="nc" id="L207">                }</span>
+            } else {
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">                if(test.getData()==null) {</span>
+<span class="nc" id="L210">                    test.init(new Goate());</span>
+                }
+            }
+        }
+<span class="fc" id="L214">    }</span>
+
+    public void init(Goate data) {
+<span class="fc" id="L217">        LOG.debug(&quot;Init&quot;, &quot;setting test data for the class.&quot;);</span>
+<span class="fc" id="L218">        setData(data);</span>
+<span class="fc" id="L219">        String sKey = getData().findKeyIgnoreCase(&quot;Scenario&quot;);</span>
+<span class="fc" id="L220">        setScenario(get(sKey, &quot;empty::&quot;, String.class));</span>
+//        setRunNumber(number);
+//        bumpRunNumber();
+<span class="fc" id="L223">    }</span>
+
+    @Override
+    public String getTestName() {
+<span class="fc" id="L227">        StringBuilder name = new StringBuilder(&quot;&quot;);</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        if (includeClassMethodInName) {</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">            name.append((testClass == null ? getClass().getCanonicalName() : testClass.getCanonicalName()))</span>
+<span class="fc" id="L230">                    .append(&quot;:&quot;)</span>
+<span class="fc" id="L231">                    .append(methodName)</span>
+<span class="fc" id="L232">                    .append(&quot;:&quot;);</span>
+        }
+<span class="fc bfc" id="L234" title="All 2 branches covered.">        if(scenario!=null) {</span>
+<span class="fc" id="L235">            name.append(scenario);</span>
+        }
+<span class="fc" id="L237">        name.append(&quot;(&quot; + runNumber + &quot;)&quot;);</span>
+<span class="fc" id="L238">        return name.toString();</span>
+    }
+
+    @Override
+    @DataProvider(name = &quot;dataLoader&quot;)
+    public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
+//        number = 0;//resets the count, assumes TestNG loads all the runs before processing the next class.
+//        number.put(&quot;&quot; + method.getRealClass().getCanonicalName() + &quot;:&quot; + &quot;class&quot;, 0);
+<span class="fc" id="L246">        testClass = method.getRealClass();</span>
+<span class="fc" id="L247">        this.testContext = context;</span>
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">        if (context != null) {</span>
+<span class="fc" id="L249">            xt = context.getCurrentXmlTest();</span>
+        }
+<span class="fc" id="L251">        initDataLoaders();</span>
+<span class="fc" id="L252">        return TestNGRunFactory.loadRuns(getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());</span>
+    }
+
+    public void initDataLoaders() {
+<span class="fc bfc" id="L256" title="All 2 branches covered.">        if (runData == null) {</span>
+<span class="fc" id="L257">            runData = new Goate();</span>
+        }
+<span class="fc bfc" id="L259" title="All 2 branches covered.">        if (constantData == null) {</span>
+<span class="fc" id="L260">            constantData = new Goate();</span>
+        }
+<span class="fc" id="L262">        defineDataLoaders();</span>
+<span class="fc" id="L263">    }</span>
+
+    @Override
+    public void defineDataLoaders(Goate runData, Goate constantData) {
+<span class="fc" id="L267">        this.runData = runData;</span>
+<span class="fc" id="L268">        this.constantData = constantData;</span>
+<span class="fc" id="L269">    }</span>
+
+    @Override
+    public Goate getRunDataLoader() {
+<span class="fc" id="L273">        return this.runData;</span>
+    }
+
+    @Override
+    public Goate getConstantDataLoader() {
+<span class="fc" id="L278">        return this.constantData;</span>
+    }
+
+    @Override
+    public Goate getData() {
+<span class="fc" id="L283">        return this.data;</span>
+    }
+
+    @Override
+    public void setData(Goate data) {
+<span class="fc bfc" id="L288" title="All 2 branches covered.">        if (data == null) {</span>
+<span class="fc" id="L289">            data = new Goate();</span>
+        }
+<span class="fc" id="L291">        this.data = data;</span>
+<span class="fc" id="L292">    }</span>
+
+    @Override
+    public void setRunNumber(int number) {
+<span class="fc" id="L296">        runNumber = number;</span>
+<span class="fc" id="L297">    }</span>
+
+    @Override
+    public void bumpRunNumber(String name) {
+<span class="pc bpc" id="L301" title="1 of 2 branches missed.">        if (number.containsKey(&quot;&quot; + testClass.getCanonicalName() + &quot;:&quot; + name)) {</span>
+<span class="fc" id="L302">            int num = number.get(&quot;&quot; + testClass.getCanonicalName() + &quot;:&quot; + name);</span>
+<span class="fc" id="L303">            number.put(&quot;&quot; + testClass.getCanonicalName() + &quot;:&quot; + name, num + 1);</span>
+        }
+<span class="fc" id="L305">    }</span>
+
+    @Override
+    public int getRunNumber() {
+<span class="nc" id="L309">        return runNumber;</span>
+    }
+
+    @Override
+    public void setScenario(String scenario) {
+<span class="fc" id="L314">        this.scenario = scenario;</span>
+<span class="fc" id="L315">    }</span>
+
+    @Override
+    public String getScenario() {
+<span class="fc" id="L319">        return scenario;</span>
+    }
+
+    @Override
+    public Object get(String key) {
+<span class="fc" id="L324">        return get(key, null);</span>
+    }
+
+    @Override
+    public Object get(String key, Object def) {
+<span class="fc" id="L329">        return get(key, def, Object.class);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T get(String key, Object def, Class&lt;T&gt; type) {
+<span class="fc" id="L334">        return data.get(key, def, true, type);</span>
+    }
+
+    @Override
+    public TestNG put(String key, Object val) {
+<span class="fc" id="L339">        data.put(key, val);</span>
+<span class="fc" id="L340">        return this;</span>
+    }
+
+    @Override
+    public TestNGEngine expect(Expectation expectation) {
+<span class="fc bfc" id="L345" title="All 2 branches covered.">        if (etb.isBuilt()) {</span>
+<span class="fc" id="L346">            clearExpectations();</span>
+        }
+<span class="pc bpc" id="L348" title="1 of 2 branches missed.">        if (etb != null) {</span>
+<span class="fc" id="L349">            etb.expect(expectation);</span>
+<span class="fc" id="L350">            expectationsSet = true;</span>
+        }
+<span class="fc" id="L352">        return this;</span>
+    }
+
+    @Override
+    public TestNGEngine expect(ExpectationBuilder expectationBuilder) {
+<span class="fc" id="L357">        return expect(expectationBuilder.build());</span>
+    }
+
+    @Override
+    public TestNGEngine expect(List&lt;Expectation&gt; expectationList) {
+<span class="fc" id="L362">        expectationList.forEach(this::expect);</span>
+<span class="fc" id="L363">        return this;</span>
+    }
+
+    @Override
+    public TestNGEngine evalPeriod(long periodMS) {
+<span class="pc bpc" id="L368" title="1 of 2 branches missed.">        if (etb != null) {</span>
+<span class="fc" id="L369">            etb.period(periodMS);</span>
+        }
+<span class="fc" id="L371">        return this;</span>
+    }
+
+    @Override
+    public TestNGEngine evalTimeout(long timeoutMS) {
+<span class="pc bpc" id="L376" title="1 of 2 branches missed.">        if (etb != null) {</span>
+<span class="fc" id="L377">            etb.timeout(timeoutMS);</span>
+        }
+<span class="fc" id="L379">        return this;</span>
+    }
+
+    public ExpectEvaluator getEv() {
+<span class="fc" id="L383">        return ev;</span>
+    }
+
+    @Override
+    public void evaluate() {
+<span class="fc" id="L388">        evaluate(null);</span>
+<span class="fc" id="L389">    }</span>
+
+    public void evaluate(boolean clearAfterRunning) {
+<span class="fc" id="L392">        evaluate(null, clearAfterRunning);</span>
+<span class="fc" id="L393">    }</span>
+
+    @Override
+    public void evaluate(ITestResult testResult) {
+<span class="fc" id="L397">        evaluate(testResult, false);</span>
+<span class="fc" id="L398">    }</span>
+
+    public void evaluate(ITestResult testResult, boolean clearAfterRunning) {
+<span class="fc bfc" id="L401" title="All 2 branches covered.">        if (etb.isBuilt()) {</span>
+<span class="fc" id="L402">            LOG.info(&quot;Evaluate&quot;, &quot;Expectations have already been evaluated and will not be re-evaluated.&quot;);</span>
+        } else {
+<span class="fc" id="L404">            expectationsNotEvaluated = false;</span>
+<span class="fc" id="L405">            ev = new ExpectEvaluator(etb);</span>
+<span class="fc" id="L406">            boolean result = ev.evaluate();</span>
+<span class="fc" id="L407">            executedExpectations.add(ev);</span>
+<span class="fc bfc" id="L408" title="All 2 branches covered.">            if (ev.fails().size() &gt; 0) {</span>
+<span class="fc" id="L409">                LOG.warn(&quot;failures detected...&quot;);</span>
+<span class="fc" id="L410">                result = false;</span>
+            }
+<span class="fc bfc" id="L412" title="All 2 branches covered.">            if (ev.skipped().size() &gt; 0) {</span>
+<span class="fc" id="L413">                LOG.warn(&quot;skipped tests detected...&quot;);</span>
+<span class="fc" id="L414">                result = false;</span>
+            }
+<span class="fc" id="L416">            logStatuses(ev, clearAfterRunning);</span>
+            try {
+<span class="fc" id="L418">                assertTrue(result, ev.failed());</span>
+<span class="fc" id="L419">            } catch (Throwable e) {</span>
+<span class="fc" id="L420">                StringBuilder failures = new StringBuilder();</span>
+<span class="fc" id="L421">                executedExpectations.stream().forEach(ex -&gt; failures.append(getFailures(ex)));</span>
+<span class="fc" id="L422">                throw new ExpectationError(failures.toString());</span>
+//                throw e;
+            } finally {
+<span class="fc bfc" id="L425" title="All 4 branches covered.">                if (clearAfterRunning) {</span>
+<span class="fc" id="L426">                    executedExpectations = new ArrayList&lt;&gt;();</span>
+                }
+<span class="fc" id="L428">            }</span>
+        }
+<span class="fc" id="L430">    }</span>
+
+    private String getFailures(ExpectEvaluator ev) {
+<span class="fc" id="L433">        StringBuilder failures = new StringBuilder();</span>
+<span class="fc" id="L434">        String fails = new FailAmplifier(null)</span>
+<span class="fc" id="L435">                .muteFrom(eut(&quot;expect.mute&quot;, muteFrom, Boolean.class))</span>
+<span class="fc" id="L436">                .testName(getTestName())</span>
+<span class="fc" id="L437">                .amplify(ev);</span>
+<span class="fc bfc" id="L438" title="All 2 branches covered.">        if (!fails.isEmpty()) {</span>
+<span class="fc" id="L439">            failures.append(&quot;\nfailed&quot;).append(fails);</span>
+        }
+
+<span class="fc" id="L442">        String skips = new SkippedAmplifier(null)</span>
+<span class="fc" id="L443">                .muteFrom(eut(&quot;expect.mute&quot;, muteFrom, Boolean.class))</span>
+<span class="fc" id="L444">                .testName(getTestName())</span>
+<span class="fc" id="L445">                .amplify(ev);</span>
+<span class="fc bfc" id="L446" title="All 2 branches covered.">        if (!skips.isEmpty()) {</span>
+<span class="fc" id="L447">            failures.append(skips);</span>
+        }
+<span class="fc" id="L449">        return failures.toString();</span>
+    }
+
+    public void logStatuses(ExpectEvaluator ev) {
+<span class="fc" id="L453">        logStatuses(ev, true);</span>
+<span class="fc" id="L454">    }</span>
+
+    public void logStatuses(ExpectEvaluator ev, boolean logFailuresDefault) {
+<span class="fc" id="L457">        Goate.innerGoate = -1;</span>
+<span class="fc" id="L458">        String passes = new PassAmplifier(null)</span>
+<span class="fc" id="L459">                .muteFrom(eut(&quot;expect.mute&quot;, muteFrom, Boolean.class))</span>
+<span class="fc" id="L460">                .testName(getTestName())</span>
+<span class="fc" id="L461">                .amplify(ev);</span>
+<span class="fc bfc" id="L462" title="All 2 branches covered.">        if (!passes.isEmpty()) {</span>
+<span class="fc" id="L463">            LOG.info(&quot;Status&quot;, &quot;\npassed:&quot; + passes);</span>
+        }
+
+<span class="fc bfc" id="L466" title="All 2 branches covered.">        if (eut(&quot;assert.printStackTrace&quot;, logFailuresDefault, Boolean.class)) {</span>
+<span class="fc" id="L467">            LOG.fail(&quot;Status&quot;, getFailures(ev));</span>
+        }
+
+<span class="fc" id="L470">        String skipZero = new ZeroOrMoreAmplifier(null)</span>
+<span class="fc" id="L471">                .muteFrom(eut(&quot;expect.mute&quot;, muteFrom, Boolean.class))</span>
+<span class="fc" id="L472">                .testName(getTestName())</span>
+<span class="fc" id="L473">                .amplify(ev);</span>
+<span class="fc bfc" id="L474" title="All 2 branches covered.">        if (!skipZero.isEmpty()) {</span>
+<span class="fc" id="L475">            LOG.info(&quot;Expectations&quot;, &quot;may not have been evaluated:&quot; + skipZero);</span>
+        }
+<span class="fc" id="L477">        Goate.innerGoate = 0;</span>
+<span class="fc" id="L478">    }</span>
+
+    @Override
+    public TestNGEngine clearExpectations() {
+<span class="fc" id="L482">        etb = new ExpectationThreadBuilder(data);</span>
+<span class="fc" id="L483">        expectationsSet = false;</span>
+<span class="fc" id="L484">        expectationsNotEvaluated = true;</span>
+<span class="fc" id="L485">        return this;</span>
+    }
+
+    @Override
+    public boolean isExpectationsSet()
+    {
+<span class="fc" id="L491">        return this.expectationsSet;</span>
+    }
+
+    @Override
+    public boolean isExpectationsNotEvaluated()
+    {
+<span class="fc" id="L497">        return this.expectationsNotEvaluated;</span>
+    }
+
+    public void setTestClass(Class testClass) {
+<span class="fc" id="L501">        this.testClass = testClass;</span>
+<span class="fc" id="L502">    }</span>
+
+    public Class getTestClass() {
+<span class="nc" id="L505">        return this.testClass;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

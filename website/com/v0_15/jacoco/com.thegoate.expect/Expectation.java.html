@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Expectation.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.expect</a> &gt; <span class="el_source">Expectation.java</span></div><h1>Expectation.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.expect;
+
+import com.thegoate.Goate;
+import com.thegoate.dsl.Interpreter;
+import com.thegoate.expect.builder.Value;
+import com.thegoate.expect.extras.Extra;
+import com.thegoate.expect.extras.OneOrMore;
+import com.thegoate.expect.extras.ZeroOrMore;
+import com.thegoate.expect.test.SkipExpectation;
+import com.thegoate.expect.validate.Validate;
+import com.thegoate.locate.Locate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.reflection.Executioner;
+import com.thegoate.staff.Employee;
+import com.thegoate.utils.compare.CompareUtil;
+import com.thegoate.utils.fill.serialize.DeSerializer;
+import com.thegoate.utils.fill.serialize.DefaultSource;
+import com.thegoate.utils.fill.serialize.Serializer;
+import com.thegoate.utils.togoate.ToGoate;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static com.thegoate.Goate.GOATE_VARIABLE_PREFIX;
+import static com.thegoate.logging.volume.VolumeKnob.volume;
+
+/**
+ * Contains the information about what is expected.
+ * The source should be defined and annotated as an Employee.&lt;br&gt;
+ * Created by Eric Angeli on 5/8/2017.
+ */
+public class Expectation {
+
+    public final static String EmployeeWorkResult = GOATE_VARIABLE_PREFIX + &quot;Employee Work Result&quot;;
+
+    public Validate getValidator() {
+<span class="fc" id="L66">        return validator;</span>
+    }
+
+    public Expectation validate(Validate validator) {
+<span class="fc" id="L70">        return setValidator(validator);</span>
+    }
+
+    public Expectation setValidator(Validate validator) {
+<span class="fc" id="L74">        this.validator = validator;</span>
+<span class="fc" id="L75">        this.operator = validator.operator();</span>
+<span class="fc" id="L76">        simpleState += &quot;i&quot;;</span>
+<span class="fc" id="L77">        checkState(false);</span>
+<span class="fc" id="L78">        return this;</span>
+    }
+
+    public long getRetryTimeout() {
+<span class="fc" id="L82">        return retryTimeout;</span>
+    }
+
+    public Expectation retryTimeout(long retryTimeout) {
+<span class="fc" id="L86">        this.retryTimeout = retryTimeout;</span>
+<span class="fc" id="L87">        return this;</span>
+    }
+
+    public long getRetryPeriod() {
+<span class="fc" id="L91">        return retryPeriod;</span>
+    }
+
+    public Expectation retryPeriod(long retryPeriod) {
+<span class="fc" id="L95">        this.retryPeriod = retryPeriod;</span>
+<span class="fc" id="L96">        return this;</span>
+    }
+
+<span class="nc" id="L99">    enum EXTRAS {</span>
+<span class="nc" id="L100">        ZERO_OR_MORE(&quot;zeroOrMore&quot;, new ZeroOrMore()), ONE_OR_MORE(&quot;oneOrMore&quot;, new OneOrMore());</span>
+        String label;
+        Extra extra;
+
+<span class="nc" id="L104">        EXTRAS(String label, Extra extra) {</span>
+<span class="nc" id="L105">            this.label = label;</span>
+<span class="nc" id="L106">            this.extra = extra;</span>
+<span class="nc" id="L107">        }</span>
+
+        public EXTRAS process(Expectation expectation, Object value) {
+<span class="nc" id="L110">            extra.processExtra(expectation, value);</span>
+<span class="nc" id="L111">            return this;</span>
+        }
+
+        public static EXTRAS lookUp(String label) {
+<span class="nc" id="L115">            EXTRAS extra = null;</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">            for (EXTRAS ext : values()) {</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">                if (ext.label.equalsIgnoreCase(label)) {</span>
+<span class="nc" id="L118">                    extra = ext;</span>
+<span class="nc" id="L119">                    break;</span>
+                }
+            }
+<span class="nc" id="L122">            return extra;</span>
+        }
+    }
+
+<span class="fc" id="L126">    protected final BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+<span class="fc" id="L127">    String name = &quot;&quot;;</span>
+<span class="fc" id="L128">    String expectedName = &quot;&quot;;</span>
+<span class="fc" id="L129">    String id = &quot;&quot;;</span>
+<span class="fc" id="L130">    Goate data = null;</span>
+<span class="fc" id="L131">    Goate expect = new Goate();</span>
+<span class="fc" id="L132">    String simpleState = &quot;&quot;;</span>
+    volatile Object actual;
+<span class="fc" id="L134">    String operator = &quot;&quot;;</span>
+<span class="fc" id="L135">    private Validate validator = null;</span>
+<span class="fc" id="L136">    volatile Object expected = null;</span>
+<span class="fc" id="L137">    long cachePeriod = 50L;</span>
+<span class="fc" id="L138">    Object from = null;</span>
+<span class="fc" id="L139">    Object fromExpected = null;</span>
+<span class="fc" id="L140">    Object source = null;</span>
+<span class="fc" id="L141">    boolean zeroOrMore = true;</span>
+<span class="fc" id="L142">    String clearedState = null;</span>
+<span class="fc" id="L143">    StringBuilder failed = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L144">    String failureMessage = null;</span>
+<span class="fc" id="L145">    volatile List&lt;Goate&gt; fails = Collections.synchronizedList(new ArrayList&lt;&gt;());//new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L146">    volatile List&lt;Goate&gt; passes = Collections.synchronizedList(new ArrayList&lt;&gt;());//new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L147">    boolean includeExtras = false;</span>
+<span class="fc" id="L148">    private long retryTimeout = -42L;</span>
+<span class="fc" id="L149">    private long retryPeriod = -42L;</span>
+
+<span class="fc" id="L151">    public Expectation(Goate data) {</span>
+<span class="fc" id="L152">        this.data = data;</span>
+<span class="fc" id="L153">    }</span>
+
+    public static Expectation build() {
+<span class="fc" id="L156">        return build(null);</span>
+    }
+
+    public static Expectation build(Goate data) {
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">        if (data == null) {</span>
+<span class="fc" id="L161">            data = new Goate();</span>
+        }
+<span class="fc" id="L163">        return new Expectation(data);</span>
+    }
+
+    public String fullName() {
+<span class="fc bfc" id="L167" title="All 4 branches covered.">        return name + &quot;#&quot; + id + (expectedName.isEmpty() ? &quot;&quot; : &quot;::&quot; + expectedName) + (validator == null ? &quot;&quot; : &quot;::&quot; + validator.getName());</span>
+    }
+
+    public String id() {
+<span class="nc" id="L171">        return this.id;</span>
+    }
+
+    public Expectation period(long period) {
+<span class="fc" id="L175">        this.cachePeriod = period;</span>
+<span class="fc" id="L176">        return this;</span>
+    }
+
+    public Expectation oneOrMore() {
+<span class="nc" id="L180">        zeroOrMore = false;</span>
+<span class="nc" id="L181">        includeExtras = true;</span>
+<span class="nc" id="L182">        return this;</span>
+    }
+
+    public Expectation zeroOrMore() {
+<span class="nc" id="L186">        zeroOrMore = true;</span>
+<span class="nc" id="L187">        includeExtras = true;</span>
+<span class="nc" id="L188">        return this;</span>
+    }
+
+    public Expectation fromClone(Object source) {
+<span class="nc" id="L192">        Object clone = null;</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        if (source != null) {</span>
+<span class="nc" id="L194">            Goate dna = new Serializer&lt;&gt;(source, DefaultSource.class).toGoate();</span>
+<span class="nc" id="L195">            clone = new DeSerializer().data(dna).build(source.getClass());</span>
+        }
+<span class="nc" id="L197">        return from(clone);</span>
+    }
+
+    public Expectation from(Object source) {
+<span class="fc" id="L201">        return from(source, true);</span>
+    }
+
+    protected Expectation from(Object source, boolean setFrom) {
+<span class="fc" id="L205">        this.source = source;</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">        if (source instanceof String) {</span>
+<span class="fc" id="L207">            this.from = buildSource(&quot;&quot; + source);</span>
+<span class="fc bfc" id="L208" title="All 4 branches covered.">            if (this.from == null &amp;&amp; setFrom) {</span>
+<span class="fc" id="L209">                this.from = source;</span>
+            }
+        } else {
+<span class="fc bfc" id="L212" title="All 4 branches covered.">            if (source != null &amp;&amp; !source.equals(actual)) {</span>
+<span class="fc" id="L213">                this.from = source;</span>
+            }
+        }
+<span class="pc bpc" id="L216" title="1 of 6 branches missed.">        if (name == null || name.isEmpty() || name.equals(actual)) {</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">            if (source != null) {</span>
+<span class="fc" id="L218">                name = volume(source);</span>
+            }
+        }
+<span class="fc" id="L221">        return this;</span>
+    }
+
+    public Object getFrom() {
+<span class="nc" id="L225">        return this.from;</span>
+    }
+
+    public Object getActual() {
+<span class="nc" id="L229">        return actual;</span>
+    }
+
+    public String getOperator() {
+<span class="nc" id="L233">        return operator;</span>
+    }
+
+    public Object getExpected() {
+<span class="nc" id="L237">        return expected;</span>
+    }
+
+    public Object getFromExpected() {
+<span class="nc" id="L241">        return this.fromExpected;</span>
+    }
+
+    public String getFailureMessage() {
+<span class="nc" id="L245">        return this.failureMessage;</span>
+    }
+
+    /**
+     * When adding a new expectation to an existing one you must set actual, is, and expected, (even if expected is null)
+     * Except for the last one added.
+     *
+     * @return Self for syntactic sugar.
+     */
+    public Expectation addNewExpectation() {
+<span class="fc" id="L255">        checkState(true);</span>
+<span class="fc" id="L256">        simpleState = &quot;&quot;;</span>
+<span class="fc" id="L257">        actual = null;</span>
+<span class="fc" id="L258">        operator = &quot;&quot;;</span>
+<span class="fc" id="L259">        expected = null;</span>
+<span class="fc" id="L260">        return this;</span>
+    }
+
+    public Goate getExpectations() {
+<span class="fc" id="L264">        return expect;</span>
+    }
+
+    public Expectation add(Expectation expectation) {
+<span class="fc" id="L268">        Goate ex = expectation.getExpectations();</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">        for (String key : ex.keys()) {</span>
+<span class="fc" id="L270">            Goate exp = (Goate) ex.get(key);</span>
+<span class="fc" id="L271">            actual(exp.getStrict(&quot;actual&quot;)).is(&quot;&quot; + exp.getStrict(&quot;operator&quot;)).expected(exp.getStrict(&quot;expected&quot;)).failureMessage(&quot;&quot; + exp.getStrict(&quot;failure message&quot;));</span>
+<span class="fc" id="L272">        }</span>
+<span class="fc" id="L273">        return this;</span>
+    }
+
+    public Expectation actualValue(Value value) {
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">        if (value != null) {</span>
+<span class="fc" id="L278">            actual(value.getLocator());</span>
+<span class="pc bpc" id="L279" title="1 of 2 branches missed.">            if (value.getContainer() != null) {</span>
+<span class="fc" id="L280">                from(value.getContainer());</span>
+            }
+        }
+<span class="fc" id="L283">        return this;</span>
+    }
+
+    public Expectation actual(Object actual) {
+<span class="fc bfc" id="L287" title="All 2 branches covered.">        if (actual instanceof Value) {</span>
+<span class="fc" id="L288">            return actualValue((Value) actual);</span>
+        }
+<span class="fc bfc" id="L290" title="All 2 branches covered.">        if (actual instanceof Locate) {</span>
+<span class="fc" id="L291">            actual = ((Locate) actual).toPath();</span>
+        }
+<span class="fc bfc" id="L293" title="All 2 branches covered.">        if (actual == null) {</span>
+<span class="fc" id="L294">            actual = &quot;null::&quot;;</span>
+        }
+<span class="fc" id="L296">        this.actual = actual;</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">        if (this.source == null) {</span>
+<span class="fc" id="L298">            from(actual, false);</span>
+        }
+<span class="fc" id="L300">        simpleState += &quot;a&quot;;</span>
+<span class="fc" id="L301">        checkState(false);</span>
+<span class="fc" id="L302">        return this;</span>
+    }
+
+    public Expectation isEqualTo(Object expected) {
+<span class="fc" id="L306">        return is(&quot;==&quot;).expected(expected);</span>
+    }
+
+    public Expectation isEqualToIgnoreCase(Object expected) {
+<span class="nc" id="L310">        return is(&quot;~=&quot;).expected(expected);</span>
+    }
+
+    public Expectation isNotEqualTo(Object expected) {
+<span class="fc" id="L314">        return is(&quot;!=&quot;).expected(expected);</span>
+    }
+
+    public Expectation isGreaterThan(Object expected) {
+<span class="nc" id="L318">        return is(&quot;&gt;&quot;).expected(expected);</span>
+    }
+
+    public Expectation isGreaterThanOrEqualTo(Object expected) {
+<span class="nc" id="L322">        return is(&quot;&gt;=&quot;).expected(expected);</span>
+    }
+
+    public Expectation isLessThan(Object expected) {
+<span class="fc" id="L326">        return is(&quot;&lt;&quot;).expected(expected);</span>
+    }
+
+    public Expectation isLessThanOrEqualTo(Object expected) {
+<span class="fc" id="L330">        return is(&quot;&lt;=&quot;).expected(expected);</span>
+    }
+
+    public Expectation isPresent(Object expected) {
+<span class="fc" id="L334">        return is(&quot;isPresent&quot;).expected(expected);</span>
+    }
+
+    public Expectation isEmpty(Object expected) {
+<span class="fc" id="L338">        return is(&quot;isEmpty&quot;).expected(expected);</span>
+    }
+
+    public Expectation isNull(Object expected) {
+<span class="fc" id="L342">        return is(&quot;isNull&quot;).expected(expected);</span>
+    }
+
+    public Expectation isIn(Object expected) {
+<span class="fc" id="L346">        return is(&quot;contains&quot;).expected(expected);</span>
+    }
+
+    public Expectation contains(Object expected) {
+<span class="nc" id="L350">        return is(&quot;contains&quot;).expected(expected);</span>
+    }
+
+    public Expectation is(String operator) {
+<span class="fc" id="L354">        this.operator = operator;</span>
+<span class="fc" id="L355">        this.validator = null;</span>
+<span class="fc" id="L356">        simpleState += &quot;i&quot;;</span>
+<span class="fc" id="L357">        checkState(false);</span>
+<span class="fc" id="L358">        return this;</span>
+    }
+
+    public Expectation is(Class operator) {
+<span class="fc" id="L362">        CompareUtil cu = (CompareUtil) operator.getAnnotation(CompareUtil.class);</span>
+<span class="fc" id="L363">        return is(cu.operator());</span>
+    }
+
+    public Expectation is(ExpectedBuilder expected) {
+<span class="fc" id="L367">        is(expected.getClass());</span>
+<span class="fc" id="L368">        expected(expected.generateExpected());</span>
+<span class="fc" id="L369">        fromExpected(expected.fromExpected());</span>
+<span class="fc" id="L370">        return this;</span>
+    }
+
+    public Expectation expectedValue(Value value) {
+<span class="pc bpc" id="L374" title="1 of 2 branches missed.">        if (value != null) {</span>
+<span class="fc" id="L375">            expected(value.getLocator());</span>
+<span class="pc bpc" id="L376" title="1 of 2 branches missed.">            if (value.getContainer() != null) {</span>
+<span class="fc" id="L377">                fromExpected(value.getContainer());</span>
+            }
+        }
+<span class="fc" id="L380">        return this;</span>
+    }
+
+    public Expectation expected(Object expected) {
+<span class="fc bfc" id="L384" title="All 2 branches covered.">        if (expected instanceof Value) {</span>
+<span class="fc" id="L385">            return expectedValue((Value) expected);</span>
+        }
+
+<span class="fc bfc" id="L388" title="All 2 branches covered.">        if (expected instanceof Locate) {</span>
+<span class="fc" id="L389">            expected = ((Locate) expected).toPath();</span>
+        }
+<span class="fc" id="L391">        this.expected = expected;</span>
+<span class="fc" id="L392">        simpleState += &quot;c&quot;;</span>
+<span class="fc" id="L393">        checkState(false);</span>
+<span class="fc" id="L394">        return this;</span>
+    }
+
+    protected void checkState(boolean force) {
+<span class="pc bpc" id="L398" title="3 of 10 branches missed.">        if ((simpleState.length() == 3 &amp;&amp; simpleState.contains(&quot;a&quot;) &amp;&amp; simpleState.contains(&quot;i&quot;) &amp;&amp; simpleState.contains(&quot;c&quot;)) || force) {</span>
+<span class="pc bpc" id="L399" title="2 of 6 branches missed.">            if (actual != null &amp;&amp; operator != null &amp;&amp; !operator.isEmpty()) {//must at least set actual and operator fields.</span>
+<span class="fc" id="L400">                String key = &quot;&quot; + actual + operator + expected;</span>
+<span class="fc" id="L401">                Goate exp = new Goate();</span>
+<span class="fc" id="L402">                exp.put(&quot;actual&quot;, actual);</span>
+<span class="fc" id="L403">                exp.put(&quot;operator&quot;, operator);</span>
+<span class="fc" id="L404">                exp.put(&quot;expected&quot;, expected);</span>
+<span class="fc" id="L405">                exp.put(&quot;from&quot;, from);</span>
+<span class="fc" id="L406">                exp.put(&quot;failure message&quot;, failureMessage);</span>
+<span class="pc bpc" id="L407" title="1 of 2 branches missed.">                if (includeExtras) {</span>
+<span class="nc" id="L408">                    Goate extras = new Goate();</span>
+<span class="nc" id="L409">                    extras.put(&quot;zeroOrMore&quot;, zeroOrMore);</span>
+<span class="nc" id="L410">                    exp.put(&quot;extras&quot;, extras);</span>
+                }
+<span class="fc" id="L412">                expect.put(key, exp);</span>
+<span class="fc" id="L413">                actual = null;</span>
+<span class="fc" id="L414">                operator = &quot;&quot;;</span>
+<span class="fc" id="L415">                expected = null;</span>
+<span class="fc" id="L416">                simpleState = &quot;&quot;;</span>
+<span class="fc" id="L417">                failureMessage = null;</span>
+<span class="fc" id="L418">                clearedState = key;</span>
+<span class="fc" id="L419">            }</span>
+        } else {
+<span class="fc" id="L421">            clearedState = null;</span>
+        }
+<span class="fc" id="L423">    }</span>
+
+    public boolean evaluate() {
+<span class="fc" id="L426">        failed = new StringBuilder(&quot;&quot;);//only the last failure is preserved. if the expectation is executed more than once it resets the failure message.</span>
+<span class="fc" id="L427">        fails = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L428">        passes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L429">        boolean result = true;//assume true, and if a failure is detected set to false.</span>
+<span class="fc" id="L430">        boolean forceFrom = false;</span>
+<span class="fc bfc" id="L431" title="All 2 branches covered.">        if (from == null) {</span>
+<span class="fc" id="L432">            forceFrom = true;</span>
+<span class="fc" id="L433">            from = new Goate().put(&quot;actual&quot;, source);</span>
+        }
+        try {
+<span class="fc bfc" id="L436" title="All 2 branches covered.">            if (from instanceof Employee) {</span>
+<span class="fc" id="L437">                source = ((Employee) from).expectation(this).defaultPeriod(cachePeriod).syncWork();</span>
+            } else {
+<span class="fc" id="L439">                source = from;</span>
+            }
+<span class="fc" id="L441">        } catch (Throwable e) {</span>
+<span class="fc" id="L442">            LOG.error(&quot;Expectation&quot;, &quot;Problem getting the source for comparison: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L443">            logFail(e);</span>
+<span class="fc" id="L444">            source = null;</span>
+<span class="fc" id="L445">        }</span>
+
+<span class="fc bfc" id="L447" title="All 2 branches covered.">        if (source != null) {</span>
+<span class="fc bfc" id="L448" title="All 2 branches covered.">            if(source instanceof SkipExpectation){</span>
+<span class="fc" id="L449">                LOG.info(&quot;Expectation&quot;, &quot;Specifically skipped an expectation.&quot;);</span>
+            } else {
+<span class="fc" id="L451">                List&lt;Validate&gt; checkers = new ArrayList&lt;&gt;();</span>
+                try {
+<span class="fc" id="L453">                    LOG.debug(&quot;Expectation&quot;, &quot;evaluating expectations.&quot;);</span>
+<span class="fc" id="L454">                    Object rtrn = new ToGoate(source).convert();//source;//from.work();</span>
+<span class="pc bpc" id="L455" title="1 of 2 branches missed.">                    if (rtrn == null) {</span>
+<span class="nc" id="L456">                        rtrn = new Goate().get(&quot;source&quot;, source);</span>
+                    }
+<span class="pc bpc" id="L458" title="1 of 2 branches missed.">                    if (rtrn instanceof Goate) {</span>
+<span class="fc" id="L459">                        Set&lt;String&gt; keys = ((Goate) rtrn).keys();</span>
+<span class="fc bfc" id="L460" title="All 4 branches covered.">                        if (keys.size() == 1 &amp;&amp; keys.contains(&quot;_original_&quot;)) {</span>
+<span class="fc" id="L461">                            rtrn = source;</span>
+                        }
+                    }
+<span class="pc bpc" id="L464" title="1 of 2 branches missed.">                    if (expect.size() == 0) {</span>
+<span class="nc" id="L465">                        logFail(new Exception(&quot;Expection not defined properly.&quot;), new Goate()</span>
+<span class="nc" id="L466">                                .put(&quot;actual&quot;, getActual())</span>
+<span class="nc" id="L467">                                .put(&quot;from&quot;, getFrom())</span>
+<span class="nc" id="L468">                                .put(&quot;operator&quot;, getOperator())</span>
+<span class="nc" id="L469">                                .put(&quot;expected&quot;, getExpected())</span>
+<span class="nc" id="L470">                                .put(&quot;fromExpected&quot;, getFromExpected())</span>
+<span class="nc" id="L471">                                .put(&quot;failure message&quot;, getFailureMessage()));</span>
+<span class="nc" id="L472">                        result = false;</span>
+                    } else {
+<span class="fc bfc" id="L474" title="All 2 branches covered.">                        for (String key : expect.keys()) {</span>
+<span class="fc" id="L475">                            Goate exp = (Goate) expect.get(key);</span>
+<span class="fc bfc" id="L476" title="All 2 branches covered.">                            if (forceFrom) {</span>
+<span class="fc" id="L477">                                exp.put(&quot;actual&quot;, &quot;actual&quot;);</span>
+<span class="fc" id="L478">                                exp.put(&quot;from&quot;, from);</span>
+                            }
+//                        String act = exp.get(&quot;actual&quot;, null, String.class);
+//                        if(act != null &amp;&amp; act.equals(EmployeeWorkResult)){
+//                            exp.put(&quot;actual&quot;, &quot;actual&quot;);
+//                            exp.put(&quot;from&quot;, source);
+//                        }
+<span class="fc" id="L485">                            Validate checker = buildValidator(exp, key, rtrn);//new Checker(exp, key, rtrn);</span>
+//                        checker.start();
+<span class="fc" id="L487">                            checkers.add(checker);</span>
+<span class="fc" id="L488">                        }</span>
+                    }
+<span class="fc" id="L490">                    result = playCheckers(checkers);</span>
+<span class="nc" id="L491">                } catch (Throwable t) {</span>
+<span class="nc" id="L492">                    result = false;</span>
+<span class="nc" id="L493">                    logFail(t);</span>
+                } finally {
+<span class="pc bpc" id="L495" title="4 of 6 branches missed.">                    for (Validate checker : checkers) {</span>
+<span class="pc" id="L496">                        passes.addAll(checker.getPasses());</span>
+<span class="pc" id="L497">                        fails.addAll(checker.getFails());</span>
+<span class="pc" id="L498">                    }</span>
+<span class="pc" id="L499">                }</span>
+<span class="fc" id="L500">            }</span>
+        } else {
+<span class="fc" id="L502">            result = false;</span>
+<span class="fc" id="L503">            logFail(new Exception(&quot;The source of the data to check was not set&quot;), expect);</span>
+//            failed.append(&quot;the source of the data to check was not set.&quot;);
+//            fails.add(expect);
+        }
+<span class="fc" id="L507">        return result;</span>
+    }
+
+    private boolean playCheckers(List&lt;Validate&gt; checkers) {
+<span class="fc" id="L511">        boolean result = new Executioner&lt;Validate&gt;().process(checkers);</span>
+<span class="fc bfc" id="L512" title="All 2 branches covered.">        for (Validate checker : checkers) {</span>
+<span class="fc bfc" id="L513" title="All 2 branches covered.">            if (!checker.result()) {</span>
+<span class="fc" id="L514">                result = false;</span>
+            }
+<span class="fc" id="L516">        }</span>
+<span class="fc" id="L517">        return result;</span>
+    }
+
+    private void logFail(Throwable t) {
+<span class="fc" id="L521">        Goate exp = new Goate();</span>
+<span class="fc" id="L522">        exp.put(&quot;from&quot;, fullName());</span>
+<span class="fc" id="L523">        exp.put(&quot;error&quot;, t.getMessage());</span>
+<span class="fc" id="L524">        logFail(t, exp);</span>
+<span class="fc" id="L525">    }</span>
+
+    private void logFail(Throwable t, Goate exp) {
+<span class="fc" id="L528">        LOG.error(t.getMessage(), t);</span>
+<span class="fc" id="L529">        failed.append(&quot;there was a problem executing the work: &quot; + t.getMessage() + &quot;\n&quot;);</span>
+<span class="fc" id="L530">        fails.add(exp);</span>
+<span class="fc" id="L531">    }</span>
+
+    public String failed() {
+<span class="fc bfc" id="L534" title="All 2 branches covered.">        if (from instanceof Employee) {</span>
+<span class="fc" id="L535">            failed.append(((Employee) from).getHrReport().printRecords());</span>
+        }
+<span class="fc" id="L537">        return failed.toString();</span>
+    }
+
+    public List&lt;Goate&gt; fails() {
+<span class="fc" id="L541">        return fails;</span>
+    }
+
+    public List&lt;Goate&gt; passes() {
+<span class="fc" id="L545">        return passes;</span>
+    }
+
+    /**
+     * This can be used to build the expectation by parsing a string that defines the expectation.&lt;br&gt;
+     * There are four parts to the definition&lt;br&gt;
+     * the first part is the source followed by &quot;{@literal &gt;}&quot; &lt;br&gt;
+     * then the next three parts define how to validate the expectation, they should be separated using &quot;,&quot;&lt;br&gt;
+     * If the value you are expecting needs to include a &quot;,&quot; you will need to abstract it using o::expected_value&lt;br&gt;
+     * and make sure expected_value contains the actual value.&lt;br&gt;
+     * example: source1{@literal &gt;}field_1,==,int::42 &lt;br&gt;
+     * this means &quot;get field_1 from the source and validate that it is equal to the int value 42&quot;
+     *
+     * @param expectation The string defining the expectation
+     * @return Instance of itself, syntactic sugar.
+     */
+    public Expectation define(String expectation) {
+<span class="pc bpc" id="L562" title="1 of 2 branches missed.">        if (data == null) {</span>
+<span class="nc" id="L563">            data = new Goate();</span>
+        }
+<span class="pc bpc" id="L565" title="2 of 4 branches missed.">        if (expectation != null &amp;&amp; !expectation.isEmpty()) {</span>
+<span class="fc" id="L566">            String source = null;</span>
+<span class="pc bpc" id="L567" title="1 of 2 branches missed.">            if (expectation.startsWith(&quot;&gt;&gt;&quot;)) {</span>
+<span class="nc" id="L568">                expectation = &quot;&quot; + data.getStrict(expectation.substring(2));</span>
+            }
+<span class="fc bfc" id="L570" title="All 2 branches covered.">            if (expectation.contains(&quot;&gt;&quot;)) {</span>
+<span class="fc" id="L571">                source = expectation.substring(0, expectation.indexOf(&quot;&gt;&quot;));</span>
+<span class="fc" id="L572">                expectation = expectation.substring(expectation.indexOf(&quot;&gt;&quot;) + 1);</span>
+            }
+<span class="fc" id="L574">            String[] parts = expectation.split(&quot;,&quot;);</span>
+<span class="fc" id="L575">            Interpreter i = new Interpreter(data);</span>
+<span class="fc" id="L576">            from(source);</span>
+<span class="fc" id="L577">            Object act = i.translate(parts[0]);</span>
+<span class="fc" id="L578">            actual(act);</span>
+<span class="pc bpc" id="L579" title="1 of 2 branches missed.">            if (parts.length &gt; 1) {</span>
+<span class="fc" id="L580">                is(&quot;&quot; + i.translate(parts[1]));</span>
+            }
+<span class="pc bpc" id="L582" title="1 of 2 branches missed.">            if (parts.length &gt; 2) {</span>
+<span class="fc" id="L583">                expected(i.translate(parts[2]));</span>
+            }
+<span class="pc bpc" id="L585" title="1 of 2 branches missed.">            if (parts.length &gt; 3) {</span>
+<span class="nc" id="L586">                processExtras(parts[3].split(&quot;&amp;&quot;));</span>
+            }
+<span class="pc bpc" id="L588" title="1 of 2 branches missed.">            if (parts.length &gt; 4) {</span>
+<span class="nc" id="L589">                failureMessage(parts[4]);</span>
+            }
+        }
+<span class="fc" id="L592">        return this;</span>
+    }
+
+    private void processExtras(String[] extras) {
+<span class="nc" id="L596">        Interpreter i = new Interpreter(data);</span>
+<span class="nc bnc" id="L597" title="All 2 branches missed.">        for (String extra : extras) {</span>
+<span class="nc" id="L598">            String[] pieces = extra.split(&quot;:=&quot;);</span>
+<span class="nc" id="L599">            String extraKey = &quot;&quot; + i.translate(pieces[0]);</span>
+<span class="nc" id="L600">            Object extraValue = null;</span>
+<span class="nc bnc" id="L601" title="All 2 branches missed.">            if (pieces.length &gt; 1) {</span>
+<span class="nc" id="L602">                extraValue = i.translate(pieces[1]);</span>
+            }
+<span class="nc" id="L604">            EXTRAS.lookUp(extraKey).process(this, extraValue);</span>
+        }
+<span class="nc" id="L606">    }</span>
+
+    public Expectation failureMessage(String failureMessage) {
+<span class="pc bpc" id="L609" title="1 of 2 branches missed.">        if (clearedState != null) {</span>
+<span class="fc" id="L610">            ((Goate) expect.get(clearedState)).put(&quot;failure message&quot;, failureMessage);</span>
+        } else {
+<span class="nc" id="L612">            this.failureMessage = failureMessage;</span>
+        }
+<span class="fc" id="L614">        return this;</span>
+    }
+
+    public Expectation fromExpected(Object from) {
+<span class="fc" id="L618">        this.fromExpected = from;</span>
+<span class="fc" id="L619">        expectedName = &quot;&quot; + from;</span>
+<span class="fc" id="L620">        checkState(false);</span>
+<span class="fc" id="L621">        return this;</span>
+    }
+
+    public Expectation setData(Goate data) {
+<span class="fc" id="L625">        this.data = data;</span>
+<span class="fc" id="L626">        initFrom(data, from);</span>
+<span class="fc" id="L627">        initFrom(data, fromExpected);</span>
+<span class="fc" id="L628">        return this;</span>
+    }
+
+    protected void initFrom(Goate data, Object init) {
+<span class="fc bfc" id="L632" title="All 4 branches covered.">        if (init != null &amp;&amp; init instanceof Employee) {</span>
+<span class="fc" id="L633">            ((Employee) init).mergeData(data);</span>
+        }
+<span class="fc" id="L635">    }</span>
+
+    protected Employee buildSource(String source) {
+<span class="fc" id="L638">        Employee worker = null;</span>
+<span class="pc bpc" id="L639" title="1 of 2 branches missed.">        if (data == null) {</span>
+<span class="nc" id="L640">            data = new Goate();</span>
+        }
+<span class="fc" id="L642">        Interpreter i = new Interpreter(data);</span>
+<span class="fc" id="L643">        Object workerId = i.translate(source);</span>
+<span class="fc bfc" id="L644" title="All 2 branches covered.">        if (workerId instanceof String) {</span>
+<span class="fc" id="L645">            source = &quot;&quot; + workerId;</span>
+<span class="fc" id="L646">            String[] sourceInfo = source.split(&quot;#&quot;);//if the source does not define an id number, assume 0.</span>
+<span class="fc" id="L647">            this.name = volume(sourceInfo[0]);</span>
+<span class="fc bfc" id="L648" title="All 2 branches covered.">            if (sourceInfo.length &gt; 1) {</span>
+<span class="fc" id="L649">                this.id = sourceInfo[1];</span>
+            } else {
+<span class="fc" id="L651">                this.id = &quot;0&quot;;</span>
+            }
+<span class="fc" id="L653">            worker = Employee.recruit(source, data);</span>
+        }
+<span class="fc" id="L655">        return worker;</span>
+    }
+
+    protected Validate buildValidator(Goate exp, String key, Object rtrn) {
+        Validate vlad;
+<span class="fc bfc" id="L660" title="All 2 branches covered.">        if (getValidator() != null) {</span>
+<span class="fc" id="L661">            vlad = getValidator()</span>
+<span class="fc" id="L662">                    .setExp(exp)</span>
+<span class="fc" id="L663">                    .setKey(key)</span>
+<span class="fc" id="L664">                    .setRtrn(rtrn)</span>
+<span class="fc" id="L665">                    .setPeriod(cachePeriod)</span>
+<span class="fc" id="L666">                    .setData(data);</span>
+        } else {
+<span class="fc" id="L668">            vlad = Validate.lookUpGeneric(exp, key, from, fromExpected, rtrn, cachePeriod, data);</span>
+//            if (rtrn instanceof Goate) {
+//                vlad = new ValidateGoate(exp, key, from, fromExpected, rtrn, cachePeriod, data);
+//            } else {
+//                vlad = new ValidateNotGoate(exp, key, from, fromExpected, rtrn, cachePeriod, data);
+//            }
+        }
+<span class="fc" id="L675">        return vlad;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

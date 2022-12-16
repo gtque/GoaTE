@@ -27,8 +27,8 @@
 import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
-    compile d.depends(":kernel", project.internalVersion);
-    compile d.depends(":json", project.internalVersion);
-    compile "org.mockito:mockito-core:+";
-    testCompile d.depends(":testng", project.internalVersion);
+    api  d.depends(":kernel", project.internalVersion);
+    api  d.depends(":json", project.internalVersion);
+    api  "org.mockito:mockito-core:4.8.1";
+    testImplementation d.depends(":testng", project.internalVersion);
 }

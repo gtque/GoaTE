@@ -2,19 +2,20 @@ package com.thegoate.spring.boot;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-import oracle.jdbc.pool.OracleDataSource;
+//import oracle.jdbc.pool.OracleDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
+ * Stupid tricky bits with oracle jdbc driver.
+ * Too lazy to set up access to oracle's maven repo.
+ * commented out the offending code until it can be revisted.
  * Simple DAO for inserting and querying simple table.
  * Created by Eric Angeli on 11/1/2017.
  */
@@ -23,8 +24,8 @@ import java.sql.SQLException;
 public class SimpleDAO {//extends JdbcDaoSupport{
     BleatBox LOG = BleatFactory.getLogger(getClass());
 
-    @Autowired
-    private OracleDataSource dataSource;
+//    @Autowired
+//    private OracleDataSource dataSource;
 
 //    @PostConstruct
 //    private void initialize(){
@@ -89,9 +90,9 @@ public class SimpleDAO {//extends JdbcDaoSupport{
     }
 
     protected Connection getConnect() throws SQLException{
-        Connection conn = dataSource.getConnection();
-        conn.setAutoCommit(false);
-        return conn;
+//        Connection conn = dataSource.getConnection();
+//        conn.setAutoCommit(false);
+        return null;
     }
 
     public int countRows(){

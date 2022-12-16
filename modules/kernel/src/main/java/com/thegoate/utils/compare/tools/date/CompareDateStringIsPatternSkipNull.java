@@ -30,8 +30,6 @@ import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
 
-import java.text.SimpleDateFormat;
-
 /**
  * Checks if a string is empty or not.
  * Returns true only if actual is not null and is empty and if expected is true.
@@ -40,7 +38,7 @@ import java.text.SimpleDateFormat;
  * example: field1,==,null::
  * Created by Eric Angeli on 7/7/2017.
  */
-@CompareUtil(operator = "dateIsPatternSkipNull", type = "String")
+@CompareUtil(operator = "dateIsPatternSkipNull", type = String.class)
 @IsDefault
 public class CompareDateStringIsPatternSkipNull extends CompareTool {
     public CompareDateStringIsPatternSkipNull(Object actual) {

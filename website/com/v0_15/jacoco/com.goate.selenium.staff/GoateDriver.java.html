@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GoateDriver.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.goate.selenium.staff</a> &gt; <span class="el_source">GoateDriver.java</span></div><h1>GoateDriver.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.goate.selenium.staff;
+
+import com.goate.selenium.annotations.Driver;
+import com.thegoate.Goate;
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.GoateUtils;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.WebDriver;
+
+/**
+ * Base class for defining a driver builder object.
+ * &lt;br&gt;
+ * The paths are relative to the resource directory.&lt;br&gt;
+ * By default they are looked for in webdrivers/{browser}/{os}/[architecture]&lt;br&gt;
+ * The location may also be set in an eut/{eut}.properties file by setting selenium.{browser}.path&lt;br&gt;
+ * The path should be relative to the resources directory. The driver(s) still need to be in the correct {os}/[architecture] folder.&lt;br&gt;
+ * supported OSs and the os folder name to use:
+ * &lt;ul&gt;
+ *     &lt;li&gt;windows&lt;/li&gt;
+ *     &lt;li&gt;linux&lt;/li&gt;
+ *     &lt;li&gt;macos&lt;/li&gt;
+ *     &lt;li&gt;android&lt;/li&gt;
+ *     &lt;li&gt;ios&lt;/li&gt;
+ * &lt;/ul&gt;
+ * Created by Eric Angeli on 6/28/2017.
+ */
+public abstract class GoateDriver {
+<span class="fc" id="L55">    BleatBox LOG = BleatFactory.getLogger(getClass());</span>
+<span class="pc" id="L56">    enum OS{</span>
+<span class="fc" id="L57">        WIN32(&quot;windows/32&quot;, true),WIN64(&quot;windows/64&quot;, true),LIN32(&quot;linux/32&quot;, false),LIN64(&quot;linux/64&quot;, false),ANDROID(&quot;android/64&quot;, false),IOS(&quot;ios/64&quot;, false),MACOS(&quot;macos/64&quot;, false);</span>
+        String path;
+        boolean exe;
+
+<span class="fc" id="L61">        OS(String path, boolean exe){</span>
+<span class="fc" id="L62">            this.path = path;</span>
+<span class="fc" id="L63">            this.exe = exe;</span>
+<span class="fc" id="L64">        }</span>
+        public String path(){
+<span class="fc" id="L66">            return path;</span>
+        }
+        public String ext(String extension){
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">            return exe?extension:extension.replace(&quot;.exe&quot;,&quot;&quot;);</span>
+        }
+    }
+    OS os;
+    MutableCapabilities dc;
+<span class="fc" id="L74">    boolean driverInstalled = false;</span>
+<span class="fc" id="L75">    String driverPath = &quot;&quot;;</span>
+
+    /**
+     * if the driver exe does not end with driver.exe, over load the simple constructor and set it what it should be after the call to super().
+     */
+<span class="fc" id="L80">    String extension = &quot;driver.exe&quot;;</span>
+<span class="fc" id="L81">    public GoateDriver(){</span>
+<span class="fc" id="L82">        os = detectOS();</span>
+<span class="fc" id="L83">        dc = loadCapabilities();</span>
+<span class="fc" id="L84">        setPathToDriver();</span>
+<span class="fc" id="L85">    }</span>
+
+    /**
+     * Override this method to return the capabilities for the implemented web driver.
+     * @return The desired capabilities for the given driver.
+     */
+    protected abstract MutableCapabilities loadCapabilities();
+
+    public MutableCapabilities getDc(){
+<span class="nc" id="L94">        return dc;</span>
+    }
+
+    /**
+     * Override this method and return an instance of the webdriver.&lt;br&gt;
+     * When instantiating, make sure to set the desired capabilities.
+     * @return The new web driver.
+     */
+    public abstract WebDriver build();
+
+    public GoateDriver addCapability(String name, Object value){
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if(dc!=null){</span>
+<span class="nc" id="L106">            dc.setCapability(name, value);</span>
+        }else{
+<span class="nc" id="L108">            LOG.warn(&quot;Capabilities have not been loaded for the driver.&quot;);</span>
+        }
+<span class="nc" id="L110">        return this;</span>
+    }
+
+    protected OS detectOS(){
+<span class="fc" id="L114">        OS type = null;</span>
+<span class="fc" id="L115">        String sys = System.getProperty(&quot;os.name&quot;);</span>
+<span class="fc" id="L116">        String architecture = System.getProperty(&quot;os.arch&quot;, System.getenv(&quot;ProgramFiles(x86)&quot;));</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if(sys.contains(&quot;Windows&quot;)){</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">            if(architecture==null){</span>
+<span class="nc" id="L119">                type = OS.WIN32;</span>
+            }else{
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                if(architecture.contains(&quot;32&quot;)){</span>
+<span class="nc" id="L122">                    type = OS.WIN32;</span>
+                }else{
+<span class="fc" id="L124">                    type = OS.WIN64;</span>
+                }
+            }
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        } else if(sys.contains(&quot;Linux&quot;)){</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            if(architecture==null){</span>
+<span class="nc" id="L129">                type = OS.LIN32;</span>
+            }else{
+<span class="nc bnc" id="L131" title="All 2 branches missed.">                if(architecture.contains(&quot;32&quot;)){</span>
+<span class="nc" id="L132">                    type = OS.LIN32;</span>
+                }else{
+<span class="nc" id="L134">                    type = OS.LIN64;</span>
+                }
+            }
+<span class="nc bnc" id="L137" title="All 2 branches missed.">        } else if(sys.contains(&quot;Mac&quot;)){</span>
+<span class="nc" id="L138">            type = OS.MACOS;//assumes only one architecture type.</span>
+        }
+<span class="fc" id="L140">        return type;</span>
+    }
+
+    protected void setPathToDriver(){
+<span class="fc" id="L144">        String browser = &quot;&quot;;</span>
+<span class="fc" id="L145">        String path = &quot;&quot;;</span>
+<span class="fc" id="L146">        Driver d = getClass().getAnnotation(Driver.class);</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        if(d!=null) {</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">            browser = d.property().isEmpty()?d.type():d.property();</span>
+<span class="fc" id="L149">            driverPath = new Goate().get(&quot;driverpath&quot;,&quot;eut::selenium.&quot;+browser+&quot;.path,empty::&quot;,String.class);</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">            if(driverPath.isEmpty()){</span>
+<span class="fc" id="L151">                driverPath = &quot;webdrivers/&quot;+browser;</span>
+            }
+<span class="fc" id="L153">            path = driverPath +&quot;/&quot;+os.path() + &quot;/&quot; + browser + os.ext(extension);</span>
+<span class="fc" id="L154">            path = GoateUtils.getFilePath(path);</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">            if (!browser.isEmpty()) {</span>
+<span class="fc" id="L156">                System.setProperty(&quot;webdriver.&quot; + browser + &quot;.driver&quot;, path);</span>
+            }
+        }
+<span class="fc" id="L159">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

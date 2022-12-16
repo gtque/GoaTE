@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>TestNGEngineMethodDL.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GoaTE</a> &gt; <a href="index.source.html" class="el_package">com.thegoate.testng</a> &gt; <span class="el_source">TestNGEngineMethodDL.java</span></div><h1>TestNGEngineMethodDL.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2017. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the &quot;Software&quot;),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
+package com.thegoate.testng;
+
+import com.thegoate.Goate;
+import com.thegoate.annotations.AnnotationFactory;
+import com.thegoate.data.DLProvider;
+import com.thegoate.data.GoateDLP;
+import com.thegoate.data.GoateNullClass;
+import com.thegoate.data.GoateProvider;
+import com.thegoate.reflection.GoateReflection;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Factory;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * This can be used to define data provider at the method level.
+ * The test method should be annotated with {@literal @}GoateProvider &lt;br&gt;
+ * and the {@literal @}Test annotation should also specify the dataProvider = &quot;methodLoader&quot;
+ * and the data loader/provider class or method native to the test class that defines the data should be annotated with {@literal @}GoateDLP &lt;br&gt;
+ * if you define a method in the test class to define the data loaders it must return a Goate[2] array.
+ * Index 0 should be the run data loader(s) and index 1 should be the constant data loader(s).
+ * The name fields in each should match.
+ * Created by Eric Angeli on 5/12/2017.
+ */
+public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
+
+    public TestNGEngineMethodDL() {
+<span class="fc" id="L61">        super();</span>
+<span class="fc" id="L62">    }</span>
+
+    public TestNGEngineMethodDL(Goate data) {
+<span class="fc" id="L65">        super(data);</span>
+<span class="fc" id="L66">    }</span>
+
+    @DataProvider(name = &quot;methodLoader&quot;)
+    public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
+<span class="fc" id="L70">        number.put(&quot;&quot;+method.getDeclaringClass().getCanonicalName()+&quot;:&quot;+method.getName(), 0);</span>
+        //number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+<span class="fc" id="L72">        setTestClass(method.getDeclaringClass());</span>
+<span class="fc" id="L73">        this.testContext = context;</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (context != null) {</span>
+<span class="fc" id="L75">            xt = context.getCurrentXmlTest();</span>
+        }
+<span class="fc" id="L77">        Goate rdl = new Goate();</span>
+<span class="fc" id="L78">        Goate cdl = new Goate();</span>
+<span class="fc" id="L79">        buildDataLoaders(rdl, cdl, method);</span>
+<span class="fc" id="L80">        return TestNGRunFactory.loadRuns(rdl, cdl, false,testContext.getIncludedGroups(),testContext.getExcludedGroups());</span>
+    }
+
+    protected void buildDataLoaders(Goate rdl, Goate cdl, Method method) {
+<span class="fc" id="L84">        GoateProvider gp = method.getAnnotation(GoateProvider.class);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (gp != null) {</span>
+            try {
+<span class="fc" id="L87">                AnnotationFactory af = new AnnotationFactory();</span>
+<span class="fc" id="L88">                DLProvider provider = (DLProvider) af.find(gp.name()).annotatedWith(GoateDLP.class)</span>
+<span class="fc" id="L89">                        .using(GoateDLP.class.getMethod(&quot;name&quot;))</span>
+<span class="fc" id="L90">                        .build();</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">                if (provider == null) {</span>
+                    try {
+<span class="fc" id="L93">                        provider = (DLProvider) Class.forName(gp.name()).newInstance();</span>
+<span class="fc" id="L94">                    } catch (Exception e) {</span>
+<span class="fc" id="L95">                        LOG.warn(&quot;trying to find data loader method provider: &quot; + gp.name());</span>
+<span class="fc" id="L96">                    }</span>
+                }
+<span class="fc bfc" id="L98" title="All 2 branches covered.">                if (provider != null) {</span>
+<span class="fc" id="L99">                    provider.init();</span>
+<span class="fc" id="L100">                    provider.getConstantDataLoaders().put(&quot;_goate:method&quot;, method);</span>
+<span class="fc" id="L101">                    rdl.merge(provider.getRunDataLoaders(), true);</span>
+<span class="fc" id="L102">                    cdl.merge(provider.getConstantDataLoaders(), true);</span>
+                } else {
+<span class="fc" id="L104">                    Goate[] providers = buildMethodProviders(gp.name(), method, gp.container());</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                    if (providers == null) {</span>
+<span class="nc" id="L106">                        throw new Exception(&quot;Failed to find the DLProvider: &quot; + gp.name());</span>
+                    }else{
+<span class="fc bfc" id="L108" title="All 2 branches covered.">                        if(providers[1]==null){</span>
+<span class="fc" id="L109">                            providers[1] = new Goate();</span>
+                        }
+<span class="fc" id="L111">                        providers[1].put(&quot;_goate:method&quot;, method);</span>
+<span class="fc" id="L112">                        rdl.merge(providers[0], true);</span>
+<span class="fc" id="L113">                        cdl.merge(providers[1], true);</span>
+                    }
+                }
+<span class="nc" id="L116">            } catch (Exception e) {</span>
+<span class="nc" id="L117">                LOG.error(&quot;There was a problem building the providers: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L118">            }</span>
+        }
+<span class="fc" id="L120">    }</span>
+
+    protected Goate[] buildMethodProviders(String name, Method method, Class container) {
+<span class="fc" id="L123">        Goate[] providers = null;</span>
+<span class="fc" id="L124">        GoateReflection gr = new GoateReflection();</span>
+<span class="fc" id="L125">        List&lt;Method&gt; methods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L126">        Class declaring_class = method.getDeclaringClass();</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if(!container.equals(GoateNullClass.class)) {</span>
+<span class="fc" id="L128">            declaring_class = container;</span>
+        }
+<span class="fc" id="L130">        gr.getAllMethods(declaring_class, methods);</span>
+
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        for (Method m : methods) {</span>
+<span class="fc" id="L133">            GoateDLP dlp = m.getAnnotation(GoateDLP.class);</span>
+<span class="fc bfc" id="L134" title="All 6 branches covered.">            if (m.getName().equals(name) || (dlp != null &amp;&amp; dlp.name().equals(name))) {</span>
+                try {
+<span class="fc" id="L136">                    providers = (Goate[]) m.invoke(declaring_class.newInstance());</span>
+<span class="fc" id="L137">                    break;</span>
+<span class="nc" id="L138">                } catch (IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc" id="L139">                    LOG.error(&quot;Problem defining data loaders for a method: &quot; + name + &quot;\n&quot; + e.getMessage(), e);</span>
+<span class="nc" id="L140">                } catch (InstantiationException e) {</span>
+<span class="nc" id="L141">                    LOG.error(&quot;Problem defining data loaders for a method, make sure the test class as a default/empty constructor: &quot; + name + &quot;\n&quot; + e.getMessage(), e);</span>
+<span class="nc" id="L142">                }</span>
+            }
+<span class="fc" id="L144">        }</span>
+<span class="fc" id="L145">        return providers;</span>
+    }
+
+    @Override
+    public void defineDataLoaders() {
+        try {
+<span class="fc" id="L151">            Constructor constructor = getClass().getConstructor(Goate.class);</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">            if (constructor!=null){</span>
+<span class="fc" id="L153">                Annotation factor = constructor.getAnnotation(Factory.class);</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">                if(factor!=null){</span>
+<span class="fc" id="L155">                    super.defineDataLoaders();</span>
+                }
+            }
+<span class="nc" id="L158">        }catch(Exception e){</span>
+<span class="nc" id="L159">            LOG.info(&quot;Define Data Loaders&quot;, &quot;Not using factory&quot;);</span>
+<span class="fc" id="L160">        }</span>
+<span class="fc" id="L161">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>
