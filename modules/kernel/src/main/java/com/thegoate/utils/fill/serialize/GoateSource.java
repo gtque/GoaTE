@@ -48,4 +48,5 @@ public @interface GoateSource {
     boolean flatten() default false;
     Class serializeTo() default GoateSource.class;
     boolean skipInModel() default false;
+    int priority() default Integer.MAX_VALUE;//the priority in which to apply the source mapping/key
 }

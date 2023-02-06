@@ -12,6 +12,11 @@ public class EutSettings extends Kid {
     private boolean useEutSettings = false;
     private boolean configured = false;
 
+    public EutSettings configured() {
+        this.configured = true;
+        return this;
+    }
+
     public String getLocation() {
         return location;
     }
