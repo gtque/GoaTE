@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. Eric Angeli
+ * Copyright (c) 2017. Eric Angeli
  *
  *  Permission is hereby granted, free of charge,
  *  to any person obtaining a copy of this software
@@ -24,24 +24,22 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-package com.thegoate.eut.properties;
+package com.thegoate.utils.fill.serialize;
 
-import com.thegoate.eut.Eut;
-import com.thegoate.eut.EutConfig;
-import com.thegoate.utils.fill.serialize.IsFinal;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-@EutConfig(useEutConfigFile = true)
-public class Simple2Eut extends Eut<Simple2Eut> {
+import org.atteo.classindex.IndexAnnotated;
 
-    public static final Simple2Eut eut = load(Simple2Eut.class);
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
 
-    public String FIELD_A = "Fuzzy Wuzzy had no hair";
-
-	@IsFinal
-	public String FIELD_B = "Fuzzy Wuzzy wasn't fuzzy was he";
-
-    @Override
-    public Simple2Eut eut() {
-        return eut;
-    }
+/**
+ * Created by Eric Angeli on 6/26/2018.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "Use to mark a field in a pojo, specifically an eut/config pojo, as final.")
+@Info(classifier = "isFinal")
+@IndexAnnotated
+public @interface IsFinal {
 }

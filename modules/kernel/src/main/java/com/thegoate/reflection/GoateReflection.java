@@ -46,7 +46,7 @@ import com.thegoate.utils.fill.serialize.GoateIgnore;
  */
 public class GoateReflection {
 
-//	BleatBox LOG = BleatFactory.getLogger(getClass());
+	//	BleatBox LOG = BleatFactory.getLogger(getClass());
 
 	public Constructor findConstructor(Class theClass, Object[] args) {
 		return findConstructor(theClass.getConstructors(), args);
@@ -98,7 +98,7 @@ public class GoateReflection {
 						if (args[i] != null && !ptypes[i].isAssignableFrom(args[i].getClass())) {
 							found = false;
 						} else {
-							if(!ptypes[i].equals(Object.class)){
+							if (!ptypes[i].equals(Object.class)) {
 								notObject = true;
 							}
 						}
@@ -106,7 +106,7 @@ public class GoateReflection {
 				}
 			}
 			if (found) {
-				if(notObject) {
+				if (notObject) {
 					p = constructor;
 					break;
 				} else {
@@ -114,7 +114,7 @@ public class GoateReflection {
 				}
 			}
 		}
-		return p==null?d:p;
+		return p == null ? d : p;
 	}
 
 	public boolean isCollectionOrMap(Field field) {
@@ -123,43 +123,42 @@ public class GoateReflection {
 
 	public boolean isCollectionOrMap(Class klass) {
 		return Collection.class.isAssignableFrom(klass)
-				|| Set.class.isAssignableFrom(klass)
-				|| Map.class.isAssignableFrom(klass)
-				|| klass.isArray();
+			|| Set.class.isAssignableFrom(klass)
+			|| Map.class.isAssignableFrom(klass)
+			|| klass.isArray();
 	}
 
 	public boolean isPrimitiveOrNumerical(Object o) {
 		return o != null && (isPrimitive(o.getClass()) || o instanceof Number || primitiveType(o) != null);
 	}
 
-	public boolean isNumber(Object o){
+	public boolean isNumber(Object o) {
 		return o != null && (isPrimitiveNumber(o.getClass()) || o instanceof Number);
 	}
 
-	public boolean classIsNumber(Class o){
+	public boolean classIsNumber(Class o) {
 		return o != null && (isPrimitiveNumber(o) || Number.class.isAssignableFrom(o));
 	}
 
 	public boolean isPrimitive(Class c) {
-        return c != null &&
-                (c.equals(Boolean.class) || c.equals(Boolean.TYPE)
-			|| c.equals(Byte.class) || c.equals(Byte.TYPE)
-			|| c.equals(Integer.class) || c.equals(Integer.TYPE)
-			|| c.equals(Double.class) || c.equals(Double.TYPE)
-			|| c.equals(Float.class) || c.equals(Float.TYPE)
-			|| c.equals(Long.class) || c.equals(Long.TYPE)
-			|| c.equals(Character.class) || c.equals(Character.TYPE)
-                        || c.equals(Short.class) || c.equals(Short.TYPE));
-	}
-
-
-	public boolean isPrimitiveNumber(Class c) {
-        return c != null &&
-                (c.equals(Integer.class) || c.equals(Integer.TYPE)
+		return c != null &&
+			(c.equals(Boolean.class) || c.equals(Boolean.TYPE)
+				|| c.equals(Byte.class) || c.equals(Byte.TYPE)
+				|| c.equals(Integer.class) || c.equals(Integer.TYPE)
 				|| c.equals(Double.class) || c.equals(Double.TYPE)
 				|| c.equals(Float.class) || c.equals(Float.TYPE)
 				|| c.equals(Long.class) || c.equals(Long.TYPE)
-                        || c.equals(Short.class) || c.equals(Short.TYPE));
+				|| c.equals(Character.class) || c.equals(Character.TYPE)
+				|| c.equals(Short.class) || c.equals(Short.TYPE));
+	}
+
+	public boolean isPrimitiveNumber(Class c) {
+		return c != null &&
+			(c.equals(Integer.class) || c.equals(Integer.TYPE)
+				|| c.equals(Double.class) || c.equals(Double.TYPE)
+				|| c.equals(Float.class) || c.equals(Float.TYPE)
+				|| c.equals(Long.class) || c.equals(Long.TYPE)
+				|| c.equals(Short.class) || c.equals(Short.TYPE));
 	}
 
 	public boolean isBooleanType(Class c) {
@@ -344,6 +343,17 @@ public class GoateReflection {
 		return result;
 	}
 
+	public Field findField(Class theClass, String fieldName) {
+		Field field = null;
+		for (Map.Entry<String, Field> entry : findFields(theClass).entrySet()) {
+			if (entry.getValue().getName().equals(fieldName)) {
+				field = entry.getValue();
+				break;
+			}
+		}
+		return field;
+	}
+
 	public Map<String, Field> findFields(Class theClass) {
 		Map<String, Field> fields = new HashMap<>();
 		findFields(theClass, fields);
@@ -369,15 +379,15 @@ public class GoateReflection {
 		}
 	}
 
-	public Object getFieldValue(Object owner, Field field){
+	public Object getFieldValue(Object owner, Field field) {
 		Object value = null;
-		if(owner != null){
-			boolean access = Modifier.isStatic(field.getModifiers())?field.canAccess(null):field.canAccess(owner);//.isAccessible();
-			try{
+		if (owner != null) {
+			boolean access = Modifier.isStatic(field.getModifiers()) ? field.canAccess(null) : field.canAccess(owner);//.isAccessible();
+			try {
 				field.setAccessible(true);
 				value = field.get(owner);
 			} catch (IllegalAccessException e) {
-//				LOG.debug("Get Field Value", "failed to get value: " + e.getMessage());
+				//				LOG.debug("Get Field Value", "failed to get value: " + e.getMessage());
 			}
 			field.setAccessible(access);
 		}
@@ -400,32 +410,61 @@ public class GoateReflection {
 
 	public Object getDefaultPrimitive(Class klass) {
 		Object o = null;
-		if(klass.equals(String.class)) {
+		if (klass.equals(String.class)) {
 			o = "";
-		} else if(isByteType(klass)) {
+		} else if (isByteType(klass)) {
 			o = Byte.parseByte("0");
-		}else if(isShortType(klass)) {
+		} else if (isShortType(klass)) {
 			o = Short.parseShort("0");
-		}else if(isDoubleType(klass)) {
+		} else if (isDoubleType(klass)) {
 			o = 0D;
-		}else if(isFloatType(klass)) {
+		} else if (isFloatType(klass)) {
 			o = 0F;
-		}else if(isIntegerType(klass)) {
+		} else if (isIntegerType(klass)) {
 			o = 0;
-		}else if(isLongType(klass)) {
+		} else if (isLongType(klass)) {
 			o = 0L;
-		}else if(isCharacterType(klass)) {
+		} else if (isCharacterType(klass)) {
 			o = 'A';
-		}else if(isBooleanType(klass)) {
+		} else if (isBooleanType(klass)) {
 			o = true;
 		}
 		return o;
 	}
 
+	/**
+	 * Converts primitive class type to the non-primitive equivalent or simply returns the class if not a primitive.
+	 *
+	 * @param type The type to check and convert the primitive to non-primitive.
+	 * @return The non-primitive class of the type passed in.
+	 */
+	public Class toType(Class type) {
+		if (isPrimitive(type)) {
+			if (isBooleanType(type)) {
+				type = Boolean.class;
+			} else if (isByteType(type)) {
+				type = Byte.class;
+			} else if (isIntegerType(type)) {
+				type = Integer.class;
+			} else if (isDoubleType(type)) {
+				type = Double.class;
+			} else if (isFloatType(type)) {
+				type = Float.class;
+			} else if (isLongType(type)) {
+				type = Long.class;
+			} else if (isCharacterType(type)) {
+				type = Character.class;
+			} else if (isShortType(type)) {
+				type = Short.class;
+			}
+		}
+		return type;
+	}
+
 	public Class primitiveType(Object o) {
 		Class klass = null;
-		if(o instanceof String) {
-			if((""+o).matches("[truefalsTRUEFALS$.,\\-+0-9]+")||(""+o).length()<2) {
+		if (o instanceof String) {
+			if (("" + o).matches("[truefalsTRUEFALS$.,\\-+0-9]+") || ("" + o).length() < 2) {
 				try {
 					parseLong(o);
 					klass = Long.class;
@@ -470,7 +509,7 @@ public class GoateReflection {
 				}
 			}
 		} else {
-			if(isPrimitive(o.getClass()) || o instanceof Number) {
+			if (isPrimitive(o.getClass()) || o instanceof Number) {
 				klass = o.getClass();
 			}
 		}
@@ -515,7 +554,7 @@ public class GoateReflection {
 
 	public boolean parseBoolean(Object value) {
 		String v = "" + value;
-		if(!v.equalsIgnoreCase("true")&&!v.equalsIgnoreCase("false")){
+		if (!v.equalsIgnoreCase("true") && !v.equalsIgnoreCase("false")) {
 			throw new RuntimeException("Not a parseable boolean: ie, not true or false.");
 		}
 		return Boolean.parseBoolean(v);

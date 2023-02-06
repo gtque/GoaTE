@@ -1,3 +1,29 @@
+/*
+ * Copyright (c) 2023. Eric Angeli
+ *
+ *  Permission is hereby granted, free of charge,
+ *  to any person obtaining a copy of this software
+ *  and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction,
+ *  including without limitation the rights to use, copy,
+ *  modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit
+ *  persons to whom the Software is furnished to do so,
+ *  subject to the following conditions:
+ *
+ *  The above copyright notice and this permission
+ *  notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ *  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ *  AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ */
 package com.thegoate.eut;
 
 import org.atteo.classindex.IndexAnnotated;
@@ -55,7 +81,7 @@ public @interface EutConfig {
     String defaultProfile() default "eut";
 
     /**
-     * Whether or not to use the eut/eut.config file for defining the settings for the properties/config file.<br/>
+     * Whether to use the eut/eut.config file for defining the settings for the properties/config file.<br/>
      * If set to true, all other settings in this annotation are ignored, and only the values in the eut/eut.config file will be used for defining the settings for the properties/config file.
      * @return boolean to use eut/eut.config, defaults to false, set to true to use the settings in the eut/eut.config file.
      */
