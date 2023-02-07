@@ -57,9 +57,9 @@ import java.util.regex.Pattern;
  * The Goate approach to loading and handling properties. <br/>
  * This provides a loading method using reflection, which allows you to use polymorphism with your properties. <br/>
  * Extend `Eut` and add a static final singleton, name of your choice but we recommend eut or config, and initialize it using the static load method.<br/>
- * The parameter to `load` should be the Class itself. You should also set the Class as the generic type in the extends Eut&lt?&gt
+ * The parameter to `load` should be the Class itself. You should also set the Class as the generic type in the extends Eut&lt;?&gt;
  * example:
- * <pre><p>Simple config, not intended to be inherited</p>
+ * <div><pre>Simple config, not intended to be inherited
  * {@code
  * public class SimpleConfig extends Eut<SimpleConfig> {
  *     public static final SimpleConfig eut = load(SimpleConfig.class);
@@ -69,8 +69,8 @@ import java.util.regex.Pattern;
  *     }
  * }
  * }
- * </pre>
- * <pre><p>More complex config, that should be extended itself.</p>
+ * </pre></div>
+ * <div><pre>More complex config, that should be extended itself.
  * {@code
  * public class ParentConfig<CONFIG extends ParentConfig> extends Eut<CONFIG> {
  *     public String FIELD_A = "tiny fluffy kittens";
@@ -92,8 +92,9 @@ import java.util.regex.Pattern;
  *         return ChildConfig.eut.FIELD_A + " " + ChildConfig.eut.FIELD_B;
  *     }
  * }
+ * }
  * </pre>
- *
+ * </div>
  * @param <EUT> Should be the class itself, unless it too is abstract and intended to be extended, in which it should take a generic type and pass it Eut's generic type.
  */
 public abstract class Eut<EUT extends Eut> extends Kid {
