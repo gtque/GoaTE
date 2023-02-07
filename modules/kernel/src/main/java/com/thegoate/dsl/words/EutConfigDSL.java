@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  * Checks for a properties file in a folder called eut
- * whith a file name using the pattern eut.properties, where env is set or passed as a system property or environment
+ * with a file name using the pattern eut.properties, where env is set or passed as a system property or environment
  * variable where eut is replaced with the name of the environment under test.<br>
  * example: -Deut=local<br>
  *      then in the resource directory:<br>
