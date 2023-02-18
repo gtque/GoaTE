@@ -33,7 +33,6 @@ import com.thegoate.utils.to.To;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InaccessibleObjectException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -261,7 +260,7 @@ public class Serializer<T, S, U> extends Cereal {
                                 }
                                 try {
                                     field.getValue().setAccessible(acc);
-                                } catch (InaccessibleObjectException | SecurityException exception) {
+                                } catch (Exception exception) {
                                     LOG.debug("Serializer", "Unable to reset accessibility: " + field.getKey());
                                 }
                             }

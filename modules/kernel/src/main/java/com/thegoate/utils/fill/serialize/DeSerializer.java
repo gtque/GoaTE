@@ -32,7 +32,6 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InaccessibleObjectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +74,7 @@ public class DeSerializer extends Cereal{
                     try {
                         field.getValue().setAccessible(true);
                         isAcc = field.getValue().isAccessible();
-                    } catch (InaccessibleObjectException | SecurityException exception) {
+                    } catch (Exception exception) {
                         LOG.debug("DeSerializer", "Failed to make " + field.getValue().getName() + " accessible, skipping for deserialization unless it is already accessible");
                     }
                     if(isAcc) {
@@ -100,7 +99,7 @@ public class DeSerializer extends Cereal{
                         }
                         try {
                             field.getValue().setAccessible(acc);
-                        } catch (InaccessibleObjectException | SecurityException exception) {
+                        } catch (Exception exception) {
                             LOG.debug("DeSerializer", "Unable to reset accessibility: " + field.getKey());
                         }
                     }
