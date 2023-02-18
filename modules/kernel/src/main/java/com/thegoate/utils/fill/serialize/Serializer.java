@@ -27,15 +27,13 @@
 package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.Goate;
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.fill.serialize.to.SerializeTo;
 import com.thegoate.utils.to.To;
-import com.thegoate.utils.togoate.ToGoate;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -231,7 +229,7 @@ public class Serializer<T, S, U> extends Cereal {
                                 field.getValue().setAccessible(true);
                                 isAcc = field.getValue().isAccessible();
                             } catch (Exception e) {
-                                LOG.debug("Serializer", "Failed to make " + field.getValue().getName() + " accessible, skipping for serialization");
+                                LOG.debug("Serializer", "Failed to make " + field.getValue().getName() + " accessible, skipping for serialization unless it is already accessible");
                             }
                             if(isAcc) {
                                 try {
@@ -261,7 +259,11 @@ public class Serializer<T, S, U> extends Cereal {
                                 } catch (IllegalAccessException | InstantiationException e) {
                                     LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
                                 }
-                                field.getValue().setAccessible(acc);
+                                try {
+                                    field.getValue().setAccessible(acc);
+                                } catch (InaccessibleObjectException | SecurityException exception) {
+                                    LOG.debug("Serializer", "Unable to reset accessibility: " + field.getKey());
+                                }
                             }
                         }
                     }
