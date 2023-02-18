@@ -39,6 +39,7 @@ import com.thegoate.utils.fill.serialize.*;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -180,22 +181,34 @@ public abstract class Eut<EUT extends Eut> extends Kid {
 			Field modifiersField = gr.findField(Field.class,"modifiers");
 			boolean modifiersFieldAccessible = false;
 			if(modifiersField != null) {
-				modifiersFieldAccessible = modifiersField.canAccess(this);
-				modifiersField.setAccessible(true);
+			    try {
+                    modifiersFieldAccessible = modifiersField.canAccess((EUT) this);
+                } catch (IllegalArgumentException e) {
+			        LOG.debug("Eut Load", "couldn't tell if modifiers is accessible or not");
+			        modifiersField = null;
+                }
+			    try {
+			        if(modifiersField != null) {
+                        modifiersField.setAccessible(true);
+                    }
+                } catch (InaccessibleObjectException | SecurityException e) {
+			        LOG.debug("Eut Load", "failed to set modifiers to be accessible");
+			        modifiersField = null;
+                }
 			}
 
 			for (Map.Entry<String, Field> field : fields.entrySet()) {
                 String fieldName = field.getKey();
                 Field fieldself = field.getValue();
 				int fieldModifiers = fieldself.getModifiers();
-                boolean _accessible = fieldself.canAccess(this);
+                boolean _accessible = fieldself.canAccess((EUT)this);
                 boolean _finalAfterLoad = fieldself.getAnnotation(IsFinal.class) != null;
                 fieldself.setAccessible(true);
 
 				if(modifiersField != null) {
 					try {
 						modifiersField.setInt(this, fieldModifiers & ~Modifier.FINAL);
-					} catch (IllegalAccessException e) {
+					} catch (IllegalAccessException | IllegalArgumentException e) {
 						LOG.warn("EUT", "Couldn't remove \"final\" modifier, may encounter an issue trying to set the field.");
 					}
 				}
