@@ -27,20 +27,20 @@
 package com.thegoate.json.utils.fill.serialize.to;
 
 import com.thegoate.Goate;
-import com.thegoate.Sponge;
 import com.thegoate.json.utils.tojson.GoateToJSON;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.Serializer;
-import com.thegoate.utils.fill.serialize.SerializerSponge;
 import com.thegoate.utils.fill.serialize.to.SerializeTo;
 import com.thegoate.utils.togoate.ToGoate;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Eric Angeli on 4/2/2019.

@@ -1,11 +1,5 @@
 package com.thegoate.utils.fill.serialize;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import com.thegoate.Goate;
 import com.thegoate.HealthMonitor;
 import com.thegoate.logging.BleatBox;
@@ -13,6 +7,12 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtility;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Eric Angeli on 7/3/2020.

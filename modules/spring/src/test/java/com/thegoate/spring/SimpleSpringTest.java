@@ -15,7 +15,6 @@ import org.testng.annotations.Test;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
 /**
  * Created by Eric Angeli on 10/31/2017.

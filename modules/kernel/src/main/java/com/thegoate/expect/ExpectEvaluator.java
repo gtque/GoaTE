@@ -35,10 +35,6 @@ import com.thegoate.reflection.Executioner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Maintains a simple thread pool and executes expectations in threads.

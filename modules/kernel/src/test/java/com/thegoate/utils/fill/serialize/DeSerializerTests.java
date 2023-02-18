@@ -47,7 +47,6 @@ import com.thegoate.utils.fill.serialize.pojos.nullable.WrapperPrimitiveDouble;
 import com.thegoate.utils.fill.serialize.primitives.CastBoolean;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -55,7 +54,10 @@ import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.thegoate.dsl.words.LoadFile.fileAsAString;
 import static org.testng.Assert.*;

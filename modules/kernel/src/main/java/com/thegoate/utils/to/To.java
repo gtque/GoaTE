@@ -28,7 +28,6 @@
 package com.thegoate.utils.to;
 
 import com.thegoate.utils.UnknownUtilType;
-import com.thegoate.utils.fill.serialize.CastUtil;
 
 /**
  * The generic togoate class.

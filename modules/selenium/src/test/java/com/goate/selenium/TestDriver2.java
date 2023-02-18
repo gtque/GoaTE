@@ -26,27 +26,19 @@
  */
 package com.goate.selenium;
 
-import static com.thegoate.dsl.words.DateCurrentDSL.date;
-import static com.thegoate.utils.GoateUtils.sleep;
-import static com.thegoate.utils.file.Copy.copy;
-import static org.testng.Assert.assertNotNull;
-
-import java.io.File;
-import java.io.IOException;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.Factory;
-import org.testng.annotations.Test;
-
 import com.thegoate.Goate;
 import com.thegoate.data.StaticDL;
 import com.thegoate.testng.TestNGEngine;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.Test;
+
+import java.io.File;
+
+import static com.thegoate.dsl.words.DateCurrentDSL.date;
+import static com.thegoate.utils.GoateUtils.sleep;
+import static com.thegoate.utils.file.Copy.copy;
 
 /**
  * Tests loading web drivers included in selenium-java package.

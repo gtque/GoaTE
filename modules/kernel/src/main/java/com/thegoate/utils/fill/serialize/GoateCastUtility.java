@@ -26,11 +26,11 @@
  */
 package com.thegoate.utils.fill.serialize;
 
-import static com.thegoate.utils.fill.serialize.Cereal.findGoateSource;
-
 import com.thegoate.Goate;
 
 import java.lang.reflect.Field;
+
+import static com.thegoate.utils.fill.serialize.Cereal.findGoateSource;
 
 /**
  * Created by Eric Angeli on 6/27/2018.

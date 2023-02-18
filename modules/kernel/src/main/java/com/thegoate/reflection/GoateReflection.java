@@ -27,17 +27,16 @@
 
 package com.thegoate.reflection;
 
+import com.thegoate.logging.BleatBox;
+import com.thegoate.logging.BleatFactory;
+import com.thegoate.utils.fill.serialize.GoateIgnore;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.*;
-
-import com.thegoate.logging.BleatBox;
-import com.thegoate.logging.BleatFactory;
-import com.thegoate.utils.fill.serialize.GoateIgnore;
 
 /**
  * Some simple custom methods for reflection.

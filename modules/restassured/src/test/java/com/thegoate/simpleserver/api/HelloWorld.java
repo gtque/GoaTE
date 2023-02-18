@@ -29,7 +29,6 @@ package com.thegoate.simpleserver.api;
 
 import com.thegoate.simpleserver.pojo.SimpleName;
 import com.thegoate.utils.get.Get;
-
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

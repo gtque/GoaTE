@@ -32,7 +32,6 @@ import com.thegoate.data.GoateProvider;
 import com.thegoate.data.StaticDL;
 import com.thegoate.expect.Expectation;
 import com.thegoate.testng.test.DataContainer;
-
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

@@ -27,12 +27,12 @@
 
 package com.thegoate.utils.togoate;
 
-import java.util.Map;
-
 import com.thegoate.Goate;
 import com.thegoate.utils.UnknownUtilType;
 import com.thegoate.utils.to.ToUtil;
 import com.thegoate.utils.to.ToUtility;
+
+import java.util.Map;
 
 /**
  * The generic togoate class.

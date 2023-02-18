@@ -27,13 +27,12 @@
 
 package com.thegoate.utils.type;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import org.atteo.classindex.IndexAnnotated;
-
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Annotate something as a utility that converts something to a list.

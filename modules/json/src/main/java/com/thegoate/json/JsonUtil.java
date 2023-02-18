@@ -31,9 +31,6 @@ import com.thegoate.json.utils.type.JsonType;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.Utility;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Base json util class that implements the isType method.

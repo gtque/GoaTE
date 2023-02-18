@@ -27,19 +27,6 @@
 
 package com.thegoate.spreadsheets;
 
-import static com.thegoate.dsl.words.LoadFile.fileAsAString;
-import static com.thegoate.utils.get.Nested.nested;
-import static org.testng.Assert.assertEquals;
-
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.thegoate.spreadsheets.utils.CSVSheet;
-import org.testng.annotations.Test;
-
 import com.thegoate.Goate;
 import com.thegoate.data.DataLoader;
 import com.thegoate.expect.Expectation;
@@ -49,12 +36,24 @@ import com.thegoate.spreadsheets.dsl.words.LoadCsv;
 import com.thegoate.spreadsheets.pojo.CsvSource;
 import com.thegoate.spreadsheets.pojo.MapCsvPojo;
 import com.thegoate.spreadsheets.staff.GetCsvEmployee;
+import com.thegoate.spreadsheets.utils.CSVSheet;
 import com.thegoate.spreadsheets.utils.SheetUtils;
 import com.thegoate.spreadsheets.utils.togoate.SpreadSheetToGoate;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.file.Delete;
 import com.thegoate.utils.get.Get;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.thegoate.dsl.words.LoadFile.fileAsAString;
+import static com.thegoate.utils.get.Nested.nested;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Tests the loading of a csv file and getting cells from it.

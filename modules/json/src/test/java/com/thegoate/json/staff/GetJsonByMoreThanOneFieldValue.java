@@ -31,13 +31,12 @@ import com.thegoate.expect.Expectation;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.get.NotFound;
-
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by Eric Angeli on 4/3/2019.

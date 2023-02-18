@@ -28,8 +28,6 @@ package com.thegoate.rest.assured;
 
 import com.thegoate.rest.RestCall;
 import com.thegoate.staff.Employee;
-
-import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.Response;
 
 /**

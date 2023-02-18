@@ -3,7 +3,6 @@ package com.thegoate.logging.volume;
 import com.thegoate.logging.volume.amp.Amplifier;
 import com.thegoate.logging.volume.amp.GoateAmplifier;
 import com.thegoate.utils.UnknownUtilType;
-import com.thegoate.utils.UtilCache;
 import com.thegoate.utils.get.NotFound;
 import com.thegoate.utils.type.FindType;
 

@@ -35,7 +35,6 @@ import com.thegoate.map.EnumMap;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.togoate.ToGoate;
-
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 

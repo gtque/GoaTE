@@ -32,7 +32,6 @@ import com.thegoate.eut.properties.SimpleEut;
 import com.thegoate.expect.Expectation;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.GoateUtils;
-
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;

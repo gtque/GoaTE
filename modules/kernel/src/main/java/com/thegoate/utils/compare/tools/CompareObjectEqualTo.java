@@ -27,16 +27,14 @@
 
 package com.thegoate.utils.compare.tools;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import com.thegoate.Goate;
 import com.thegoate.HealthMonitor;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.reflection.GoateReflection;
-import com.thegoate.utils.compare.Compare;
-import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static com.thegoate.logging.volume.VolumeKnob.volume;
 

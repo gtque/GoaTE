@@ -1,13 +1,12 @@
 package com.thegoate.testng;
 
-import org.testng.annotations.Test;
-
 import com.thegoate.Goate;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.data.StaticDL;
 import com.thegoate.expect.Expectation;
 import com.thegoate.utils.GoateUtils;
+import org.testng.annotations.Test;
 
 /**
  * Created by Eric Angeli on 2/17/2020.

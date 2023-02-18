@@ -26,12 +26,11 @@
  */
 package com.thegoate.utils.fill.serialize.pojos;
 
-import java.util.Map;
-
 import com.thegoate.utils.fill.serialize.GoatePojo;
-import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.collections.MapKeyType;
 import com.thegoate.utils.fill.serialize.collections.MapType;
+
+import java.util.Map;
 
 /**
  * Created by Eric Angeli on 6/26/2018.

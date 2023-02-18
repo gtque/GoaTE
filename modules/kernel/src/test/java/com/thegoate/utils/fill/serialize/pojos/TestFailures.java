@@ -26,10 +26,11 @@
  */
 package com.thegoate.utils.fill.serialize.pojos;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.thegoate.utils.fill.serialize.Kid;
 import com.thegoate.utils.fill.serialize.collections.ListType;
+
+import java.util.ArrayList;
+import java.util.List;
 public class TestFailures extends Kid {
 	@ListType(type = TestFailure.class)
 	private List<TestFailure> failures = new ArrayList<>();

@@ -1,9 +1,7 @@
 package com.thegoate.utils.togoate;
 
 import com.thegoate.Goate;
-import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.Utility;
-import com.thegoate.utils.fill.serialize.Serializer;
 
 import java.util.Arrays;
 import java.util.Map;

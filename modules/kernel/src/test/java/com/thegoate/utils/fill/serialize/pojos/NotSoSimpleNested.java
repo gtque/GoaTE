@@ -26,10 +26,10 @@
  */
 package com.thegoate.utils.fill.serialize.pojos;
 
-import java.time.LocalDate;
-
 import com.thegoate.utils.fill.serialize.GoatePojo;
 import com.thegoate.utils.fill.serialize.GoateSource;
+
+import java.time.LocalDate;
 
 /**
  * Created by Eric Angeli on 4/22/2019.

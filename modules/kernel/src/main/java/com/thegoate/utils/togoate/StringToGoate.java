@@ -26,12 +26,10 @@
  */
 package com.thegoate.utils.togoate;
 
-import java.util.Arrays;
-
 import com.thegoate.Goate;
-import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.Utility;
-import com.thegoate.utils.fill.serialize.Serializer;
+
+import java.util.Arrays;
 
 /**
  * Converts the given string to a goate collection.

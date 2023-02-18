@@ -1,12 +1,11 @@
 package com.thegoate.json.utils.type;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.type.FindType;
 import com.thegoate.utils.type.IsType;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by Eric Angeli on 7/6/2020.

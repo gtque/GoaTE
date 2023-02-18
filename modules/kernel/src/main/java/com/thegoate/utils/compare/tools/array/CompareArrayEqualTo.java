@@ -31,7 +31,6 @@ import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 
 /**
  * Checks if an array equals another array, order enforced.

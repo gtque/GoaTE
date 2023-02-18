@@ -32,8 +32,6 @@ import com.thegoate.data.DLProvider;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 
-import java.lang.reflect.Method;
-
 import static com.thegoate.testng.TestNGRunFactory.*;
 
 /**

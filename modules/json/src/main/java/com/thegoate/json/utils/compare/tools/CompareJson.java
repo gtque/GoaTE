@@ -26,8 +26,6 @@
  */
 package com.thegoate.json.utils.compare.tools;
 
-import static com.thegoate.dsl.words.EutConfigDSL.eut;
-
 import com.thegoate.Goate;
 import com.thegoate.json.JsonUtil;
 import com.thegoate.utils.compare.Compare;
@@ -38,6 +36,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
+
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
 
 /**
  * Base class for comparing json.

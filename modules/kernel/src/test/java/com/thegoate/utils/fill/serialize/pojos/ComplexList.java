@@ -27,11 +27,11 @@
 
 package com.thegoate.utils.fill.serialize.pojos;
 
-import java.util.List;
-
 import com.thegoate.utils.fill.serialize.GoatePojo;
 import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.collections.ListType;
+
+import java.util.List;
 
 /**
  * Created by Eric Angeli on 8/1/2019.

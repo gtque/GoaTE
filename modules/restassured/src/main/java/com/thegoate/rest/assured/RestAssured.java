@@ -26,16 +26,6 @@
  */
 package com.thegoate.rest.assured;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
-import static io.restassured.config.HeaderConfig.headerConfig;
-import static io.restassured.config.HttpClientConfig.httpClientConfig;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-
 import com.github.dzieciou.testing.curl.CurlRestAssuredConfigFactory;
 import com.github.dzieciou.testing.curl.Options;
 import com.github.dzieciou.testing.curl.Platform;
@@ -45,7 +35,6 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
-
 import io.restassured.config.LogConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
@@ -54,6 +43,16 @@ import io.restassured.http.Cookie;
 import io.restassured.http.Cookies;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.config.EncoderConfig.encoderConfig;
+import static io.restassured.config.HeaderConfig.headerConfig;
+import static io.restassured.config.HttpClientConfig.httpClientConfig;
 
 /**
  * REST Assured implementation.

@@ -34,8 +34,6 @@ import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.testng.TestNGEngine;
 import org.testng.SkipException;
 
-import static org.testng.Assert.assertTrue;
-
 /**
  * The base barn class for running complete data driven tests.
  * Created by Eric Angeli on 5/22/2017.

@@ -4,7 +4,6 @@ import com.thegoate.Goate;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.expect.Expectation;
 import com.thegoate.expect.ExpectationError;
-import com.thegoate.expect.builder.ExpectationBuilder;
 import org.testng.annotations.Test;
 
 public class TestNGDslMethodTests extends TestNGEngineMethodDL {

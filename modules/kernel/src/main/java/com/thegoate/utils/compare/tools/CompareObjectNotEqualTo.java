@@ -26,14 +26,13 @@
  */
 package com.thegoate.utils.compare.tools;
 
-import java.util.Objects;
-
 import com.thegoate.HealthMonitor;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
-import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
+
+import java.util.Objects;
 
 import static com.thegoate.logging.volume.VolumeKnob.volume;
 

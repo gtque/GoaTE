@@ -26,17 +26,16 @@
  */
 package com.thegoate.data;
 
-import static com.thegoate.dsl.words.LoadFile.fileAsAString;
-import static com.thegoate.xml.XmlHelper.generateDocument;
+import com.thegoate.Goate;
+import com.thegoate.utils.GoateUtils;
+import com.thegoate.xml.utils.togoate.XmlToGoate;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.thegoate.Goate;
-import com.thegoate.utils.GoateUtils;
-import com.thegoate.utils.get.GetFileAsString;
-import com.thegoate.xml.utils.togoate.XmlToGoate;
+import static com.thegoate.dsl.words.LoadFile.fileAsAString;
+import static com.thegoate.xml.XmlHelper.generateDocument;
 
 /**
  * Loads a simple flat file into a single data set.

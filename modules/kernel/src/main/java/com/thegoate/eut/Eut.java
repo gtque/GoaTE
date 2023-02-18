@@ -34,22 +34,14 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.fill.FillString;
-import com.thegoate.utils.fill.serialize.GoateIgnore;
-import com.thegoate.utils.fill.serialize.GoateSource;
-import com.thegoate.utils.fill.serialize.GoateSourceNode;
-import com.thegoate.utils.fill.serialize.IsFinal;
-import com.thegoate.utils.fill.serialize.Kid;
+import com.thegoate.utils.fill.serialize.*;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

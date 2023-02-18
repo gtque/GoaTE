@@ -1,12 +1,11 @@
 package com.thegoate.utils.fill.serialize.pojos;
 
-import java.util.List;
-
-import com.thegoate.utils.fill.serialize.DeSerializerTests;
 import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.Kid;
 import com.thegoate.utils.fill.serialize.TypeT;
 import com.thegoate.utils.fill.serialize.collections.ListType;
+
+import java.util.List;
 
 public class ContentJA<T> extends Kid {
 
