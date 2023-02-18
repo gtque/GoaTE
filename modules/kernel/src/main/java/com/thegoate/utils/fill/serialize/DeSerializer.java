@@ -32,7 +32,9 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.reflection.GoateReflection;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,28 +72,40 @@ public class DeSerializer extends Cereal{
                         flatten = gs.flatten();
                     }
                     Object value = fieldKey.isEmpty()?data:data.get(fieldKey);
-                    boolean acc = field.getValue().canAccess(o);//.isAccessible();
-                    field.getValue().setAccessible(true);
+                    boolean acc = Modifier.isStatic(field.getValue().getModifiers()) ? field.getValue().canAccess(null) : field.getValue().canAccess(o);//field.getValue().canAccess(o);//.isAccessible();
+                    boolean isAcc = acc;
                     try {
-                        if(value!=null
-                                ||data.filter(fieldKey+"\\.").size()>0
-                                ||data.getStrict(fieldKey)!=null
-                                ||field.getValue().getType().getAnnotation(GoatePojo.class)!=null) {
-                            Goate d = new Goate().merge(data,false);
-                            if(!flatten){
-                                d = data.filter(fieldKey.replace("##", "[0-9]*"));
-                                if(!fieldKey.isEmpty()){
-                                    d = d.scrubKeys(fieldKey+"\\.");
-                                }
-                            } else {
-                                d = data.filterStrict(fieldKey.replace("##","[0-9]*"));
-                            }
-                            field.getValue().set(o, new Cast(d, dataSource).container(o).field(field.getValue()).cast(value,getType(field.getValue())));
-                        }
-                    } catch (Exception e) {
-                        LOG.error("Build Pojo", "Failed to set field: " + e.getMessage(), e);
+                        field.getValue().setAccessible(true);
+                        isAcc = Modifier.isStatic(field.getValue().getModifiers()) ? field.getValue().canAccess(null) : field.getValue().canAccess(o);
+                    } catch (InaccessibleObjectException | SecurityException e) {
+                        LOG.debug("DeSerializer", "Failed to make " + field.getValue().getName() + " accessible, skipping for serialization unless already accessible");
                     }
-                    field.getValue().setAccessible(acc);
+                    if (isAcc) {
+                        try {
+                            if (value != null
+                                    || data.filter(fieldKey + "\\.").size() > 0
+                                    || data.getStrict(fieldKey) != null
+                                    || field.getValue().getType().getAnnotation(GoatePojo.class) != null) {
+                                Goate d = new Goate().merge(data, false);
+                                if (!flatten) {
+                                    d = data.filter(fieldKey.replace("##", "[0-9]*"));
+                                    if (!fieldKey.isEmpty()) {
+                                        d = d.scrubKeys(fieldKey + "\\.");
+                                    }
+                                } else {
+                                    d = data.filterStrict(fieldKey.replace("##", "[0-9]*"));
+                                }
+                                field.getValue().set(o, new Cast(d, dataSource).container(o).field(field.getValue()).cast(value, getType(field.getValue())));
+                            }
+                        } catch (Exception e) {
+                            LOG.error("Build Pojo", "Failed to set field: " + e.getMessage(), e);
+                        }
+                        try {
+                            field.getValue().setAccessible(acc);
+                        } catch (InaccessibleObjectException | SecurityException exception) {
+                            LOG.debug("DeSerializer", "Unable to reset accessibility: " + field.getKey());
+                        }
+                    }
                 }
             }
         } catch (IllegalAccessException | InstantiationException e) {

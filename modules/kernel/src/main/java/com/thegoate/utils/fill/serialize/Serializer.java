@@ -34,10 +34,7 @@ import com.thegoate.utils.fill.serialize.to.SerializeTo;
 import com.thegoate.utils.to.To;
 import com.thegoate.utils.togoate.ToGoate;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -229,16 +226,16 @@ public class Serializer<T, S, U> extends Cereal {
                         if (exclude) {
                             LOG.debug("Excluding", fieldKey);
                         } else {
-                            if(!Modifier.isFinal(field.getValue().getModifiers())) {
+                            if (!Modifier.isFinal(field.getValue().getModifiers())) {
                                 boolean acc = Modifier.isStatic(field.getValue().getModifiers()) ? field.getValue().canAccess(null) : field.getValue().canAccess(pojo);//.isAccessible();
-                                boolean isAcc = false;
+                                boolean isAcc = acc;
                                 try {
                                     field.getValue().setAccessible(true);
                                     isAcc = Modifier.isStatic(field.getValue().getModifiers()) ? field.getValue().canAccess(null) : field.getValue().canAccess(pojo);
-                                } catch (Exception e) {
-                                    LOG.debug("Serializer", "Failed to make " + field.getValue().getName() + " accessible, skipping for serialization");
+                                } catch (InaccessibleObjectException | SecurityException e) {
+                                    LOG.debug("Serializer", "Failed to make " + field.getValue().getName() + " accessible, skipping for serialization unless already accessible");
                                 }
-                                if(isAcc) {
+                                if (isAcc) {
                                     try {
                                         Object o = field.getValue().get(pojo);
                                         if (gs != null && gs.serializeTo() != GoateSource.class) {
@@ -266,7 +263,11 @@ public class Serializer<T, S, U> extends Cereal {
                                     } catch (IllegalAccessException | InstantiationException e) {
                                         LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
                                     }
-                                    field.getValue().setAccessible(acc);
+                                    try {
+                                        field.getValue().setAccessible(acc);
+                                    } catch (InaccessibleObjectException | SecurityException exception) {
+                                        LOG.debug("Serializer", "Unable to reset accessibility: " + field.getKey());
+                                    }
                                 }
                             }
                         }
