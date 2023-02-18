@@ -47,9 +47,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The Goate approach to loading and handling properties. <br/>
- * This provides a loading method using reflection, which allows you to use polymorphism with your properties. <br/>
- * Extend `Eut` and add a static final singleton, name of your choice but we recommend eut or config, and initialize it using the static load method.<br/>
+ * The Goate approach to loading and handling properties. <br>
+ * This provides a loading method using reflection, which allows you to use polymorphism with your properties. <br>
+ * Extend `Eut` and add a static final singleton, name of your choice but we recommend eut or config, and initialize it using the static load method.<br>
  * The parameter to `load` should be the Class itself. You should also set the Class as the generic type in the extends Eut&lt;?&gt;
  * example:
  * <div><pre>Simple config, not intended to be inherited
