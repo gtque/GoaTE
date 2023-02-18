@@ -50,7 +50,7 @@ buildscript {
 
 //-Dorg.gradle.java.home=<path to jdk>
 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
-def maxJV = "17";//this should be updated when a new version of java is supported.
+def maxJV = "11";//this should be updated when a new version of java is supported.
 String javaVersion = "" + Integer.parseInt(project.hasProperty("javaVersion") ? (project.javaVersion.isEmpty() ? maxJV : project.javaVersion) : maxJV)
 if (javaVersion.contains(".")) {
     javaVersion = javaVersion.substring(("" + javaVersion).indexOf(".") + 1);
