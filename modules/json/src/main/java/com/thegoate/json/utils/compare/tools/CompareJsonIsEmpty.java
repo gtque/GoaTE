@@ -29,7 +29,6 @@ package com.thegoate.json.utils.compare.tools;
 import com.thegoate.json.utils.type.JsonType;
 import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.compare.CompareUtility;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 

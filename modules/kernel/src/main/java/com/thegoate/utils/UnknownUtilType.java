@@ -27,17 +27,17 @@
 
 package com.thegoate.utils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Optional;
-
 import com.thegoate.Goate;
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.get.NotFound;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Base Class for staff. Determines the type of util to use.

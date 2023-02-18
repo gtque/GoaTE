@@ -26,15 +26,9 @@
  */
 package com.thegoate.utils.compare.tools;
 
-import com.thegoate.HealthMonitor;
 import com.thegoate.annotations.IsDefault;
-import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.compare.CompareUtil;
-
-import java.util.Objects;
-
-import static com.thegoate.logging.volume.VolumeKnob.volume;
 
 /**
  * Swaps the check for contains, makes the lookup using a "wildcard" easier when the expected is already a container.

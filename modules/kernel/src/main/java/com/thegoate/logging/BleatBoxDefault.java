@@ -27,12 +27,11 @@
 
 package com.thegoate.logging;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-
+import com.thegoate.annotations.IsDefault;
 import org.slf4j.Marker;
 
-import com.thegoate.annotations.IsDefault;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
 /**
  * Simple default BleatBox implementation that logs

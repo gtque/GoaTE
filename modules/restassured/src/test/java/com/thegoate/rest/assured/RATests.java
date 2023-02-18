@@ -38,21 +38,19 @@ import com.thegoate.rest.staff.ApiGet;
 import com.thegoate.simpleserver.SimpleServer;
 import com.thegoate.spring.SpringTestEngine;
 import com.thegoate.staff.Employee;
-
 import io.restassured.response.Response;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Simple rest tests.

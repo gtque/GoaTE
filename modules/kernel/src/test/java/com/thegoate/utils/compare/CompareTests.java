@@ -27,16 +27,6 @@
 
 package com.thegoate.utils.compare;
 
-import static com.thegoate.utils.type.GoateNullCheck.isNull;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.math.BigDecimal;
-
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
 import com.thegoate.Goate;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
@@ -44,15 +34,17 @@ import com.thegoate.data.StaticDL;
 import com.thegoate.expect.Expectation;
 import com.thegoate.testng.ExpectToFail;
 import com.thegoate.testng.TestNGEngineMethodDL;
-import com.thegoate.utils.compare.tools.integer.CompareIntEqualTo;
-import com.thegoate.utils.compare.tools.integer.CompareIntGreaterThan;
-import com.thegoate.utils.compare.tools.integer.CompareIntGreaterThanEqualTo;
-import com.thegoate.utils.compare.tools.integer.CompareIntLessThan;
-import com.thegoate.utils.compare.tools.integer.CompareIntLessThanEqualTo;
-import com.thegoate.utils.compare.tools.integer.CompareIntNotEqualTo;
+import com.thegoate.utils.compare.tools.integer.*;
 import com.thegoate.utils.compare.tools.l.CompareLongEqualTo;
 import com.thegoate.utils.compare.tools.l.CompareLongGreaterThanEqualTo;
 import com.thegoate.utils.get.Get;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import java.math.BigDecimal;
+
+import static com.thegoate.utils.type.GoateNullCheck.isNull;
+import static org.testng.Assert.*;
 
 /**
  * Tests compare utilities.

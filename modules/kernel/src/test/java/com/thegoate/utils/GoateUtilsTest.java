@@ -26,13 +26,12 @@
  */
 package com.thegoate.utils;
 
+import com.thegoate.Goate;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
-
-import com.thegoate.Goate;
 
 /**
  * Test the helper methods in GoateUtils.

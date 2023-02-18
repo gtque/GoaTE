@@ -31,7 +31,6 @@ import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
-import com.thegoate.utils.fill.Fill;
 import com.thegoate.utils.fill.serialize.DeSerializer;
 
 /**

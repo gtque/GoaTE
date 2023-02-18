@@ -1,7 +1,6 @@
 package com.thegoate.expect.test;
 
 import com.thegoate.logging.volume.amp.BasicAmplifier;
-import com.thegoate.logging.volume.amp.GoateAmplifier;
 
 /**
  * Created by Eric Angeli on 7/1/2020.

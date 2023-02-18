@@ -1,10 +1,10 @@
 package com.thegoate.utils.compare.tools.date;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.thegoate.utils.type.FindType;
 import com.thegoate.utils.type.IsType;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Eric Angeli on 7/6/2020.

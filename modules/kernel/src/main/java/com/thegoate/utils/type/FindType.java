@@ -2,7 +2,6 @@ package com.thegoate.utils.type;
 
 import com.thegoate.Goate;
 import com.thegoate.utils.UnknownUtilType;
-import com.thegoate.utils.UtilCache;
 
 /**
  * Created by Eric Angeli on 7/6/2020.

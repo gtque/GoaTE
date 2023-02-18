@@ -28,7 +28,6 @@
 package com.thegoate.utils.fill;
 
 import com.thegoate.Goate;
-import com.thegoate.annotations.IsDefault;
 
 import java.util.ArrayList;
 import java.util.List;

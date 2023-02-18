@@ -28,8 +28,6 @@ package com.thegoate.utils.fill.serialize.model;
 
 import com.thegoate.utils.Utility;
 
-import java.lang.reflect.Field;
-
 /**
  * Simple interface for defining the modeling utility that returns a model of the specified type.
  * Created by Eric Angeli on 6/20/2021.

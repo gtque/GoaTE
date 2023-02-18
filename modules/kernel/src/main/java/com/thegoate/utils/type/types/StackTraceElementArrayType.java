@@ -4,8 +4,6 @@ import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.type.FindType;
 import com.thegoate.utils.type.IsType;
 
-import java.util.List;
-
 /**
  * Created by Eric Angeli on 7/6/2020.
  */

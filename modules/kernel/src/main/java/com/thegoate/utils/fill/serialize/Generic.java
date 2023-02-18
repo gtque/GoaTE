@@ -26,14 +26,13 @@
  */
 package com.thegoate.utils.fill.serialize;
 
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
+import org.atteo.classindex.IndexAnnotated;
+
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import org.atteo.classindex.IndexAnnotated;
-
-import com.thegoate.annotations.GoateDescription;
-import com.thegoate.info.Info;
 
 /**
  * Created by Eric Angeli on 4/27/2021.

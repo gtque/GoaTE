@@ -32,10 +32,9 @@ import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.mock.annotations.Mocker;
 import com.thegoate.mock.staff.Mock;
+import org.mockito.Spy;
 
 import java.lang.reflect.InvocationTargetException;
-
-import org.mockito.Spy;
 
 /**
  * Builds and returns a mock of the given object.

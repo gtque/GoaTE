@@ -3,8 +3,6 @@ package com.thegoate.utils.fill.serialize.pojos;
 import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.Kid;
 
-import java.util.List;
-
 public class Cereals extends Kid {
 
     @GoateSource(source = SimpleSource.class, key = "name")

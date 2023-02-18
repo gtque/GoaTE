@@ -26,14 +26,6 @@
  */
 package com.thegoate.json.utils.compare;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.testng.annotations.Test;
-
 import com.thegoate.Goate;
 import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.Expectation;
@@ -42,6 +34,13 @@ import com.thegoate.json.utils.compare.tools.CompareJsonEqualTo;
 import com.thegoate.json.utils.compare.tools.EqualIgnoreFields;
 import com.thegoate.testng.TestNGEngineAnnotatedDL;
 import com.thegoate.utils.compare.CompareUtility;
+import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by Eric Angeli on 8/13/2018.

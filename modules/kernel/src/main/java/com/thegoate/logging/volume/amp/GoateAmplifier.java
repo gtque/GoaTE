@@ -1,12 +1,11 @@
 package com.thegoate.logging.volume.amp;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import org.atteo.classindex.IndexAnnotated;
-
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by Eric Angeli on 7/1/2020.

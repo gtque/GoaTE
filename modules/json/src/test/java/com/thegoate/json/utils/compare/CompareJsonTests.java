@@ -33,7 +33,6 @@ import com.thegoate.expect.ExpectEvaluator;
 import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import com.thegoate.utils.fill.FillString;
-
 import org.json.JSONObject;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;

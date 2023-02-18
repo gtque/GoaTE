@@ -1,11 +1,9 @@
 package com.thegoate.expect.test;
 
+import com.thegoate.utils.fill.serialize.Kid;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.thegoate.utils.compare.Compare;
-import com.thegoate.utils.compare.CompareUtility;
-import com.thegoate.utils.fill.serialize.Kid;
 
 /**
  * Created by Eric Angeli on 7/1/2020.

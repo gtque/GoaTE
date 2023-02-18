@@ -26,9 +26,9 @@
  */
 package com.thegoate.logging;
 
-import java.util.logging.Level;
-
 import org.slf4j.Logger;
+
+import java.util.logging.Level;
 
 /**
  * Base Logging class.

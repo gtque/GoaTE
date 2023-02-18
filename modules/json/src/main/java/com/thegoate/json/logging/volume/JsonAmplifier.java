@@ -1,14 +1,13 @@
 package com.thegoate.json.logging.volume;
 
-import java.util.logging.Level;
-
-import org.json.JSONObject;
-
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.json.JsonUtil;
 import com.thegoate.logging.BleatLevel;
 import com.thegoate.logging.volume.amp.Amplifier;
 import com.thegoate.logging.volume.amp.GoateAmplifier;
+import org.json.JSONObject;
+
+import java.util.logging.Level;
 
 /**
  * Created by Eric Angeli on 7/2/2020.

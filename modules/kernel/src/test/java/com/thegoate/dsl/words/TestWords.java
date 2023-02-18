@@ -1,8 +1,6 @@
 package com.thegoate.dsl.words;
 
 import com.thegoate.Goate;
-import com.thegoate.data.DataLoader;
-import com.thegoate.data.DataSeriesLoader;
 import com.thegoate.dsl.words.employee.SimpleEmployee;
 import com.thegoate.expect.Expectation;
 import com.thegoate.spreadsheets.data.SpreadSheetDL;
@@ -17,7 +15,6 @@ import java.util.List;
 
 import static com.thegoate.dsl.words.EmployeeDSL.employee;
 import static com.thegoate.dsl.words.HireDSL.hire;
-import static org.testng.Assert.assertEquals;
 
 /**
  * Created by Eric Angeli on 11/18/2019.

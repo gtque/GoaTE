@@ -1,12 +1,10 @@
 package com.thegoate.testng.test;
 
-import static com.thegoate.data.DLProvider.constants;
-import static com.thegoate.data.DLProvider.runs;
-import static com.thegoate.data.DLProvider.size;
-
 import com.thegoate.Goate;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.StaticDL;
+
+import static com.thegoate.data.DLProvider.*;
 
 /**
  * Created by Eric Angeli on 6/25/2020.

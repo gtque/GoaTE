@@ -29,7 +29,6 @@ package com.thegoate.utils.compare.tools.list;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.CompareUtil;
-import com.thegoate.utils.compare.tools.string.CompareStringTool;
 
 import java.util.List;
 

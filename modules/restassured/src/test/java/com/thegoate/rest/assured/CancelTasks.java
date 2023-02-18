@@ -1,7 +1,5 @@
 package com.thegoate.rest.assured;
 
-import org.testng.annotations.Test;
-
 import com.thegoate.Goate;
 import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
@@ -10,6 +8,7 @@ import com.thegoate.expect.Expectation;
 import com.thegoate.rest.RestCall;
 import com.thegoate.rest.RestResult;
 import com.thegoate.testng.TestNGEngineMethodDL;
+import org.testng.annotations.Test;
 
 public class CancelTasks extends TestNGEngineMethodDL {
 

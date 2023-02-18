@@ -34,7 +34,6 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.GoateUtils;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;

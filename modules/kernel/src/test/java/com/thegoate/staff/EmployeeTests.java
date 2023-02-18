@@ -29,7 +29,6 @@ package com.thegoate.staff;
 
 import com.thegoate.Goate;
 import com.thegoate.metrics.Stopwatch;
-import com.thegoate.staff.test.EventuallyTrue;
 import com.thegoate.staff.test.EventuallyTrueInt;
 import com.thegoate.testng.TestNGEngineMethodDL;
 import org.testng.annotations.Test;

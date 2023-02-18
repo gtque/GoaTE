@@ -26,13 +26,13 @@
  */
 package com.thegoate.dsl.words;
 
-import java.io.File;
-
 import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 import com.thegoate.utils.get.GetFile;
+
+import java.io.File;
 
 /**
  * Created by Eric Angeli on 7/5/2017.

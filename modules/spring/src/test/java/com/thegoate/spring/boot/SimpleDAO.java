@@ -2,8 +2,6 @@ package com.thegoate.spring.boot;
 
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
-//import oracle.jdbc.pool.OracleDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

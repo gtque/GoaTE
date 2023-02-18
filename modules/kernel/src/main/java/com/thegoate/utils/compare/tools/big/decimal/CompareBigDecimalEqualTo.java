@@ -26,10 +26,9 @@
  */
 package com.thegoate.utils.compare.tools.big.decimal;
 
-import java.math.BigDecimal;
-
 import com.thegoate.utils.compare.CompareUtil;
-import com.thegoate.utils.compare.tools.d.CompareDoubleTool;
+
+import java.math.BigDecimal;
 
 /**
  * Compares two big decimals for equality.

@@ -34,8 +34,6 @@ import com.thegoate.utils.get.Get;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-
 /**
  * Created by Eric Angeli on 8/28/2018.
  */

@@ -28,11 +28,7 @@ package com.thegoate.expect.amp;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
-import com.thegoate.expect.ExpectThreadExecuter;
-import com.thegoate.expect.Expectation;
 import com.thegoate.logging.volume.amp.GoateAmplifier;
-
-import java.util.List;
 
 @GoateAmplifier(type = SkippedChannel.class)
 @IsDefault(forType = true)

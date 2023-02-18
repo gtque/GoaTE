@@ -28,8 +28,6 @@ package com.thegoate.utils.compare.tools.date;
 
 import com.thegoate.utils.compare.CompareTool;
 
-import java.text.SimpleDateFormat;
-
 /**
  * Adds check for date type.
  * Just checks date, ignores time, if time is delimited by T.

@@ -1,6 +1,5 @@
 package com.thegoate.utils.fill.serialize.pojos;
 
-import com.thegoate.utils.fill.serialize.DefaultSource;
 import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.Kid;
 import com.thegoate.utils.fill.serialize.collections.ListType;

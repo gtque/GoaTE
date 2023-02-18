@@ -1,21 +1,19 @@
 package com.thegoate.json.logging.volume;
 
-import static com.thegoate.logging.volume.VolumeKnob.volume;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import com.thegoate.expect.Expectation;
 import com.thegoate.json.utils.type.JsonType;
 import com.thegoate.testng.ExpectToFail;
+import com.thegoate.testng.TestNGEngineMethodDL;
+import com.thegoate.utils.GoateUtils;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-import com.thegoate.expect.Expectation;
-import com.thegoate.testng.TestNGEngineMethodDL;
-import com.thegoate.utils.GoateUtils;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+import static com.thegoate.logging.volume.VolumeKnob.volume;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by Eric Angeli on 7/2/2020.

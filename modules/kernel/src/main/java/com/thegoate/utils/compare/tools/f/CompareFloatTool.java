@@ -31,7 +31,6 @@ import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.ParseDetector;
 import com.thegoate.utils.compare.CompareTool;
 import com.thegoate.utils.compare.tools.d.CompareDoubleEqualTo;
-import com.thegoate.utils.compare.tools.d.CompareDoubleTool;
 
 /**
  * Created by Eric Angeli on 7/14/2017.

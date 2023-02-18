@@ -27,11 +27,11 @@
 
 package com.thegoate.utils.compare.tools.big.decimal;
 
-import java.math.BigDecimal;
-
 import com.thegoate.reflection.GoateReflection;
 import com.thegoate.utils.ParseDetector;
 import com.thegoate.utils.compare.CompareTool;
+
+import java.math.BigDecimal;
 
 /**
  * Created by Eric Angeli on 7/14/2017.

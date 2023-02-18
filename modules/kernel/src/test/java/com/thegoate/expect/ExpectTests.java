@@ -49,7 +49,6 @@ import com.thegoate.utils.fill.serialize.DefaultSource;
 import com.thegoate.utils.fill.serialize.Serializer;
 import com.thegoate.utils.get.Get;
 import com.thegoate.utils.togoate.ToGoate;
-
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
