@@ -50,12 +50,18 @@ import static java.lang.Thread.currentThread;
  */
 public class Goate implements HealthMonitor, Diary, Cloneable {
 
+    private volatile Map<String, Object> data = new ConcurrentHashMap<>();
+    @GoateIgnore
 	public static final String GOATE_VARIABLE_PREFIX = "_goate_(%$#)_";
-	volatile Map<String, Object> data = new ConcurrentHashMap<>();
-	volatile Map<String, Object> ghosted = new ConcurrentHashMap<>();
+    @GoateIgnore
+    private volatile Map<String, Object> ghosted = new ConcurrentHashMap<>();
+    @GoateIgnore
 	public volatile static List<String> ghosts = null;
-	Interpreter dictionary;
+    @GoateIgnore
+    private Interpreter dictionary;
+    @GoateIgnore
 	boolean increment = true;
+    @GoateIgnore
 	static volatile Map<String, Integer> prettyPrintTabs = new ConcurrentHashMap<>();
 
 	public Goate() {
@@ -176,10 +182,28 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 	public String buildKey(String key) {
 		String fullKey = key;
 		if (increment) {
+//            Goate counters = (Goate) ghosted.get("key counter");
+//            if (counters == null) {
+//                counters = new Goate();
+//                ghosted.put("key counter", counters);
+//            }
+            Set<String> keys = data.keySet();
 			while (fullKey.contains("##")) {
-				Goate billy = filter(fullKey.substring(0, fullKey.indexOf("##")) + "[0-9]+");
-				fullKey = fullKey.replaceFirst("##", "" + billy.size());
+                String partialKey = fullKey.substring(0, fullKey.indexOf("##"));
+                long size = keys.parallelStream().filter(id -> id.matches(partialKey + "[0-9]+.*")).count();
+//                int size = counters.get(partialKey, -42, Integer.class);
+//                if (size < 0) {
+//                    Goate billy = filter(partialKey + "[0-9]+");
+//                    size = billy.size();
+//                }
+                fullKey = fullKey.replaceFirst("##", "" + size);
+//                size++;
+//                counters.put(partialKey, size);
 			}
+//			String[] keyParts = key.replace(".","\\.").split("##");
+//
+//			String keyPattern = key.replace("##", "[0-9]+").replace(".","\\.");
+//			fullKey = keyPattern;
 		} else {
 			fullKey = key.replace("##", "" + System.nanoTime());
 		}
@@ -193,6 +217,7 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 	public Object getStrict(String key, Object def) {
 		return get(key, def, false);
 	}
+
 	public Object get(int index) {
 		Iterator<String> keys = data.keySet().iterator();
 		String key = "";
@@ -368,32 +393,16 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 	 */
 	public Goate filterStrict(String pattern) {
 		Goate filtered = new Goate();
-		StringBuilder keyList = new StringBuilder();
 		if (data != null) {
-			for (String key : keys()) {
-				//                keyList.append("-!").append(key).append("!-");
-				if (key.matches(pattern)) {
-					filtered.put(key, getStrict(key));
+            keys().parallelStream().forEach(key -> addToFiltered(filtered, key, key.matches(pattern)));
 				}
+        return filtered;
 			}
-			//            StringBuilder goatePattern = new StringBuilder();
-			//            int countEnding = pattern.endsWith(")")?1:0;
-			//            int lastCurlyOpen = pattern.lastIndexOf("{");
-			//            int lastCurlyClose = pattern.lastIndexOf("}");
-			//            if((countEnding == 1 && lastCurlyClose!=pattern.length()-2)||lastCurlyOpen<0){
-			//                lastCurlyOpen = pattern.length();
-			//            }
-			//
-			//            goatePattern.append(pattern).insert(countEnding,"(-!").insert(lastCurlyOpen+3,"!-)");
-			//            Pattern p = Pattern.compile(goatePattern.toString());
-			//            Matcher m = p.matcher(keyList.toString());
-			//            while (m.find()) {
-			//                String key = m.group().replace("-!","").replace("!-","");
-			//                filtered.put(key, getStrict(key));
-			//                //m = p.matcher(pattern);
-			//            }
+
+    protected void addToFiltered(Goate filtered, String key, boolean add) {
+        if (add) {
+            filtered.put(key, getStrict(key));
 		}
-		return filtered;
 	}
 
 	/**
@@ -405,11 +414,8 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 	public Goate filterExclude(String pattern) {
 		Goate filtered = new Goate();
 		if (data != null) {
-			for (String key : keys()) {
-				if (!key.matches(pattern + ".*")) {
-					filtered.put(key, getStrict(key));
-				}
-			}
+            String fullPattern = pattern + ".*";
+            keys().parallelStream().forEach(key -> addToFiltered(filtered, key, !key.matches(fullPattern)));
 		}
 		return filtered;
 	}

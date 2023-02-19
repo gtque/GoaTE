@@ -45,8 +45,9 @@ import java.util.Map;
  */
 public class Interpreter {
     BleatBox LOG = BleatFactory.getLogger(getClass());
+    static BleatBox SLOG = BleatFactory.getLogger(Interpreter.class);
     Goate data;
-    Map<String, Class> dictionary = null;
+    static final Map<String, Class> dictionary = initDictionary();
 
     public Interpreter(Goate data) {
         this.data = data;
@@ -107,15 +108,17 @@ public class Interpreter {
      * The last instance of a word wins, ie there will only be one version of a word in the dictionary
      * which may produce unexpected results if more than one uses the same word.
      */
-    protected void initDictionary() {
+    protected static Map<String, Class> initDictionary() {
+        Map<String, Class> dictionary = null;
         try {
             if (dictionary == null) {
                 new AnnotationFactory().using(GoateDSL.class.getMethod("word")).doDefault().annotatedWith(GoateDSL.class).buildDirectory();
             }
             dictionary = AnnotationFactory.directory.get(GoateDSL.class.getCanonicalName());
         } catch (Throwable e) {
-            LOG.error("Problem initializing dsl: " + e.getMessage(), e);
+            SLOG.error("Problem initializing dsl: " + e.getMessage(), e);
         }
+        return dictionary;
     }
 
     public Map<String,Class> getDictionary(){

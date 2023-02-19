@@ -144,7 +144,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         if (utility == null) {
             utility = uncached(util, args, checkArgs, id, identifier, isType, type);
             if (utility != null) {
-                if (obj != null && useCache && !(obj instanceof String)) {
+                if (obj != null && useCache) {// && !(obj instanceof String && type != String.class)) {
                     Goate cache = pokedex.get(region, new Goate(), Goate.class);
                     if (cache != null) {
                         cache.put(key(util, obj, id, type), utility.getClass());
@@ -184,7 +184,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
     }
 
     protected String key(Class<? extends java.lang.annotation.Annotation> util, Object obj, String id, Class isType) {
-        return util.getName() + ":" + getName(obj, isType) + ":" + id + ":" + isType;
+        return (util.getName() + ":" + getName(obj, isType) + ":" + id + ":" + isType).toLowerCase();
     }
 
     protected String getName(Object obj, Class isType) {
