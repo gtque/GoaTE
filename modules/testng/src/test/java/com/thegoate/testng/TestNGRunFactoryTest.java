@@ -78,6 +78,7 @@ public class TestNGRunFactoryTest extends TestNGEngineMethodDL {
         GoateUtils.setEnvironment("runGroups", "do");
         Goate runData = new Goate()
                 .put("run##", new StaticDL().add("groups", " do"))
+                .put("run##", new StaticDL().add("groups", " do").add("runEnabled", "boolean::false"))
                 .put("run##", new StaticDL().add("groups", "do not"))
                 .put("run##", new StaticDL().add("groups", "do not"))
                 .put("run##", new StaticDL().add("groups", "maybe,    do , yes"))

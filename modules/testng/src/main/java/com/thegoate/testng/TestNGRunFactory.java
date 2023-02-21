@@ -227,12 +227,12 @@ public class TestNGRunFactory {
         return filtered;
     }
 
-    protected static boolean checkRunGroups(Object runData, String[] runGroups) {
+    protected static boolean checkRunGroups(Goate runData, String[] runGroups) {
         boolean check = true;
         if (runGroups != null && runGroups.length > 0) {
             Object run = runData;
-            if (runData != null && runData instanceof Goate) {
-                run = ((Goate) runData).get("groups");
+            if (runData != null) {
+                run = runData.get("groups");
             }
             if (run != null) {
                 if (run instanceof String) {
@@ -245,7 +245,7 @@ public class TestNGRunFactory {
                 check = false;
             }
         }
-        return check;
+        return check && runEnabled(runData);
     }
 
     protected static boolean filterRun(Goate run, String[] runIds) {
