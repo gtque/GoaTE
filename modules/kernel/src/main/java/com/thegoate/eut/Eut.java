@@ -88,6 +88,7 @@ import java.util.regex.Pattern;
  * }
  * </pre>
  * </div>
+ *
  * @param <EUT> Should be the class itself, unless it too is abstract and intended to be extended, in which it should take a generic type and pass it Eut's generic type.
  */
 public abstract class Eut<EUT extends Eut> extends Kid {
@@ -127,140 +128,59 @@ public abstract class Eut<EUT extends Eut> extends Kid {
         return (EUT) load(eutType).eut();
     }
 
-	private EutSettings defineEutSettings() {
-		EutConfig propertiesDefinition = getClass().getAnnotation(EutConfig.class);
-		EutSettings definition = new EutSettings();
-		if (propertiesDefinition == null || propertiesDefinition.useEutConfigFile()) {
-			//Loading the eut/eut.config file
-			Goate config = new Goate();
-			if (loadedEutFiles.containsKey("eut/eut.config")) {
-				if(loadedEutFiles.get("eut/eut.config") instanceof EutSettings) {
-					definition = (EutSettings) loadedEutFiles.get("eut/eut.config");
-				} else {
-					config = (Goate) loadedEutFiles.get("eut/eut.config");
-				}
-			} else {
-				//try loading the file.
-				List<Goate> configs = (new PropertyFileDL()).file("eut/eut.config").load();
-				if (configs.size() > 0) {
-					config = configs.get(0);
-				}
-			}
-			if (!definition.isConfigured()) {
-				definition.setLocation(config.get("location", "settings", String.class))
-					.setExtension(config.get("extension", "properties", String.class))
-					.setPattern(config.get("pattern", "config-${profile}", String.class))
-					.setDefaultFile(config.get("default", "settings/config.properties", String.class))
-					.setDefaultProfile(config.get("default.profile", "localdev", String.class))
-					.setUseEutSettings(config.get("useEutSettings", true, Boolean.class))
-					.configured();
-				loadedEutFiles.put("eut/eut.config", definition);
-			}
-		} else {
-			definition.setLocation(propertiesDefinition.location())
-				.setExtension(propertiesDefinition.extension())
-				.setPattern(propertiesDefinition.pattern())
-				.setDefaultFile(propertiesDefinition.defaultFile())
-				.setDefaultProfile(propertiesDefinition.defaultProfile())
-				.setUseEutSettings(false)
-				.configured();
-		}
-		return definition;
-	}
-    protected void loadEut() {
-
-        EutSettings definition = defineEutSettings();
-
-        properties = loadFromCustomPropertiesFile(definition);
-
-		List<String> sources = sourcePrefixList();
-
-        GoateReflection gr = new GoateReflection();
-        Map<String, Field> fields = gr.findFields(getClass());
-        if (fields.size() > 0) {
-			Field modifiersField = gr.findField(Field.class,"modifiers");
-			boolean modifiersFieldAccessible = false;
-			if(modifiersField != null) {
-			    try {
-                    modifiersFieldAccessible = modifiersField.canAccess((EUT) this);
-                } catch (IllegalArgumentException e) {
-			        LOG.debug("Eut Load", "couldn't tell if modifiers is accessible or not");
-			        modifiersField = null;
-                }
-			    try {
-			        if(modifiersField != null) {
-                        modifiersField.setAccessible(true);
-                    }
-                } catch (InaccessibleObjectException | SecurityException e) {
-			        LOG.debug("Eut Load", "failed to set modifiers to be accessible");
-			        modifiersField = null;
-                }
-			}
-
-			for (Map.Entry<String, Field> field : fields.entrySet()) {
-                String fieldName = field.getKey();
-                Field fieldself = field.getValue();
-				int fieldModifiers = fieldself.getModifiers();
-                boolean _accessible = fieldself.canAccess((EUT)this);
-                boolean _finalAfterLoad = fieldself.getAnnotation(IsFinal.class) != null;
-                fieldself.setAccessible(true);
-
-				if(modifiersField != null) {
-					try {
-						modifiersField.setInt(this, fieldModifiers & ~Modifier.FINAL);
-					} catch (IllegalAccessException | IllegalArgumentException e) {
-						LOG.warn("EUT", "Couldn't remove \"final\" modifier, may encounter an issue trying to set the field.");
-					}
-				}
-				Class fieldType = gr.toType(fieldself.getType());
-                List<String> altNames = getAlternateNames(fieldself, fieldName, sources);//.toLowerCase().replace("_", "."), source.toLowerCase());
-                Object setValue1 = null;
-                for (String altName : altNames) {
-                    setValue1 = getProperty(altName, null, fieldType, properties);
-                    if (setValue1 != null) {
-                        LOG.debug("Properties", "Found a property with the alternate name: " + fieldName + ">" + altName);
-                        properties.put(altName, setValue1);
-                        break;
-                    }
-                }
-
-                if (setValue1 != null) {
-					try {
-						fieldself.set(this, setValue1);
-					} catch (IllegalAccessException e) {
-						LOG.error("Eut", "Unable to set property \""+ fieldself.getName() + "\" in the eut/config pojo: " + e.getMessage());
-					}
-				}
-                if (_finalAfterLoad) {
-                    fieldself.setAccessible(false);
-					if(modifiersField != null) {
-						try {
-							modifiersField.setInt(this, fieldModifiers ^ Modifier.FINAL);
-						} catch (IllegalAccessException e) {
-							LOG.warn("Eut", "Unable to make field final.");
-						}
-					}
+    private EutSettings defineEutSettings() {
+        EutConfig propertiesDefinition = getClass().getAnnotation(EutConfig.class);
+        EutSettings definition = new EutSettings();
+        if (propertiesDefinition == null || propertiesDefinition.useEutConfigFile()) {
+            //Loading the eut/eut.config file
+            Goate config = new Goate();
+            if (loadedEutFiles.containsKey("eut/eut.config")) {
+                if (loadedEutFiles.get("eut/eut.config") instanceof EutSettings) {
+                    definition = (EutSettings) loadedEutFiles.get("eut/eut.config");
                 } else {
-                    fieldself.setAccessible(_accessible);
-					if(modifiersField != null) {
-						try {
-							modifiersField.setInt(this, fieldModifiers);
-						} catch (IllegalAccessException e) {
-							LOG.warn("EUT", "Couldn't reset field modifiers: " + e.getMessage());
-						}
-					}
-				}
+                    config = (Goate) loadedEutFiles.get("eut/eut.config");
+                }
+            } else {
+                //try loading the file.
+                List<Goate> configs = (new PropertyFileDL()).file("eut/eut.config").load();
+                if (configs.size() > 0) {
+                    config = configs.get(0);
+                }
             }
-			if(modifiersField != null) {
-				modifiersField.setAccessible(modifiersFieldAccessible);
-			}
+            if (!definition.isConfigured()) {
+                definition.setLocation(config.get("location", "settings", String.class))
+                        .setExtension(config.get("extension", "properties", String.class))
+                        .setPattern(config.get("pattern", "config-${profile}", String.class))
+                        .setDefaultFile(config.get("default", "settings/config.properties", String.class))
+                        .setDefaultProfile(config.get("default.profile", "localdev", String.class))
+                        .setUseEutSettings(config.get("useEutSettings", true, Boolean.class))
+                        .configured();
+                loadedEutFiles.put("eut/eut.config", definition);
+            }
+        } else {
+            definition.setLocation(propertiesDefinition.location())
+                    .setExtension(propertiesDefinition.extension())
+                    .setPattern(propertiesDefinition.pattern())
+                    .setDefaultFile(propertiesDefinition.defaultFile())
+                    .setDefaultProfile(propertiesDefinition.defaultProfile())
+                    .setUseEutSettings(false)
+                    .configured();
         }
+        return definition;
+    }
+
+    protected void loadEut() {
+        EutSettings definition = defineEutSettings();
+        properties = loadFromCustomPropertiesFile(definition);
+        DeSerializer deSerializer = new DeSerializer().pojo(this).from(AllOrderedSource.class).data(properties);
+        deSerializer.build(getClass());
+        properties = deSerializer.getDupeData();
         LOG.debug("finished initializing properties...");
     }
 
     public void reset() {
-		loadEut();
-	}
+        loadEut();
+    }
 
     public String get(String key) {
         return get(key, null, String.class);
@@ -271,110 +191,14 @@ public abstract class Eut<EUT extends Eut> extends Kid {
     }
 
     public <T> T get(String key, Object defaultValue, Class<T> type) {
-        return null;//getProperty(key, defaultValue, type, properties);
+        return properties.get(key, defaultValue, type);//null;//getProperty(key, defaultValue, type, properties);
     }
 
-    public List<String> sourcePrefixList() {
-        List<String> sources = new ArrayList<>();
-        GoateSource[] sourceLabels = getClass().getAnnotationsByType(GoateSource.class);
-		GoateSourceNode head = new GoateSourceNode();
-		GoateSourceNode finalHead = head;
-        Arrays.stream(sourceLabels).forEach(source -> finalHead.addSource(source));
-        head.addSource(defineDefaultSource(getClass().getSimpleName()));
-        while (head != null) {
-            String prefix = head.getTheSource().flatten() ? "" : head.getTheSource().key();
-            if (!sources.contains(prefix)) {
-                sources.add(prefix);
-            }
-            head = head.getNext();
-        }
-        return sources;
-    }
-
-    private GoateSource defineDefaultSource(String fieldName) {
-        return new GoateSource() {
-
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return GoateSource.class;
-            }
-
-            @Override
-            public Class source() {
-                return null;
-            }
-
-            @Override
-            public String key() {
-                return fieldName.toLowerCase().replace("_", ".");
-            }
-
-            @Override
-            public boolean flatten() {
-                return false;
-            }
-
-            @Override
-            public Class serializeTo() {
-                return null;
-            }
-
-            @Override
-            public boolean skipInModel() {
-                return false;
-            }
-
-            @Override
-            public int priority() {
-                return Integer.MAX_VALUE;
-            }
-        };
-    }
-
-    public List<String> getAlternateNames(Field field, String name, List<String> sources) {
-        List<String> alternate = new ArrayList<>();
-        GoateSource[] altProperties = field.getAnnotationsByType(GoateSource.class);
-		GoateSourceNode head = new GoateSourceNode();
-		GoateSourceNode finalHead = head;
-        Arrays.stream(altProperties).forEach(source -> finalHead.addSource(source));
-        head.addSource(defineDefaultSource(field.getName()));
-        while (head != null) {
-            String base = head.getTheSource().key();
-            //base2 is recommended to be used for setting as environment properties and is all uppercase with - and . replaced with _
-            //example: if original is hello-world.greeting then use HELLO_WORLD_GREETING as the property name for the environment variable.
-            //although technically it HELLO_WORLD_GREETING would also work if used in the properties file, it is recommended to only use
-            //that pattern when setting it through environment variables to help preserve your sanity.
-            String base2 = base.toUpperCase().replace("-", "_").replace(".", "_");
-            if (head.getTheSource().flatten()) {
-                if (!alternate.contains(base2)) {
-                    alternate.add(base2);
-                }
-                if (!alternate.contains(base)) {
-                    alternate.add(base);
-                }
-            } else {
-                sources.stream().forEach(source -> addAlternates(alternate, source, base, base2));
-            }
-            head = head.getNext();
-        }
-        return alternate;
-    }
-
-    private void addAlternates(List<String> alternates, String prefix, String base, String base2) {
-        String full1 = prefix + (prefix.isEmpty() ? "" : ".") + base;
-        String prefix2 = prefix.toUpperCase().toUpperCase().replace("-", "_").replace(".", "_");
-        String full2 = prefix2 + (prefix2.isEmpty() ? "" : "_") + base2;
-        if (!alternates.contains(full2)) {
-            alternates.add(full2);
-        }
-        if (!alternates.contains(full1)) {
-            alternates.add(full1);
-        }
-    }
     private <Type> Type getProperty(String key, Object def, Class<Type> type, Goate properties) {
         Object property = properties.get(key, def, type);
         return (Type) property;
     }
+
     private Goate loadFromCustomPropertiesFile(EutSettings propertiesDefinition) {
         String location = propertiesDefinition.getLocation();
         String extension = propertiesDefinition.getExtension();
@@ -390,37 +214,37 @@ public abstract class Eut<EUT extends Eut> extends Kid {
                 .put("default.profile", defaultFile)
                 .put("profile", profile);
         String fileName = propDef.get("pattern", defaultFile, String.class);
-		propDef.merge(getPatternProperties(fileName), false);
+        propDef.merge(getPatternProperties(fileName), false);
         String eutProfile = "" + (new FillString(fileName)).with(propDef);
         String file = propDef.get("location") + "/" + eutProfile + "." + extension;
         if (!(new File(GoateUtils.getFilePath(file))).exists()) {
             file = defaultFile;
         }
-		Goate loadedEut = null;
+        Goate loadedEut = null;
         if (!loadedEutFiles.containsKey(file)) {
-			loadedEut = (new PropertyFileDL()).file(file).load().get(0);
+            loadedEut = (new PropertyFileDL()).file(file).load().get(0);
 
         }
-		loadedEut = loadedEutFiles.get(file, loadedEut, Goate.class);
+        loadedEut = loadedEutFiles.get(file, loadedEut, Goate.class);
         return loadedEut;
     }
 
-	public Goate getPatternProperties(String input){
-		Goate patternProperties = new Goate();
-		String keyPattern = "\\$\\{[^}]*\\}";
-		Pattern pattern = Pattern.compile(keyPattern);
-		ArrayList list = new ArrayList();
-		//Matching the compiled pattern in the String
-		Matcher matcher = pattern.matcher(input);
-		while (matcher.find()) {
-			list.add(matcher.group());
-		}
-		Iterator it = list.iterator();
-		while(it.hasNext()){
-			String key = ""+it.next();
-			key = key.replace("${","").replace("}","");
-			patternProperties.put(key, getProperty(key, null, String.class, patternProperties));
-		}
-		return patternProperties;
-	}
+    public Goate getPatternProperties(String input) {
+        Goate patternProperties = new Goate();
+        String keyPattern = "\\$\\{[^}]*\\}";
+        Pattern pattern = Pattern.compile(keyPattern);
+        ArrayList list = new ArrayList();
+        //Matching the compiled pattern in the String
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            list.add(matcher.group());
+        }
+        Iterator it = list.iterator();
+        while (it.hasNext()) {
+            String key = "" + it.next();
+            key = key.replace("${", "").replace("}", "");
+            patternProperties.put(key, getProperty(key, null, String.class, patternProperties));
+        }
+        return patternProperties;
+    }
 }

@@ -63,33 +63,33 @@ public class EutTest extends TestNGEngineMethodDL {
 			.isEqualTo("but sally sells seashells by the seashore"));
 	}
 
-	@Test(groups = {"unit"})
-	public void sourcePrefixList() {
-		List<String> prefixes = SimpleEut.eut.sourcePrefixList();
-		expect(Expectation.build()
-			.actual(prefixes.size())
-			.isEqualTo(6));
-		expect(Expectation.build()
-			.actual(prefixes.get(1))
-			.isEqualTo("second"));
-	}
-
-	@Test(groups = {"unit"})
-	public void alternateNameList() throws NoSuchFieldException {
-		List<String> prefixes = SimpleEut.eut.sourcePrefixList();
-		Field fieldA = SimpleEut.class.getField("FIELD_A");
-		List<String> alternates = SimpleEut.eut.getAlternateNames(fieldA, fieldA.getName(), prefixes);
-		expect(Expectation.build()
-			.actual(prefixes.size())
-			.isEqualTo(6));
-		expect(Expectation.build()
-			.actual(alternates.size())
-			.isEqualTo(38));
-		expect(Expectation.build()
-			.actual(alternates)
-			.is(LIST_CONTAINS)
-			.expected("simpleeut.field.a"));
-	}
+//	@Test(groups = {"unit"})
+//	public void sourcePrefixList() {
+//		List<String> prefixes = SimpleEut.eut.sourcePrefixList();
+//		expect(Expectation.build()
+//			.actual(prefixes.size())
+//			.isEqualTo(6));
+//		expect(Expectation.build()
+//			.actual(prefixes.get(1))
+//			.isEqualTo("second"));
+//	}
+//
+//	@Test(groups = {"unit"})
+//	public void alternateNameList() throws NoSuchFieldException {
+//		List<String> prefixes = SimpleEut.eut.sourcePrefixList();
+//		Field fieldA = SimpleEut.class.getField("FIELD_A");
+//		List<String> alternates = SimpleEut.eut.getAlternateNames(fieldA, fieldA.getName(), prefixes);
+//		expect(Expectation.build()
+//			.actual(prefixes.size())
+//			.isEqualTo(6));
+//		expect(Expectation.build()
+//			.actual(alternates.size())
+//			.isEqualTo(38));
+//		expect(Expectation.build()
+//			.actual(alternates)
+//			.is(LIST_CONTAINS)
+//			.expected("simpleeut.field.a"));
+//	}
 
 	@Test(groups = {"unit"})
 	public void findPropertyKeysInFileName() {
