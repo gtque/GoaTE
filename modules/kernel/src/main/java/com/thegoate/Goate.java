@@ -36,6 +36,7 @@ import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.fill.serialize.*;
 import com.thegoate.utils.togoate.ToGoate;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -668,7 +669,9 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 		return result;
 	}
 
+	@GoateIgnore
 	private volatile String entry = "";
+	@GoateIgnore
 	private volatile boolean stale;
 
 	@Override
@@ -684,24 +687,41 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 		stale = false;
 	}
 
-	public Object clone(){
-		Goate clone = new Goate();
-		GoateReflection gr = new GoateReflection();
-		for(String key:keys()){
-			Object value = getStrict(key);
-			if(gr.isPrimitive(gr.primitiveType(value))){
-				clone.put(key, value);
-			} else if(value == null) {
-				clone.put(key, "null::");
+	private void copy(Goate clone, String key, Object value, GoateReflection gr) throws CloneNotSupportedException{
+		if (gr.isPrimitive(gr.primitiveType(value))) {
+			clone.put(key, value);
+		} else if (value == null) {
+			clone.put(key, "null::");
+		} else {
+			if (value instanceof Nanny) {
+				clone.put(key, ((Nanny) value).clone());//new DeSerializer().data(new Serializer<>(value).toGoate()).build(value.getClass()));
 			} else {
-				if(value instanceof Nanny) {
-					clone.put(key, new DeSerializer().data(new Serializer<>(value).toGoate()).build(value.getClass()));
-				} else {
-					//if you find yourself here because your cloned data was not as deep as you had hoped
-					//I am sorry, but I only deep copy pojos that extend kid/nanny at the moment.
+				//if you find yourself here because your cloned data was not as deep as you had hoped
+				//I am sorry, but I only deep copy pojos/objects that extend kid/nanny at the moment.
+				//but I will go ahead and try it and see if it works.
+				try {
+					clone.put(key, gr.cloneValue(value));
+				} catch (InvocationTargetException | IllegalAccessException e) {
+					//failed to do a deeper clone, so settling for a shallow copy.
 					clone.put(key, value);
 				}
 			}
+		}
+	}
+
+	public Object clone() throws CloneNotSupportedException {
+		Goate clone = new Goate();
+		GoateReflection gr = new GoateReflection();
+		StringBuilder cloned = new StringBuilder();
+		data.entrySet().parallelStream().forEach(entry -> {
+			try {
+				copy(clone, entry.getKey(), entry.getValue(), gr);
+			} catch (CloneNotSupportedException e) {
+				cloned.append(e.getMessage()).append("\n");
+			}
+		});
+		if(cloned.length()>0) {
+			throw new CloneNotSupportedException(cloned.toString());
 		}
 		return clone;
 	}

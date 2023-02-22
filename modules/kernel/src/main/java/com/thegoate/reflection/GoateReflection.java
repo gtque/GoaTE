@@ -33,6 +33,7 @@ import com.thegoate.utils.fill.serialize.GoateIgnore;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.*;
@@ -45,6 +46,19 @@ import java.util.*;
 public class GoateReflection {
 
 //	BleatBox LOG = BleatFactory.getLogger(getClass());
+
+    public Object cloneValue(Object value) throws InvocationTargetException, IllegalAccessException {
+        Object clone = value;
+
+        if (Cloneable.class.isAssignableFrom(value.getClass())) {
+            Method doClone = findMethod(value, "clone");
+            boolean acc = doClone.isAccessible();
+            doClone.setAccessible(true);
+            clone = doClone.invoke(value);
+            doClone.setAccessible(acc);
+        }
+        return clone;
+    }
 
     public Constructor findConstructor(Class theClass, Object[] args) {
         return findConstructor(theClass.getConstructors(), args);
@@ -382,9 +396,13 @@ public class GoateReflection {
         return value;
     }
 
-    public Method findMethod(Object theClass, String methodName) {
-        Optional<Method> first = getAllMethods(theClass.getClass()).stream().filter(m -> m.getName().equals(methodName)).findFirst();
+    public Method findMethod(Class theClass, String methodName) {
+        Optional<Method> first = getAllMethods(theClass).stream().filter(m -> m.getName().equals(methodName)).findFirst();
         return first.isPresent() ? first.get() : null;
+    }
+
+    public Method findMethod(Object theClass, String methodName) {
+        return findMethod(theClass.getClass(), methodName);
     }
 
     public Class findClass(String theClass) {

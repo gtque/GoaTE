@@ -26,27 +26,43 @@
  */
 package com.thegoate.utils.fill.serialize;
 
-import com.thegoate.Goate;
 import com.thegoate.expect.Expectation;
-import com.thegoate.json.utils.fill.serialize.to.JsonString;
 import com.thegoate.testng.TestNGEngineMethodDL;
-import com.thegoate.utils.fill.serialize.pojos.PojoWithGoate;
+import com.thegoate.utils.fill.serialize.pojos.Doug;
+import com.thegoate.utils.fill.serialize.pojos.Steve;
 import org.testng.annotations.Test;
 
-public class SerializeTest extends TestNGEngineMethodDL {
+public class NannyTest extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
-    public void pojoWithGoate() {
-        PojoWithGoate withGoate = new PojoWithGoate()
-                .addToGoate("inner goate.##", new Goate().put("a.##", "hello").put("a.##", "world"));
-
-        String json = "" + new Serializer<>(withGoate).to(new JsonString());
-
-        LOG.info("the results", json);
+    public void cloneAllKids() throws CloneNotSupportedException {
+        Doug og = new Doug()
+                .setTheAnswer(84)
+                .setTheClone(new Steve()
+                        .setTheWord("birds"));
+        Doug clone = (Doug) og.clone();
+        Doug clone2a = (Doug) og.clone();
+        Doug clone2b = (Doug) clone.clone();
+        Doug clone3 = (Doug) clone.clone();
+        clone.getTheClone().setTheWord("thrilled");
 
         expect(Expectation.build()
-                .actual("goate.data.inner goate.0.data.a.1")
-                .from(json)
-                .isEqualTo("world"));
+                .setId("2a2b")
+                .actual(clone2a)
+                .isEqualTo(clone2b)
+                .failureMessage("clone2a was not equal to clone2b"));
+        expect(Expectation.build()
+                .setId("og3")
+                .actual(og)
+                .isEqualTo(clone3)
+                .failureMessage("og was not equal to clone3"));
+        expect(Expectation.build()
+                .actual(og.hashCode())
+                .isNotEqualTo(clone3.hashCode()));
+        expect(Expectation.build()
+                .actual(clone.getTheClone().getTheWord())
+                .isNotEqualTo(clone3.getTheClone().getTheWord())
+                .failureMessage("clone was equal to clone3"));
+
     }
 }
