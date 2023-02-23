@@ -215,4 +215,20 @@ public class TestNGRunFactoryTest extends TestNGEngineMethodDL {
         the[1] = null;
         return the;
     }
+
+    @GoateProvider(name = "skip fail")
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void skipFail(Goate testData) {
+        expect(Expectation.build().actual("shouldRun").from(testData).isEqualTo(true));
+    }
+
+    @GoateDLP(name = "skip fail")
+    public Goate[] skipFailData() {
+        Goate[] the = new Goate[2];
+        the[0] = new Goate()
+                .put("run##", new StaticDL().add("Scenario", "do").add("runEnabled", "o::shouldRun").add("shouldRun","boolean::true"))
+                .put("run##", new StaticDL().add("scenario", "should be skipped").add("runEnabled", "o::shouldRun").add("shouldRun","boolean::false"));
+        the[1] = null;
+        return the;
+    }
 }
