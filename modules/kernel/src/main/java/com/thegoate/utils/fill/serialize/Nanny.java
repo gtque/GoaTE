@@ -184,8 +184,8 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
     protected void copy(Map.Entry<String, Field> field, GoateReflection gr, Object clone) {
         Field value = field.getValue();
         if (!gr.isPrimitive(field.getValue().getType())) {
-            try{
-                if(Cloneable.class.isAssignableFrom(value.getType())) {
+            try {
+                if (Cloneable.class.isAssignableFrom(value.getType())) {
                     boolean acc = field.getValue().isAccessible();
                     boolean isAcc = acc;
                     try {
@@ -194,13 +194,15 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
                     } catch (Exception e) {
                         LOG.debug("Serializer", "Failed to make " + field.getValue().getName() + " accessible, skipping for serialization unless it is already accessible");
                     }
-                    if(isAcc) {
+                    if (isAcc) {
                         Object og = value.get(this);
-                        Method doClone = gr.findMethod(value.getType(), "clone");
-                        boolean macc = doClone.isAccessible();
-                        doClone.setAccessible(macc);
-                        field.getValue().set(clone, doClone.invoke(og));
-                        doClone.setAccessible(macc);
+                        if (og != null) {
+                            Method doClone = gr.findMethod(value.getType(), "clone");
+                            boolean macc = doClone.isAccessible();
+                            doClone.setAccessible(macc);
+                            field.getValue().set(clone, doClone.invoke(og));
+                            doClone.setAccessible(macc);
+                        }
                     }
                     try {
                         field.getValue().setAccessible(acc);
