@@ -205,7 +205,12 @@ public class TestNGRunFactory {
             for (int i = 0; i < rData.length; i++) {
                 if (oData[i][0] != null) {
                     Goate gData = (Goate) oData[i][0];
-                    rData[i][0] = gData.clone();
+                    try {
+                        rData[i][0] = gData.clone();
+                    } catch (CloneNotSupportedException e) {
+                        LOG.debug("Run Factory", "Unable to do a deep clone of the the run data, hopefully a shallow copy is good enough.");
+                        rData[i][0] = gData;
+                    }
                 }
             }
         }
