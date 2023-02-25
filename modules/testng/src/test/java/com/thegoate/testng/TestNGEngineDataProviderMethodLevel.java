@@ -28,6 +28,9 @@ package com.thegoate.testng;
 
 import com.thegoate.Goate;
 import com.thegoate.data.GoateProvider;
+import com.thegoate.expect.Expectation;
+import com.thegoate.testng.pojos.SimplePojo;
+import com.thegoate.utils.fill.serialize.GoateSource;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -40,7 +43,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
 
-    public TestNGEngineDataProviderMethodLevel(){
+    public TestNGEngineDataProviderMethodLevel() {
         super();
     }
 
@@ -50,10 +53,10 @@ public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
         LOG.info("data size: " + data.size());
         LOG.info("data: " + data.toString());
         assertEquals(data.size(), 3);
-        assertEquals(get("b","z"),"y");
-        assertEquals(get("a","y"),"x");
+        assertEquals(get("b", "z"), "y");
+        assertEquals(get("a", "y"), "x");
         //put("c", 3);
-        assertEquals(get("c",3),3);
+        assertEquals(get("c", 3), 3);
         assertEquals(data.size(), 4);
     }
 
@@ -63,19 +66,18 @@ public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
         LOG.info("data size: " + data.size());
         LOG.info("data: " + data.toString());
         assertEquals(data.size(), 3);
-        assertEquals(get("b"),"y");
-        assertEquals(get("a"),"x");
+        assertEquals(get("b"), "y");
+        assertEquals(get("a"), "x");
         put("c", 3);
-        assertEquals(get("c"),3);
+        assertEquals(get("c"), 3);
         assertEquals(data.size(), 4);
     }
 
-    public int removeDuplicates(int[] nums)
-    {
+    public int removeDuplicates(int[] nums) {
         int size = 0;
         int lastNum = 0;
-        for(int index = 0; index < nums.length; index++){
-            if(size == 0 || lastNum!=nums[index]){
+        for (int index = 0; index < nums.length; index++) {
+            if (size == 0 || lastNum != nums[index]) {
                 lastNum = nums[index];
                 nums[size] = lastNum;
                 size++;
@@ -85,11 +87,40 @@ public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
     }
 
     @Test
-    public void testDup(){
-        int[] ia = {0,0,1,1,1,2,2,3,3,4};
+    public void testDup() {
+        int[] ia = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4};
         List<String> list = new ArrayList<>();
         list.add(0, "hello");
         int size = removeDuplicates(ia);
         assertEquals(size, 5);
+    }
+
+    @GoateProvider(name = "hidden scenario with named test parameters")
+    @Test(groups = {"unit"}, dataProvider = METHOD_NAMED_PARAMETERS_LOADER)
+    public void namedParametersForTestMethod(@GoateSource(key = "greeting") @GoateSource(key = "pleasentries") String greeting,
+                                            @GoateSource(key = "number", priority = 3) @GoateSource(key = "fubar", priority = 2) @GoateSource(key = "doda", priority = 1)int number,
+                                            @GoateSource(key = "flag") boolean flag,
+                                            @GoateSource(key = "pojo") SimplePojo pojo,
+                                            @GoateSource(key = "hidden") String hidden) {
+        expect(Expectation.build()
+                .actual(greeting)
+                .isEqualTo("howdy")
+                .failureMessage("greeting was not howdy"));
+        expect(Expectation.build()
+                .actual(number)
+                .isEqualTo(42)
+                .failureMessage("number was not 42"));
+        expect(Expectation.build()
+                .actual(flag)
+                .isEqualTo(true)
+                .failureMessage("flag was not true"));
+        expect(Expectation.build()
+                .actual(pojo.getFieldA())
+                .isEqualTo("sploosh")
+                .failureMessage("pojo was not set correctly."));
+        expect(Expectation.build()
+                .actual(hidden)
+                .isEqualTo(get("Scenario"))
+                .failureMessage("what happened to the hidden scenario?"));
     }
 }

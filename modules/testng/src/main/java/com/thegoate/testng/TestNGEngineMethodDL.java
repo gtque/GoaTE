@@ -41,6 +41,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,9 +67,12 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         super(data);
     }
 
-    @DataProvider(name = "methodLoader")
+    public static final String METHOD_LOADER = "methodLoader";
+    public static final String METHOD_NAMED_PARAMETERS_LOADER = "methodNamedParametersLoader";
+
+    @DataProvider(name = METHOD_LOADER)
     public Object[][] dataLoader(ITestContext context, Method method) throws Exception {
-        number.put(""+method.getDeclaringClass().getCanonicalName()+":"+method.getName(), 0);
+        number.put("" + method.getDeclaringClass().getCanonicalName() + ":" + method.getName(), 0);
         //number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
         setTestClass(method.getDeclaringClass());
         this.testContext = context;
@@ -78,7 +82,36 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         Goate rdl = new Goate();
         Goate cdl = new Goate();
         buildDataLoaders(rdl, cdl, method);
-        return TestNGRunFactory.loadRuns(method, provider, rdl, cdl, false,testContext.getIncludedGroups(),testContext.getExcludedGroups());
+        return TestNGRunFactory.loadRuns(method, provider, rdl, cdl, false, testContext.getIncludedGroups(), testContext.getExcludedGroups());
+    }
+
+    @DataProvider(name = METHOD_NAMED_PARAMETERS_LOADER)
+    public Object[][] dataLoaderNamedParameters(ITestContext context, Method method) throws Exception {
+        number.put("" + method.getDeclaringClass().getCanonicalName() + ":" + method.getName(), 0);
+        //number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+        setTestClass(method.getDeclaringClass());
+        this.testContext = context;
+        if (context != null) {
+            xt = context.getCurrentXmlTest();
+        }
+        Goate rdl = new Goate();
+        Goate cdl = new Goate();
+        buildDataLoaders(rdl, cdl, method);
+        Object[][] runs = TestNGRunFactory.loadRuns(method, provider, rdl, cdl, false, testContext.getIncludedGroups(), testContext.getExcludedGroups());
+        Parameter[] parameters = method.getParameters();
+        Object[][] namedRuns = new Object[runs.length][method.getParameters().length];
+        for (int runNumber = 0; runNumber < namedRuns.length; runNumber++) {
+            Goate run = (Goate) runs[runNumber][0];
+            Object[] namedRun = new Object[parameters.length];
+            int parameterIndex = 0;
+            for (Parameter parameter : parameters) {
+                namedRun[parameterIndex] = getNamedParameter(run, parameter);
+                parameterIndex++;
+            }
+            namedRuns[runNumber] = namedRun;
+            namedParametersFullGoate.put("" + method.getName() + runNumber, run);
+        }
+        return namedRuns;
     }
 
     protected void buildDataLoaders(Goate rdl, Goate cdl, Method method) {
@@ -106,8 +139,8 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
                     Goate[] providers = buildMethodProviders(gp.name(), method, gp.container());
                     if (providers == null) {
                         throw new Exception("Failed to find the DLProvider: " + gp.name());
-                    }else{
-                        if(providers[1]==null){
+                    } else {
+                        if (providers[1] == null) {
                             providers[1] = new Goate();
                         }
 //                        providers[1].put("_goate:method", method);
@@ -126,7 +159,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         GoateReflection gr = new GoateReflection();
         List<Method> methods = new ArrayList<>();
         Class declaring_class = method.getDeclaringClass();
-        if(!container.equals(GoateNullClass.class)) {
+        if (!container.equals(GoateNullClass.class)) {
             declaring_class = container;
         }
         gr.getAllMethods(declaring_class, methods);
@@ -151,13 +184,13 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
     public void defineDataLoaders() {
         try {
             Constructor constructor = getClass().getConstructor(Goate.class);
-            if (constructor!=null){
+            if (constructor != null) {
                 Annotation factor = constructor.getAnnotation(Factory.class);
-                if(factor!=null){
+                if (factor != null) {
                     super.defineDataLoaders();
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             LOG.info("Define Data Loaders", "Not using factory");
         }
     }
