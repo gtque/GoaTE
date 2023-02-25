@@ -43,6 +43,9 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.metrics.Stopwatch;
 import com.thegoate.statics.StaticScrubber;
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.fill.serialize.AllOrderedSource;
+import com.thegoate.utils.fill.serialize.GoateSource;
+import com.thegoate.utils.fill.serialize.GoateSourceLister;
 import com.thegoate.utils.get.Get;
 import org.testng.ITest;
 import org.testng.ITestContext;
@@ -60,6 +63,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.thegoate.dsl.words.EutConfigDSL.eut;
+import static com.thegoate.utils.fill.serialize.GoateSourceLister.FLATTEN;
 import static org.testng.Assert.assertTrue;
 
 
@@ -71,7 +75,10 @@ import static org.testng.Assert.assertTrue;
 @GhostProtocol(ghosts = {"_testng_test_name"})
 public abstract class TestNGEngine implements ITest, TestNG {
 
+    public static final String FACTORY_DATA_LOADER = "dataLoader";
+    public static final String FACTORY_NAMED_PARAMETERS_DATA_LOADER = "namedParametersDataLoader";
     private Class testClass = getClass();
+    protected static final Goate namedParametersFullGoate = new Goate();
     protected GoateProvider provider = null;
     //    protected volatile boolean dd = false;
     protected BleatBox LOG = BleatFactory.getLogger(getClass());
@@ -220,7 +227,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     public static void doInitData(Object[] data, Method method, TestNG test) {
         if (data != null) {
             if (data.length > 0) {
-                if (data[0] instanceof Goate) {
+                if (data[0] instanceof Goate && data.length == 1) {
                     test.init((Goate) data[0]);
                 } else {
                     Goate dGoate = new Goate();
@@ -230,9 +237,13 @@ public abstract class TestNGEngine implements ITest, TestNG {
                         }
                     } else {
                         Parameter[] parameters = method.getParameters();
-                        for (int i = 0; i < parameters.length; i++) {
-                            Parameter parameter = parameters[i];
-                            dGoate.put(parameter.getName(), data[i]);
+                        if (namedParametersFullGoate.containsKey("" + method.getName() + test.getRunNumber())) {
+                            dGoate = namedParametersFullGoate.get("" + method.getName() + test.getRunNumber(), new Goate(), Goate.class);
+                        } else {
+                            for (int i = 0; i < parameters.length; i++) {
+                                Parameter parameter = parameters[i];
+                                dGoate.put(parameter.getName(), data[i]);
+                            }
                         }
                     }
                     test.init(dGoate);
@@ -279,7 +290,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    @DataProvider(name = "dataLoader")
+    @DataProvider(name = FACTORY_DATA_LOADER)
     public Object[][] dataLoader(ITestNGMethod method, ITestContext context) throws Exception {
 //        number = 0;//resets the count, assumes TestNG loads all the runs before processing the next class.
 //        number.put("" + method.getRealClass().getCanonicalName() + ":" + "class", 0);
@@ -290,6 +301,47 @@ public abstract class TestNGEngine implements ITest, TestNG {
         }
         initDataLoaders();
         return TestNGRunFactory.loadRuns(method.getConstructorOrMethod().getMethod(), provider, getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
+    }
+
+    @DataProvider(name = FACTORY_NAMED_PARAMETERS_DATA_LOADER)
+    public Object[][] dataLoaderNamedParameters(ITestNGMethod method, ITestContext context) throws Exception {
+//        number = 0;//resets the count, assumes TestNG loads all the runs before processing the next class.
+//        number.put("" + method.getRealClass().getCanonicalName() + ":" + "class", 0);
+        testClass = method.getRealClass();
+        this.testContext = context;
+        if (context != null) {
+            xt = context.getCurrentXmlTest();
+        }
+        initDataLoaders();
+        Method constructor = method.getConstructorOrMethod().getMethod();
+        Object[][] runs = TestNGRunFactory.loadRuns(constructor, provider, getRunDataLoader(), getConstantDataLoader(), true, testContext.getIncludedGroups(), testContext.getExcludedGroups());
+        Parameter[] parameters = constructor.getParameters();
+        Object[][] namedRuns = new Object[runs.length][constructor.getParameters().length];
+        for (int runNumber = 0; runNumber < namedRuns.length; runNumber++) {
+            Goate run = (Goate) runs[runNumber][0];
+            Object[] namedRun = new Object[parameters.length];
+            int parameterIndex = 0;
+            for (Parameter parameter : parameters) {
+                namedRun[parameterIndex] = getNamedParameter(run, parameter);
+                parameterIndex++;
+            }
+            namedRuns[runNumber] = namedRun;
+            namedParametersFullGoate.put("" + constructor.getName() + runNumber, run);
+        }
+        return namedRuns;
+    }
+
+    public Object getNamedParameter(Goate run, Parameter parameter) {
+        Object value = null;
+        GoateSourceLister sourceLister = new GoateSourceLister();
+        for (String source : sourceLister.getAlternateNames(parameter.getAnnotationsByType(GoateSource.class), parameter.getName(), AllOrderedSource.class, FLATTEN)) {
+            String name = source.split(FLATTEN)[0];
+            if(run.containsKey(name)){
+                value = run.get(name, null, parameter.getType());
+                break;
+            }
+        }
+        return value;
     }
 
     public void initDataLoaders() {
@@ -386,7 +438,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public boolean expectNow(Expectation expectation, boolean failImmediately){
+    public boolean expectNow(Expectation expectation, boolean failImmediately) {
         expect(expectation);
         return evaluateNow(failImmediately);
     }
@@ -397,7 +449,7 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectation, boolean failImmediately){
+    public boolean expectNow(ExpectationBuilder<? extends ExpectationBuilder> expectation, boolean failImmediately) {
         expect(expectation);
         return evaluateNow(failImmediately);
     }
@@ -408,18 +460,18 @@ public abstract class TestNGEngine implements ITest, TestNG {
     }
 
     @Override
-    public boolean expectNow(List<Expectation> expectation, boolean failImmediately){
+    public boolean expectNow(List<Expectation> expectation, boolean failImmediately) {
         expect(expectation);
         return evaluateNow(failImmediately);
     }
 
-    private boolean evaluateNow(boolean failImmediately){
+    private boolean evaluateNow(boolean failImmediately) {
         boolean result = false;
         try {
             evaluate();
             result = true;
         } catch (ExpectationError expectationError) {
-            if(failImmediately){
+            if (failImmediately) {
                 throw expectationError;
             }
         } finally {
@@ -485,18 +537,18 @@ public abstract class TestNGEngine implements ITest, TestNG {
         evaluate(testResult, false);
     }
 
-    protected void clearEvaluated(){
+    protected void clearEvaluated() {
         executedExpectations = new ArrayList<>();
     }
 
     public void evaluate(ITestResult testResult, boolean clearAfterRunning) {
         if (etb.isBuilt()) {
             LOG.info("Evaluate", "Expectations have already been evaluated and will not be re-evaluated.");
-            if(executedExpectations.size()>0 && expectationsNow){
+            if (executedExpectations.size() > 0 && expectationsNow) {
                 LOG.debug("Evaluate", "but there were expectations that have already been displayed, so I am going to reprint the results");
                 ev = new ExpectEvaluator(executedExpectations);
                 logStatuses(ev, true);
-                assertTrue(ev.fails().size()==0, getFailures(ev));
+                assertTrue(ev.fails().size() == 0, getFailures(ev));
             }
             expectationsNow = false;
         } else {
@@ -512,9 +564,9 @@ public abstract class TestNGEngine implements ITest, TestNG {
                 LOG.warn("skipped tests detected...");
                 result = false;
             }
-            if(testResult != null){
+            if (testResult != null) {
                 ev = new ExpectEvaluator(executedExpectations);
-                result = ev.fails().size()==0;
+                result = ev.fails().size() == 0;
             }
             logStatuses(ev, clearAfterRunning);
             try {
