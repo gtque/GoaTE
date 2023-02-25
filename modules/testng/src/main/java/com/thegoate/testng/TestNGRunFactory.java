@@ -107,8 +107,8 @@ public class TestNGRunFactory {
                     runs.add(null);
                 }
                 //if (constants.size() > 0) {
-                boolean ogFilter = Boolean.parseBoolean(""+GoateUtils.getProperty("ORIGINAL_FILTER", false));
-                if(ogFilter) {
+                boolean ogFilter = Boolean.parseBoolean("" + GoateUtils.getProperty("ORIGINAL_FILTER", false));
+                if (ogFilter) {
                     if (constants.size() > 0) {
                         for (Goate data : runs) {
                             int i = -42;
@@ -151,16 +151,19 @@ public class TestNGRunFactory {
                         }
                         boolean doRun = true;
                         if (data != null) {
-                            if (doFilterRunGroups) {
-                                doRun = filterRun(data, runGroups);
-                            }
+                            doRun = runEnabled(data);
                             if (doRun) {
-                                if (doFilterRunIds) {
-                                    doRun = filterRunByIds(data, runIds, count);
+                                if (doFilterRunGroups) {
+                                    doRun = filterRun(data, runGroups);
                                 }
-                            }
-                            if (doRun) {
-                                filteredRuns.add(data);
+                                if (doRun) {
+                                    if (doFilterRunIds) {
+                                        doRun = filterRunByIds(data, runIds, count);
+                                    }
+                                }
+                                if (doRun) {
+                                    filteredRuns.add(data);
+                                }
                             }
                         }
                         //a constant can be overloaded by setting it in the run data.
@@ -250,7 +253,7 @@ public class TestNGRunFactory {
                 check = false;
             }
         }
-        return check && runEnabled(runData);
+        return check;
     }
 
     protected static boolean filterRun(Goate run, String[] runIds) {

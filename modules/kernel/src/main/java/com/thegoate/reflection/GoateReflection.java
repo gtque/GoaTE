@@ -53,7 +53,7 @@ public class GoateReflection {
 
         if (Cloneable.class.isAssignableFrom(value.getClass())) {
             Method doClone = findMethod(value, "clone");
-            boolean acc = doClone.isAccessible();
+            boolean acc = Modifier.isStatic(doClone.getModifiers()) ? doClone.canAccess(null) : doClone.canAccess(value);//.isAccessible();//doClone.isAccessible();
             doClone.setAccessible(true);
             clone = doClone.invoke(value);
             doClone.setAccessible(acc);

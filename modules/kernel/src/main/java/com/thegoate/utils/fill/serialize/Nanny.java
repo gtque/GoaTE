@@ -38,6 +38,7 @@ import javax.swing.text.html.parser.Entity;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -186,11 +187,11 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
         if (!gr.isPrimitive(field.getValue().getType())) {
             try {
                 if (Cloneable.class.isAssignableFrom(value.getType())) {
-                    boolean acc = field.getValue().isAccessible();
+                    boolean acc = Modifier.isStatic(field.getValue().getModifiers()) ? field.getValue().canAccess(null) : field.getValue().canAccess(clone);//.isAccessible();field.getValue().isAccessible();
                     boolean isAcc = acc;
                     try {
                         field.getValue().setAccessible(true);
-                        isAcc = field.getValue().isAccessible();
+                        isAcc = Modifier.isStatic(field.getValue().getModifiers()) ? field.getValue().canAccess(null) : field.getValue().canAccess(clone);//.isAccessible();field.getValue().isAccessible();
                     } catch (Exception e) {
                         LOG.debug("Serializer", "Failed to make " + field.getValue().getName() + " accessible, skipping for serialization unless it is already accessible");
                     }
@@ -198,7 +199,7 @@ public class Nanny implements HealthMonitor, TypeT, Cloneable {
                         Object og = value.get(this);
                         if (og != null) {
                             Method doClone = gr.findMethod(value.getType(), "clone");
-                            boolean macc = doClone.isAccessible();
+                            boolean macc = Modifier.isStatic(doClone.getModifiers()) ? doClone.canAccess(null) : doClone.canAccess(og);//doClone.isAccessible();
                             doClone.setAccessible(macc);
                             field.getValue().set(clone, doClone.invoke(og));
                             doClone.setAccessible(macc);

@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.thegoate.utils.fill.serialize.GoateSourceLister.FLATTEN;
+
 /**
  * Remember: GoaTE is intended for testing purposes, as such unsafe
  * methods, reflection, and access may be used or altered. Use in production code at your own risk.
@@ -157,7 +159,8 @@ public class DeSerializer extends Cereal {
     }
 
     private void orderedSerializer(Object pojo, Class type) {
-        List<String> sources = sourcePrefixList(type, dataSource, pojo instanceof Eut);
+        GoateSourceLister sourceLister = new GoateSourceLister();
+        List<String> sources = sourceLister.sourcePrefixList(type, dataSource, pojo instanceof Eut);
         GoateReflection gr = new GoateReflection();
         Map<String, Field> fields = gr.findFields(type);
         if (fields.size() > 0) {
@@ -205,7 +208,7 @@ public class DeSerializer extends Cereal {
                 }
                 if (isAcc) {
 //                    Class fieldType = gr.toType(fieldself.getType());
-                    List<String> altNames = getAlternateNames(fieldself, fieldName, sources, dataSource);//.toLowerCase().replace("_", "."), source.toLowerCase());
+                    List<String> altNames = sourceLister.getAlternateNames(fieldself.getAnnotationsByType(GoateSource.class), fieldName, sources, dataSource, FLATTEN);//.toLowerCase().replace("_", "."), source.toLowerCase());
                     Object setValue1 = null;
                     String fieldKey = null;
                     boolean flatten = false;

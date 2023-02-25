@@ -230,8 +230,9 @@ public class Serializer<T, S, U> extends Cereal {
     }
 
     private void orderedSerializer(Map<String, Object> data, Map<String, Field> fields) {
+        GoateSourceLister sourceLister = new GoateSourceLister();
         for (Map.Entry<String, Field> field : fields.entrySet()) {
-            GoateSource gs = sortedSources(new GoateSourceNode(), field.getValue().getAnnotationsByType(GoateSource.class), (Class)source, field.getKey(), false).getTheSource();//findGoateSource(field.getValue(), (Class) source);
+            GoateSource gs = sourceLister.sortedSources(new GoateSourceNode(), field.getValue().getAnnotationsByType(GoateSource.class), (Class)source, field.getKey(), false).getTheSource();//findGoateSource(field.getValue(), (Class) source);
             String fieldKey = field.getKey();
             boolean exclude = false;
             if (gs != null) {
