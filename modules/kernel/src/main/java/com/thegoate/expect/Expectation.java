@@ -130,7 +130,7 @@ public class Expectation {
     String name = "";
     String expectedName = "";
     String id = "";
-    Goate data = null;
+    protected Goate data = null;
     volatile Goate expect = new Goate();
     String simpleState = "";
     volatile Object actual;
@@ -153,6 +153,7 @@ public class Expectation {
     private long retryPeriod = -42L;
     private final Object synchro = new Object();
     private StackTraceElement[] stack;
+    private volatile ExpectThreadExecuter threadExecuter;
 
     public Expectation(Goate data) {
         this.data = data;
@@ -171,6 +172,20 @@ public class Expectation {
         return new Expectation(data);
     }
 
+    public ExpectThreadExecuter getThread() {
+        if(threadExecuter == null) {
+            threadExecuter = new ExpectThreadExecuter(this);
+        }
+        return threadExecuter;
+    }
+
+    public String failedMessage(){
+        return threadExecuter != null ? threadExecuter.failedMessage() : "";
+    }
+
+    public boolean status() {
+        return threadExecuter != null && threadExecuter.status();
+    }
     public Expectation stackTrace(StackTraceElement[] stack){
         this.stack = stack;
         return this;

@@ -54,9 +54,21 @@ public class ExpectationThreadBuilder {
         return this;
     }
 
+    public long getTimeoutMS() {
+        return timeoutMS;
+    }
+
     public ExpectationThreadBuilder period(long period){
         this.period = period;
         return this;
+    }
+
+    public long getPeriod() {
+        return this.period;
+    }
+
+    public Goate getData() {
+        return data;
     }
 
     public List<Expectation> expectations(){
@@ -92,18 +104,18 @@ public class ExpectationThreadBuilder {
     public List<ExpectThreadExecuter> build(){
         Map<String, ExpectThreadExecuter> map = new ConcurrentHashMap<>();
         List<ExpectThreadExecuter> e = new ArrayList<>();
-        for(Expectation expectation:expectations){
-            if(map.containsKey(expectation.fullName())){
-                Expectation expTemp = map.get(expectation.fullName()).getExpectation();
-                if(expTemp.getFrom()!=null&&expTemp.getFrom().equals(expectation.getFrom())) {
-                    expTemp.addNewExpectation().add(expectation);
-                }
-            }else{
-                ExpectThreadExecuter et = new ExpectThreadExecuter(expectation.setData(data).period(period-1)).timeout(timeoutMS).period(period);
-                map.put(expectation.fullName(), et);
-                e.add(et);
-            }
-        }
+//        for(Expectation expectation:expectations){
+//            if(map.containsKey(expectation.fullName())){
+//                Expectation expTemp = map.get(expectation.fullName()).getExpectation();
+//                if(expTemp.getFrom()!=null&&expTemp.getFrom().equals(expectation.getFrom())) {
+//                    expTemp.addNewExpectation().add(expectation);
+//                }
+//            }else{
+//                ExpectThreadExecuter et = new ExpectThreadExecuter(expectation.setData(data).period(period-1)).timeout(timeoutMS).period(period);
+//                map.put(expectation.fullName(), et);
+//                e.add(et);
+//            }
+//        }
         built = true;
         return e;
     }

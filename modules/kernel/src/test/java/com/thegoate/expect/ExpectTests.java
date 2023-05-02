@@ -2236,4 +2236,26 @@ public class ExpectTests extends TestNGEngineMethodDL {
                 .actual("42")
                 .isEqualTo(42.0));
     }
+
+    @Test(groups = {"unit"})
+    public void listOfExpectations() {
+        expect(Expectation.build()
+                .actual("42")
+                .isEqualTo(42.0));
+
+        expect(Expectation.build()
+                .actual(true)
+                .isEqualTo(true));
+
+        String json = "{\"a\":42, \"b\":[{\"bb\":\"hello\"},{\"bb\":\"hello\"}]}";
+        expect(Expectation.build()
+                .actual("a")
+                .from(json)
+                .isEqualTo(42));
+
+        expect(Expectation.build()
+                .actual("b.+.bb")
+                .from(json)
+                .isEqualTo("hello"));
+    }
 }

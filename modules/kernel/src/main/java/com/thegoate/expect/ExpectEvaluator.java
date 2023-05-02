@@ -43,12 +43,15 @@ import java.util.List;
 public class ExpectEvaluator {
     final BleatBox LOG = BleatFactory.getLogger(getClass());
 
-    List<ExpectThreadExecuter> expectations = null;
+    List<Expectation> expectations = null;
     volatile StringBuilder failed = new StringBuilder("");
     volatile List<Goate> fails = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
     volatile List<Goate> passes = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
     volatile List<Goate> skipped = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
     volatile List<Goate> zeroOrMore = Collections.synchronizedList(new ArrayList<>());//new ArrayList<>();
+    long timeoutMs = 0L;
+    long period = 0L;
+    Goate data;
 
     public ExpectEvaluator(ExpectationThreadBuilder etb){
         buildExpectations(etb);
@@ -67,7 +70,11 @@ public class ExpectEvaluator {
     }
 
     protected void buildExpectations(ExpectationThreadBuilder etb){
-        expectations = etb.build();
+        expectations = etb.expectations();//etb.build();
+        timeoutMs = etb.getTimeoutMS();
+        period = etb.getPeriod();
+        data = etb.getData();
+        etb.build();
     }
 
     public boolean evaluate() {
@@ -78,11 +85,11 @@ public class ExpectEvaluator {
         boolean result = true;
         failed = new StringBuilder("");
         process(threadSize);
-        for(ExpectThreadExecuter expect:expectations){
+        for(Expectation expect:expectations){
             if(!expect.status()){
 //                LOG.debug("Expect Evaluation", "detected a failed expectation: " + expect.getExpectation().getExpectations());
                 result = false;
-                LOG.info("Expect Evaluation", "detected failed expectations: " + expect.failedMessage());
+                LOG.debug("Expect Evaluation", "detected failed expectations: " + expect.failedMessage());
                 failed.append(expect.failedMessage());
                 fails.addAll(expect.fails());
             }
@@ -92,7 +99,7 @@ public class ExpectEvaluator {
         return result;
     }
 
-    public List<ExpectThreadExecuter> expectations(){
+    public List<Expectation> expectations(){
         return expectations;
     }
 
@@ -118,7 +125,7 @@ public class ExpectEvaluator {
 
     protected void process(int threadSize){
         LOG.debug("starting executor to evaluate expectations.");
-        if(new Executioner<ExpectThreadExecuter>(threadSize).process(expectations())){
+        if(new Executioner<Expectation>(threadSize).process(expectations(), data, timeoutMs, period)){
             LOG.debug("Expectations", "Evaluation finished successfully");
         } else {
             LOG.info("Expectations", "Evaluation did not finish successfully, at least one expectation was not executed for some reason.");
@@ -128,8 +135,8 @@ public class ExpectEvaluator {
     }
 
     private void checkForSkipped(){
-        for (ExpectThreadExecuter expectation : expectations()) {
-            Expectation ex = expectation.getExpectation();
+        for (Expectation expectation : expectations()) {
+            Expectation ex = expectation;//.getExpectation();
             Goate eval = ex.getExpectations();
             //if(eval.size()>(passes().size()+fails().size())) {
                 //LOG.debug("Evaluate", "detected possible skipped expectation.");
