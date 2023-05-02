@@ -86,7 +86,7 @@ public class TestNGRunFactory {
             LOG.debug("test is being excluded: " + excludeMessage);
         } else {
             String providerCacheId = provider != null ? (provider.name() + ":" + provider.nickName()) : "";
-            if (!runCacheEnabled || (provider != null && !providerCache.containsKey(provider.name() + ":")) || provider == null) {
+            if (!runCacheEnabled || (provider != null && !providerCache.containsKey(providerCacheId)) || provider == null) {
                 if (runData != null) {
                     for (String key : runData.keys()) {
                         List<Goate> list = ((DataLoader) runData.get(key)).load();
@@ -176,12 +176,20 @@ public class TestNGRunFactory {
                     runs = new ArrayList<>();
                 }
                 rawData = new Object[runs.size()][runs.size() > 0 ? 1 : 0];
+                Object[][] rawClone = new Object[runs.size()][runs.size() > 0 ? 1 : 0];
                 for (int i = 0; i < rawData.length; i++) {
                     rawData[i][0] = runs.get(i);
+                    if (!providerCacheId.isEmpty()) {
+                        try {
+                            rawClone[i][0] = runs.get(i).clone();
+                        } catch (CloneNotSupportedException e) {
+                            LOG.debug("Run Factory", "problem clone raw run data: " + e.getMessage());
+                        }
+                    }
                 }
                 if (!providerCacheId.isEmpty()) {
-                    providerCache.put(providerCacheId, rawData);
-                    //alreadyCached = false;
+                    providerCache.put(providerCacheId, rawClone);
+                    alreadyCached = false;
                 }
             }
             if (runCacheEnabled && provider != null && alreadyCached) {
