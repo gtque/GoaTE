@@ -77,7 +77,8 @@ public class TestNGRunFactory {
                 }
             }
         }
-
+        String constantGroups = null;
+        StringBuilder constantGroupsBuilder = new StringBuilder("");
         List<Goate> runs = new ArrayList<>();
         Goate constants = new Goate();
         Object[][] rawData = {};
@@ -98,10 +99,20 @@ public class TestNGRunFactory {
 //                        if (key.equals("_goate:method")) {
 //                            constants.put(key, constantData.get(key));
 //                        } else {
-                        constants.merge(((DataLoader) constantData.get(key)).load().get(0), true);
+                        Goate cd = ((DataLoader) constantData.get(key)).load().get(0);
+                        constants.merge(cd, true);
+                        String tempGroups = cd.get("groups", null, String.class);
+                        if (tempGroups != null) {
+                            if (constantGroupsBuilder.length() == 0) {
+                                constantGroupsBuilder.append(tempGroups);
+                            } else {
+                                constantGroupsBuilder.append(",").append(tempGroups);
+                            }
+                        }
                         //the last loaded value of the constant wins.
 //                        }
                     }
+                    constantGroups = constantGroupsBuilder.toString();
                 }
                 if (runs.size() == 0) {
                     runs.add(null);
@@ -117,6 +128,16 @@ public class TestNGRunFactory {
                                 data = new Goate();
                             }
                             data.merge(constants, false);
+                            if(data != null) {
+                                String theRunGroups = data.get("groups", null, String.class);
+                                if (constantGroups != null  && !constantGroups.isEmpty()) {
+                                    if (theRunGroups == null) {
+                                        data.put("groups", constantGroups);
+                                    } else {
+                                        data.put("groups", theRunGroups + "," + constantGroups);
+                                    }
+                                }
+                            }
                             if (i != -42) {
                                 runs.set(i, data);
                             }
@@ -142,6 +163,16 @@ public class TestNGRunFactory {
                         if (data == null && constantsSize > 0) {
 //                        i = runs.indexOf(data);
                             data = new Goate();
+                        }
+                        if(data != null) {
+                            String theRunGroups = data.get("groups", null, String.class);
+                            if (constantGroups != null && !constantGroups.isEmpty()) {
+                                if (theRunGroups == null) {
+                                    data.put("groups", constantGroups);
+                                } else {
+                                    data.put("groups", theRunGroups + "," + constantGroups);
+                                }
+                            }
                         }
                         if (constantsSize > 0) {
                             data.merge(constants, false);

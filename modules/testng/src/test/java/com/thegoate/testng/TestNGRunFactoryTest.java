@@ -98,6 +98,30 @@ public class TestNGRunFactoryTest extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
+    public void constantAndRunRunGroups() {
+        Object run = GoateUtils.getProperty("runGroups");
+        GoateUtils.setEnvironment("runGroups", "z");
+        Goate constantData = new Goate()
+                .put("run##", new StaticDL().add("Scenario", "do not").add("groups", "z"));
+        Goate runData = new Goate()
+                .put("run##", new StaticDL().add("Scenario", "do").add("groups", "a"))
+                .put("run##", new StaticDL().add("Scenario", "do not").add("groups", "a"))
+                .put("run##", new StaticDL().add("scenario", "do not").add("groups", "a"))
+                .put("run##", new StaticDL().add("scenario", "do").add("groups", "a"))
+                .put("run##", new StaticDL().add("sCenArio", "do not").add("groups", "a"))
+                .put("run##", new StaticDL().add("sCenArio", "do").add("groups", "a"));
+        Object[][] runs = TestNGRunFactory.loadRuns(runData, constantData, true, new String[0], new String[0]);
+
+        expect(Expectation.build().actual(runs.length).isEqualTo(6));
+
+        if (run != null) {
+            GoateUtils.setEnvironment("runGroups", "" + run);
+        } else {
+            GoateUtils.setEnvironment("runGroups", "");
+        }
+    }
+
+    @Test(groups = {"unit"})
     public void caseInsensitiveScenario() {
         Object run = GoateUtils.getProperty("run");
         GoateUtils.setEnvironment("run", "do");
