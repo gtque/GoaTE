@@ -32,6 +32,7 @@ import com.thegoate.annotations.GhostProtocol;
 import com.thegoate.dsl.Interpreter;
 import com.thegoate.logging.volume.Diary;
 import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.GoateUtils;
 import com.thegoate.utils.compare.Compare;
 import com.thegoate.utils.fill.serialize.*;
 import com.thegoate.utils.togoate.ToGoate;
@@ -244,7 +245,7 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 				}
 				if (value == null) {
 					if(key != null && !key.isEmpty() && !key.equalsIgnoreCase("username")) {
-						value = System.getenv(key);
+						value = GoateUtils.getenv(key);
 					}
 					if (value == null) {
 						if(ghosts.contains(key)){

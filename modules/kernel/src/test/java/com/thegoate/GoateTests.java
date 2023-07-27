@@ -123,7 +123,7 @@ public class GoateTests extends TestNGEngineMethodDL {
     public void testUrlEncodedPath() {
         String path = "nonexistant%402/sample.json";
         path = GoateUtils.getFilePath(path);
-        assertEquals(path, "\\\\nonexistant@2\\sample.json");
+        assertEquals(path, System.getProperty("os.name").contains("Windows")?"\\\\nonexistant@2\\sample.json":"/nonexistant@2/sample.json");
     }
 
     @Test(groups = {"unit"})

@@ -39,6 +39,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Some basic utility helpers.
@@ -46,6 +47,7 @@ import java.util.*;
  */
 public class GoateUtils {
     static final BleatBox LOG = BleatFactory.getLogger(GoateUtils.class);
+    static final Map<String, String> secretEnv = new ConcurrentHashMap<>();
 
     public static Object getProperty(String key){
         return getProperty(key, null);
@@ -165,106 +167,162 @@ public class GoateUtils {
      * @param <V> generic type
      */
     public static <K, V> void setEnvironment(String key, String value){
-        try {
-            /// we obtain the actual environment
-            final Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
-            final Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-            final boolean environmentAccessibility = theEnvironmentField.canAccess(null);//isAccessible();
-            theEnvironmentField.setAccessible(true);
-
-            final Map<K, V> env = (Map<K, V>) theEnvironmentField.get(null);
-
-            if (System.getProperty("os.name").contains("Windows")) {
-                // This is all that is needed on windows running java jdk 1.8.0_92
-                if (value == null) {
-                    env.remove(key);
-                } else {
-                    env.put((K) key, (V) value);
-                }
-            } else {
-                // This is triggered to work on openjdk 1.8.0_91
-                // The ProcessEnvironment$Variable is the key of the map
-                final Class<K> variableClass = (Class<K>) Class.forName("java.lang.ProcessEnvironment$Variable");
-                final Method convertToVariable = variableClass.getMethod("valueOf", String.class);
-                final boolean conversionVariableAccessibility = convertToVariable.canAccess(null);//.isAccessible();
-                convertToVariable.setAccessible(true);
-
-                // The ProcessEnvironment$Value is the value fo the map
-                final Class<V> valueClass = (Class<V>) Class.forName("java.lang.ProcessEnvironment$Value");
-                final Method convertToValue = valueClass.getMethod("valueOf", String.class);
-                final boolean conversionValueAccessibility = convertToValue.canAccess(null);//.isAccessible();
-                convertToValue.setAccessible(true);
-
-                if (value == null) {
-                    env.remove(convertToVariable.invoke(null, key));
-                } else {
-                    // we place the new value inside the map after conversion so as to
-                    // avoid class cast exceptions when rerunning this code
-                    env.put((K) convertToVariable.invoke(null, key), (V) convertToValue.invoke(null, value));
-
-                    // reset accessibility to what they were
-                    convertToValue.setAccessible(conversionValueAccessibility);
-                    convertToVariable.setAccessible(conversionVariableAccessibility);
-                }
-            }
-            // reset environment accessibility
-            theEnvironmentField.setAccessible(environmentAccessibility);
-
-            // we apply the same to the case insensitive environment
-            final Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
-            final boolean insensitiveAccessibility = theCaseInsensitiveEnvironmentField.canAccess(null);//.isAccessible();
-            theCaseInsensitiveEnvironmentField.setAccessible(true);
-            // Not entirely sure if this needs to be casted to ProcessEnvironment$Variable and $Value as well
-            final Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
-            if (value == null) {
-                // remove if null
-                cienv.remove(key);
-            } else {
-                cienv.put(key, value);
-            }
-            theCaseInsensitiveEnvironmentField.setAccessible(insensitiveAccessibility);
-        } catch (final ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException("Failed setting environment variable <" + key + "> to <" + value + ">", e);
-        } catch (final NoSuchFieldException e) {
-            // we could not find theEnvironment
-            final Map<String, String> env = System.getenv();
-            //Stream.of(Collections.class.getDeclaredClasses())
-            List<Class> filteredClass = filterClasses();
-            try {
-                List<Field> map = mapFields(filteredClass);
-                for(Field field:map){
-                    try {
-                        final boolean fieldAccessibility = field.canAccess(null);//.isAccessible();
-                        field.setAccessible(true);
-                        // we obtain the environment
-                        final Map<String, String> map2 = (Map<String, String>) field.get(env);
-                        if (value == null) {
-                            // remove if null
-                            map.remove(key);
-                        } else {
-                            map2.put(key, value);
-                        }
-                        // reset accessibility
-                        field.setAccessible(fieldAccessibility);
-                    } catch (final ConcurrentModificationException e1) {
-                        // This may happen if we keep backups of the environment before calling this method
-                        // as the map that we kept as a backup may be picked up inside this block.
-                        // So we simply skip this attempt and continue adjusting the other maps
-                        // To avoid this one should always keep individual keys/value backups not the entire map
-                        LOG.info("Attempted to modify source map: " + field.getDeclaringClass() + "#" + field.getName(), e1);
-                    } catch (final IllegalAccessException e1) {
-                        throw new IllegalStateException("Failed setting environment variable <" + key + "> to <" + value + ">. Unable to access field!", e1);
-                    }
-                }
-            } catch (NoSuchFieldException e1) {
-                e1.printStackTrace();
-            }
+        if(value == null) {
+            secretEnv.remove(key);
+        } else {
+            secretEnv.put(key, value);
         }
-        LOG.info("Set environment variable <" + key + "> to <" + value + ">. Sanity Check: " + System.getenv(key));
+//        try {
+            /// we obtain the actual environment
+//            final Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
+//            final Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
+//            final boolean environmentAccessibility = theEnvironmentField.canAccess(null);//isAccessible();
+//            theEnvironmentField.setAccessible(true);
+//
+//            final Map<K, V> env = (Map<K, V>) theEnvironmentField.get(null);
+//
+//            if (System.getProperty("os.name").contains("Windows")) {
+//                // This is all that is needed on windows running java jdk 1.8.0_92
+//                if (value == null) {
+//                    env.remove(key);
+//                } else {
+//                    env.put((K) key, (V) value);
+//                }
+//            } else {
+////                if (value == null) {
+////                    env.remove(key);
+////                } else {
+////                    env.put((K) key, (V) value);
+////                }
+////                LOG.info("non-windows environment variable set: " + env.get(key));
+//                injectEnvironmentVariable(key, value);
+////                // This is triggered to work on openjdk 1.8.0_91
+////                // The ProcessEnvironment$Variable is the key of the map
+////                final Class<K> variableClass = (Class<K>) Class.forName("java.lang.ProcessEnvironment$Variable");
+////                final Method convertToVariable = variableClass.getMethod("valueOf", String.class);
+////                final boolean conversionVariableAccessibility = convertToVariable.canAccess(null);//.isAccessible();
+////                convertToVariable.setAccessible(true);
+////
+////                // The ProcessEnvironment$Value is the value fo the map
+////                final Class<V> valueClass = (Class<V>) Class.forName("java.lang.ProcessEnvironment$Value");
+////                final Method convertToValue = valueClass.getMethod("valueOf", String.class);
+////                final boolean conversionValueAccessibility = convertToValue.canAccess(null);//.isAccessible();
+////                convertToValue.setAccessible(true);
+////
+////                if (value == null) {
+////                    env.remove(convertToVariable.invoke(null, key));
+////                } else {
+////                    // we place the new value inside the map after conversion so as to
+////                    // avoid class cast exceptions when rerunning this code
+////                    env.put((K) convertToVariable.invoke(null, key), (V) convertToValue.invoke(null, value));
+////
+////                    // reset accessibility to what they were
+////                    convertToValue.setAccessible(conversionValueAccessibility);
+////                    convertToVariable.setAccessible(conversionVariableAccessibility);
+////                }
+////            }
+////            // reset environment accessibility
+////            theEnvironmentField.setAccessible(environmentAccessibility);
+////
+////            // we apply the same to the case insensitive environment
+////            final Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
+////            final boolean insensitiveAccessibility = theCaseInsensitiveEnvironmentField.canAccess(null);//.isAccessible();
+////            theCaseInsensitiveEnvironmentField.setAccessible(true);
+////            // Not entirely sure if this needs to be casted to ProcessEnvironment$Variable and $Value as well
+////            final Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
+////            if (value == null) {
+////                // remove if null
+////                cienv.remove(key);
+////            } else {
+////                cienv.put(key, value);
+////            }
+////            theCaseInsensitiveEnvironmentField.setAccessible(insensitiveAccessibility);
+//            }
+////        } catch (final ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+////            throw new IllegalStateException("Failed setting environment variable <" + key + "> to <" + value + ">", e);
+//        } catch (final Exception e) {
+//            // we could not find theEnvironment
+////            final Map<String, String> env = GoateUtils.getenv();
+////            //Stream.of(Collections.class.getDeclaredClasses())
+////            List<Class> filteredClass = filterClasses();
+////            try {
+////                List<Field> map = mapFields(filteredClass);
+////                for(Field field:map){
+////                    try {
+////                        //final boolean fieldAccessibility = field.canAccess(null);//.isAccessible();
+////                        field.setAccessible(true);
+////                        // we obtain the environment
+////                        final Map<String, String> map2 = (Map<String, String>) field.get(env);
+////                        if (value == null) {
+////                            // remove if null
+////                            map.remove(key);
+////                        } else {
+////                            map2.put(key, value);
+////                        }
+////                        // reset accessibility
+////                        //field.setAccessible(fieldAccessibility);
+////                    } catch (final ConcurrentModificationException e1) {
+////                        // This may happen if we keep backups of the environment before calling this method
+////                        // as the map that we kept as a backup may be picked up inside this block.
+////                        // So we simply skip this attempt and continue adjusting the other maps
+////                        // To avoid this one should always keep individual keys/value backups not the entire map
+////                        LOG.info("Attempted to modify source map: " + field.getDeclaringClass() + "#" + field.getName(), e1);
+////                    } catch (final IllegalAccessException e1) {
+////                        throw new IllegalStateException("Failed setting environment variable <" + key + "> to <" + value + ">. Unable to access field!", e1);
+////                    }
+////                }
+////            } catch (NoSuchFieldException e1) {
+////                e1.printStackTrace();
+////            }
+//            throw new RuntimeException(e);
+//        }
+        LOG.info("Set environment variable <" + key + "> to <" + value + ">. Sanity Check: " + GoateUtils.getenv(key));
     }
 
+    public static String getenv(String key) {
+        String value = "";
+        if(secretEnv.containsKey(key)){
+            value = secretEnv.get(key);
+        } else {
+            value = System.getenv(key);
+        }
+        return value;
+    }
     public static void removeEnvironment(String key){
         setEnvironment(key, null);
+    }
+
+    public static void injectEnvironmentVariable(String key, String value)
+            throws Exception {
+
+        Class<?> processEnvironment = Class.forName("java.lang.ProcessEnvironment");
+
+        Field unmodifiableMapField = getAccessibleField(processEnvironment, "theUnmodifiableEnvironment");
+        Object unmodifiableMap = unmodifiableMapField.get(null);
+        injectIntoUnmodifiableMap(key, value, unmodifiableMap);
+
+        Field mapField = getAccessibleField(processEnvironment, "theEnvironment");
+        Map<String, String> map = (Map<String, String>) mapField.get(null);
+        map.put(key, value);
+    }
+
+    private static Field getAccessibleField(Class<?> clazz, String fieldName)
+            throws NoSuchFieldException {
+
+        Field field = clazz.getDeclaredField(fieldName);
+        boolean setAccess = field.trySetAccessible();
+        LOG.debug("set environment accessibility set to: " + setAccess);
+        //field.setAccessible(true);
+        return field;
+    }
+
+    private static void injectIntoUnmodifiableMap(String key, String value, Object map)
+            throws ReflectiveOperationException {
+
+        Class unmodifiableMap = Class.forName("java.util.Collections$UnmodifiableMap");
+        Field field = getAccessibleField(unmodifiableMap, "m");
+        Object obj = field.get(map);
+        ((Map<String, String>) obj).put(key, value);
     }
 
     protected static List<Class> filterClasses(){

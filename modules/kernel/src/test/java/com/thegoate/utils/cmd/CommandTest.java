@@ -17,7 +17,13 @@ public class CommandTest extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
     public void echo() {
-        Goate cmd = new Command("cmd").arg("/c").arg("echo hello world!!!").execute();
+        Goate cmd = null;
+        if(System.getProperty("os.name").contains("Windows")){
+            cmd = new Command("cmd").arg("/c").arg("echo hello world!!!").execute();
+        } else {
+            cmd = new Command("echo").arg("hello world!!!").execute();
+        }
+        LOG.info("actual results", ""+cmd);
         expect(Expectation.build()
                 .actual("output")
                 .from(cmd)
@@ -35,6 +41,6 @@ public class CommandTest extends TestNGEngineMethodDL {
     public void badCommand() {
         Goate cmd = new Command("booger").execute();
 
-        expect(Expectation.build().actual(cmd.get("output")).isEqualTo("Cannot run program \"booger\": CreateProcess error=2, The system cannot find the file specified"));
+        expect(Expectation.build().actual(cmd.get("output")).isEqualTo(System.getProperty("os.name").contains("Windows")?"Cannot run program \"booger\": CreateProcess error=2, The system cannot find the file specified":"Cannot run program \"booger\": error=2, No such file or directory"));
     }
 }

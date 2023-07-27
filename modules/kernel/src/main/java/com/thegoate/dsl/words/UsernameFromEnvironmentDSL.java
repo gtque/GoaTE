@@ -31,6 +31,7 @@ import com.thegoate.Goate;
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
+import com.thegoate.utils.GoateUtils;
 
 /**
  * Returns current host os username.
@@ -53,7 +54,7 @@ public class UsernameFromEnvironmentDSL extends DSL {
     public Object evaluate(Goate data) {
         String username = System.getProperty("username");
         if(username == null) {
-            username = System.getenv("username");
+            username = GoateUtils.getenv("username");
         }
         return username;
     }

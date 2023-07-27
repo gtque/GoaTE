@@ -29,6 +29,7 @@ package com.thegoate.utils;
 import com.thegoate.Goate;
 import org.testng.annotations.Test;
 
+import static com.thegoate.dsl.words.EutConfigDSL.eut;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
@@ -46,6 +47,14 @@ public class GoateUtilsTest {
         assertEquals(GoateUtils.getProperty("finklestein","man taco"),"dooda");
         GoateUtils.removeEnvironment("finklestein");
         assertEquals(GoateUtils.getProperty("finklestein","man taco"),"man taco");
+    }
+    @Test(groups = {"unit"})
+    public void setEnvGetByEut(){
+        assertNull(GoateUtils.getProperty("finklestein"));
+        GoateUtils.setEnvironment("finklestein", "grippers");
+        assertEquals(eut("finklestein", "man taco"),"grippers");
+        GoateUtils.removeEnvironment("finklestein");
+        assertEquals(eut("finklestein", "man taco"),"man taco");
     }
 
     @Test(groups = {"unit"})

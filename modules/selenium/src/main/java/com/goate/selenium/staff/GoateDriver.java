@@ -113,7 +113,7 @@ public abstract class GoateDriver {
     protected OS detectOS(){
         OS type = null;
         String sys = System.getProperty("os.name");
-        String architecture = System.getProperty("os.arch", System.getenv("ProgramFiles(x86)"));
+        String architecture = System.getProperty("os.arch", GoateUtils.getenv("ProgramFiles(x86)"));
         if(sys.contains("Windows")){
             if(architecture==null){
                 type = OS.WIN32;

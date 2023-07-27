@@ -41,8 +41,10 @@ public class Command {
     //            LOG.error("kubectl", "problem clearing redis: " + e.getMessage(), e);
     //        }
     public Goate execute() {
-        String commandOutput = "";
+        String commandOutput = "not set";
         int exitCode = -42;
+        LOG.debug("command", "" + cmd);
+        Goate result = new Goate();
         if(cmd!=null && cmd.size()>0) {
             ProcessBuilder builder = new ProcessBuilder(cmd);
             try {
@@ -53,14 +55,24 @@ public class Command {
                 Executors.newSingleThreadExecutor().submit(streamGobbler);
                 exitCode = process.waitFor();
                 commandOutput = bucket.getFeed();
+                LOG.debug("command output", commandOutput);
+                String theResult = "" + commandOutput.toString();
+                result.put("output", "" + theResult);
+                LOG.debug("command output goate", result);
+                LOG.debug("command output theResult", theResult);
             } catch (InterruptedException | IOException e) {
                 LOG.error("command", "problem running command: " + e.getMessage(), e);
                 commandOutput = e.getMessage();
+                result.put("output", ""+commandOutput);
             }
         } else {
             commandOutput = "no command defined";
+            result.put("output", ""+commandOutput);
         }
-        return new Goate().put("exit code", exitCode).put("output", commandOutput);
+        LOG.debug("command output check again", commandOutput);
+        result.put("exit code", exitCode);
+        LOG.debug("command", "results:\n" + result);
+        return result;
     }
 
     private static class StreamGobbler implements Runnable {
@@ -83,6 +95,7 @@ public class Command {
         StringBuilder feed = new StringBuilder();
 
         String getFeed(){
+            LOG.debug("command buffer" + feed.toString());
             return feed.toString();
         }
 
