@@ -150,6 +150,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
                 }
                 tool.actual(actual).to(expected).using(operator);
             }
+            tool.setData(this.data);
         }
         return tool;
     }
