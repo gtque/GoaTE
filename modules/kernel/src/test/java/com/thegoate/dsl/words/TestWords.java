@@ -157,4 +157,39 @@ public class TestWords extends TestNGEngineMethodDL {
                 .actual(result)
                 .isEqualTo(true));
     }
+
+    @Test(groups = {"unit"})
+    public void listFromCsvEscaped() {
+        List<String> result = new Goate().get("value", "list from csv::one\\,two\\,three", List.class);
+        expect(Expectation.build()
+                .actual(result.size())
+                .isEqualTo(3));
+    }
+
+    @Test(groups = {"unit"})
+    public void listFromCsv() {
+        List<String> result = new Goate().get("value", "list from csv::one,two,three", List.class);
+        expect(Expectation.build()
+                .actual(result.size())
+                .isEqualTo(3));
+    }
+
+    @Test(groups = {"unit"})
+    public void listFromCsvMixed() {
+        List<String> result = new Goate().get("value", "list from csv::one,two\\,three", List.class);
+        expect(Expectation.build()
+                .actual(result.size())
+                .isEqualTo(3));
+    }
+
+    @Test(groups = {"unit"})
+    public void listFromCsvComplex() {
+        List<String> smore = new ArrayList<>();
+        smore.add("hello");
+        smore.add("world");
+        List<String> result = new Goate().put("extra", smore).get("value", "list from csv::one,two\\,three,o::extra", List.class);
+        expect(Expectation.build()
+                .actual(result.size())
+                .isEqualTo(5));
+    }
 }

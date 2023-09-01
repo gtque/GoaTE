@@ -32,8 +32,7 @@ import com.thegoate.annotations.GoateDescription;
 import com.thegoate.dsl.DSL;
 import com.thegoate.dsl.GoateDSL;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Returns a list of things generated from the comma separated list of parameters.
@@ -51,7 +50,26 @@ public class ListFromCsvDSL extends DSL {
     public Object evaluate(Goate data) {
         List<Object> list = new ArrayList<>();
         for(int i = 1; i<numberOfParameters(); i++) {
-            list.add(get(i,data));
+            var item = get(i,data);
+            if(item instanceof String && item != null){
+                item = Arrays.asList(((String) item).split(","));
+            }
+            Class klass = item.getClass();
+            if (Collection.class.isAssignableFrom(klass) || (item != null && klass.isArray())) {
+                Collection collection;
+                if (klass.isArray()) {
+                    collection = Arrays.asList(item);
+                } else {
+                    collection = (Collection) item;
+                }
+                Iterator it = collection.iterator();
+                while (it.hasNext()) {
+                    Object o = it.next();
+                    list.add(o);
+                }
+            } else {
+                list.add(item);
+            }
         }
         return list;
     }
