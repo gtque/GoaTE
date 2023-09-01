@@ -30,4 +30,5 @@ dependencies{
     api  d.depends(":kernel", project.internalVersion);
     api  "org.testng:testng:7.6.1"
     api  "org.apache.commons:commons-lang3:3.12.0"
+    testImplementation d.depends(":json", project.internalVersion);
 }

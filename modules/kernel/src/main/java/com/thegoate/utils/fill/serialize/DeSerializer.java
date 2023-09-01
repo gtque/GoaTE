@@ -214,16 +214,17 @@ public class DeSerializer extends Cereal {
                     boolean flatten = false;
                     for (String altName : altNames) {
                         String[] name = altName.split(FLATTEN);
-                        setValue1 = getProperty(name[0], null, data);
+                        Object setValue1b = getProperty(name[0], null, data);
                         if(fieldKey == null) {
                             fieldKey = name[0];
                             flatten = Boolean.parseBoolean(name[1]);
                         }
-                        if (setValue1 != null) {
+                        if (setValue1b != null) {
                             LOG.debug("Properties", "Found a property with the alternate name: " + fieldName + ">" + altName);
-                            dupeData.put(name[0], setValue1);
+                            dupeData.put(name[0], setValue1b);
                             fieldKey = name[0];
                             flatten = Boolean.parseBoolean(name[1]);
+                            setValue1 = setValue1b;
                             break;
                         } else if (name[0].isEmpty()) {
                             setValue1 = data;

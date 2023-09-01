@@ -47,6 +47,14 @@ public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
         super();
     }
 
+    @GoateProvider(name = "sampleClone")
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void putRunDataClone(Goate d) throws Exception {
+        LOG.info("data size: " + data.size());
+        LOG.info("data: " + data.toString());
+        assertEquals(data.size(), 3);
+    }
+
     @GoateProvider(name = "sample")
     @Test(groups = {"unit"}, dataProvider = "methodLoader")
     public void putRunData(Goate d) throws Exception {
