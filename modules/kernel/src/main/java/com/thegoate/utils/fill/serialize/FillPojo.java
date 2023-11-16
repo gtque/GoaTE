@@ -56,7 +56,7 @@ public class FillPojo implements FillUtility{
 
     @Override
     public boolean isType(Object check) {
-        return check instanceof Object;
+        return check instanceof Object && !(check instanceof String);
     }
 
     @Override

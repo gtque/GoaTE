@@ -51,7 +51,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate health = new Goate();
     protected Goate data = null;
-    protected static Goate pokedex = new Goate();
+    protected static volatile Goate pokedex = new Goate();
     protected String region = "kanto";
     protected boolean resetCache = false;
     protected boolean useCache = false;
@@ -153,7 +153,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                         pokedex.put(region, cache);
                     }
                 } else {
-                    LOG.debug("buildUtil", "seems like cache was not enabled.");
+                    LOG.debug("buildUtil", "seems like cache was not enabled, so it was not cached.");
                 }
             } else {
                 LOG.debug("buildUtil", "could not find an uncached util implementation." + key(util, obj, id, type));
@@ -161,6 +161,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         }
         if(utility instanceof NotFound){
             utility = null;
+            LOG.warn("buildUtil", "utility returned as NotFound: " + key(util, obj, id, type));
         }
         return utility;
     }
@@ -214,7 +215,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                     try {
                         utility = af.constructor(null).build(c);
                     } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                        LOG.debug("The class (" + c.getName() + ") could not be build from the util cache for some reason: " + e.getMessage(), e);
+                        LOG.warn("The class (" + c.getName() + ") could not be build from the util cache for some reason: " + e.getMessage(), e);
                     }
                 } else {
                     LOG.debug("util cache", "not found in cache: " + _key);
@@ -300,23 +301,32 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         Class def = null;
         AnnotationFactory af = new AnnotationFactory();
         af.constructorArgs(args);
-        Map<String, Class> utils = af.annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
+        Map<String, Class> utils = af.doDefault().annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
         if (utils != null) {
             final Class[] _def = new Class[1];
 //            final Object[] _util = new Object[1];
             _def[0] = null;
 //            _util[0] = null;
 
-            Optional<String> opt = utils.keySet().stream().filter(key -> checkUtility(utils.get(key), _def, isType, af, type, checkArgs)).findFirst();
-            if(opt.isPresent()) {
-                try {
-                    utility = af.constructor(null).build(utils.get(opt.get()));//af.constructor(null).build(c);;
-                } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
-                    LOG.warn("uncached", "problem building utility: " + e.getMessage(), e);
+//            if(utils.keySet().size() == 1){
+//                try {
+//                    utility = af.constructor(null).build(utils.get(utils.keySet().iterator().next()));
+//                } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
+//                    LOG.warn("uncached", "problem building utility: " + e.getMessage(), e);
+//                }
+//            }
+//            if(utility == null) {
+                Optional<String> opt = utils.keySet().stream().filter(key -> checkUtility(utils.get(key), _def, isType, af, type, checkArgs)).findFirst();
+                if (opt.isPresent()) {
+                    try {
+                        utility = af.constructor(null).build(utils.get(opt.get()));//af.constructor(null).build(c);;
+                    } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                        LOG.warn("uncached", "problem building utility: " + e.getMessage(), e);
+                    }
+                } else {
+                    LOG.debug("uncached", "failed to find the utility");
                 }
-            } else {
-                LOG.debug("uncached", "failed to find the utility");
-            }
+//            }
             def = _def[0];
             /**
              for (String key : utils.keySet()) {
@@ -371,7 +381,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
              }
              }/**/
         } else {
-            LOG.info("The utility directory was null for some reason: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
+            LOG.warn("The utility directory was null for some reason: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
         }
         if (utility == null) {
             if (def != null) {
@@ -379,7 +389,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                     utility = af.constructor(null).build(def);
                     ((Utility) utility).setData(data);
                 } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                    LOG.debug("Problem instantiating the default utility (" + def.getName() + "): " + e.getMessage(), e);
+                    LOG.warn("Problem instantiating the default utility (" + def.getName() + "): " + e.getMessage(), e);
                 }
             } else {
                 LOG.debug("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
