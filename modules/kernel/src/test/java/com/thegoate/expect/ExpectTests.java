@@ -32,6 +32,8 @@ import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.data.StaticDL;
 import com.thegoate.expect.builder.*;
+import com.thegoate.expect.dto.BigItem;
+import com.thegoate.expect.dto.BigList;
 import com.thegoate.expect.test.*;
 import com.thegoate.expect.validate.Validate;
 import com.thegoate.expect.validate.ValidateAbsence;
@@ -1553,6 +1555,51 @@ public class ExpectTests extends TestNGEngineMethodDL {
 
         expect(Expectation.build()
                 .actual(a).isEqualToIgnoreOrder(b));
+    }
+
+    @ExpectToFail
+    @Test(groups = {"unit"})
+    public void unsortedListMissing() {
+        ListPojo a = new ListPojo();
+        a.getTheList().add("a");
+        a.getTheList().add("b");
+        a.getTheList().add("e");
+        a.getTheList().add("d");
+
+        ListPojo b = new ListPojo();
+        b.getTheList().add("c");
+        b.getTheList().add("a");
+        b.getTheList().add("d");
+        b.getTheList().add("b");
+
+        expect(Expectation.build()
+                .actual(a).isEqualToIgnoreOrder(b));
+    }
+
+    @ExpectToFail
+    @Test(groups = {"unit"})
+    public void unsortedBigListMissing() {
+        BigList a = new BigList();
+        BigList b = new BigList();
+        List<BigItem> items = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            items.add(new BigItem());
+            a.list.add(items.get(items.size()-1));
+        }
+        while(items.size()>0) {
+            b.list.add(items.remove((int)(Math.random()*items.size())));
+        }
+        int modified = (int)(Math.random()*b.list.size());
+        BigItem m = new BigItem();
+        m.a = b.list.get(modified).a;
+        m.i = b.list.get(modified).i;
+        m.j = null;
+        b.list.remove(modified);
+        b.list.add(m);
+        LOG.info("modified("+modified+"): " + b.list.get(modified));
+        expect(Expectation.build()
+                .actual(a).isEqualToIgnoreOrder(b));
+
     }
 
     @Test(groups = {"unit"})

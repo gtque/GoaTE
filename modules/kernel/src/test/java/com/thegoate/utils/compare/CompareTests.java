@@ -512,4 +512,37 @@ public class CompareTests extends TestNGEngineMethodDL {
                 .actual("2019-01-01")
                 .isNotEqualTo(null));
     }
+
+    @GoateDLP(name = "compare longs")
+    public Goate[] dlpForLongComparison() {
+        Goate[] d = new Goate[2];
+        d[0] = new Goate()
+                .put("dl##", new StaticDL().add("Scenario", "string, string").add("actual", "0").add("expected", "0"))
+                .put("dl##", new StaticDL().add("Scenario", "string, int").add("actual", "0").add("expected", 0))
+                .put("dl##", new StaticDL().add("Scenario", "int, string").add("actual", 0).add("expected", "0"))
+                .put("dl##", new StaticDL().add("Scenario", "int, int").add("actual", 0).add("expected", 0))
+                .put("dl##", new StaticDL().add("Scenario", "int, long").add("actual", 0).add("expected", 0L))
+                .put("dl##", new StaticDL().add("Scenario", "long, int").add("actual", 0L).add("expected", 0))
+                .put("dl##", new StaticDL().add("Scenario", "long, long").add("actual", 0L).add("expected", 0L))
+        ;
+        return d;
+    }
+
+    @GoateProvider(name = "compare longs")
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void compareLongsFrom(Goate testdata) {
+        expect(Expectation.build()
+                .actual("actual")
+                .from(testdata)
+                .isEqualTo("expected")
+                .fromExpected(testdata));
+    }
+
+    @GoateProvider(name = "compare longs")
+    @Test(groups = {"unit"}, dataProvider = "methodLoader")
+    public void compareLongsDirect(Goate testdata) {
+        expect(Expectation.build()
+                .actual(get("actual"))
+                .isEqualTo(get("expected")));
+    }
 }
