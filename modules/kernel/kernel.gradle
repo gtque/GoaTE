@@ -27,7 +27,7 @@
 import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    api  "org.atteo.classindex:classindex:3.11"
+    api  "org.atteo.classindex:classindex:3.13"
     api  "org.slf4j:slf4j-api:1.7.36"
     testImplementation d.depends(":testng", project.internalVersion);
     testImplementation d.depends(":json", project.internalVersion);

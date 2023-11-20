@@ -1,6 +1,5 @@
 package com.thegoate.json.utils.type;
 
-import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.type.FindType;
 import com.thegoate.utils.type.IsType;
 import org.json.JSONArray;
@@ -11,7 +10,6 @@ import org.json.JSONObject;
  * Created by Eric Angeli on 7/6/2020.
  */
 @IsType
-@IsDefault(forType = true)
 public class JsonType extends FindType {
 
 	@Override

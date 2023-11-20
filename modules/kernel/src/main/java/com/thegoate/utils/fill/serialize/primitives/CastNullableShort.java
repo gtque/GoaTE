@@ -24,7 +24,6 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *  DEALINGS IN THE SOFTWARE.
  */
-
 package com.thegoate.utils.fill.serialize.primitives;
 
 import com.thegoate.utils.fill.serialize.CastUtil;
@@ -33,24 +32,24 @@ import com.thegoate.utils.fill.serialize.GoateCastUtility;
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-@CastUtil(type = CastNullableFloat.class)
-public class CastNullableFloat extends GoateCastUtility {
+@CastUtil(type = CastNullableShort.class)
+public class CastNullableShort extends GoateCastUtility {
 
-	public CastNullableFloat(Object value) {
-		super(value);
-	}
+    public CastNullableShort(Object value) {
+        super(value);
+    }
 
-	@Override
-	public <T> T cast(Class<T> type) {
-		Object t = null;
-		if (value != null) {
-			t = Float.parseFloat("" + value);
-		}
-		return (T) t;
-	}
+    @Override
+    public <T> T cast(Class<T> type) {
+        Object t = null;
+        if(value != null){
+            t = Short.parseShort("" + value);
+        }
+        return (T)t;
+    }
 
-	@Override
-	public boolean isType(Object c) {
-		return c.equals(CastNullableFloat.class);
-	}
+    @Override
+    public boolean isType(Object c) {
+        return c.equals(CastNullableShort.class);
+    }
 }

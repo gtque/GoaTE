@@ -30,6 +30,7 @@ package com.thegoate.reflection;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.fill.serialize.GoateIgnore;
+import com.thegoate.utils.fill.serialize.primitives.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -154,15 +155,49 @@ public class GoateReflection {
     }
 
     public boolean isPrimitive(Class c) {
-        return c != null &&
-                (c.equals(Boolean.class) || c.equals(Boolean.TYPE)
-                        || c.equals(Byte.class) || c.equals(Byte.TYPE)
-                        || c.equals(Integer.class) || c.equals(Integer.TYPE)
-                        || c.equals(Double.class) || c.equals(Double.TYPE)
-                        || c.equals(Float.class) || c.equals(Float.TYPE)
-                        || c.equals(Long.class) || c.equals(Long.TYPE)
-                        || c.equals(Character.class) || c.equals(Character.TYPE)
-                        || c.equals(Short.class) || c.equals(Short.TYPE));
+        return c != null && nonPrimitiveType(c) != null;
+    }
+
+    public Class nonPrimitiveType(Class c) {
+        if (c.equals(Boolean.class) || c.equals(Boolean.TYPE)) {
+            return Boolean.class;
+        } else if (c.equals(Byte.class) || c.equals(Byte.TYPE)) {
+            return Byte.class;
+        } else if (c.equals(Integer.class) || c.equals(Integer.TYPE)) {
+            return Integer.class;
+        } else if (c.equals(Double.class) || c.equals(Double.TYPE)) {
+            return Double.class;
+        } else if (c.equals(Float.class) || c.equals(Float.TYPE)) {
+            return Float.class;
+        } else if (c.equals(Long.class) || c.equals(Long.TYPE)) {
+            return Long.class;
+        } else if (c.equals(Character.class) || c.equals(Character.TYPE)) {
+            return Character.class;
+        } else if (c.equals(Short.class) || c.equals(Short.TYPE)) {
+            return Short.class;
+        }
+        return null;
+    }
+
+    public Class nullablePrimitiveType(Class c) {
+        if (c.equals(Boolean.class)) {
+            return CastNullableBoolean.class;
+        } else if (c.equals(Byte.class)) {
+            return CastNullableByte.class;
+        } else if (c.equals(Integer.class)) {
+            return CastNullableInt.class;
+        } else if (c.equals(Double.class)) {
+            return CastNullableDouble.class;
+        } else if (c.equals(Float.class)) {
+            return CastNullableFloat.class;
+        } else if (c.equals(Long.class)) {
+            return CastNullableLong.class;
+        } else if (c.equals(Character.class)) {
+            return CastNullableChar.class;
+        } else if (c.equals(Short.class)) {
+            return CastNullableShort.class;
+        }
+        return null;
     }
 
     public boolean isPrimitiveNumber(Class c) {
@@ -356,16 +391,16 @@ public class GoateReflection {
         return result;
     }
 
-	public Field findField(Class theClass, String fieldName) {
-		Field field = null;
-		for (Map.Entry<String, Field> entry : findFields(theClass).entrySet()) {
-			if (entry.getValue().getName().equals(fieldName)) {
-				field = entry.getValue();
-				break;
-			}
-		}
-		return field;
-	}
+    public Field findField(Class theClass, String fieldName) {
+        Field field = null;
+        for (Map.Entry<String, Field> entry : findFields(theClass).entrySet()) {
+            if (entry.getValue().getName().equals(fieldName)) {
+                field = entry.getValue();
+                break;
+            }
+        }
+        return field;
+    }
 
     public Map<String, Field> findFields(Class theClass) {
         Map<String, Field> fields = new HashMap<>();
@@ -395,7 +430,7 @@ public class GoateReflection {
     public Object getFieldValue(Object owner, Field field) {
         Object value = null;
         if (owner != null) {
-			boolean access = Modifier.isStatic(field.getModifiers()) ? field.canAccess(null) : field.canAccess(owner);//.isAccessible();
+            boolean access = Modifier.isStatic(field.getModifiers()) ? field.canAccess(null) : field.canAccess(owner);//.isAccessible();
             try {
                 field.setAccessible(true);
                 value = field.get(owner);
@@ -430,9 +465,9 @@ public class GoateReflection {
         if (klass.equals(String.class)) {
             o = "";
         } else if (isByteType(klass)) {
-			o = Byte.parseByte("0");
+            o = Byte.parseByte("0");
         } else if (isShortType(klass)) {
-			o = Short.parseShort("0");
+            o = Short.parseShort("0");
         } else if (isDoubleType(klass)) {
             o = 0D;
         } else if (isFloatType(klass)) {
@@ -449,34 +484,34 @@ public class GoateReflection {
         return o;
     }
 
-	/**
-	 * Converts primitive class type to the non-primitive equivalent or simply returns the class if not a primitive.
-	 *
-	 * @param type The type to check and convert the primitive to non-primitive.
-	 * @return The non-primitive class of the type passed in.
-	 */
-	public Class toType(Class type) {
-		if (isPrimitive(type)) {
-			if (isBooleanType(type)) {
-				type = Boolean.class;
-			} else if (isByteType(type)) {
-				type = Byte.class;
-			} else if (isIntegerType(type)) {
-				type = Integer.class;
-			} else if (isDoubleType(type)) {
-				type = Double.class;
-			} else if (isFloatType(type)) {
-				type = Float.class;
-			} else if (isLongType(type)) {
-				type = Long.class;
-			} else if (isCharacterType(type)) {
-				type = Character.class;
-			} else if (isShortType(type)) {
-				type = Short.class;
-			}
-		}
-		return type;
-	}
+    /**
+     * Converts primitive class type to the non-primitive equivalent or simply returns the class if not a primitive.
+     *
+     * @param type The type to check and convert the primitive to non-primitive.
+     * @return The non-primitive class of the type passed in.
+     */
+    public Class toType(Class type) {
+        if (isPrimitive(type)) {
+            if (isBooleanType(type)) {
+                type = Boolean.class;
+            } else if (isByteType(type)) {
+                type = Byte.class;
+            } else if (isIntegerType(type)) {
+                type = Integer.class;
+            } else if (isDoubleType(type)) {
+                type = Double.class;
+            } else if (isFloatType(type)) {
+                type = Float.class;
+            } else if (isLongType(type)) {
+                type = Long.class;
+            } else if (isCharacterType(type)) {
+                type = Character.class;
+            } else if (isShortType(type)) {
+                type = Short.class;
+            }
+        }
+        return type;
+    }
 
     public Class primitiveType(Object o) {
         Class klass = null;

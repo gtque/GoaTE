@@ -132,20 +132,28 @@ public class AnnotationFactory {
         Map<String, Class> unfiltered = directory.get(dir);
         Map<String, Class> filtered = new ConcurrentHashMap<>();
         if (id != null && identifier != null) {
-            for (String key : unfiltered.keySet()) {
-                try {
-                    Class temp = unfiltered.get(key);
-                    Annotation service = temp.getAnnotation(annotation);
-                    if (identifier != null) {
-                        Object theCheck = identifier.invoke(service);
-                        if (theCheck != null && theCheck.equals(id)) {
-                            filtered.put(key, temp);
+            if (directory.containsKey(dir + ":" + id + ":" + identifier.getName())) {
+                filtered = directory.get(dir + ":" + id + ":" + identifier.getName());
+            } else {
+                for (String key : unfiltered.keySet()) {
+                    try {
+                        Class temp = unfiltered.get(key);
+                        Annotation service = temp.getAnnotation(annotation);
+                        if (identifier != null) {
+                            Object theCheck = identifier.invoke(service);
+                            if (theCheck != null && theCheck.equals(id)) {
+                                Class typeClass = addToDefaults(filtered, temp, temp, service);
+                                String filterKey = typeClass != null ? typeClass.getCanonicalName() : key;
+                                filtered.put(filterKey, temp);
+                            }
                         }
+                    } catch (Exception e) {
+                        LOG.error("Problem checking the class: " + e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    LOG.error("Problem checking the class: " + e.getMessage(), e);
                 }
+                directory.put(dir + ":" + id + ":" + identifier.getName(), filtered);
             }
+//            LOG.debug("directory: (" + dir + ":" + id + ":" + identifier.getName() + ") = " + filtered.size());
         }
         return (id != null && identifier != null) ? filtered : unfiltered;
     }
@@ -164,7 +172,7 @@ public class AnnotationFactory {
         buildDirectory();
         Class c = null;
         LOG.debug("looking for " + annotation.getName());
-        String theClass = ""+id;
+        String theClass = "" + id;
         try {
             c = directory.get(annotation.getCanonicalName()).get(theClass);
         } catch (NullPointerException e) {
@@ -181,11 +189,24 @@ public class AnnotationFactory {
 
     /**
      * Clear the built directory. Use to force the directory to be rebuilt.
+     *
      * @return
      */
-    public synchronized AnnotationFactory clearDirectory(){
+    public synchronized AnnotationFactory clearDirectory() {
         directory.remove(annotation.getCanonicalName());
         return this;
+    }
+
+    public String getDefaultName(Class type) {
+        return "default: " + (type==null?"null":type.getName());
+    }
+
+    public String listingName(Class listing, Class type) {
+        return listingName(listing.getCanonicalName(), type);
+    }
+
+    public String listingName(String listing, Class type) {
+        return listing;// + (type != null ? (":" + type.getCanonicalName()) : "");
     }
 
     /**
@@ -199,52 +220,89 @@ public class AnnotationFactory {
         }
         Map<String, Class> listing = directory.get(annotation.getCanonicalName());
         if (listing.size() == 0) {
-            if(LOG!=null) {
-                LOG.debug("Building Directory "+annotation.getCanonicalName(), "the listing was empty, trying to build it.");
+            if (LOG != null) {
+                LOG.debug("Building Directory " + annotation.getCanonicalName(), "the listing was empty, trying to build it.");
             }
             Iterable<Class<?>> klasses = ClassIndex.getAnnotated(annotation);
             for (Class<?> klass : klasses) {
                 String theClass = klass.getCanonicalName();
-                if(LOG!=null) {
+                if (LOG != null) {
                     LOG.debug("Adding to directory", theClass);
                 }
                 try {
                     Class temp = Class.forName(theClass);
                     Annotation service = temp.getAnnotation(annotation);
-                    String aid = theClass;
+//                    String aid = theClass;
+                    Class typeClass = null;
+                    typeClass = addToDefaults(listing, temp, klass, service);
                     if (check != null) {
                         Object theCheck = check.invoke(service);
                         if (theCheck != null && theCheck.getClass().isArray()) {
                             listing.put("" + theClass, klass.forName(theClass));
                             for (Object aido : (Object[]) theCheck) {
-                                listing.put("" + aido, klass.forName(theClass));
+                                listing.put(listingName("" + aido, typeClass), klass.forName(theClass));
                             }
                         } else {
-                            listing.put("" + theCheck, klass.forName(theClass));
+                            listing.put(listingName("" + theCheck, typeClass), klass.forName(theClass));
                         }
                     } else {
-                        listing.put(temp.getCanonicalName(), klass.forName(theClass));//default to using the full class name.
-                    }
-                    if (setDefault) {
-                        IsDefault def = (IsDefault) temp.getAnnotation(IsDefault.class);
-                        if (def != null) {
-							if(def.forType()) {
-								listing.put("default", temp);
-							} else {
-							    if(!listing.containsKey("default")) {
-                                    listing.put("default", temp);
-                                }
-							}
-                        }
+                        listing.put(listingName(temp, typeClass), klass.forName(theClass));//default to using the full class name.
                     }
                 } catch (ClassNotFoundException | NullPointerException | IllegalAccessException | InvocationTargetException e) {
-                    LOG.error("could not get the class: " + theClass + "; " + e.getMessage(), e);
+                    if (LOG != null) {
+                        LOG.error("could not get the class: " + theClass + "; " + e.getMessage(), e);
+                    }
                 } catch (NoClassDefFoundError ncdfe) {
-                    LOG.error("Build Directory", "This shouldn't have happened, but a class in the list was not found." + ncdfe.getMessage(), ncdfe);
+                    if (LOG != null) {
+                        LOG.error("Build Directory", "This shouldn't have happened, but a class in the list was not found." + ncdfe.getMessage(), ncdfe);
+                    }
                 }
+            }
+        } else {
+            if (LOG != null) {
+//                LOG.debug("Build Directory", "directory already defined: " + listing.size());
             }
         }
         return this;
+    }
+
+    private Class addToDefaults(Map<String, Class> listing, Class temp, Class klass, Annotation service) {
+        IsDefault def = (IsDefault) temp.getAnnotation(IsDefault.class);
+        Class typeClass = null;
+        try {
+            Object[] args = {};
+            Method type = service.getClass().getMethod("type");
+            Object typeCheck = type.invoke(service, args);
+            if (typeCheck instanceof Class) {
+                typeClass = (Class) typeCheck;
+            }
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            if (LOG != null) {
+                LOG.debug("annotation does not have the 'type' field");
+            }
+        }
+        if (setDefault) {
+            if (def != null) {
+                if (def.forType()) {
+                    if (typeClass != null) {
+                        listing.put(getDefaultName(typeClass), klass);
+                    } else {
+                        if (LOG != null) {
+                            LOG.debug("not storing a default by type for: " + temp.getCanonicalName());
+                        }
+                    }
+//								listing.put("default", klass);
+//                                if (LOG != null) {
+//                                    LOG.debug("Build Directory", "can't track defaults for specific types here, this is only for generic default for all.");
+//                                }
+                } else {
+                    if (!listing.containsKey("default")) {
+                        listing.put("default", temp);
+                    }
+                }
+            }
+        }
+        return typeClass;
     }
 
     public AnnotationFactory constructor(Constructor constructor) {
@@ -259,7 +317,7 @@ public class AnnotationFactory {
                 Object[] ca = constructorArgs;
                 if (constructor == null) {
                     constructor = new GoateReflection().findConstructor(klass.getConstructors(), constructorArgs);
-                    if(constructor == null){
+                    if (constructor == null) {
 //                        LOG.debug("Build Class", "didn't find specific constructor, checking for default constructor");
                         constructor = new GoateReflection().findConstructor(klass.getConstructors(), new Object[0]);
                         ca = new Object[0];
@@ -268,11 +326,11 @@ public class AnnotationFactory {
                 if (constructor != null) {
                     try {
 //                        if(ca!=null) {
-                            o = constructor.newInstance(ca);
+                        o = constructor.newInstance(ca);
 //                        } else {
 //                            o = constructor.getDeclaredConstructor().newInstance();
 //                        }
-                    }catch(IllegalAccessException | InstantiationException | InvocationTargetException e){
+                    } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                         LOG.debug("Building Class", "Problem instantiating a new instances: " + e.getMessage(), e);
                         throw e;
                     }
@@ -301,7 +359,7 @@ public class AnnotationFactory {
         for (String theClass : listings.keySet()) {
             LOG.debug("Checking Class", theClass);
             List<Method> methods = new GoateReflection().getDeclaredMethods(listings.get(theClass));
-            LOG.debug("Methods to check ("+methods.size()+")", methods.toString());
+            LOG.debug("Methods to check (" + methods.size() + ")", methods.toString());
             for (Method m : methods) {
                 if (m.isAnnotationPresent(methodAnnotation)) {
                     for (Method am : methodAnnotation.getDeclaredMethods()) {

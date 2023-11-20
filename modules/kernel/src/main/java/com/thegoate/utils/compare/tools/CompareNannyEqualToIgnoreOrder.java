@@ -43,8 +43,8 @@ import static com.thegoate.logging.volume.VolumeKnob.volume;
  * Compares two Nanny based pojos (or Kid since Kid extends Nanny) and ignores list order.
  * Created by Eric Angeli on 5/9/2017.
  */
-@CompareUtil(operator = "~==")
-@IsDefault
+@CompareUtil(operator = "~==", type = Nanny.class)
+@IsDefault(forType = true)
 public class CompareNannyEqualToIgnoreOrder extends CompareObject {
 
 	public CompareNannyEqualToIgnoreOrder(Object actual) {

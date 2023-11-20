@@ -1,6 +1,5 @@
 package com.thegoate.xml.utils.type;
 
-import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.type.FindType;
 import com.thegoate.utils.type.IsType;
 import org.w3c.dom.Document;
@@ -11,7 +10,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 
 @IsType
-@IsDefault(forType = true)
 public class XmlType extends FindType {
 
     @Override

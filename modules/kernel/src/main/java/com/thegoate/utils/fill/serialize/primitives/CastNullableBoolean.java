@@ -33,7 +33,7 @@ import com.thegoate.utils.fill.serialize.GoateCastUtility;
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-@CastUtil(type = Boolean.class)
+@CastUtil(type = CastNullableBoolean.class)
 public class CastNullableBoolean extends GoateCastUtility {
 
 	public CastNullableBoolean(Object value) {
@@ -51,6 +51,6 @@ public class CastNullableBoolean extends GoateCastUtility {
 
 	@Override
 	public boolean isType(Object c) {
-		return c.equals(Boolean.class);
+		return c.equals(CastNullableBoolean.class);
 	}
 }

@@ -1,13 +1,11 @@
 package com.thegoate.xml.utils.type;
 
-import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.type.FindType;
 import com.thegoate.utils.type.IsType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 @IsType
-@IsDefault(forType = true)
 public class HtmlType extends FindType {
 
     @Override

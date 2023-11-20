@@ -43,4 +43,5 @@ import java.lang.annotation.RetentionPolicy;
 @Info
 @IndexAnnotated
 public @interface ToGoateUtil {
+    Class type() default Object.class;
 }

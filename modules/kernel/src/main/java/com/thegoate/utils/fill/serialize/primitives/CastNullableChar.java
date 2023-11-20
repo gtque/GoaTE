@@ -33,7 +33,7 @@ import com.thegoate.utils.fill.serialize.GoateCastUtility;
 /**
  * Created by Eric Angeli on 6/26/2018.
  */
-@CastUtil(type = Character.class)
+@CastUtil(type = CastNullableChar.class)
 public class CastNullableChar extends GoateCastUtility {
 
 	public CastNullableChar(Object value) {
@@ -51,6 +51,6 @@ public class CastNullableChar extends GoateCastUtility {
 
 	@Override
 	public boolean isType(Object c) {
-		return c.equals(Character.class);
+		return c.equals(CastNullableChar.class);
 	}
 }

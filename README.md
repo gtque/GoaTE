@@ -6,4 +6,7 @@ You can pull down only the modules you need to keep the foot print as small as p
 GoaTE follows the MIT License and we try to make sure we are in line with any licenses used by third party libraries. If you want to contribute to GoaTE, please feel free to branch or fork the project. Just be sure to maintain credit and licenses.
 <br/>
 <br/>
+./gradlew -x gradle:publish publish -Prelease=final
+./gradlew clean test testReport -PtestGroups=unit,api,ui,webui
+
 Good Luck.

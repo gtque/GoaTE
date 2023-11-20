@@ -145,7 +145,12 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
             utility = uncached(util, args, checkArgs, id, identifier, isType, type);
             if (utility != null) {
                 if (obj != null && useCache) {// && !(obj instanceof String && type != String.class)) {
-                    Goate cache = pokedex.get(region, new Goate(), Goate.class);
+                    Goate cache = null;
+                    try {
+                        cache = pokedex.get(region, new Goate(), Goate.class);
+                    } catch (Exception e) {
+                        LOG.debug("UnknownUtil Cache", "cache was weird for some reason: " + e.getMessage());
+                    }
                     if (cache != null) {
                         cache.put(key(util, obj, id, type), utility.getClass());
                     } else {
@@ -159,7 +164,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                 LOG.debug("buildUtil", "could not find an uncached util implementation." + key(util, obj, id, type));
             }
         }
-        if(utility instanceof NotFound){
+        if (utility instanceof NotFound) {
             utility = null;
             LOG.warn("buildUtil", "utility returned as NotFound: " + key(util, obj, id, type));
         }
@@ -170,10 +175,10 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         clearCache(klass, null);
     }
 
-    public static void clearCache(Class<? extends UnknownUtilType> klass, Class annotation){
+    public static void clearCache(Class<? extends UnknownUtilType> klass, Class annotation) {
         UtilCache uc = klass.getAnnotation(UtilCache.class);
         if (uc.clear()) {
-            if(annotation != null) {
+            if (annotation != null) {
                 new AnnotationFactory().annotatedWith(annotation).clearDirectory();
             }
             pokedex.put(uc.name(), new Goate());
@@ -196,6 +201,12 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
 //            GoateReflection gr = new GoateReflection();
             if (isType != null) {
                 name = isType.getTypeName();
+            } else {
+                if (obj instanceof String) {
+                    name = obj != null ? ("" + obj.hashCode()) : null;
+                } else {
+                    name = obj != null ? obj.getClass().getCanonicalName() : null;
+                }
             }
         }
         return name;
@@ -204,22 +215,30 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
     protected Object cached(Class<? extends java.lang.annotation.Annotation> util, Object[] args, Object obj, String id, Class isType) {
         Object utility = null;
         if (useCache) {
-            Goate cache = pokedex.get(region, null, Goate.class);
-            if (obj != null && cache != null) {
-                String _key = key(util, obj, id, isType);
-                Class c = cache.get(_key, null, Class.class);
-                if (c != null) {
-                    LOG.debug("util cache", "found a cached implementation: " + _key);
-                    AnnotationFactory af = new AnnotationFactory();
-                    af.constructorArgs(args);
-                    try {
-                        utility = af.constructor(null).build(c);
-                    } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                        LOG.warn("The class (" + c.getName() + ") could not be build from the util cache for some reason: " + e.getMessage(), e);
+            try {
+                if (pokedex.keys().contains(region)) {
+                    Goate cache = pokedex.get(region, "null::", Goate.class);
+                    if (obj != null && cache != null) {
+                        String _key = key(util, obj, id, isType);
+                        Class c = cache.get(_key, "null::", Class.class);
+                        if (c != null) {
+//                        LOG.debug("util cache", "found a cached implementation: " + _key);
+                            AnnotationFactory af = new AnnotationFactory();
+                            af.constructorArgs(args);
+                            try {
+                                utility = af.constructor(null).build(c);
+                            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+//                            LOG.warn("The class (" + c.getName() + ") could not be build from the util cache for some reason: " + e.getMessage(), e);
+                            }
+                        } else {
+//                        LOG.debug("util cache", "not found in cache: " + _key);
+                        }
+                    } else {
+//                    LOG.debug("util cache", "no cache yet for: " + region);
                     }
-                } else {
-                    LOG.debug("util cache", "not found in cache: " + _key);
                 }
+            } catch (Exception e) {
+                LOG.debug("cache not configure properly: " + e.getMessage());
             }
         }
         return utility;
@@ -242,7 +261,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
 
     protected boolean isDefault(Class c, Class def) {
         IsDefault d = (IsDefault) c.getAnnotation(IsDefault.class);
-        return d != null && !d.forType() && def == null;
+        return d != null && (d.forType() || def == null);
     }
 
     protected Object getUtility(Class c, Class[] _def, AnnotationFactory af, String isType, Class type, Object[] checkArgs) {
@@ -259,9 +278,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                 }
                 Object u = af.constructor(null).build(c);
                 if (check != null && Boolean.parseBoolean("" + check.invoke(u, checkArgs))) {
-                    if (d != null && d.forType()) {
-                        _def[0] = c;
-                    } else {
+                    if (d == null) {
                         utility = u;
 //                    break;
                     }
@@ -270,9 +287,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                 }
             } else {
                 if (checkType(c, type)) {
-                    if (d != null && d.forType()) {
-                        _def[0] = c;
-                    } else {
+                    if (d == null) {
                         utility = af.constructor(null).build(c);
 //                    break;
                     }
@@ -281,7 +296,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                 }
             }
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            LOG.debug("The class (" + c.getName() + ") did not have isType, cannot determine if that class is the correct type. " + e.getMessage(), e);
+            LOG.warn("The class (" + c.getName() + ") did not have isType, cannot determine if that class is the correct type. " + e.getMessage(), e);
         }
         return utility;
     }
@@ -304,30 +319,31 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         Map<String, Class> utils = af.doDefault().annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
         if (utils != null) {
             final Class[] _def = new Class[1];
-//            final Object[] _util = new Object[1];
-            _def[0] = null;
-//            _util[0] = null;
-
-//            if(utils.keySet().size() == 1){
-//                try {
-//                    utility = af.constructor(null).build(utils.get(utils.keySet().iterator().next()));
-//                } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
-//                    LOG.warn("uncached", "problem building utility: " + e.getMessage(), e);
-//                }
-//            }
-//            if(utility == null) {
-                Optional<String> opt = utils.keySet().stream().filter(key -> checkUtility(utils.get(key), _def, isType, af, type, checkArgs)).findFirst();
-                if (opt.isPresent()) {
-                    try {
-                        utility = af.constructor(null).build(utils.get(opt.get()));//af.constructor(null).build(c);;
-                    } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
-                        LOG.warn("uncached", "problem building utility: " + e.getMessage(), e);
+            if (type == null || NotFound.class.isAssignableFrom(type)) {
+                for (Map.Entry<String, Class> entry : utils.entrySet()) {
+                    //Cast Primitive to Nullable?
+                    if (!entry.getKey().startsWith("default")) {
+                        utility = getUtility(entry.getValue(), _def, af, isType, type, checkArgs);
+                        if (utility != null) {
+                            break;
+                        }
                     }
-                } else {
-                    LOG.debug("uncached", "failed to find the utility");
                 }
-//            }
-            def = _def[0];
+                def = (utils.containsKey(af.getDefaultName(type)) ? utils.get(af.getDefaultName(type)) : utils.get("default"));
+            } else {
+                def = utils.containsKey(type.getCanonicalName()) ? utils.get(type.getCanonicalName()) : (utils.containsKey(af.getDefaultName(type)) ? utils.get(af.getDefaultName(type)) : utils.get("default"));
+                if (def == null) {
+                    for (Map.Entry<String, Class> entry : utils.entrySet()) {
+                        if (!entry.getKey().startsWith("default")) {
+                            utility = getUtility(entry.getValue(), _def, af, isType, type, checkArgs);
+                            if (utility != null) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             /**
              for (String key : utils.keySet()) {
              Class c = Object.class;
@@ -392,7 +408,13 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                     LOG.warn("Problem instantiating the default utility (" + def.getName() + "): " + e.getMessage(), e);
                 }
             } else {
-                LOG.debug("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
+                LOG.warn("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
+                StringBuilder summary = new StringBuilder();
+                summary.append("\n\tsize: ").append(utils.size());
+                for (Map.Entry<String, Class> entry : utils.entrySet()) {
+                    summary.append("\n\t").append(entry.getKey()).append(":").append(entry.getValue().getCanonicalName());
+                }
+                LOG.warn("existing implementations: " + summary);
             }
         }
         return utility;

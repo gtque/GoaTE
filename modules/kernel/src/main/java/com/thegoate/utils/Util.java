@@ -25,32 +25,22 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-package com.thegoate.utils.fill.serialize.primitives;
+package com.thegoate.utils;
 
-import com.thegoate.utils.fill.serialize.CastUtil;
-import com.thegoate.utils.fill.serialize.GoateCastUtility;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.info.Info;
+import org.atteo.classindex.IndexAnnotated;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by Eric Angeli on 6/26/2018.
+ * Annotate something as a compare utility.
+ * Created by Eric Angeli on 5/5/2017.
  */
-@CastUtil(type = CastNullableFloat.class)
-public class CastNullableFloat extends GoateCastUtility {
-
-	public CastNullableFloat(Object value) {
-		super(value);
-	}
-
-	@Override
-	public <T> T cast(Class<T> type) {
-		Object t = null;
-		if (value != null) {
-			t = Float.parseFloat("" + value);
-		}
-		return (T) t;
-	}
-
-	@Override
-	public boolean isType(Object c) {
-		return c.equals(CastNullableFloat.class);
-	}
+@Retention(RetentionPolicy.RUNTIME)
+@GoateDescription(description = "simple type identifier")
+@Info(classifier = "util")
+public @interface Util {
+    Class type() default Object.class;
 }

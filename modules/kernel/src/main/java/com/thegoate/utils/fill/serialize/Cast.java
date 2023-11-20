@@ -50,7 +50,7 @@ public class Cast extends UnknownUtilType {
     private Field field;
     private Object container;
 
-    public Cast(Goate data, Class dataSource){
+    public Cast(Goate data, Class dataSource) {
         this.data = data;
         this.dataSource = dataSource;
     }
@@ -58,22 +58,22 @@ public class Cast extends UnknownUtilType {
     public <T> T cast(Object value, Class<T> type) throws IllegalAccessException, InstantiationException {
         Object object = null;
         GoateReflection gr = new GoateReflection();
-        if(gr.isPrimitive(type)){
+        if (gr.isPrimitive(type)) {
             object = buildFromCastUtil(type, value);
-        } else{
+        } else {
             GoatePojo goatePojo = type.getAnnotation(GoatePojo.class);
-            if(goatePojo!=null){
-                if(goatePojo.forceCast()) {
+            if (goatePojo != null) {
+                if (goatePojo.forceCast()) {
                     object = buildFromCastUtil(type, value);
                 } else {
                     DeSerializer serializer = new DeSerializer().data(data).from(dataSource);
                     object = serializer.build(type);
                 }
             } else {
-                if(type.equals(String.class)){
-                    if(value instanceof String) {
+                if (type.equals(String.class)) {
+                    if (value instanceof String) {
                         object = value;
-                    } else if(value == null){
+                    } else if (value == null) {
                         object = null;
                     } else {
                         object = new StringConverter().value(value).convert();
@@ -93,22 +93,23 @@ public class Cast extends UnknownUtilType {
                 }
             }
         }
-        return (T)object;
+        return (T) object;
     }
 
-    public Cast container(Object o){
+    public Cast container(Object o) {
         this.container = o;
         return this;
     }
-    public Cast field(Field field){
+
+    public Cast field(Field field) {
         this.field = field;
         return this;
     }
 
-    protected Class getType(Class type){
+    protected Class getType(Class type) {
         Class t = type;
-        if(type == TypeT.class){
-            if(container instanceof TypeT) {
+        if (type == TypeT.class) {
+            if (container instanceof TypeT) {
                 try {
 
                     Method get_type = container.getClass().getMethod("goateType", int.class);
@@ -118,26 +119,37 @@ public class Cast extends UnknownUtilType {
                 }
             }
             LOGGER.debug("found a generic type: " + type);
+        } else {
+            GoateReflection gr = new GoateReflection();
+            Class klass = gr.nullablePrimitiveType(t);
+            if (klass != null) {
+                t = klass;
+            } else {
+                klass = gr.nonPrimitiveType(t);
+                if (klass != null) {
+                    t = klass;
+                }
+            }
         }
         return t;
     }
 
-    protected Object buildFromCastUtil(Class type, Object value){
-        CastUtility caster = (CastUtility)buildUtil(getType(type), CastUtil.class, value);
-        if(caster==null){
-            LOGGER.error("Cast","Could not build: " + type.getName() +". You may need to implement a CastUtility to support that object type.");
-            throw new RuntimeException("Could not build: " + type.getName() +". You may need to implement a CastUtility to support that object type.");
+    protected Object buildFromCastUtil(Class type, Object value) {
+        CastUtility caster = (CastUtility) buildUtil(getType(type), CastUtil.class, value);
+        if (caster == null) {
+            LOGGER.error("Cast", "Could not build: " + type.getName() + ". You may need to implement a CastUtility to support that object type.");
+            throw new RuntimeException("Could not build: " + type.getName() + ". You may need to implement a CastUtility to support that object type.");
         }
-        LOGGER.debug("Cast","Cast utility found, building object.");
+        LOGGER.debug("Cast", "Cast utility found, building object.");
         caster.setData(data);
-        if(caster instanceof GoateCastUtility){
-            ((GoateCastUtility)caster).setContainer(container);
+        if (caster instanceof GoateCastUtility) {
+            ((GoateCastUtility) caster).setContainer(container);
         }
         return caster.dataSource(dataSource).field(field).cast(type);
     }
 
-    protected Constructor findConstructor(Class type, Object value){
-        Object[] asString = {""+value};
+    protected Constructor findConstructor(Class type, Object value) {
+        Object[] asString = {"" + value};
         Object[] selfie = {value};
         Object[] empty = {};
 
@@ -145,10 +157,10 @@ public class Cast extends UnknownUtilType {
 
         args = selfie;
         Constructor constructor = gr.findConstructor(type, selfie);
-        if(constructor==null){
+        if (constructor == null) {
             args = empty;
             constructor = gr.findConstructor(type, empty);
-            if(constructor==null){
+            if (constructor == null) {
                 args = asString;
                 constructor = gr.findConstructor(type, asString);
             }

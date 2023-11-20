@@ -28,6 +28,7 @@ package com.thegoate.rest.assured.utils.togoate;
 
 import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
+import com.thegoate.rest.assured.utils.type.RAResponseType;
 import com.thegoate.utils.togoate.ToGoate;
 import com.thegoate.utils.togoate.ToGoateUtil;
 import com.thegoate.utils.togoate.ToGoateUtility;
@@ -38,7 +39,7 @@ import io.restassured.response.Response;
  * Created by Eric Angeli on 3/1/2019.
  */
 @IsDefault(forType = true)
-@ToGoateUtil
+@ToGoateUtil(type = Response.class)
 public class RAResponseToGoate extends ToGoate implements ToGoateUtility {
 
     public RAResponseToGoate(Object val) {
