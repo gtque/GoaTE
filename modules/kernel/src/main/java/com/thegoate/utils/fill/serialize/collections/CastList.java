@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * Created by Eric Angeli on 6/27/2018.
  */
-@CastUtil
+@CastUtil(type = List.class)
 public class CastList extends CastCollection {
     public CastList(Object value) {
         super(value);

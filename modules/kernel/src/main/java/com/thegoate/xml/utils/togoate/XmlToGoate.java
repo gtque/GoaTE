@@ -40,7 +40,7 @@ import static com.thegoate.xml.XmlHelper.*;
  * Converts from json to goate.
  * Created by Eric Angeli on 5/19/2017.
  */
-@ToGoateUtil
+@ToGoateUtil(type = Document.class)
 public class XmlToGoate extends XmlUtil implements ToGoateUtility {
     Goate result;
     boolean autoIncrement = true;

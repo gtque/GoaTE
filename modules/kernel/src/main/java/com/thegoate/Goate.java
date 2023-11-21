@@ -207,7 +207,7 @@ public class Goate implements HealthMonitor, Diary, Cloneable {
 	public Object get(int index) {
 		Iterator<String> keys = data.keySet().iterator();
 		String key = "";
-		while (index >= 0) {
+		while (index >= 0 && keys.hasNext()) {
 			key = keys.next();
 			index--;
 		}

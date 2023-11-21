@@ -27,6 +27,7 @@
 package com.thegoate.utils.togoate;
 
 import com.thegoate.Goate;
+import com.thegoate.annotations.IsDefault;
 import com.thegoate.utils.Utility;
 
 import java.util.Arrays;
@@ -35,8 +36,8 @@ import java.util.Arrays;
  * Converts the given string to a goate collection.
  * If a string, assumes it is in a semicolon separated list of key=value pairs.
  */
-@ToGoateUtil()
-//@IsDefault
+@ToGoateUtil(type = String.class)
+@IsDefault(forType = true)
 public class StringToGoate implements ToGoateUtility {
 	Object takeActionOn;
 

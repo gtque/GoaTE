@@ -408,13 +408,13 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                     LOG.warn("Problem instantiating the default utility (" + def.getName() + "): " + e.getMessage(), e);
                 }
             } else {
-                LOG.warn("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
+                LOG.debug("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
                 StringBuilder summary = new StringBuilder();
                 summary.append("\n\tsize: ").append(utils.size());
                 for (Map.Entry<String, Class> entry : utils.entrySet()) {
                     summary.append("\n\t").append(entry.getKey()).append(":").append(entry.getValue().getCanonicalName());
                 }
-                LOG.warn("existing implementations: " + summary);
+                LOG.debug("existing implementations: " + summary);
             }
         }
         return utility;

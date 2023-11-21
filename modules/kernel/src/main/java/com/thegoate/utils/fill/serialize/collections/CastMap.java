@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * Created by Eric Angeli on 6/27/2018.
  */
-@CastUtil
+@CastUtil(type = Map.class)
 public class CastMap extends CastCollection {
 
 	public CastMap(Object value) {

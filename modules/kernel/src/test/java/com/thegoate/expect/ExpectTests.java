@@ -1488,12 +1488,12 @@ public class ExpectTests extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
     public void containsListInList() {
-        String json = "'content':[" +
+        String json = "[" +
                 "{'id':'1st'}," +
                 "{'id':'4th'}," +
                 "{'id':'1st'}," +
                 "{'id':'2nd'}," +
-                "{'id':'3rd'}" +
+                "{'id':'3rd'}," +
                 "{'id':'3rd'}" +
                 "]";
         List<String> expected = new ArrayList<>();

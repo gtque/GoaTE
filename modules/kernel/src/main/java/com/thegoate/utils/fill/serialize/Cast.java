@@ -138,7 +138,8 @@ public class Cast extends UnknownUtilType {
         CastUtility caster = (CastUtility) buildUtil(getType(type), CastUtil.class, value);
         if (caster == null) {
             LOGGER.error("Cast", "Could not build: " + type.getName() + ". You may need to implement a CastUtility to support that object type.");
-            throw new RuntimeException("Could not build: " + type.getName() + ". You may need to implement a CastUtility to support that object type.");
+            //throw new RuntimeException("Could not build: " + type.getName() + ". You may need to implement a CastUtility to support that object type.");
+            return null;
         }
         LOGGER.debug("Cast", "Cast utility found, building object.");
         caster.setData(data);

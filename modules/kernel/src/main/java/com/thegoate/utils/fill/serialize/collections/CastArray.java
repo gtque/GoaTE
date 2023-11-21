@@ -34,7 +34,7 @@ import java.lang.reflect.Array;
 /**
  * Created by Eric Angeli on 6/27/2018.
  */
-@CastUtil
+@CastUtil(type = Array.class)
 public class CastArray extends CastCollection {
 
     public CastArray(Object value){

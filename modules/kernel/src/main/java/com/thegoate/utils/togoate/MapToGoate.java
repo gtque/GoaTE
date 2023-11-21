@@ -11,7 +11,7 @@ import java.util.Map;
  * If a string, assumes it is in a semicolon separated list of key=value pairs.
  * Otherwise it will attempt to serialize it to a Goate collection using the default source.
  */
-@ToGoateUtil()
+@ToGoateUtil(type = Map.class)
 public class MapToGoate implements ToGoateUtility {
 	Object takeActionOn;
 

@@ -38,7 +38,7 @@ import org.json.JSONObject;
  * Converts from json to goate.
  * Created by Eric Angeli on 5/19/2017.
  */
-@ToGoateUtil
+@ToGoateUtil(type = JSONObject.class)
 public class JSONToGoate extends JsonUtil implements ToGoateUtility {
     Goate result;
     boolean autoIncrement = true;

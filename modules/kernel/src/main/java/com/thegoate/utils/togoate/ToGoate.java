@@ -29,8 +29,10 @@ package com.thegoate.utils.togoate;
 
 import com.thegoate.Goate;
 import com.thegoate.utils.UnknownUtilType;
+import com.thegoate.utils.compare.CompareUtil;
 import com.thegoate.utils.to.ToUtil;
 import com.thegoate.utils.to.ToUtility;
+import com.thegoate.utils.type.FindType;
 
 import java.util.Map;
 
@@ -67,7 +69,8 @@ public class ToGoate extends UnknownUtilType<ToGoate> implements ToGoateUtility,
         if(original instanceof Goate){
             result = (Goate)original;
         } else {
-            tool = (ToGoateUtility) buildUtil(original, ToGoateUtil.class);
+            Class type = new FindType().type(original);
+            tool = (ToGoateUtility) buildUtil(original, ToGoateUtil.class, original, null, null, type);//buildUtil(original, ToGoateUtil.class);
             if (tool != null) {
                 result = tool.autoIncrement(autoIncrement).convert();
             }
@@ -85,8 +88,7 @@ public class ToGoate extends UnknownUtilType<ToGoate> implements ToGoateUtility,
 
     @Override
     public boolean checkType(Class tool, Class type) {
-        //        CastUtil tu = (CastUtil) tool.getAnnotation(CastUtil.class);
-        //        return tu.type()!=null?(tu.type() == type):(type == null);
-        return Goate.class.equals(type);
+        ToGoateUtil tu = (ToGoateUtil) tool.getAnnotation(ToGoateUtil.class);
+        return tu.type() != null ? (tu.type() == type) : (type == null);
     }
 }

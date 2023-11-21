@@ -42,7 +42,7 @@ import java.util.Map;
 /**
  * Created by Eric Angeli on 12/6/2018.
  */
-@ToGoateUtil
+@ToGoateUtil(type = SheetUtils.class)
 public class SpreadSheetToGoate extends SpreadSheetUtil implements ToGoateUtility {
 
     boolean autoIncrement = false;
