@@ -27,6 +27,7 @@
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import com.thegoate.gradle.GoateGradleHelper
+
 buildscript {
     repositories {
         gradlePluginPortal()
@@ -59,9 +60,9 @@ if (javaVersion.contains(".")) {
 def majorVersion = 0
 def minorVersion = 15
 def vbase = "${majorVersion}.${minorVersion}.${javaVersion}"
-def buildDate = "" + (project.hasProperty("buildDate")?project.buildDate:sdf.format(new Date()))
-def v = "${vbase}." + (project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? buildDate : '0'):'0')
-def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : ('-'+project.release)) : '-SNAPSHOT'
+def buildDate = "" + (project.hasProperty("buildDate") ? project.buildDate : sdf.format(new Date()))
+def v = "${vbase}." + (project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? buildDate : '0') : '0')
+def release = project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? '' : ('-' + project.release)) : '-SNAPSHOT'
 def isNonStable = { String version ->
     def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
     def regex = /^[0-9,.v-]+(-r)?$/
@@ -84,7 +85,7 @@ allprojects {
     configurations {
         goatescala
     }
-    dependencies{
+    dependencies {
 //        goatescala "org.scala-lang:scala-compiler:2.13.5"
 //        goatescala "org.scala-lang:scala-library:2.13.5"
 //        goatescala "org.scala-lang:scala-reflect:2.13.5"
@@ -119,8 +120,8 @@ subprojects {
         annotations;
     }
     boolean oneOff = project.hasProperty("oneOff")
-    def projectJavaLabel = project.hasProperty("projectJavaLabel")?project.projectJavaLabel:"false"
-    def projectName = "${project.name}" + (Boolean.parseBoolean(""+projectJavaLabel)?javaVersion:"")
+    def projectJavaLabel = project.hasProperty("projectJavaLabel") ? project.projectJavaLabel : "false"
+    def projectName = "${project.name}" + (Boolean.parseBoolean("" + projectJavaLabel) ? javaVersion : "")
     projectName = projectName.replace(":", "").replace("module", "")
     apply plugin: 'java'
     apply plugin: 'java-library'
@@ -230,7 +231,7 @@ subprojects {
                         }
                     }
                     developers {
-                        developer{
+                        developer {
                             id = 'gtque'
                             name = 'Eric Angeli'
                         }
@@ -254,7 +255,7 @@ subprojects {
                 def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 authentication {
-                    basic(BasicAuthentication){
+                    basic(BasicAuthentication) {
                         credentials {
                             username = ossrhUsername
                             password = ossrhPassword
@@ -336,10 +337,10 @@ subprojects {
         archiveBaseName.set("${projectName}")
     }
 
-    javadocJar{
-        dependsOn alljavadocJar,groovydocJar
+    javadocJar {
+        dependsOn alljavadocJar, groovydocJar
         archiveClassifier.set('javadoc')
-        from groovydocJar.archiveFile,alljavadocJar.archiveFile
+        from groovydocJar.archiveFile, alljavadocJar.archiveFile
         archiveBaseName.set("${projectName}")
     }
     signing {
@@ -392,7 +393,7 @@ task jacocoMergedReport(type: JacocoReport) {
     }
 
     classDirectories.from = files(getJacocoClassDirs().collect {
-        fileTree(dir: it, exclude: ['com/**/gradle/**','com/**/performance/**','com/**/barn/idea/**'])
+        fileTree(dir: it, exclude: ['com/**/gradle/**', 'com/**/performance/**', 'com/**/barn/idea/**'])
     })
     sourceDirectories.from = getJacocoSrcDirs()
     executionData getJacocoExecFiles()
@@ -400,7 +401,7 @@ task jacocoMergedReport(type: JacocoReport) {
 }
 
 task testReport(type: TestReport) {
-    if(project.hasProperty("testReport")) {
+    if (project.hasProperty("testReport")) {
         subprojects {
             plugins.withType(JavaPlugin) {
                 test {
@@ -450,8 +451,10 @@ gradle.taskGraph.whenReady { taskGraph ->
 //}
 gradle.buildFinished { //when it finishes check if there are any failures and blow up
 
-    if (ext.testFailures > 0) {
-        //ant.fail("The build finished but ${ext.testFailures} tests failed - blowing up the build ! ")
+    if (project.hasProperty("testGroups")) {
+        if (ext.testFailures > 0) {
+            ant.fail("The build finished but ${ext.testFailures} tests failed - blowing up the build ! ")
+        }
     }
 
 }
