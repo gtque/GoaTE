@@ -36,6 +36,8 @@ import com.thegoate.utils.get.NotFound;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,12 +53,18 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
     protected final BleatBox LOG = BleatFactory.getLogger(getClass());
     protected Goate health = new Goate();
     protected Goate data = null;
-    protected static volatile Goate pokedex = new Goate();
+    protected volatile static Goate pokedex = new Goate();
     protected String region = "kanto";
     protected boolean resetCache = false;
     protected boolean useCache = false;
     protected boolean nameIsHash = false;
     protected Class declaredType = null;
+
+    public static void clearShadows(){
+        synchronized (pokedex) {
+            pokedex.dropShadows();
+        }
+    }
 
     public UnknownUtilType() {
         UtilCache uc = getClass().getAnnotation(UtilCache.class);
@@ -203,7 +211,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                 name = isType.getTypeName();
             } else {
                 if (obj instanceof String) {
-                    name = obj != null ? ("" + obj.hashCode()) : null;
+                    name = obj != null ? ("_shadow_ban_:" + obj.hashCode()) : null;
                 } else {
                     name = obj != null ? obj.getClass().getCanonicalName() : null;
                 }

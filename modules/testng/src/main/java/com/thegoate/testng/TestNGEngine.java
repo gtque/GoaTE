@@ -47,6 +47,7 @@ import com.thegoate.utils.fill.serialize.AllOrderedSource;
 import com.thegoate.utils.fill.serialize.GoateSource;
 import com.thegoate.utils.fill.serialize.GoateSourceLister;
 import com.thegoate.utils.get.Get;
+import com.thegoate.utils.type.FindType;
 import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
@@ -127,7 +128,6 @@ public abstract class TestNGEngine implements ITest, TestNG {
         return (!test.dataProvider().isEmpty()) || (gp);
     }
 
-
     @BeforeMethod(alwaysRun = true, dependsOnMethods = "initGoate")
     @Override
     public void startUp(Method method, ITestResult testResult) {
@@ -185,6 +185,9 @@ public abstract class TestNGEngine implements ITest, TestNG {
             Stopwatch.global.stop(data.get("lap", Thread.currentThread().getName(), String.class));
         }
         scrubber.scrub();
+        FindType.ban();
+        UnknownUtilType.clearShadows();
+        data.dropShadows();
         String endMessage = "\n" +
                 "*****************************************************************\n" +
                 "*\t" + getTestName() + "\t*\n";

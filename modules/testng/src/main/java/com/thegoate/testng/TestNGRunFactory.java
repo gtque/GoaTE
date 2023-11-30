@@ -31,6 +31,7 @@ import com.thegoate.data.DataLoader;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.logging.BleatFactory;
+import com.thegoate.statics.ResetStatic;
 import com.thegoate.utils.GoateUtils;
 import org.testng.annotations.Test;
 
@@ -48,10 +49,10 @@ import static com.thegoate.dsl.words.EutConfigDSL.eut;
  * Loads the run data and builds the runs.
  * Created by Eric Angeli on 5/11/2017.
  */
-public class TestNGRunFactory {
+public class TestNGRunFactory implements ResetStatic {
     static final BleatBox LOG = BleatFactory.getLogger(TestNGRunFactory.class);
     public static final boolean runCacheEnabled = eut("run.cache.enabled", true, Boolean.class);
-    public static final Map<String, Object[][]> providerCache = new ConcurrentHashMap<>();
+    private volatile static Map<String, Object[][]> providerCache = new ConcurrentHashMap<>();
 
     public static String providerCacheDefaultId(GoateProvider gp) {
         return gp != null ? (gp.name() + ":") : ("" + System.nanoTime());
@@ -87,7 +88,7 @@ public class TestNGRunFactory {
             LOG.debug("test is being excluded: " + excludeMessage);
         } else {
             String providerCacheId = provider != null ? (provider.name() + ":" + provider.nickName()) : "";
-            if (!runCacheEnabled || (provider != null && !providerCache.containsKey(providerCacheId)) || provider == null) {
+            if (!runCacheEnabled || (provider != null && !getProviderCache().containsKey(providerCacheId)) || provider == null) {
                 if (runData != null) {
                     for (String key : runData.keys()) {
                         List<Goate> list = ((DataLoader) runData.get(key)).load();
@@ -128,9 +129,9 @@ public class TestNGRunFactory {
                                 data = new Goate();
                             }
                             data.merge(constants, false);
-                            if(data != null) {
+                            if (data != null) {
                                 String theRunGroups = data.get("groups", null, String.class);
-                                if (constantGroups != null  && !constantGroups.isEmpty()) {
+                                if (constantGroups != null && !constantGroups.isEmpty()) {
                                     if (theRunGroups == null) {
                                         data.put("groups", constantGroups);
                                     } else {
@@ -164,7 +165,7 @@ public class TestNGRunFactory {
 //                        i = runs.indexOf(data);
                             data = new Goate();
                         }
-                        if(data != null) {
+                        if (data != null) {
                             String theRunGroups = data.get("groups", null, String.class);
                             if (constantGroups != null && !constantGroups.isEmpty()) {
                                 if (theRunGroups == null) {
@@ -219,20 +220,20 @@ public class TestNGRunFactory {
                     }
                 }
                 if (!providerCacheId.isEmpty()) {
-                    providerCache.put(providerCacheId, rawClone);
+                    getProviderCache().put(providerCacheId, rawClone);
                     alreadyCached = false;
                 }
             }
             if (runCacheEnabled && provider != null && alreadyCached) {
                 if (provider.nickName().isEmpty()) {// !providerCache.containsKey(providerCacheId)){
-                    Object[][] oData = providerCache.get(providerCacheId);
+                    Object[][] oData = getProviderCache().get(providerCacheId);
                     rawData = cloneRun(oData);
-                } else if (!providerCache.containsKey(providerCacheId)) {
-                    Object[][] oData = providerCache.get(provider.name() + ":");
+                } else if (!getProviderCache().containsKey(providerCacheId)) {
+                    Object[][] oData = getProviderCache().get(provider.name() + ":");
                     rawData = cloneRun(oData);
-                    providerCache.put(providerCacheId, rawData);
+                    getProviderCache().put(providerCacheId, rawData);
                 } else {
-                    rawData = providerCache.get(providerCacheId);
+                    rawData = getProviderCache().get(providerCacheId);
                 }
             }
         }
@@ -391,5 +392,18 @@ public class TestNGRunFactory {
             }
         }
         return filterRunGroups(filtered);
+    }
+
+    public static Map<String, Object[][]> getProviderCache() {
+        return providerCache;
+    }
+
+    public static void setProviderCache(Map<String, Object[][]> providerCache) {
+        TestNGRunFactory.providerCache = providerCache;
+    }
+
+    @Override
+    public void resetStatics() {
+        TestNGRunFactory.providerCache = new ConcurrentHashMap<>();
     }
 }

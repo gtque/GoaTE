@@ -464,6 +464,8 @@ public class GoateReflection {
         Object o = null;
         if (klass.equals(String.class)) {
             o = "";
+        } else if (isIntegerType(klass)) {
+            o = 0;
         } else if (isByteType(klass)) {
             o = Byte.parseByte("0");
         } else if (isShortType(klass)) {
@@ -472,9 +474,7 @@ public class GoateReflection {
             o = 0D;
         } else if (isFloatType(klass)) {
             o = 0F;
-        } else if (isIntegerType(klass)) {
-            o = 0;
-        } else if (isLongType(klass)) {
+        }  else if (isLongType(klass)) {
             o = 0L;
         } else if (isCharacterType(klass)) {
             o = 'A';
@@ -518,13 +518,13 @@ public class GoateReflection {
         if (o instanceof String) {
             if (("" + o).matches("[truefalsTRUEFALS$.,\\-+0-9]+") || ("" + o).length() < 2) {
                 try {
-                    parseLong(o);
-                    klass = Long.class;
-                } catch (Exception peLong) {
+                    parseInt(o);
+                    klass = Integer.class;
+                } catch (Exception peInteger) {
                     try {
-                        parseInt(o);
-                        klass = Integer.class;
-                    } catch (Exception peInteger) {
+                        parseLong(o);
+                        klass = Long.class;
+                    } catch (Exception peLong) {
                         try {
                             parseShort(o);
                             klass = Short.class;
@@ -561,8 +561,10 @@ public class GoateReflection {
                 }
             }
         } else {
-            if (isPrimitive(o.getClass()) || o instanceof Number) {
+            if (o!=null && (isPrimitive(o.getClass()) || o instanceof Number)) {
                 klass = o.getClass();
+            } else if(o == null) {
+                klass = Object.class;
             }
         }
         return klass;

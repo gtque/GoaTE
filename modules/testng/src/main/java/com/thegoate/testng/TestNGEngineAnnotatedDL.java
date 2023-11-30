@@ -62,7 +62,7 @@ public class TestNGEngineAnnotatedDL extends TestNGEngine {
         AnnotationFactory af = new AnnotationFactory();
         GoateProvider gp = getClass().getAnnotation(GoateProvider.class);
         this.provider = gp;
-        if(gp!=null && (!runCacheEnabled || (runCacheEnabled && !providerCache.containsKey(providerCacheDefaultId(gp))))){
+        if(gp!=null && (!runCacheEnabled || (runCacheEnabled && !getProviderCache().containsKey(providerCacheDefaultId(gp))))){
             try {
                 DLProvider provider = (DLProvider) af.find(gp.name()).annotatedWith(GoateDLP.class)
                         .using(GoateDLP.class.getMethod("name"))

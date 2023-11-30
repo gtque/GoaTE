@@ -117,7 +117,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
     protected void buildDataLoaders(Goate rdl, Goate cdl, Method method) {
         GoateProvider gp = method.getAnnotation(GoateProvider.class);
         this.provider = gp;
-        if (gp != null && (!runCacheEnabled || (runCacheEnabled && !providerCache.containsKey(providerCacheDefaultId(gp))))) {
+        if (gp != null && (!runCacheEnabled || (runCacheEnabled && !getProviderCache().containsKey(providerCacheDefaultId(gp))))) {
             try {
                 AnnotationFactory af = new AnnotationFactory();
                 DLProvider dlProvider = (DLProvider) af.find(gp.name()).annotatedWith(GoateDLP.class)

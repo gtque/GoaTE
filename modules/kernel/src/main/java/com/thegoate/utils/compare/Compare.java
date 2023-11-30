@@ -87,7 +87,7 @@ public class Compare extends UnknownUtilType implements CompareUtility {
         CompareUtility tool = lookupTool();
         try {
             if (tool != null) {
-                result = tool.evaluate();//step into evaluate here to debug the comparator implementation
+                 result = tool.evaluate();//step into evaluate here to debug the comparator implementation
             }
             if (!result) {
                 if(tool != null) {
