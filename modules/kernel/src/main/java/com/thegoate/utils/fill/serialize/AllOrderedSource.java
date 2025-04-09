@@ -27,7 +27,6 @@
 package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.annotations.GoateDescription;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,7 +36,6 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "used to treat all GoateSource annotations as a possible mapping, checking them in priority order.")
-@IndexAnnotated
 @GoateSourceDef(id = "default")
 public @interface AllOrderedSource {
 }

@@ -28,8 +28,8 @@
 package com.thegoate.statics;
 
 import com.thegoate.annotations.GoateDescription;
+import com.thegoate.annotations.Scan;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,6 +40,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Used to indicate if there are any static variables that have to be reset, especially between test execution.")
 @Info
-@IndexAnnotated
+@Scan
 public @interface ResetStatics {
 }

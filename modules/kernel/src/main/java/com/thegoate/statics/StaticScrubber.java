@@ -16,7 +16,7 @@ public class StaticScrubber {
     public void scrub(){
         BleatBox LOG = BleatFactory.getLogger(getClass());
         AnnotationFactory af = new AnnotationFactory();
-        Map<String, Class> scrubbers = af.annotatedWith(ResetStatics.class).getDirectory(ResetStatics.class.getCanonicalName());
+        Map<String, Class<?>> scrubbers = af.annotatedWith(ResetStatics.class).getDirectory(ResetStatics.class.getCanonicalName());
         for(String key:scrubbers.keySet()){
             Class c = scrubbers.get(key);
             try{

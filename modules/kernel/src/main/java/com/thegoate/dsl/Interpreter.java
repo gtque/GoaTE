@@ -47,7 +47,7 @@ public class Interpreter {
     BleatBox LOG = BleatFactory.getLogger(getClass());
     static BleatBox SLOG = BleatFactory.getLogger(Interpreter.class);
     Goate data;
-    static final Map<String, Class> dictionary = initDictionary();
+    static final Map<String, Class<?>> dictionary = initDictionary();
 
     public Interpreter(Goate data) {
         this.data = data;
@@ -108,12 +108,12 @@ public class Interpreter {
      * The last instance of a word wins, ie there will only be one version of a word in the dictionary
      * which may produce unexpected results if more than one uses the same word.
      */
-    protected static Map<String, Class> initDictionary() {
-        Map<String, Class> dictionary = null;
+    protected static Map<String, Class<?>> initDictionary() {
+        Map<String, Class<?>> dictionary = null;
         try {
-            if (dictionary == null) {
+//            if (dictionary == null) {
                 new AnnotationFactory().using(GoateDSL.class.getMethod("word")).doDefault().annotatedWith(GoateDSL.class).buildDirectory();
-            }
+//            }
             dictionary = AnnotationFactory.directory.get(GoateDSL.class.getCanonicalName());
         } catch (Throwable e) {
             SLOG.error("Problem initializing dsl: " + e.getMessage(), e);
@@ -121,7 +121,7 @@ public class Interpreter {
         return dictionary;
     }
 
-    public Map<String,Class> getDictionary(){
+    public Map<String,Class<?>> getDictionary(){
         return dictionary;
     }
 }

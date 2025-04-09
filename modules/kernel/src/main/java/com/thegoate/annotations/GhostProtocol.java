@@ -28,7 +28,6 @@
 package com.thegoate.annotations;
 
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -42,7 +41,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Add a list of ghost data, aka meta data, to be stored and accessed by goate, but that you don't want to be part of the actual data collection.")
 @Info
-@IndexAnnotated
+@Scan
 public @interface GhostProtocol {
     String[] ghosts() default {};
 }

@@ -44,8 +44,8 @@ public class BleatFactory {
     protected static Logger LOG = LoggerFactory.getLogger(BleatFactory.class);//don't want to use self just in case.
     public static BleatBox getLogger(Class logFromClass){
         BleatBox bb = null;
-        AnnotationFactory af = new AnnotationFactory().doDefault().annotatedWith(Bleat.class).buildDirectory();
-        Map<String, Class> dir = af.getDirectory(Bleat.class.getCanonicalName());
+        AnnotationFactory af = new AnnotationFactory(Bleat.class).doDefault().annotatedWith(Bleat.class).buildDirectory();
+        Map<String, Class<?>> dir = af.getDirectory(Bleat.class.getCanonicalName());
         Class def = dir.get("default");
         Class logger = null;
         for(String c:dir.keySet()){

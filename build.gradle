@@ -58,7 +58,7 @@ if (javaVersion.contains(".")) {
 }
 
 def majorVersion = 0
-def minorVersion = 15
+def minorVersion = 16
 def vbase = "${majorVersion}.${minorVersion}.${javaVersion}"
 def buildDate = "" + (project.hasProperty("buildDate") ? project.buildDate : sdf.format(new Date()))
 def v = "${vbase}." + (project.hasProperty("release") ? (project.release.equals("final") | project.release.equals("release") ? buildDate : '0') : '0')
@@ -148,8 +148,6 @@ subprojects {
         testImplementation 'ch.qos.logback:logback-access:1.2.11'
         testImplementation 'ch.qos.logback:logback-core:1.2.11'
         testImplementation 'org.codehaus.janino:janino:3.1.8'
-        annotationProcessor 'org.atteo.classindex:classindex:3.13'
-        testAnnotationProcessor 'org.atteo.classindex:classindex:3.13'
     }
 
     jar.archiveBaseName = projectName

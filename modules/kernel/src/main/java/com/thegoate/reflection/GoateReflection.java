@@ -47,8 +47,6 @@ import java.util.*;
  */
 public class GoateReflection {
 
-//	BleatBox LOG = BleatFactory.getLogger(getClass());
-
     public Object cloneValue(Object value) throws InvocationTargetException, IllegalAccessException {
         Object clone = value;
 
@@ -474,7 +472,7 @@ public class GoateReflection {
             o = 0D;
         } else if (isFloatType(klass)) {
             o = 0F;
-        }  else if (isLongType(klass)) {
+        } else if (isLongType(klass)) {
             o = 0L;
         } else if (isCharacterType(klass)) {
             o = 'A';
@@ -511,6 +509,65 @@ public class GoateReflection {
             }
         }
         return type;
+    }
+
+    public <T> T parseToPrimitive(Object o, Class<T> type) {
+        T parsedValue = null;
+        if (o instanceof String) {
+            if(type.equals(String.class)) {
+                parsedValue = (T) ("" + o);
+            } else if (isIntegerType(type)) {
+                try {
+                    parsedValue = (T) Integer.valueOf("" + o);
+                } catch (Exception peInteger) {
+                    //do nothing, it is already null.
+                }
+            } else if (isLongType(type)) {
+                try {
+                    parsedValue = (T) Long.valueOf("" + o);
+                } catch (Exception peLong) {
+                    //do nothing, it is already null.
+                }
+            } else if (isShortType(type)) {
+                try {
+                    parsedValue = (T) Short.valueOf("" + o);
+                } catch (Exception peShort) {
+                    //do nothing, it is already null.
+                }
+            } else if (isFloat(type)) {
+                try {
+                    parsedValue = (T) Float.valueOf("" + o);
+                } catch (Exception peFloat) {
+                    //do nothing, it is already null.
+                }
+            } else if (isDoubleType(type)) {
+                try {
+                    parsedValue = (T) Double.valueOf("" + o);
+                } catch (Exception peDouble) {
+                    //do nothing, it is already null.
+                }
+            } else if (isCharacterType(type)) {
+                try {
+                    parsedValue = (T) Character.valueOf(("" + o).charAt(0));
+                } catch (Exception pe) {
+                    //do nothing, it is already null.
+                }
+            } else if (isByteType(type)) {
+                try {
+                    parsedValue = (T) Byte.valueOf("" + o);
+                } catch (Exception peByte) {
+                    //do nothing, it is already null.
+                }
+            } else if (isBooleanType(type)) {
+                try {
+                    parsedValue = (T) Boolean.valueOf("" + o);
+                } catch (Exception peBoolean) {
+                    //do nothing, it is already null.
+                }
+
+            }
+        }
+        return parsedValue;
     }
 
     public Class primitiveType(Object o) {
@@ -561,9 +618,9 @@ public class GoateReflection {
                 }
             }
         } else {
-            if (o!=null && (isPrimitive(o.getClass()) || o instanceof Number)) {
+            if (o != null && (isPrimitive(o.getClass()) || o instanceof Number)) {
                 klass = o.getClass();
-            } else if(o == null) {
+            } else if (o == null) {
                 klass = Object.class;
             }
         }

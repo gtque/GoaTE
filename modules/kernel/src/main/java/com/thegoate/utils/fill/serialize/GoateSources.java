@@ -28,7 +28,6 @@ package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,9 +36,8 @@ import java.lang.annotation.RetentionPolicy;
  * Created by Eric Angeli on 6/26/2018.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@GoateDescription(description = "Allows for staking of GoateSource annotations to specify more than one source mapping for a field in a pojo.")
+@GoateDescription(description = "Allows for stacking of GoateSource annotations to specify more than one source mapping for a field in a pojo.")
 @Info
-@IndexAnnotated
 public @interface GoateSources {
     GoateSource[] value();
 }

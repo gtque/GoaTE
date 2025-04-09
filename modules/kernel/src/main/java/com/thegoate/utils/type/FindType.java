@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Eric Angeli on 7/6/2020.
  */
 public class FindType extends UnknownUtilType implements TypeUtility {
-    private static volatile Map<String, Class> typeList = new ConcurrentHashMap<>();
+    private static volatile Map<String, Class<?>> typeList = new ConcurrentHashMap<>();
     private static volatile List<String> shadows = new ArrayList<>();
 
     public static void ban() {

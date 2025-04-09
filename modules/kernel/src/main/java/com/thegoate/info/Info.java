@@ -28,7 +28,7 @@
 package com.thegoate.info;
 
 import com.thegoate.annotations.GoateDescription;
-import org.atteo.classindex.IndexAnnotated;
+import com.thegoate.annotations.Scan;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -41,7 +41,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Annotate GoaTE annotation with @Info to automatically pick it up in the encyclopedia.")
 @Info(classifier = "classifier")
-@IndexAnnotated
+@Scan
 public @interface Info {
     String classifier() default "";
     String[] tags() default {};

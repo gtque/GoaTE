@@ -27,8 +27,8 @@
 package com.thegoate.logging;
 
 import com.thegoate.annotations.GoateDescription;
+import com.thegoate.annotations.Scan;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -42,6 +42,6 @@ import java.lang.annotation.RetentionPolicy;
         "There should only be one bleatbox implementation in your class path. " +
         "Otherwise there is no guarantee which one will be used.")
 @Info
-@IndexAnnotated
+@Scan
 public @interface Bleat {
 }

@@ -44,6 +44,11 @@ import static org.testng.Assert.assertNotNull;
 public class AnnotationTests {
 
     @Test(groups = {"unit"})
+    public void classScannerTest() {
+        AnnotationScanner.getAnnotations();
+    }
+
+    @Test(groups = {"unit"})
     public void simpleAnnotatedTask() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         AnnotationFactory af = new AnnotationFactory()
                 .annotatedWith(GoateTaskContainer.class)

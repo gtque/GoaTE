@@ -324,11 +324,11 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
         Class def = null;
         AnnotationFactory af = new AnnotationFactory();
         af.constructorArgs(args);
-        Map<String, Class> utils = af.doDefault().annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
+        Map<String, Class<?>> utils = af.doDefault().annotatedWith(util).getDirectory(util.getCanonicalName(), id, identifier);
         if (utils != null) {
             final Class[] _def = new Class[1];
             if (type == null || NotFound.class.isAssignableFrom(type)) {
-                for (Map.Entry<String, Class> entry : utils.entrySet()) {
+                for (Map.Entry<String, Class<?>> entry : utils.entrySet()) {
                     //Cast Primitive to Nullable?
                     if (!entry.getKey().startsWith("default")) {
                         utility = getUtility(entry.getValue(), _def, af, isType, type, checkArgs);
@@ -341,7 +341,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
             } else {
                 def = utils.containsKey(type.getCanonicalName()) ? utils.get(type.getCanonicalName()) : (utils.containsKey(af.getDefaultName(type)) ? utils.get(af.getDefaultName(type)) : utils.get("default"));
                 if (def == null) {
-                    for (Map.Entry<String, Class> entry : utils.entrySet()) {
+                    for (Map.Entry<String, Class<?>> entry : utils.entrySet()) {
                         if (!entry.getKey().startsWith("default")) {
                             utility = getUtility(entry.getValue(), _def, af, isType, type, checkArgs);
                             if (utility != null) {
@@ -419,7 +419,7 @@ public abstract class UnknownUtilType<T extends UnknownUtilType> implements Util
                 LOG.debug("no specific utility found, and no default implementation detected either: " + util.getCanonicalName() + ":" + id + ":" + (identifier != null ? identifier.getName() : null));
                 StringBuilder summary = new StringBuilder();
                 summary.append("\n\tsize: ").append(utils.size());
-                for (Map.Entry<String, Class> entry : utils.entrySet()) {
+                for (Map.Entry<String, Class<?>> entry : utils.entrySet()) {
                     summary.append("\n\t").append(entry.getKey()).append(":").append(entry.getValue().getCanonicalName());
                 }
                 LOG.debug("existing implementations: " + summary);

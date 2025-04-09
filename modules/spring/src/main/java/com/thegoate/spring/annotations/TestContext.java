@@ -29,7 +29,6 @@ package com.thegoate.spring.annotations;
 
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -41,7 +40,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Sets the application context to use for spring testing.")
 @Info
-@IndexAnnotated
 public @interface TestContext {
     Class testContext();
 }

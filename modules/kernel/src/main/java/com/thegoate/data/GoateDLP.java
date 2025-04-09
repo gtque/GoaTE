@@ -27,8 +27,8 @@
 package com.thegoate.data;
 
 import com.thegoate.annotations.GoateDescription;
+import com.thegoate.annotations.Scan;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,7 +40,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Identifies a data loader provider.")
 @Info(classifier = "name")
-@IndexAnnotated
 public @interface GoateDLP {
+    @Scan
     String name();
 }

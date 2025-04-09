@@ -27,8 +27,8 @@
 package com.thegoate.utils.fill.serialize.string;
 
 import com.thegoate.annotations.GoateDescription;
+import com.thegoate.annotations.Scan;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,6 +39,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Used to identify string converter implementations.")
 @Info
-@IndexAnnotated
+@Scan
 public @interface StringConverterUtil {
 }

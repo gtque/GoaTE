@@ -40,9 +40,9 @@ import java.util.TreeMap;
 public class GoateDictionary {
 
     public static void main(String[] args){
-        Map<String, Class> dictionary = new TreeMap<>(new Interpreter(new Goate()).getDictionary());
+        Map<String, Class<?>> dictionary = new TreeMap<>(new Interpreter(new Goate()).getDictionary());
         StringBuilder book = new StringBuilder("");
-        for(Map.Entry<String,Class> entry:dictionary.entrySet()){
+        for(Map.Entry<String,Class<?>> entry:dictionary.entrySet()){
             GoateDescription description = (GoateDescription)entry.getValue().getAnnotation(GoateDescription.class);
             book.append(entry.getKey()).append(":: ");
             if(description!=null){

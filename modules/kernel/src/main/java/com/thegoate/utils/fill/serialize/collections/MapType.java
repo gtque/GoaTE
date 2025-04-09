@@ -28,7 +28,6 @@ package com.thegoate.utils.fill.serialize.collections;
 
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,7 +38,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Defines the object type for the value of a map in a pojo.")
 @Info
-@IndexAnnotated
 public @interface MapType {
     Class type();
 }

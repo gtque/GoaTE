@@ -1,4 +1,4 @@
-package com.goate.selenium;
+package com.thegoate.selenium;
 
 public enum Browser {
 	CHROME("chrome"),

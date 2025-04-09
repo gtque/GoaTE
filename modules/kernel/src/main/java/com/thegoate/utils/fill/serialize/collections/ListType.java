@@ -28,7 +28,6 @@ package com.thegoate.utils.fill.serialize.collections;
 
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -41,7 +40,6 @@ import java.lang.annotation.RetentionPolicy;
 @GoateDescription(description = "Used for identifying a more explicit list implementation in a pojo.")
 @Info
 @Repeatable(ListTypes.class)
-@IndexAnnotated
 public @interface ListType {
     Class type();
     int index() default 0;

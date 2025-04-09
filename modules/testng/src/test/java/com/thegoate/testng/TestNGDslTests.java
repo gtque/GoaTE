@@ -1,9 +1,16 @@
 package com.thegoate.testng;
 
+import com.thegoate.annotations.AnnotationScanner;
 import com.thegoate.expect.Expectation;
+import com.thegoate.xml.utils.type.XmlType;
 import org.testng.annotations.Test;
 
 public class TestNGDslTests extends TestNGEngineMethodDL {
+
+    @Test(groups = {"unit"})
+    public void classScannerTest2() {
+        AnnotationScanner.getAnnotations();
+    }
 
     @Test(groups = {"unit"})
     public void getClassName() {

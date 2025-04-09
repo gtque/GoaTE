@@ -92,7 +92,7 @@ public class GoateEncyclopedia {
     }
 
     public static void main(String[] args){
-        //Map<String, Class> dictionary = new TreeMap<>(new Interpreter(new Goate()).getDictionary());
+        //Map<String, Class<?>> dictionary = new TreeMap<>(new Interpreter(new Goate()).getDictionary());
         GoateEncyclopedia ged = new GoateEncyclopedia();
         ged.buildIndex();
         StringBuilder book = new StringBuilder("");

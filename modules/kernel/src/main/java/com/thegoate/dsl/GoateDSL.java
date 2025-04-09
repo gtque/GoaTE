@@ -28,8 +28,8 @@
 package com.thegoate.dsl;
 
 import com.thegoate.annotations.GoateDescription;
+import com.thegoate.annotations.Scan;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,7 +40,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Used to define a new word in the GoaTE DSL.")
 @Info(classifier = "word")
-@IndexAnnotated
+@Scan
 public @interface GoateDSL {
     String word();
 }

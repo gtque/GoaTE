@@ -28,7 +28,6 @@ package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -40,7 +39,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Identifies a variable as using a generic type, can specify the index if more than one generic type.")
 @Info()
-@IndexAnnotated
 @Inherited
 public @interface Generic {
 	int index() default 0;

@@ -111,6 +111,10 @@ public class EutConfigDSL extends DSL {
     public Object evaluate(Goate data) {
         if(data.get("_goate_:eutConfig")!=null){
             eut = data.get("_goate_:eutConfig", eut, Goate.class);
+        } else {
+            if(eut == null){
+                eut = new Goate();
+            }
         }
         eut.put("_init_", true);
         if(!loaded) {

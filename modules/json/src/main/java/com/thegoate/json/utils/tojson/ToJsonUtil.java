@@ -28,8 +28,8 @@
 package com.thegoate.json.utils.tojson;
 
 import com.thegoate.annotations.GoateDescription;
+import com.thegoate.annotations.Scan;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -41,6 +41,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Identifies a ToJson utility")
 @Info
-@IndexAnnotated(storeJavadoc = false)
+@Scan
 public @interface ToJsonUtil {
 }

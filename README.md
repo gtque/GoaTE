@@ -8,5 +8,11 @@ GoaTE follows the MIT License and we try to make sure we are in line with any li
 <br/>
 ./gradlew -x gradle:publish publish -Prelease=final
 ./gradlew clean test testReport -PtestGroups=unit,api,ui,webui
-
+./gradlew jacocoMergedReport
 Good Luck.
+
+ToDo:
+* specify packages to scan
+* completely remove org.atteo dependency
+* example project using dependency jars
+  * make sure tests and annotation factory still work.

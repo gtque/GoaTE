@@ -34,8 +34,6 @@ import com.thegoate.utils.file.Copy;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
@@ -46,77 +44,81 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by gtque on 5/3/2017.
  */
 public class GoateUtils {
-    static final BleatBox LOG = BleatFactory.getLogger(GoateUtils.class);
     static final Map<String, String> secretEnv = new ConcurrentHashMap<>();
+//    static final BleatBox LOG = BleatFactory.getLogger(GoateUtils.class);
 
-    public static Object getProperty(String key){
+    public static Object getProperty(String key) {
         return getProperty(key, null);
     }
-    public static Object getProperty(String key, Object def){
-        return new Goate().get(key,def);
+
+    public static Object getProperty(String key, Object def) {
+        return new Goate().get(key, def);
     }
 
-    public static void sleep(long sleepInMillis){
-        sleep(sleepInMillis, LOG);
+    public static void sleep(long sleepInMillis) {
+        sleep(sleepInMillis, null);
     }
 
-    public static void sleep(long sleepInMillis, BleatBox logger){
-        try{
+    public static void sleep(long sleepInMillis, BleatBox logger) {
+        try {
             Thread.sleep(sleepInMillis);
         } catch (InterruptedException e) {
-            logger.warn("Goate Sleep Util","problem sleeping: " + e.getMessage());
+            if(logger!=null) {
+                logger.warn("Goate Sleep Util", "problem sleeping: " + e.getMessage());
+            }
             Thread.currentThread().interrupt();
         }
     }
 
-    public static String getFilePath(String file){
+    public static String getFilePath(String file) {
         return getFilePath(file, false, false);
     }
 
-    public static boolean fileExists(String file){
+    public static boolean fileExists(String file) {
         return new File(getFilePath(file)).exists();
     }
 
-    public static String moveUpDir(String fileName){
-        while(fileName.contains("../")){
-            String temp = fileName.substring(0,fileName.indexOf("../"));
-            if(temp.endsWith("/")){
-                temp = temp.substring(0,temp.length()-1);
+    public static String moveUpDir(String fileName) {
+        while (fileName.contains("../")) {
+            String temp = fileName.substring(0, fileName.indexOf("../"));
+            if (temp.endsWith("/")) {
+                temp = temp.substring(0, temp.length() - 1);
             }
             int upFolderIndex = temp.lastIndexOf("/");
-            if(upFolderIndex>0){
-                temp = temp.substring(0,upFolderIndex);
+            if (upFolderIndex > 0) {
+                temp = temp.substring(0, upFolderIndex);
             }
-            fileName = temp + fileName.substring(fileName.indexOf("../")+2);
+            fileName = temp + fileName.substring(fileName.indexOf("../") + 2);
 
         }
         return fileName;
     }
-    public static String getFilePath(String fileName,boolean leaveInJar, boolean force) {
-        if (fileName.indexOf("/") != 0&&fileName.indexOf("\\")!=0)
-            fileName = "/"+fileName;
+
+    public static String getFilePath(String fileName, boolean leaveInJar, boolean force) {
+        if (fileName.indexOf("/") != 0 && fileName.indexOf("\\") != 0)
+            fileName = "/" + fileName;
 
         fileName = moveUpDir(fileName);
 
         String path = System.getProperty("user.dir") + fileName;
 //        LOG.debug("checking path: " + path);
-        LOG.debug("Goate File Util","checking path: " + path);
+//        LOG.debug("Goate File Util", "checking path: " + path);
         try {
             File temp = new File(path);
             if (!temp.exists()) {
                 path = fileName;
-                LOG.debug("Goate File Util","file did not exist, checking resources: " + path);
+//                LOG.debug("Goate File Util", "file did not exist, checking resources: " + path);
                 URL opath = GoateUtils.class.getResource(path);
-                if(opath!=null) {
+                if (opath != null) {
                     path = GoateUtils.class.getResource(path).toString();
-                }else{
-                    LOG.debug("Goate File Util","did not find the resource");
+                } else {
+//                    LOG.debug("Goate File Util", "did not find the resource");
                 }
 //                LOG.debug("path: " + path);
                 if (path.contains("jar:")) {
-                    if(!leaveInJar) {
-                        File tf = new File("temp"+fileName);
-                        if(force||!tf.exists()) {
+                    if (!leaveInJar) {
+                        File tf = new File("temp" + fileName);
+                        if (force || !tf.exists()) {
                             String tempPath = new Copy().file(opath).to("temp" + fileName, force);
                             if (tempPath == null) {
                                 path = new File("temp" + path.substring(path.lastIndexOf("/"))).getAbsolutePath();
@@ -126,33 +128,33 @@ public class GoateUtils {
                         } else {
                             path = tf.getAbsolutePath();
                         }
-                    }else{
-                        path = path.replace("jar:","");
+                    } else {
+                        path = path.replace("jar:", "");
                     }
                 }
                 path = path.replace("file:/", "");
                 path = path.replace("file:", "");
-                if(path.indexOf(":")!=1)
-                    path = "/"+path;
+                if (path.indexOf(":") != 1)
+                    path = "/" + path;
                 if (path.contains(":")) {
                     if (path.indexOf("/") == 0) {
                         path = path.substring(1);
                     }
                 }
-                LOG.debug("Goate File Util","modified path to look in: "+path);
+//                LOG.debug("Goate File Util", "modified path to look in: " + path);
                 temp = new File(path);
 //                LOG.debug("full adjust path: " + path);
             }
             path = temp.getAbsolutePath();
-            LOG.debug("Goate File Util","file path: " + path);
+//            LOG.debug("Goate File Util", "file path: " + path);
         } catch (Exception e) {
-            LOG.debug("Goate File Util","Exception encountered finding file: " + e.getMessage(), e);
+//            LOG.debug("Goate File Util", "Exception encountered finding file: " + e.getMessage(), e);
         }
-        if(path.contains("%")){
+        if (path.contains("%")) {
             try {
                 path = URLDecoder.decode(path, "UTF-8");
-            } catch(Exception e){
-                LOG.info("Goate File Util", "Failed to decode a possibly url encoded path to UTF-8");
+            } catch (Exception e) {
+//                LOG.info("Goate File Util", "Failed to decode a possibly url encoded path to UTF-8");
             }
         }
         return path;
@@ -161,19 +163,20 @@ public class GoateUtils {
     /**
      * Borrowed from stack over flow. I have lost the original information, if
      * you know it please let me know so I may give appropriate credit.
-     * @param key the key or name of the environment variable to set
+     *
+     * @param key   the key or name of the environment variable to set
      * @param value The value to set it to.
-     * @param <K> generic type
-     * @param <V> generic type
+     * @param <K>   generic type
+     * @param <V>   generic type
      */
-    public static <K, V> void setEnvironment(String key, String value){
-        if(value == null) {
+    public static <K, V> void setEnvironment(String key, String value) {
+        if (value == null) {
             secretEnv.remove(key);
         } else {
             secretEnv.put(key, value);
         }
 //        try {
-            /// we obtain the actual environment
+        /// we obtain the actual environment
 //            final Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
 //            final Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
 //            final boolean environmentAccessibility = theEnvironmentField.canAccess(null);//isAccessible();
@@ -276,19 +279,20 @@ public class GoateUtils {
 ////            }
 //            throw new RuntimeException(e);
 //        }
-        LOG.info("Set environment variable <" + key + "> to <" + value + ">. Sanity Check: " + GoateUtils.getenv(key));
+//        LOG.info("Set environment variable <" + key + "> to <" + value + ">. Sanity Check: " + GoateUtils.getenv(key));
     }
 
     public static String getenv(String key) {
         String value = "";
-        if(secretEnv.containsKey(key)){
+        if (secretEnv.containsKey(key)) {
             value = secretEnv.get(key);
         } else {
             value = System.getenv(key);
         }
         return value;
     }
-    public static void removeEnvironment(String key){
+
+    public static void removeEnvironment(String key) {
         setEnvironment(key, null);
     }
 
@@ -311,7 +315,7 @@ public class GoateUtils {
 
         Field field = clazz.getDeclaredField(fieldName);
         boolean setAccess = field.trySetAccessible();
-        LOG.debug("set environment accessibility set to: " + setAccess);
+//        LOG.debug("set environment accessibility set to: " + setAccess);
         //field.setAccessible(true);
         return field;
     }
@@ -325,11 +329,11 @@ public class GoateUtils {
         ((Map<String, String>) obj).put(key, value);
     }
 
-    protected static List<Class> filterClasses(){
+    protected static List<Class> filterClasses() {
         List<Class> classes = new ArrayList<>();
-        for(Class c : Collections.class.getDeclaredClasses()) {
+        for (Class c : Collections.class.getDeclaredClasses()) {
             // obtain the declared classes of type $UnmodifiableMap
-            if("java.util.Collections$UnmodifiableMap".equals(c.getName())){
+            if ("java.util.Collections$UnmodifiableMap".equals(c.getName())) {
                 classes.add(c);
             }
         }
@@ -338,21 +342,21 @@ public class GoateUtils {
 
     protected static List<Field> mapFields(List<Class> classes) throws NoSuchFieldException {
         List<Field> map = new ArrayList<>();
-        for(Class c:classes){
+        for (Class c : classes) {
             map.add(c.getDeclaredField("m"));
         }
         return map;
     }
 
-    public static String tab(int count){
+    public static String tab(int count) {
         StringBuilder tabs = new StringBuilder("");
-        for(;count>0;count--){
-           tabs.append("\t");
+        for (; count > 0; count--) {
+            tabs.append("\t");
         }
         return tabs.toString();
     }
 
-    public static boolean truth(Object value){
-        return value==null?false:Boolean.parseBoolean(""+value);
+    public static boolean truth(Object value) {
+        return value == null ? false : Boolean.parseBoolean("" + value);
     }
 }

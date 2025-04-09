@@ -26,14 +26,16 @@
  */
 package com.thegoate.eut;
 
-import org.atteo.classindex.IndexAnnotated;
+import com.thegoate.annotations.GoateDescription;
+import com.thegoate.annotations.Scan;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@IndexAnnotated
+@GoateDescription(description = "used to define the eut settings on a 'config' class instead of the default eut.config file.")
+@Scan
 @Inherited
 public @interface EutConfig {
 

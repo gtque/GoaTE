@@ -35,6 +35,17 @@ public class TestWords extends TestNGEngineMethodDL {
     }
 
     @Test(groups = {"unit"})
+    public void scannerForSystemTime() {
+        Long start = System.currentTimeMillis();
+        Goate td = new Goate()
+                .put("time", "systemtime::");
+        Object result = td.get("time");
+        expect(Expectation.build().actual(result).isNotEqualTo("systemtime::"));
+        expect(Expectation.build().actual(result).isGreaterThanOrEqualTo(start));
+        expect(Expectation.build().actual(result).isLessThanOrEqualTo(System.currentTimeMillis()));
+    }
+
+    @Test(groups = {"unit"})
     public void sumWithFilter() {
         Goate td = new Goate()
                 .put("calculator", "sum::a")

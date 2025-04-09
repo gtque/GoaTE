@@ -27,7 +27,7 @@
 package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.annotations.GoateDescription;
-import org.atteo.classindex.IndexAnnotated;
+import com.thegoate.annotations.Scan;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,7 +37,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "used by the deserializer to find the mapping for the default source.")
-@IndexAnnotated
+@Scan
 @GoateSourceDef(id = "default")
 public @interface DefaultSource {
 }

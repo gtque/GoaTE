@@ -54,6 +54,18 @@ import static org.testng.Assert.*;
 public class GoateTests extends TestNGEngineMethodDL {
 
     @Test(groups = {"unit"})
+    public void testDNA() {
+//        GoateUtils.setEnvironment("SETTINGS_A", "hello");
+//        System.setProperty("SETTINGS_A", "howdy");
+//        System.setProperty("SETTINGS_B", "true");
+//        GoateUtils.setEnvironment("SETTINGS_C", "42");
+        assertEquals(RNA.rna.settings.a, "howdy");
+        assertEquals(RNA.rna.settings.b, true);
+        assertEquals(RNA.rna.settings.c, 42);
+        assertEquals(RNA.rna.settings.d, "world!");
+    }
+
+    @Test(groups = {"unit"})
     public void testPutMap() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("a", "b");

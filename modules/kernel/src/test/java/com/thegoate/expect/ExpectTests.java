@@ -105,7 +105,10 @@ public class ExpectTests extends TestNGEngineMethodDL {
         data.put("check if even.value", 4)
                 .put("check if even#1.value", 5);
         ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-        Expectation e2 = new Expectation(data).from("check if even#1").actual("return").isNotEqualTo(true);//.is("!=").expected(true);
+        Expectation e2 = new Expectation(data)
+                .from("check if even#1")
+                .actual("return")
+                .isNotEqualTo(true);//.is("!=").expected(true);
         etb.expect("check if even>return,==,boolean::true").expect(e2)
                 .expect("check if even>return,!=,boolean::false");
         ExpectEvaluator ev = new ExpectEvaluator(etb);

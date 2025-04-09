@@ -48,7 +48,7 @@ public abstract class SerializeTo extends Cereal {
     protected Class source;
     protected boolean asSourced = true;
     protected Object original;
-    protected Map<String, Class> castList = new HashMap<>();
+    protected Map<String, Class<?>> castList = new HashMap<>();
     protected List<String> exclude = new ArrayList<>();
     protected boolean isList = false;
     protected boolean includeNulls = false;

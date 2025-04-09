@@ -28,7 +28,6 @@ package com.thegoate.utils.fill.serialize;
 
 import com.thegoate.annotations.GoateDescription;
 import com.thegoate.info.Info;
-import org.atteo.classindex.IndexAnnotated;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,6 +38,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Use to mark a field in a pojo, specifically an eut/config pojo, as final.")
 @Info(classifier = "isFinal")
-@IndexAnnotated
 public @interface IsFinal {
 }

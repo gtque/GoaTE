@@ -1,0 +1,8 @@
+annotations:
+  scan: tech.thehangingpen
+settings:
+  a: howdy
+  d: world!
+  c: 42
+SETTINGS_A: hello
+SETTINGS_B: true
