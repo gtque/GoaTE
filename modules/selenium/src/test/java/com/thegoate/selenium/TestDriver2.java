@@ -35,6 +35,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.time.Duration;
 
 import static com.thegoate.dsl.words.DateCurrentDSL.date;
 import static com.thegoate.utils.GoateUtils.sleep;
@@ -60,7 +61,7 @@ public class TestDriver2 extends TestNGEngine {
             WebDriver driver = (WebDriver) get("browser", "webdriver::chrome,args.1==--incognito");
             if (driver != null) {
                 driver.navigate().to("http://qa-qaoctopus101.wi.onedatascan.io/dst");
-                WebDriverWait wait = new WebDriverWait(driver, 30000);
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(5L));
                 wait.until(ExpectedConditions.elementToBeClickable(By.id("IDToken1")));
                 WebElement id = driver.findElement(By.id("IDToken1"));
                 id.clear();

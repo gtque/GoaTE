@@ -63,6 +63,7 @@ public class GoateTests extends TestNGEngineMethodDL {
         assertEquals(RNA.rna.settings.b, true);
         assertEquals(RNA.rna.settings.c, 42);
         assertEquals(RNA.rna.settings.d, "world!");
+        assertEquals(RNA.rna.settings.nested.z, "special dark.");
     }
 
     @Test(groups = {"unit"})

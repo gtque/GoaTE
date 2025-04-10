@@ -4,5 +4,7 @@ settings:
   a: howdy
   d: world!
   c: 42
+  nested:
+    z: special dark.
 SETTINGS_A: hello
 SETTINGS_B: true

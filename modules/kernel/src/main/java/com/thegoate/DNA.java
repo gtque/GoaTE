@@ -29,19 +29,15 @@ package com.thegoate;
 import com.thegoate.annotations.AnnotationDNA;
 import com.thegoate.dsl.words.EutConfigDSL;
 import com.thegoate.reflection.GoateReflection;
-import com.thegoate.utils.fill.serialize.Cast;
 import com.thegoate.utils.fill.serialize.GoateSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,7 +73,7 @@ public class DNA {
         if (primary != null) {
             primaryKey1 = primary.key().toLowerCase();
         }
-        primaryKey = primaryKey.isEmpty() ? primaryKey1 : (primaryKey + "." + primaryKey1);
+        primaryKey = primaryKey.isEmpty() ? primaryKey1 : (primaryKey1.isEmpty() ? primaryKey : (primaryKey + "." + primaryKey1));
         String primaryKeyAlternate = primaryKey.toUpperCase().replace(".", "_");
         final String pKey = primaryKey;
         Map<String, Field> fields = new GoateReflection().findFields(mosquito.getClass());
@@ -87,10 +83,10 @@ public class DNA {
             if (source != null) {
                 subKey = source.key();
             }
-            String theKey = pKey + (pKey.isEmpty() ? "" : ".") + subKey;
-            String theAlternateKey = primaryKeyAlternate+(primaryKeyAlternate.isEmpty() ? "" : "_")+subKey.toUpperCase();
+            String theKey = pKey + (pKey.isEmpty() ? "" : (subKey.isEmpty() ? "" : ".")) + subKey;
+            String theAlternateKey = primaryKeyAlternate + (primaryKeyAlternate.isEmpty() ? "" : "_") + subKey.toUpperCase();
             Object theValue = System.getProperty(theAlternateKey);
-            if(theValue == null) {
+            if (theValue == null) {
                 theValue = System.getenv(theAlternateKey);
                 if (theValue == null) {
                     if (yml.containsKey(theKey)) {
@@ -113,7 +109,8 @@ public class DNA {
                     theValue = field.getType().getConstructor(paramTypes).newInstance(params);
                     field.set(mosquito, theValue);
                     analyzeDna(theValue, yml, theKey);
-                } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
+                } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
+                         NoSuchMethodException e) {
                     //do nothing.
                 }
             }
@@ -213,5 +210,4 @@ public class DNA {
         }
         return resultStringBuilder.toString();
     }
-
 }

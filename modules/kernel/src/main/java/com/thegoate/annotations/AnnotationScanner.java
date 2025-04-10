@@ -1,7 +1,5 @@
 package com.thegoate.annotations;
 
-import com.thegoate.utils.GoateUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -31,7 +29,6 @@ public class AnnotationScanner {
     }
 
     private static void scanClasses() {
-//        Map<String, List<Class>> annotations = new HashMap<>();
         List<String> packageNamesFinal = new ArrayList<>();
         final List<String> includeInScan = new ArrayList<>();
         try {
@@ -53,12 +50,20 @@ public class AnnotationScanner {
                 File file = new File(resource.getPath());
 
                 if (file.isDirectory()) {
-                    packageNames.addAll(scanDirectory(file, ""));
+                    scanDirectory(file, "").forEach(aPackage -> {
+                        if(scan(aPackage, includeInScan)) {
+                            packageNames.add(aPackage);
+                        }
+                    });
                 } else if (file.getName().endsWith(".jar")) {
-                    packageNames.addAll(scanJarFile(file));
+                    scanJarFile(file).forEach(aPackage -> {
+                        if(scan(aPackage, includeInScan)) {
+                            packageNames.add(aPackage);
+                        }
+                    });
                 }
             }
-            if(dna.annotations != null) {
+            if (dna.annotations != null) {
                 includeInScan.addAll(dna.annotations.listOfPackagesToIncludeInTheScan());
             }
             Package[] packages = ClassLoader.getSystemClassLoader().getDefinedPackages();
@@ -66,7 +71,8 @@ public class AnnotationScanner {
                     .filter(aPackage -> scan(aPackage.getName(), includeInScan))
                     .forEach(aPackage -> packageNames.add(aPackage.getName()));
             packageNamesFinal = packageNames.stream()
-                    .distinct().toList();
+                    .distinct()
+                    .toList();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -81,12 +87,6 @@ public class AnnotationScanner {
         });
         checkForGoateAnnotations(klasses);
         if (!annotationCache.isEmpty()) {
-            try {
-                Class.forName(AnnotationFactory.class.getName(), true, ClassLoader.getSystemClassLoader());
-                Class.forName(GoateUtils.class.getName(), true, ClassLoader.getSystemClassLoader());
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
             klasses.stream().distinct().toList().forEach(klass -> {
                 try {
                     Class.forName(klass.getName(), true, ClassLoader.getSystemClassLoader());
@@ -98,10 +98,10 @@ public class AnnotationScanner {
     }
 
     private static boolean scan(String aPackage, List<String> includeInScan) {
-        if(aPackage.startsWith("com.thegoate")) {
+        if (aPackage.startsWith("com.thegoate")) {
             return true;
         }
-        if(includeInScan!=null&& !includeInScan.isEmpty()){
+        if (includeInScan != null && !includeInScan.isEmpty()) {
             return includeInScan.stream().anyMatch(aPackage::startsWith);
         }
         return false;
@@ -162,9 +162,7 @@ public class AnnotationScanner {
         List<Class<?>> classes = new ArrayList<>();
         while (resources.hasMoreElements()) {
             URL resource = resources.nextElement();
-            if(scan(packageName, includeInScan)) {
-                classes.addAll(GoateScanner.getClasses(resource, packageName));
-            }
+            classes.addAll(GoateScanner.getClasses(resource, packageName));
         }
         return classes;
     }
