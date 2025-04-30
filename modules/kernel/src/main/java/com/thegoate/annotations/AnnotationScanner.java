@@ -32,22 +32,14 @@ public class AnnotationScanner {
         List<String> packageNamesFinal = new ArrayList<>();
         final List<String> includeInScan = new ArrayList<>();
         try {
-            Enumeration<URL> resources = ClassLoader.getSystemResources("");
+            String classpath = System.getProperty("java.class.path");
+            String[] classpathEntries = classpath.split(System.getProperty("path.separator"));
             List<String> packageNames = new ArrayList<>();
-            while (resources.hasMoreElements()) {
-                URL resource = resources.nextElement();
-                File file = new File(resource.getPath());
-
-                if (file.isDirectory()) {
-                    packageNames.addAll(scanDirectory(file, ""));
-                } else if (file.getName().endsWith(".jar")) {
-                    packageNames.addAll(scanJarFile(file));
-                }
+            if (dna.annotations != null) {
+                includeInScan.addAll(dna.annotations.listOfPackagesToIncludeInTheScan());
             }
-            resources = AnnotationScanner.class.getClassLoader().getResources("");
-            while (resources.hasMoreElements()) {
-                URL resource = resources.nextElement();
-                File file = new File(resource.getPath());
+            for(String resource: classpathEntries) {
+                File file = new File(resource);
 
                 if (file.isDirectory()) {
                     scanDirectory(file, "").forEach(aPackage -> {
@@ -63,9 +55,7 @@ public class AnnotationScanner {
                     });
                 }
             }
-            if (dna.annotations != null) {
-                includeInScan.addAll(dna.annotations.listOfPackagesToIncludeInTheScan());
-            }
+
             Package[] packages = ClassLoader.getSystemClassLoader().getDefinedPackages();
             Arrays.stream(packages)
                     .filter(aPackage -> scan(aPackage.getName(), includeInScan))
@@ -86,15 +76,6 @@ public class AnnotationScanner {
             }
         });
         checkForGoateAnnotations(klasses);
-        if (!annotationCache.isEmpty()) {
-            klasses.stream().distinct().toList().forEach(klass -> {
-                try {
-                    Class.forName(klass.getName(), true, ClassLoader.getSystemClassLoader());
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
     }
 
     private static boolean scan(String aPackage, List<String> includeInScan) {

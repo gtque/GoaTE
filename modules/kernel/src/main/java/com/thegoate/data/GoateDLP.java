@@ -40,7 +40,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @GoateDescription(description = "Identifies a data loader provider.")
 @Info(classifier = "name")
+@Scan
 public @interface GoateDLP {
-    @Scan
     String name();
 }
