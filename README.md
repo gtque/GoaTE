@@ -16,3 +16,21 @@ ToDo:
 * completely remove org.atteo dependency
 * example project using dependency jars
   * make sure tests and annotation factory still work.
+
+
+* https://central.sonatype.org/publish/generate-portal-token/
+* https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
+* https://central.sonatype.com/publishing/deployments
+* https://ossrh-staging-api.central.sonatype.com/swagger-ui/#/default/manual_upload_repository
+* https://central.sonatype.com/search
+
+need to add a post call to "publish" after publishing.
+- curl -X 'GET' \
+  'https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer *******'
+- curl -X 'POST' \
+  'https://ossrh-staging-api.central.sonatype.com/manual/upload/repository/qMyxIq%2F108.226.71.114%2Fcom.thegoate--default-repository?publishing_type=automatic' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer *******' \
+  -d ''

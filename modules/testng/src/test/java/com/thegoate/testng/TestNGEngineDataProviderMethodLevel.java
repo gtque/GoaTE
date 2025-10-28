@@ -131,4 +131,26 @@ public class TestNGEngineDataProviderMethodLevel extends TestNGEngineMethodDL {
                 .isEqualTo(get("Scenario"))
                 .failureMessage("what happened to the hidden scenario?"));
     }
+
+    @GoateProvider(name = "hidden scenario with named test parameters")
+    @Test(groups = {"unit"}, dataProvider = METHOD_LOADER_SCENARIO)
+    public void testDataWithScenario(Goate testData,
+                                     @GoateSource(key = "Scenario") String scenario) {
+        expect(Expectation.build()
+                .actual(testData.get("pleasentries", testData.get("greeting")))
+                .isEqualTo("howdy")
+                .failureMessage("greeting was not howdy"));
+        expect(Expectation.build()
+                .actual(testData.get("doda", testData.get("fubar", testData.get("number"))))
+                .isEqualTo(42)
+                .failureMessage("number was not 42"));
+        expect(Expectation.build()
+                .actual(testData.get("flag"))
+                .isEqualTo(true)
+                .failureMessage("flag was not true"));
+        expect(Expectation.build()
+                .actual(scenario)
+                .isEqualTo(testData.get("Scenario"))
+                .failureMessage("what happened to the hidden scenario?"));
+    }
 }

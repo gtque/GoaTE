@@ -33,6 +33,7 @@ import com.thegoate.data.GoateDLP;
 import com.thegoate.data.GoateNullClass;
 import com.thegoate.data.GoateProvider;
 import com.thegoate.reflection.GoateReflection;
+import com.thegoate.utils.fill.serialize.GoateSource;
 import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
@@ -68,6 +69,7 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
     }
 
     public static final String METHOD_LOADER = "methodLoader";
+    public static final String METHOD_LOADER_SCENARIO = "methodLoaderScenario";
     public static final String METHOD_NAMED_PARAMETERS_LOADER = "methodNamedParametersLoader";
 
     @DataProvider(name = METHOD_LOADER)
@@ -83,6 +85,41 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
         Goate cdl = new Goate();
         buildDataLoaders(rdl, cdl, method);
         return TestNGRunFactory.loadRuns(method, provider, rdl, cdl, false, testContext.getIncludedGroups(), testContext.getExcludedGroups());
+    }
+
+    @DataProvider(name = METHOD_LOADER_SCENARIO)
+    public Object[][] dataLoaderScenario(ITestContext context, Method method) throws Exception {
+        number.put("" + method.getDeclaringClass().getCanonicalName() + ":" + method.getName(), 0);
+        //number = 0;//resets the count, assume TestNG loads all the runs before processing the next class.
+        setTestClass(method.getDeclaringClass());
+        this.testContext = context;
+        if (context != null) {
+            xt = context.getCurrentXmlTest();
+        }
+        Goate rdl = new Goate();
+        Goate cdl = new Goate();
+        buildDataLoaders(rdl, cdl, method);
+        Object[][] runs = TestNGRunFactory.loadRuns(method, provider, rdl, cdl, false, testContext.getIncludedGroups(), testContext.getExcludedGroups());
+        Parameter[] parameters = method.getParameters();
+        Object[][] namedRuns = new Object[runs.length][method.getParameters().length];
+        for (int runNumber = 0; runNumber < namedRuns.length; runNumber++) {
+            Goate run = (Goate) runs[runNumber][0];
+            Object[] namedRun = new Object[parameters.length];
+            int parameterIndex = 0;
+            for (Parameter parameter : parameters) {
+                GoateSource[] sources = parameter.getAnnotationsByType(GoateSource.class);
+                if ((sources.length == 0 || isTestDataParameter(sources)) && parameter.getType().equals(Goate.class)) {
+                    namedRun[parameterIndex] = run;
+                    parameterIndex++;
+                } else {
+                    namedRun[parameterIndex] = getNamedParameter(run, parameter);
+                    parameterIndex++;
+                }
+            }
+            namedRuns[runNumber] = namedRun;
+            namedParametersFullGoate.put("" + method.getName() + runNumber, run);
+        }
+        return namedRuns;
     }
 
     @DataProvider(name = METHOD_NAMED_PARAMETERS_LOADER)
@@ -112,6 +149,17 @@ public class TestNGEngineMethodDL extends TestNGEngineAnnotatedDL {
             namedParametersFullGoate.put("" + method.getName() + runNumber, run);
         }
         return namedRuns;
+    }
+
+    protected boolean isTestDataParameter(GoateSource[] sources) {
+        boolean isTestData = false;
+        for (GoateSource source : sources) {
+            if ("testData".equals(source.key()) || "data".equals(source.key())) {
+                isTestData = true;
+                break;
+            }
+        }
+        return isTestData;
     }
 
     protected void buildDataLoaders(Goate rdl, Goate cdl, Method method) {
