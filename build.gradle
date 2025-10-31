@@ -36,8 +36,8 @@ buildscript {
     }
     dependencies {
 //        classpath 'com.sourcemuse.gradle.plugin:gradle-mongo-plugin:0.13.0'
-        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.42.0'
+        classpath 'com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:8.1.1'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.53.0'
         classpath 'com.thegoate:gradle:0.15.8.202104300242'
     }
 }
@@ -112,7 +112,7 @@ configurations.all {
 }
 
 wrapper {
-    gradleVersion = '7.0' //version required
+    gradleVersion = '9.2.0' //version required
 }
 
 subprojects {
@@ -141,13 +141,16 @@ subprojects {
         }
     }
 
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+    java {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+
     dependencies {
-        testImplementation 'ch.qos.logback:logback-classic:1.2.11'
-        testImplementation 'ch.qos.logback:logback-access:1.2.11'
-        testImplementation 'ch.qos.logback:logback-core:1.2.11'
-        testImplementation 'org.codehaus.janino:janino:3.1.8'
+        testImplementation 'ch.qos.logback:logback-classic:1.5.20'
+        testImplementation 'ch.qos.logback.access:logback-access-common:2.0.7'
+        testImplementation 'ch.qos.logback:logback-core:1.5.20'
+        testImplementation 'org.codehaus.janino:janino:3.1.12'
     }
 
     jar.archiveBaseName = projectName
@@ -215,8 +218,8 @@ subprojects {
         publications {
             goate(MavenPublication) {
                 from components.java
-                groupId "com.thegoate"
-                artifactId projectName
+                groupId = "com.thegoate"
+                artifactId = projectName
 //                artifact artifacts
                 pom {
                     description = 'goate module for ' + projectName
@@ -403,7 +406,7 @@ task testReport(type: TestReport) {
         subprojects {
             plugins.withType(JavaPlugin) {
                 test {
-                    ignoreFailures true
+                    ignoreFailures = true
                 }
             }
         }

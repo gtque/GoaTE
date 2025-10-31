@@ -28,7 +28,7 @@ package com.thegoate.simpleserver.api;
 
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Created by Eric Angeli on 11/30/2018.

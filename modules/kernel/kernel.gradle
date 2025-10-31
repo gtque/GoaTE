@@ -27,7 +27,7 @@
 import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion);
-    api  "org.slf4j:slf4j-api:1.7.36"
+    api  "org.slf4j:slf4j-api:2.0.17"
     testImplementation d.depends(":testng", project.internalVersion);
     testImplementation d.depends(":json", project.internalVersion);
     testImplementation d.depends(":spreadsheets", project.internalVersion);

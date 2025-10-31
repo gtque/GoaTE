@@ -29,9 +29,9 @@ package com.thegoate.simpleserver.api;
 import com.thegoate.simpleserver.pojo.ErrorMessage;
 import com.thegoate.simpleserver.pojo.Message;
 import com.thegoate.simpleserver.pojo.SimpleContent;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
