@@ -59,7 +59,7 @@ public class ModelBuilder<M, T> extends Cereal {
             definition = (A) gr.getDefaultPrimitive(klass);
         }
         if (definition != null) {
-            if(!gr.isPrimitive(klass)) {
+            if(!gr.isPrimitive(klass) && !klass.equals(String.class)) {
                 Map<String, Field> fields = gr.findFields(klass);
                 for (Map.Entry<String, Field> field : fields.entrySet()) {
                     Object value = gr.getFieldValue(definition, field.getValue());

@@ -32,11 +32,7 @@ import com.thegoate.logging.BleatFactory;
 import com.thegoate.utils.fill.serialize.GoateIgnore;
 import com.thegoate.utils.fill.serialize.primitives.*;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -409,7 +405,7 @@ public class GoateReflection {
     public void findFields(Class theClass, Map<String, Field> fieldMap) {
         if (fieldMap != null) {
             for (Field f : theClass.getDeclaredFields()) {
-                if (!f.getName().contains("$jacocoData") && f.getType() != theClass) {
+                if (!f.getName().contains("$jacocoData") && f.getType() != theClass && !f.getName().contains("serialPersistentFields")) {
                     //need to specify a list of things to ignore, in a property file perhaps?
                     //need to ignore nested objects of the same type to avoid recursion issues,
                     //it may still be possible if the object is not the same type, but some object in the nested one does.
@@ -432,7 +428,7 @@ public class GoateReflection {
             try {
                 field.setAccessible(true);
                 value = field.get(owner);
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException | InaccessibleObjectException e) {
 //				LOG.debug("Get Field Value", "failed to get value: " + e.getMessage());
             }
             field.setAccessible(access);

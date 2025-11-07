@@ -332,7 +332,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         data.put("nestedList.0.list.1.fieldName", "Paula");
         data.put("nestedList.0.cp.0.date", "11-24-2009");
         data.put("nestedList.0.cp.0.nested.expanded name", 42);
-        data.put("nestedList.0.cp.0.nested.fieldName", "Hello, world!");
+        data.put("nestedList.0.cp.0.nested.fieldName", "Hello, world!?");
         data.put("nestedList.0.cp.0.nested.big decimal", "3.14159");
         data.put("nestedList.0.cp.0.nested.double D", "42.42");
         data.put("nestedList.0.cp.0.nested.long l", 42L);
@@ -342,6 +342,7 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         data.put("nestedList.0.cp.1.nested map.1.key", "Tony");
         data.put("nestedList.0.cp.1.nested map.1.value", "Stark");
         data.put("nestedList.0.cp.1.nested map.1.value.class", "java.lang.String");
+        data.put("nestedList.0.cp.1.nested.fieldName", "Hello, world!");
         data.put("nestedList.0.map.0.key", "bryan");
         data.put("nestedList.0.map.0.value", true);
         data.put("nestedList.0.map.1.key", "tarun");
@@ -400,7 +401,8 @@ public class DeSerializerTests extends TestNGEngineMethodDL {
         assertEquals(((SimplePojo) (((NestedPojos) pojo.getNestedList().get(0)).getMap2().get("bryan"))).getL(), 84L);
         assertTrue(Boolean.parseBoolean("" + ((NestedPojos) pojo.getNestedList().get(0)).getMap2().get("tarun")));
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getDate(), LocalDate.parse("2009-11-24", formatter));
-        assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getFieldName(), "Hello, world!");
+        assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getFieldName(), "Hello, world!?");
+        assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[1].getNested().getFieldName(), "Hello, world!");
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getSomeInt(), 42);
         assertEquals(((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getBigD(), new BigDecimal("3.14159"));
         assertEquals((double) ((NestedPojos) pojo.getNestedList().get(0)).getCp()[0].getNested().getD(), Double.parseDouble("42.42"));
