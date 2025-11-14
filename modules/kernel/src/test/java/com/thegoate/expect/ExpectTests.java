@@ -1528,7 +1528,8 @@ public class ExpectTests extends TestNGEngineMethodDL {
                 "]" +
                 "}";
         ContentPojoT<TypePojo> content = new DeSerializer().data(new ToGoate(api1).convert()).T(TypePojo.class).build(ContentPojoT.class);
-        String api1FormattedPT = new Serializer<ContentPojoT, DefaultSource, String>(new DeSerializer().data(new ToGoate(api1).convert()).T(TypePojo.class).build(ContentPojoT.class)).to(new JsonString());
+        ContentPojoT<TypePojo> pt = new DeSerializer().data(new ToGoate(api1).convert()).T(TypePojo.class).build(ContentPojoT.class);
+        String api1FormattedPT = new Serializer<ContentPojoT, DefaultSource, String>(pt).to(new JsonString());
         String api1FormattedP = "" + new Serializer<>(new DeSerializer().data(new ToGoate(api1).convert()).build(ContentPojo.class), DefaultSource.class).to(new JsonString());
         String api2FormattedP = "" + new Serializer<>(new DeSerializer().data(new ToGoate(api2).convert()).from(UDFSource.class).build(ContentPojo.class), DefaultSource.class).to(new JsonString());
         expect(Expectation.build()

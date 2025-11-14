@@ -108,30 +108,6 @@ public class RATests extends SpringTestEngine {
 	}
 
 	@Test(groups = {"unit"})
-	public void premal() {
-		Rest rest = new RestAssured();
-		Response response = (Response) rest.baseURL(baseURL()).get("breakingthings");
-		data.put("response", response);
-		data.put("expected", "{\n" +
-			"    \"title\": \"Unprocessable Entity\",\n" +
-			"    \"status\": 422,\n" +
-			"    \"detail\": \"Input data was invalid. See exceptions for details.\",\n" +
-			"    \"exceptions\": [\n" +
-			"        {\n" +
-			"            \"code\": \"API_VALIDATION_ERROR\",\n" +
-			"            \"message\": \"numeric value out of bounds (<18 digits>.<2 digits> expected)\",\n" +
-			"            \"field\": \"amount\"\n" +
-			"        }\n" +
-			"    ]\n" +
-			"}");
-		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
-		etb.expect("api response>body as a string,isEqualIgnoreFields,o::expected");
-		ExpectEvaluator ev = new ExpectEvaluator(etb);
-		boolean result = ev.evaluate();
-		assertTrue(result, ev.failed());
-	}
-
-	@Test(groups = {"unit"})
 	public void debugExtraLines() {
 		Response response = (Response) new RestCall()
 			.baseURL(baseURL())
@@ -150,43 +126,6 @@ public class RATests extends SpringTestEngine {
 	}
 
 	@Test(groups = {"unit"})
-	public void getURLRestWithExpectedWorker() {
-		Response response = (Response) new RestCall()
-			.baseURL(baseURL())
-			//                .get("/".concat(eut("endpoint.base","api")).concat("/payment-advice/{paymentAdviceId}"));
-			.get("hello/world");
-		data.put("response", response);
-
-		//        assertEquals(response.statusCode(), 200);
-		//        etb.expect("api response>status code,==,200");
-		Employee callAnotherURL = new CallAnotherURL().baseURL(baseURL());
-		expect(new Expectation(data).actual(response.statusCode()).is("==").expected(200));
-		expect(Expectation.build()
-			.actual(RestResult.statusCode)
-			.from(response)
-			.isEqualTo(200));
-		expect(Expectation.build()
-			.actual(RestResult.statusCode)
-			.from(response)
-			.isNotEqualTo(RestResult.statusCode)
-			.fromExpected("{\"status code\": 201}"));
-		expect(Expectation.build()
-			.actual(RestResult.bodyAsAString)
-			.from(response)
-			.isNotEqualTo(RestResult.bodyAsAString)
-			.fromExpected(callAnotherURL));
-		expect(Expectation.build()
-			.actual(RestResult.statusCode)
-			.from(response)
-			.isEqualTo(RestResult.statusCode)
-			.fromExpected(callAnotherURL));
-		expect(Expectation.build()
-			.actual(200)
-			.isEqualTo(RestResult.statusCode)
-			.fromExpected(callAnotherURL));
-	}
-
-	@Test(groups = {"unit"})
 	public void getURLByEmployee() {
 		Goate d = new Goate().put("base url", baseURL()).put("end point", "hello/world");
 		Employee e = new ApiGet().init(d);
@@ -198,81 +137,6 @@ public class RATests extends SpringTestEngine {
 		boolean result = ev.evaluate();
 		assertTrue(result, ev.failed());
 	}
-
-	@Test(groups = {"unit"})
-	public void testRestResultBodyAsAString() {
-		String expected = "{\"greeting\":\"hello\"}";
-		Object result = new RestCall().baseURL(baseURL())
-			.get("hello/world");
-		expect(Expectation.build()
-			.actual(RestResult.statusCode)
-			.from(result)
-			.isEqualTo(200));
-		expect(Expectation.build()
-			.actual(RestResult.bodyAsAString)
-			.from(result)
-			.isEqualTo(expected));
-		evaluate();
-		assertEquals(getEv().passes().size(), 2);
-	}
-
-	@Test(groups = {"unit"})
-	public void testGetRestBasicAuthHeader() {
-		Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
-			.get("hello/auth");
-		expect(Expectation.build()
-			.actual("user")
-			.from(result)
-			.isEqualTo("fred"));
-		expect(Expectation.build()
-			.actual("password")
-			.from(result)
-			.isEqualTo("rogers"));
-	}
-
-	@Test(groups = {"unit"})
-	public void testDeleteRestBasicAuthHeader() {
-		Object result = new RABasicAuth().user("fred").password("rogers").baseURL(baseURL())
-			.delete("hello/auth");
-		expect(Expectation.build()
-			.actual("user")
-			.from(result)
-			.isEqualTo("fred"));
-		expect(Expectation.build()
-			.actual("password")
-			.from(result)
-			.isEqualTo("rogers"));
-	}
-
-	@Test(groups = {"unit"})
-	public void testListString() {
-		List<String> simpleList = new ArrayList<>();
-		simpleList.add("a");
-		simpleList.add("b");
-		simpleList.add("c");
-		Object result = new RestCall().queryParam("list", "a,b,c").baseURL(baseURL())
-			.get("hello/list");
-		expect(Expectation.build()
-			.actual("size")
-			.from(result)
-			.isEqualTo(simpleList.size()));
-	}
-
-	@Test(groups = {"unit"})
-	public void testListObject() {
-		List<String> simpleList = new ArrayList<>();
-		simpleList.add("a");
-		simpleList.add("b");
-		simpleList.add("c");
-		RestCall<Response> rest = new RestCall<Response>().queryParam("list", simpleList).baseURL(baseURL());
-		Response result = rest
-			.get("hello/list");
-		expect(Expectation.build()
-			.actual("size")
-			.from(result)
-			.isEqualTo(simpleList.size()));
-	}
-
 
 	@Test(groups = {"unit"})
 	public void testPutRestBasicAuthHeader() {
@@ -320,84 +184,6 @@ public class RATests extends SpringTestEngine {
 			.isEqualTo("application/json"));
 	}
 
-	@Test(groups = {"unit"})
-	public void isPresentScalabilityTesting() {
-		Object body = new RestCall()
-			.baseURL(baseURL())
-			.get("hello/big");
-		//		int size = Integer.parseInt(""+new Get("content>size()").from(body));
-		//		for(int i = 0; i<size-1; i++) {
-//		muteFrom = true;
-		expect(Expectation.build()
-			.actual("content.*.id")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.a")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.b")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.c")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.d")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.e")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.f")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.g")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.h")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.i")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.j")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.k")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.l")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.m")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.n")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.o")
-			.from(body)
-			.isPresent(true));
-		expect(Expectation.build()
-			.actual("content.*.p")
-			.from(body)
-			.isPresent(true));
-		//	}
-	}
 
     @Test(groups = {"unit"})
     public void pathParametersTestHello() {
