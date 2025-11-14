@@ -49,6 +49,7 @@ public class Serializer<T, S, U> extends Cereal {
     private boolean asSourced = true;
     private boolean includeNulls = false;
     private boolean detailed = false;//whether to explode inner paths or not.
+    private boolean strict = false; //when detailed and strict are both set to true, only the nested detailed entries will be added and the higher level parent entries will be skipped.
     private boolean OLD_SERIALIZER = false;
 
     public Serializer(T pojo, S source, U cereal) {
@@ -142,11 +143,27 @@ public class Serializer<T, S, U> extends Cereal {
         return this;
     }
 
+    public Serializer<T, S, U> strict(boolean strict) {
+        this.strict = strict;
+        return this;
+    }
+
+    public Serializer<T, S, U> strict() {
+        this.strict = true;
+        return this;
+    }
+
+    public Serializer<T, S, U> relaxed() {
+        this.strict = false;
+        return this;
+    }
+
     public Goate toGoate() {
         Goate data = new Goate();
-        for (Map.Entry<String, Object> entry : toMap(HashMap.class).entrySet()) {
-            data.put(entry.getKey(), entry.getValue());
-        }
+//        for (Map.Entry<String, Object> entry : toMap(HashMap.class).entrySet()) {
+//            data.put(entry.getKey(), entry.getValue());
+//        }
+        toMap(HashMap.class, data);
         return data;
     }
 
@@ -171,7 +188,14 @@ public class Serializer<T, S, U> extends Cereal {
     }
 
     public Map<String, Object> toMap(Class mapType) {
+        return toMap(mapType, new Goate());
+    }
+
+    public Map<String, Object> toMap(Class mapType, Goate dataG) {
         Map<String, Object> data = null;
+        if (dataG == null) {
+            dataG = new Goate();
+        }
         try {
             data = (Map) mapType.getDeclaredConstructor().newInstance();
         } catch (IllegalAccessException | InstantiationException e) {
@@ -200,10 +224,11 @@ public class Serializer<T, S, U> extends Cereal {
                             Class type = o.getClass();
                             if (checkNotPrimitive(type) && doSerialize(pojo.getClass())) {
                                 if (!type.equals(pojo.getClass())) {
-                                    addMap(data, o, "" + count);
+                                    addMap(data, o, "" + count, dataG);
                                 }
                             } else {
                                 data.put("" + count, o);
+                                dataG.put("" + count, o);
                             }
                         } else if (includeNulls) {
                             data.put("" + count, "null::");
@@ -216,10 +241,10 @@ public class Serializer<T, S, U> extends Cereal {
             } else {
                 Map<String, Field> fields = gr.findFields(pojo.getClass());
                 try {
-                    if(OLD_SERIALIZER) {
-                        oldSerializer(data, fields);
+                    if (OLD_SERIALIZER) {
+                        oldSerializer(data, fields, dataG);
                     } else {
-                        orderedSerializer(data, fields);
+                        orderedSerializer(data, fields, dataG);
                     }
                 } catch (ClassCastException e) {
                     LOG.error("Serialize Pojo", "The source, second constructor parameter, must be a Class (ie Something.class)");
@@ -229,10 +254,10 @@ public class Serializer<T, S, U> extends Cereal {
         return data;
     }
 
-    private void orderedSerializer(Map<String, Object> data, Map<String, Field> fields) {
+    private void orderedSerializer(Map<String, Object> data, Map<String, Field> fields, Goate dataG) {
         GoateSourceLister sourceLister = new GoateSourceLister();
         for (Map.Entry<String, Field> field : fields.entrySet()) {
-            GoateSource gs = sourceLister.sortedSources(new GoateSourceNode(), field.getValue().getAnnotationsByType(GoateSource.class), (Class)source, field.getKey(), false).getTheSource();//findGoateSource(field.getValue(), (Class) source);
+            GoateSource gs = sourceLister.sortedSources(new GoateSourceNode(), field.getValue().getAnnotationsByType(GoateSource.class), (Class) source, field.getKey(), false).getTheSource();//findGoateSource(field.getValue(), (Class) source);
             String fieldKey = field.getKey();
             boolean exclude = false;
             if (gs != null) {
@@ -267,16 +292,19 @@ public class Serializer<T, S, U> extends Cereal {
                                             Class serializeFormat = getFormat(field.getValue());
                                             if (serializeFormat != null) {
                                                 data.put(fieldKey, doFormat(o, serializeFormat));
+                                                dataG.put(fieldKey, data.get(fieldKey));
                                             } else {
-                                                addMap(data, o, fieldKey);
+                                                addMap(data, o, fieldKey, dataG);
                                             }
                                         }
                                     } else {
                                         data.put(fieldKey, o);
+                                        dataG.put(fieldKey, o);
                                     }
                                 }
                             } else if (includeNulls) {
                                 data.put(fieldKey, "null::");
+                                dataG.put(fieldKey, "null::");
                             }
                         } catch (IllegalAccessException | InstantiationException e) {
                             LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
@@ -293,7 +321,7 @@ public class Serializer<T, S, U> extends Cereal {
     }
 
 
-    private void oldSerializer(Map<String, Object> data, Map<String, Field> fields) {
+    private void oldSerializer(Map<String, Object> data, Map<String, Field> fields, Goate dataG) {
         for (Map.Entry<String, Field> field : fields.entrySet()) {
             GoateSource gs = findGoateSource(field.getValue(), (Class) source);
             String fieldKey = field.getKey();
@@ -330,16 +358,19 @@ public class Serializer<T, S, U> extends Cereal {
                                             Class serializeFormat = getFormat(field.getValue());
                                             if (serializeFormat != null) {
                                                 data.put(fieldKey, doFormat(o, serializeFormat));
+                                                dataG.put(fieldKey, data.get(fieldKey));
                                             } else {
-                                                addMap(data, o, fieldKey);
+                                                addMap(data, o, fieldKey, dataG);
                                             }
                                         }
                                     } else {
                                         data.put(fieldKey, o);
+                                        dataG.put(fieldKey, o);
                                     }
                                 }
                             } else if (includeNulls) {
                                 data.put(fieldKey, "null::");
+                                dataG.put(fieldKey, "null::");
                             }
                         } catch (IllegalAccessException | InstantiationException e) {
                             LOG.error("Serialize Pojo", "Failed to get field: " + e.getMessage(), e);
@@ -381,40 +412,48 @@ public class Serializer<T, S, U> extends Cereal {
         return serialize;
     }
 
-    private void addMap(Map<String, Object> data, Object o, String baseKey) {
+    private void addMap(Map<String, Object> data, Object o, String baseKey, Goate dataG) {
         Map<String, Object> innerMap = new HashMap<>();
         if (o instanceof List) {
             if (detailed) {
-                data.put(baseKey, o);//ToDo: figure out how to put the correct thing here...
+                if (!strict) {
+                    data.put(baseKey, o);//ToDo: figure out how to put the correct thing here...
+                    dataG.put(baseKey, o);
+                }
                 for (int i = 0; i < ((List) o).size(); i++) {
                     Object io = ((List) o).get(i);
-                    process(data, io, baseKey + "." + i);
+                    process(data, io, baseKey + "." + i, dataG);
                 }
             } else {
                 List<Object> innerList = new ArrayList<>();
                 for (int i = 0; i < ((List) o).size(); i++) {
                     Object io = ((List) o).get(i);
-                    process(innerMap, io, "" + i);
+                    process(innerMap, io, "" + i, new Goate());
                     innerList.add(innerMap.get("" + i));
                 }
                 data.put(baseKey, innerList);
+                dataG.put(baseKey, innerList);
             }
 //            data.put(baseKey, innerMap);
         } else if (o.getClass().isArray()) {
             if (detailed) {
-                data.put(baseKey, o);
+                if (!strict) {
+                    data.put(baseKey, o);
+                    dataG.put(baseKey, o);
+                }
                 for (int i = 0; i < Array.getLength(o); i++) {
                     Object io = Array.get(o, i);
-                    process(data, io, baseKey + "." + i);
+                    process(data, io, baseKey + "." + i, dataG);
                 }
             } else {
                 List<Object> innerList = new ArrayList<>();
                 for (int i = 0; i < Array.getLength(o); i++) {
                     Object io = Array.get(o, i);
-                    process(innerMap, io, "" + i);
+                    process(innerMap, io, "" + i, new Goate());
                     innerList.add(innerMap.get("" + i));
                 }
                 data.put(baseKey, innerList);
+                dataG.put(baseKey, innerList);
             }
         } else if (o instanceof Map) {
             int i = 0;
@@ -423,7 +462,7 @@ public class Serializer<T, S, U> extends Cereal {
             while (keys.hasNext()) {
                 Object keyValue = keys.next();
                 Object io = ((Map) o).get(keyValue);
-                process(innerMap, io, "" + keyValue);
+                process(innerMap, io, "" + keyValue, new Goate());
 //                process(data, io, baseKey + "." + i + ".value");
 //                if (io.getClass().getAnnotation(GoatePojo.class) != null) {
 //                    addMap(data, io, baseKey + "." + i + ".value");
@@ -434,31 +473,41 @@ public class Serializer<T, S, U> extends Cereal {
 //                data.put(baseKey + "." + i + ".class", io.getClass().getName());
             }
             if (detailed) {
-                data.put(baseKey, o);
+                if (!strict) {
+                    data.put(baseKey, o);
+                    dataG.put(baseKey, o);
+                }
                 for (Map.Entry<String, Object> entry : innerMap.entrySet()) {
                     data.put(baseKey + "." + entry.getKey(), entry.getValue());
+                    dataG.put(baseKey + "." + entry.getKey(), entry.getValue());
                 }
             } else {
                 data.put(baseKey, innerMap);
+                dataG.put(baseKey, innerMap);
             }
         } else {
-            Map<String, Object> innerD = new Serializer(o, source).detailed(detailed).toMap(HashMap.class);
-            data.put(baseKey, innerD);
+            Map<String, Object> innerD = new Serializer(o, source).detailed(detailed).strict(strict).toMap(HashMap.class);
+            if (!detailed || (detailed && !strict)) {
+                data.put(baseKey, innerD);
+                dataG.put(baseKey, innerD);
+            }
             if (detailed) {
                 for (Map.Entry<String, Object> entry : innerD.entrySet()) {
                     data.put(baseKey + "." + entry.getKey(), entry.getValue());
+                    dataG.put(baseKey + "." + entry.getKey(), entry.getValue());
                 }
             }
         }
     }
 
-    private void process(Map<String, Object> data, Object io, String baseKey) {
+    private void process(Map<String, Object> data, Object io, String baseKey, Goate dataG) {
         if (io != null) {
             Class type = io.getClass();
             if (checkNotPrimitive(type)) {//if (io.getClass().getAnnotation(GoatePojo.class) != null) {
-                addMap(data, io, baseKey);
+                addMap(data, io, baseKey, dataG);
             } else {
                 data.put(baseKey, io);
+                dataG.put(baseKey, io);
             }
         } else {
 //            if(includeNulls) {

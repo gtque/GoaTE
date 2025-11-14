@@ -34,6 +34,7 @@ import com.thegoate.info.Info;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+
 /**
  * Annotation to identify as a rest implementation.
  * Created by gtque on 4/21/2017.

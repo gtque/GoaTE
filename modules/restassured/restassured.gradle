@@ -33,6 +33,7 @@ dependencies{
     }
     api  d.depends(":kernel", project.internalVersion);
     api  d.depends(":rest", project.internalVersion);
+    api  d.depends(":restassured-utils", project.internalVersion);
     testImplementation d.depends(":testng", project.internalVersion);
     testImplementation d.depends(":json", project.internalVersion);
     testImplementation d.depends(":spring", project.internalVersion)

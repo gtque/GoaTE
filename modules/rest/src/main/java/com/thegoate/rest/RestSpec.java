@@ -30,7 +30,7 @@ import com.thegoate.Goate;
 
 /**
  * Base Rest interface for doing restful api calls because JAVA doesn't allow
- * you to extend more than one class so this is a a little hack to get around some issues.
+ * you to extend more than one class so this is a little hack to get around some issues.
  * Created by Eric Angeli on 5/16/2017.
  */
 public interface RestSpec {
