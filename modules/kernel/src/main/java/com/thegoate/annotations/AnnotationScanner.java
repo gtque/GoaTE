@@ -2,6 +2,7 @@ package com.thegoate.annotations;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.*;
@@ -9,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 
 import static com.thegoate.DNA.dna;
 
@@ -108,32 +110,48 @@ public class AnnotationScanner {
     }
 
     private static List<String> scanJarFile(File file) throws IOException, ClassNotFoundException {
-        List<String> packageNames = new ArrayList<>();
+        // Use a set to deduplicate package names discovered in the jar and any nested jars
+        Set<String> packageNames = new HashSet<>();
         try (JarFile jarFile = new JarFile(file)) {
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
-                if (entry.isDirectory() && !entry.getName().endsWith("META-INF/")) {
-                    String packageName = entry.getName().replace("/", ".").replaceAll("\\.$", "");
-                    if (!packageName.isEmpty()) {
-                        boolean packageFound = false;
-                        Enumeration<JarEntry> innerEntries = jarFile.entries();
-                        while (innerEntries.hasMoreElements()) {
-                            JarEntry innerEntry = innerEntries.nextElement();
-                            if (innerEntry.getName().startsWith(entry.getName()) && innerEntry.getName().endsWith(".class")) {
-                                packageFound = true;
-                                break;
-                            }
-                        }
-                        if (packageFound) {
+                String name = entry.getName();
+                // If this is a class file, derive its package and add it
+                if (!entry.isDirectory() && name.endsWith(".class")) {
+                    int idx = name.lastIndexOf('/');
+                    if (idx > 0) {
+                        String packageName = name.substring(0, idx).replace('/', '.');
+                        if (!packageName.isEmpty()) {
                             packageNames.add(packageName);
                         }
-
+                    }
+                }
+                // If this is a nested jar (e.g., Spring Boot's BOOT-INF/lib/foo.jar), stream it and inspect its entries
+                if (!entry.isDirectory() && name.endsWith(".jar")) {
+                    try (InputStream nestedIs = jarFile.getInputStream(entry);
+                         JarInputStream jis = new JarInputStream(nestedIs)) {
+                        JarEntry nEntry;
+                        while ((nEntry = jis.getNextJarEntry()) != null) {
+                            String nName = nEntry.getName();
+                            if (!nEntry.isDirectory() && nName.endsWith(".class")) {
+                                int nidx = nName.lastIndexOf('/');
+                                if (nidx > 0) {
+                                    String packageName = nName.substring(0, nidx).replace('/', '.');
+                                    if (!packageName.isEmpty()) {
+                                        packageNames.add(packageName);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (IOException ioe) {
+                        // If nested stream processing fails, continue; scanning outer jar entries still helps
+                        // Do not fail the whole scan due to one nested jar issue
                     }
                 }
             }
         }
-        return packageNames;
+        return new ArrayList<>(packageNames);
     }
 
     private static List<Class<?>> findClasses(String packageName, List<String> includeInScan) throws ClassNotFoundException, IOException {
