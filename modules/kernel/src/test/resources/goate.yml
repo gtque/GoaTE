@@ -1,5 +1,7 @@
 annotations:
-  scan: tech.thehangingpen
+  scan: tech.thehangingpen,com.nested
+  debug: false
+  jars: nested
 settings:
   a: howdy
   d: world!

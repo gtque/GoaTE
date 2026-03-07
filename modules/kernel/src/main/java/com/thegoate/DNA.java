@@ -86,32 +86,43 @@ public class DNA {
             String theKey = pKey + (pKey.isEmpty() ? "" : (subKey.isEmpty() ? "" : ".")) + subKey;
             String theAlternateKey = primaryKeyAlternate + (primaryKeyAlternate.isEmpty() ? "" : "_") + subKey.toUpperCase();
             Object theValue = System.getProperty(theAlternateKey);
+            boolean inYaml = false;
             if (theValue == null) {
                 theValue = System.getenv(theAlternateKey);
                 if (theValue == null) {
                     if (yml.containsKey(theKey)) {
                         theValue = yml.get(theKey);
+                        inYaml = true;
                     } else if (yml.containsKey(theAlternateKey)) {
                         theValue = yml.get(theAlternateKey);
+                        inYaml = true;
+                    } else {
+                        inYaml = !yml.keySet().stream().filter(key -> key.startsWith(theKey) || key.startsWith(theAlternateKey)).toList().isEmpty();
                     }
                 }
             }
-            if (new GoateReflection().isPrimitive(field.getType()) || field.getType().equals(String.class)) {
-                try {
-                    field.set(mosquito, new GoateReflection().parseToPrimitive(theValue, field.getType()));
-                } catch (IllegalAccessException e) {
-                    //do nothing
+            if (theValue != null || inYaml) {
+                if ("null::".equals(theValue)) {
+                    theValue = null;
                 }
-            } else {
-                try {
-                    Object[] params = {};
-                    Class<?>[] paramTypes = {};
-                    theValue = field.getType().getConstructor(paramTypes).newInstance(params);
-                    field.set(mosquito, theValue);
-                    analyzeDna(theValue, yml, theKey);
-                } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
-                         NoSuchMethodException e) {
-                    //do nothing.
+
+                if (new GoateReflection().isPrimitive(field.getType()) || field.getType().equals(String.class)) {
+                    try {
+                        field.set(mosquito, new GoateReflection().parseToPrimitive(theValue, field.getType()));
+                    } catch (IllegalAccessException e) {
+                        //do nothing
+                    }
+                } else {
+                    try {
+                        Object[] params = {};
+                        Class<?>[] paramTypes = {};
+                        theValue = field.getType().getConstructor(paramTypes).newInstance(params);
+                        field.set(mosquito, theValue);
+                        analyzeDna(theValue, yml, theKey);
+                    } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
+                             NoSuchMethodException e) {
+                        //do nothing.
+                    }
                 }
             }
         });

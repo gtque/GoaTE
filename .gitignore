@@ -231,3 +231,4 @@ out/*
 classes/*
 **/gen/**/*.java
 *.orig
+.copilot/
