@@ -15,7 +15,7 @@ import java.util.jar.JarOutputStream;
 
 public class AnnotationScannerNestedJarTest {
 
-    @Test
+    @Test(groups = {"unit"})
     public void testNestedJarPackageDiscovery() throws Exception {
         File tempDir = Files.createTempDirectory("annscan-test").toFile();
         tempDir.deleteOnExit();

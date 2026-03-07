@@ -28,6 +28,8 @@ import com.thegoate.gradle.GoateDepends;
 dependencies{
     GoateDepends d = new GoateDepends(project, "goate", project.javaVersion)
     api  "io.rest-assured:rest-assured:5.5.6"
+    api  "org.apache.groovy:groovy:4.0.22"
+    api  "org.apache.groovy:groovy-xml:4.0.22"
     api  ("com.github.dzieciou.testing:curl-logger:3.0.0") {
         exclude group: 'org.slf4j', module: 'slf4j-api'
     }

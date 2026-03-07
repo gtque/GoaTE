@@ -173,7 +173,16 @@ public class RestAssured extends Rest implements RASpec {
     protected static void setHeaders(RequestSpecification spec, Goate headers) {
         if (headers != null && spec != null) {
             for (String key : headers.keys()) {
-                spec.header(key, headers.get(key));
+                if (key == null || key.trim().isEmpty()) {
+                    // skip invalid header keys
+                    continue;
+                }
+                Object value = headers.get(key);
+                if (value == null) {
+                    // skip null values
+                    continue;
+                }
+                spec.header(key, value);
             }
         }
     }
@@ -181,13 +190,20 @@ public class RestAssured extends Rest implements RASpec {
     protected static void setCookies(RequestSpecification spec, Goate cookies) {
         if (cookies != null && spec != null) {
             for (String key : cookies.keys()) {
+                if (key == null || key.trim().isEmpty()) {
+                    // skip invalid cookie keys
+                    continue;
+                }
                 Object cookie = cookies.get(key);
+                if (cookie == null) {
+                    continue;
+                }
                 if (cookie instanceof Cookies) {
                     spec.cookies((Cookies) cookie);
                 } else if (cookie instanceof Cookie) {
                     spec.cookie((Cookie) cookie);
                 } else {
-                    spec.cookie(key, cookies.get(key));
+                    spec.cookie(key, cookie);
                 }
             }
         }
@@ -195,8 +211,10 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setURLParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
-//            spec.params(params.data());
             for (String key : params.keys()) {
+                if (key == null || key.trim().isEmpty()) {
+                    continue;
+                }
                 spec.param(key, params.get(key));
             }
         }
@@ -204,8 +222,10 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setQueryParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
-//            spec.queryParams(params.data());
             for (String key : params.keys()) {
+                if (key == null || key.trim().isEmpty()) {
+                    continue;
+                }
                 spec.queryParam(key, params.get(key));
             }
         }
@@ -213,8 +233,10 @@ public class RestAssured extends Rest implements RASpec {
 
     protected static void setPathParameters(RequestSpecification spec, Goate params) {
         if (params != null && spec != null) {
-//            spec.pathParams(params.data());
             for (String key : params.keys()) {
+                if (key == null || key.trim().isEmpty()) {
+                    continue;
+                }
                 spec.pathParam(key, params.get(key));
             }
         }
@@ -223,9 +245,15 @@ public class RestAssured extends Rest implements RASpec {
     protected static void setBody(RequestSpecification spec, Goate body) {
         if (spec != null && body != null) {
             for (String key : body.keys()) {
+                if (key == null || key.trim().isEmpty()) {
+                    continue;
+                }
                 Goate b = (Goate) body.get(key);
                 if (b != null) {
                     for (String id : b.keys()) {
+                        if (id == null || id.trim().isEmpty()) {
+                            continue;
+                        }
                         String[] keyParts = id.split(typeSeparator);
                         String type = null;
                         String idkey = keyParts[0];
@@ -296,7 +324,13 @@ public class RestAssured extends Rest implements RASpec {
     @Override
     public Object get(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.get(endpoint);
+        if (specification == null) {
+            throw new IllegalStateException("RequestSpecification is null. Ensure getSpec() returns a valid specification.");
+        }
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Endpoint must not be null for GET request");
+        }
+        response = io.restassured.RestAssured.given().spec(specification).get(endpoint);
         log(response);
         return response;
     }
@@ -304,7 +338,13 @@ public class RestAssured extends Rest implements RASpec {
     @Override
     public Object put(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.put(endpoint);
+        if (specification == null) {
+            throw new IllegalStateException("RequestSpecification is null. Ensure getSpec() returns a valid specification.");
+        }
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Endpoint must not be null for PUT request");
+        }
+        response = io.restassured.RestAssured.given().spec(specification).put(endpoint);
         log(response);
         return response;
     }
@@ -312,7 +352,13 @@ public class RestAssured extends Rest implements RASpec {
     @Override
     public Object post(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.post(endpoint);
+        if (specification == null) {
+            throw new IllegalStateException("RequestSpecification is null. Ensure getSpec() returns a valid specification.");
+        }
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Endpoint must not be null for POST request");
+        }
+        response = io.restassured.RestAssured.given().spec(specification).post(endpoint);
         log(response);
         return response;
     }
@@ -320,7 +366,13 @@ public class RestAssured extends Rest implements RASpec {
     @Override
     public Object delete(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.delete(endpoint);
+        if (specification == null) {
+            throw new IllegalStateException("RequestSpecification is null. Ensure getSpec() returns a valid specification.");
+        }
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Endpoint must not be null for DELETE request");
+        }
+        response = io.restassured.RestAssured.given().spec(specification).delete(endpoint);
         log(response);
         return response;
     }
@@ -328,7 +380,13 @@ public class RestAssured extends Rest implements RASpec {
     @Override
     public Object patch(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.patch(endpoint);
+        if (specification == null) {
+            throw new IllegalStateException("RequestSpecification is null. Ensure getSpec() returns a valid specification.");
+        }
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Endpoint must not be null for PATCH request");
+        }
+        response = io.restassured.RestAssured.given().spec(specification).patch(endpoint);
         log(response);
         return response;
     }
@@ -336,7 +394,13 @@ public class RestAssured extends Rest implements RASpec {
     @Override
     public Object head(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.head(endpoint);
+        if (specification == null) {
+            throw new IllegalStateException("RequestSpecification is null. Ensure getSpec() returns a valid specification.");
+        }
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Endpoint must not be null for HEAD request");
+        }
+        response = io.restassured.RestAssured.given().spec(specification).head(endpoint);
         log(response);
         return response;
     }

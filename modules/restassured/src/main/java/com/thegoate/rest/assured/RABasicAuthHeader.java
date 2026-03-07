@@ -71,7 +71,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     @Override
     public Object get(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.get(endpoint);
+        response = io.restassured.RestAssured.given().spec(specification).get(endpoint);
         log(response);
         return response;
     }
@@ -79,7 +79,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     @Override
     public Object put(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.put(endpoint);
+        response = io.restassured.RestAssured.given().spec(specification).put(endpoint);
         log(response);
         return response;
     }
@@ -87,7 +87,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     @Override
     public Object post(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.post(endpoint);
+        response = io.restassured.RestAssured.given().spec(specification).post(endpoint);
         log(response);
         return response;
     }
@@ -95,7 +95,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     @Override
     public Object delete(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.delete(endpoint);
+        response = io.restassured.RestAssured.given().spec(specification).delete(endpoint);
         log(response);
         return response;
     }
@@ -103,7 +103,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     @Override
     public Object patch(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.patch(endpoint);
+        response = io.restassured.RestAssured.given().spec(specification).patch(endpoint);
         log(response);
         return response;
     }
@@ -111,7 +111,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     @Override
     public Object head(String endpoint) {
         specification = RestAssured.build(this);
-        response = specification.head(endpoint);
+        response = io.restassured.RestAssured.given().spec(specification).head(endpoint);
         log(response);
         return response;
     }
