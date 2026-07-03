@@ -34,11 +34,13 @@ import com.thegoate.expect.ExpectationThreadBuilder;
 import com.thegoate.rest.Rest;
 import com.thegoate.rest.RestCall;
 import com.thegoate.rest.RestResult;
+import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.staff.ApiGet;
 import com.thegoate.simpleserver.SimpleServer;
 import com.thegoate.spring.SpringTestEngine;
 import com.thegoate.staff.Employee;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -208,5 +210,28 @@ public class RATests extends SpringTestEngine {
 //				.actual("error")
 //				.from(rest)
 //				.isEqualTo("nemo"));
+	}
+
+
+	@Test(groups = {"unit"})
+	public void getHeader() {
+		Rest rest = new RABasicAuthHeader();
+		Response response = (Response) rest.customConfigApplicator(this::extraHeader).baseURL(baseURL()).get("hello/test/header");
+		data.put("response", response);
+		assertEquals(response.statusCode(), 200);
+		ExpectationThreadBuilder etb = new ExpectationThreadBuilder(data);
+		etb.expect("api response>status code,==,200");
+		etb.expect(Expectation.build()
+				.actual("greeting")
+				.from(response)
+				.isEqualTo("hello, value"));
+		ExpectEvaluator ev = new ExpectEvaluator(etb);
+		boolean result = ev.evaluate();
+		assertTrue(result, ev.failed());
+	}
+
+	public void extraHeader(RestSpec spec) {
+		RequestSpecification mySpec = ((RASpec)spec).getSpec(false);
+		mySpec.header("X-Test-Header", "value");
 	}
 }

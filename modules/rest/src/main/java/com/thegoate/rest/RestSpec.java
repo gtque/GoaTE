@@ -93,6 +93,10 @@ public interface RestSpec {
 
     RestSpec customData(Enum key, Object value);
 
+    RestSpec customConfigApplicator(RestCustomConfig applicator);
+
+    Goate customConfigApplicator();
+
     RestSpec processCustomData(Enum key, Object value);
 
     RestSpec processCustomData(String key, Object value);

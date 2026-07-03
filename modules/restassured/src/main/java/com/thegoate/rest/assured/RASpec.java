@@ -35,6 +35,6 @@ import io.restassured.specification.RequestSpecification;
  * Created by Eric Angeli on 5/16/2017.
  */
 public interface RASpec extends RestSpec {
-    RequestSpecification getSpec();
+    RequestSpecification getSpec(boolean init);
     BleatBox getLog();
 }

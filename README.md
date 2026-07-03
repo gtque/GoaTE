@@ -6,9 +6,13 @@ You can pull down only the modules you need to keep the foot print as small as p
 GoaTE follows the MIT License and we try to make sure we are in line with any licenses used by third party libraries. If you want to contribute to GoaTE, please feel free to branch or fork the project. Just be sure to maintain credit and licenses.
 <br/>
 <br/>
+
 ./gradlew -x gradle:publish publish -Prelease=final
+
 ./gradlew clean test testReport -PtestGroups=unit,api,ui,webui
+
 ./gradlew jacocoMergedReport
+
 Good Luck.
 
 ToDo:
@@ -28,9 +32,9 @@ need to add a post call to "publish" after publishing.
 - curl -X 'GET' \
   'https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer *******'
+  -H "Authorization: Bearer ${SONATYPE_AUTH}" \
 - curl -X 'POST' \
   'https://ossrh-staging-api.central.sonatype.com/manual/upload/repository/qMyxIq%2F108.226.71.114%2Fcom.thegoate--default-repository?publishing_type=automatic' \
   -H 'accept: */*' \
-  -H 'Authorization: Bearer *******' \
+  -H "Authorization: Bearer ${SONATYPE_AUTH}" \
   -d ''

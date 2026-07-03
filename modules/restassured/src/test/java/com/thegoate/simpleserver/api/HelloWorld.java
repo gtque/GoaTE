@@ -61,6 +61,15 @@ public class HelloWorld {
 		return greeting;
 	}
 
+	@GetMapping("/test/header")
+	public String testHeader(@RequestHeader("X-Test-Header") String header){
+		String greeting = "{\"error\":\"nemo\"}";
+		if(header != null && !header.isEmpty()){
+			greeting = "{\"greeting\":\"hello, "+header+"\"}";
+		}
+		return greeting;
+	}
+
 	@PutMapping("/world")
 	public String putWorld() {
 		return getWorld();

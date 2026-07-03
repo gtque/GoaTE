@@ -40,6 +40,7 @@ public abstract class Rest implements RestSpec {
 
     public static final String typeSeparator = "<type>";
 
+    protected Goate customConfigApplicators = new Goate();
     protected Goate cookies = new Goate();
     protected Goate headers = new Goate();
     protected Goate queryParams = new Goate();
@@ -364,4 +365,16 @@ public abstract class Rest implements RestSpec {
     public boolean urlEncode(){
         return this.urlEncode;
     }
+
+    @Override
+    public RestSpec customConfigApplicator(RestCustomConfig customConfigApplicator) {
+        customConfigApplicators.put("applicator.##", customConfigApplicator);
+        return (RestSpec) this;
+    }
+
+    @Override
+    public Goate customConfigApplicator() {
+        return this.customConfigApplicators;
+    }
+
 }
