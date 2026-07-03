@@ -125,7 +125,7 @@ public class RABasicAuthHeader extends RestAuthBasicHeader implements RASpec{
     }
 
     @Override
-    public RequestSpecification getSpec(boolean init) {
+    public synchronized RequestSpecification getSpec(boolean init) {
         if(specification == null || init) {
             specification = RestAssured.init(given(), this);
         }
