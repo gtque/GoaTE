@@ -32,7 +32,7 @@ need to add a post call to "publish" after publishing.
 - curl -X 'GET' \
   'https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any' \
   -H 'accept: application/json' \
-  -H "Authorization: Bearer ${SONATYPE_AUTH}" \
+  -H "Authorization: Bearer ${SONATYPE_AUTH}" -i
 - curl -X 'POST' \
   'https://ossrh-staging-api.central.sonatype.com/manual/upload/repository/qMyxIq%2F108.226.71.114%2Fcom.thegoate--default-repository?publishing_type=automatic' \
   -H 'accept: */*' \
