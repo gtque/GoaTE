@@ -33,8 +33,10 @@ import com.thegoate.Goate;
 import com.thegoate.annotations.IsDefault;
 import com.thegoate.logging.BleatBox;
 import com.thegoate.rest.Rest;
+import com.thegoate.rest.RestCustomConfig;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
+import io.restassured.config.EncoderConfig;
 import io.restassured.config.LogConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
@@ -62,20 +64,20 @@ import static io.restassured.config.HttpClientConfig.httpClientConfig;
 @IsDefault
 public class RestAssured extends Rest implements RASpec {
 
-	RequestSpecification specification = null;
-	Response response = null;
-	RestAssuredConfig config = null;
+    RequestSpecification specification = null;
+    Response response = null;
+    RestAssuredConfig config = null;
 
-	public RestAssured() {
-		this.specification = RestAssured.init(given(), this);
-	}
+    public RestAssured() {
+        this.specification = RestAssured.init(given(), this);
+    }
 
-	public RestAssured(RequestSpecification specification) {
-		this.specification = RestAssured.init(specification, this);
-	}
+    public RestAssured(RequestSpecification specification) {
+        this.specification = RestAssured.init(specification, this);
+    }
 
-	public static RequestSpecification init(RequestSpecification specification, RASpec spec) {
-		specification = specification == null ? given() : specification;
+    public static RequestSpecification init(RequestSpecification specification, RASpec spec) {
+        specification = specification == null ? given() : specification;
         RestAssuredConfig rac = spec.getConfig() == null ? new RestAssuredConfig() : (RestAssuredConfig) spec.getConfig();
         PrintStream streamer = getPrintStream(spec.getLog());
         LogConfig lc = new LogConfig(streamer, true);
@@ -84,45 +86,63 @@ public class RestAssured extends Rest implements RASpec {
         rac = rac.logConfig(lc);
         if (spec.getHeaders().keys().toArray().length > 0) {
             rac = rac.headerConfig(headerConfig()
-				.overwriteHeadersWithName("Content-Type", spec.getHeaders().keysArray()));
-		} else {
-			rac = rac.headerConfig(headerConfig()
-				.overwriteHeadersWithName("Content-Type"));
-		}
-		int timeout = spec.getTimeout();
-		rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout * 1000));
-		rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));
-		Options options = Options.builder().targetPlatform(Platform.UNIX).build();
-		rac = CurlRestAssuredConfigFactory.updateConfig(rac, options);
-		//		if(spec.getHeaders().containsKey("Content-Type") && spec.getHeaders().get("Content-Type", "", String.class).equals("application/csp-report")) {
-		//			rac.encoderConfig(encoderConfig().encodeContentTypeAs("application/csp-report", ContentType.TEXT));
-		//		}
-		spec.configure(rac);
-		return specification.config(rac);
-	}
+                    .overwriteHeadersWithName("Content-Type", spec.getHeaders().keysArray()));
+        } else {
+            rac = rac.headerConfig(headerConfig()
+                    .overwriteHeadersWithName("Content-Type"));
+        }
+        int timeout = spec.getTimeout();
+        rac = rac.httpClient(httpClientConfig().setParam("CONNECTION_MANAGER_TIMEOUT", timeout * 1000));
+        EncoderConfig callerEncoderConfig = (spec.getConfig() != null)
+                ? ((RestAssuredConfig) spec.getConfig()).getEncoderConfig()
+                : null;
+        EncoderConfig effectiveEncoderConfig = (callerEncoderConfig != null)
+                ? callerEncoderConfig
+                : encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false);
+        rac = rac.encoderConfig(effectiveEncoderConfig);
+//		rac = rac.encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false));
+        Options options = Options.builder().targetPlatform(Platform.UNIX).build();
+        rac = CurlRestAssuredConfigFactory.updateConfig(rac, options);
+        //		if(spec.getHeaders().containsKey("Content-Type") && spec.getHeaders().get("Content-Type", "", String.class).equals("application/csp-report")) {
+        //			rac.encoderConfig(encoderConfig().encodeContentTypeAs("application/csp-report", ContentType.TEXT));
+        //		}
+        spec.configure(rac);
+        return specification.config(rac);
+    }
 
     public static RequestSpecification build(RASpec spec) {
-        RequestSpecification mySpec = spec.getSpec();
+        RequestSpecification mySpec = spec.getSpec(true);
         if (mySpec != null) {
             mySpec.baseUri(spec.getBaseURL());
             setHeaders(mySpec, spec.getHeaders());
             setURLParameters(mySpec, spec.getURLParameters());
             setQueryParameters(mySpec, spec.getQueryParameters());
             setPathParameters(mySpec, spec.getPathParameters());
-			setBody(mySpec, spec.getBody());
-			setCookies(mySpec, spec.getCookies());
-			if (spec.doLog()) {
-				mySpec.log().all();
-				spec.getLog().flush();
-			}
-			//always set urlEncoding, the RASpec implementation should default to true.
-			mySpec.urlEncodingEnabled(spec.urlEncode());
-			//            keeping this as a reference in case I need to expose it for some reason.
-			//            io.restassured.RestAssured.urlEncodingEnabled = false;
-			if (spec.getHeaders().containsKey("Content-Type") && spec.getHeaders().get("Content-Type", "", String.class).equals("application/csp-report")) {
-				mySpec.config(((RestAssuredConfig)spec.getConfig()).encoderConfig(encoderConfig().encodeContentTypeAs("application/csp-report", ContentType.TEXT)));
-			}
-		}
+            setBody(mySpec, spec.getBody());
+            setCookies(mySpec, spec.getCookies());
+            if (spec.doLog()) {
+                mySpec.log().all();
+                spec.getLog().flush();
+            }
+            //always set urlEncoding, the RASpec implementation should default to true.
+            mySpec.urlEncodingEnabled(spec.urlEncode());
+            //            keeping this as a reference in case I need to expose it for some reason.
+            //            io.restassured.RestAssured.urlEncodingEnabled = false;
+            if (spec.getHeaders().containsKey("Content-Type") && spec.getHeaders().get("Content-Type", "", String.class).equals("application/csp-report")) {
+                mySpec.config(((RestAssuredConfig) spec.getConfig()).encoderConfig(encoderConfig().encodeContentTypeAs("application/csp-report", ContentType.TEXT)));
+            }
+            if (spec.customConfigApplicator() != null && spec.customConfigApplicator().size() > 0) {
+                for (String key : spec.customConfigApplicator().keys()) {
+                    if (key == null || key.trim().isEmpty()) {
+                        continue;
+                    }
+                    Object value = spec.customConfigApplicator().get(key);
+                    if (value != null) {
+                        ((RestCustomConfig) value).applyCustomConfig(spec);
+                    }
+                }
+            }
+        }
         return mySpec;
     }
 
@@ -414,9 +434,10 @@ public class RestAssured extends Rest implements RASpec {
     }
 
     @Override
-    public RequestSpecification getSpec() {
-        specification = RestAssured.init(given(), this);
+    public RequestSpecification getSpec(boolean init) {
+        if(specification == null || init) {
+            specification = RestAssured.init(given(), this);
+        }
         return specification;
     }
-
 }

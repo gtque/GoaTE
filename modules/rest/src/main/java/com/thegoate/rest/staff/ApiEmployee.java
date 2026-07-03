@@ -28,6 +28,7 @@ package com.thegoate.rest.staff;
 
 import com.thegoate.annotations.AnnotationFactory;
 import com.thegoate.rest.RestCall;
+import com.thegoate.rest.RestCustomConfig;
 import com.thegoate.rest.RestSpec;
 import com.thegoate.rest.annotation.GoateRest;
 import com.thegoate.staff.Employee;
@@ -80,6 +81,7 @@ public abstract class ApiEmployee<T> extends Employee<T> {
             spec.timeout(Integer.parseInt(""+definition.get("rest.timeout",15)));
             spec.configure(definition.get("config", null));
             spec.config();
+            spec.customConfigApplicator(definition.get("custom config applicator", null, RestCustomConfig.class));
             if(definition.get(RestCall.ENABLE_LOG, true, Boolean.class)){
                 spec.enableLog();
             } else {

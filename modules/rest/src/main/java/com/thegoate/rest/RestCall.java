@@ -148,6 +148,11 @@ public class RestCall<T> {
         return this;
     }
 
+    public RestCall<T> customConfiguration(RestCustomConfig config) {
+        definition.put("custom config applicator", config);
+        return this;
+    }
+
     public T get(String endpoint) {
         definition.put("end point", endpoint);
         return execute("get");
